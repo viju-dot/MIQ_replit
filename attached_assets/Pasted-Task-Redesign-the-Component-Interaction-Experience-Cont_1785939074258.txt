@@ -1,0 +1,211 @@
+Task: Redesign the Component Interaction Experience
+Context
+
+The current component interaction screen is functional but not intuitive for designers. It feels like a developer debugging interface instead of an interactive Design System Explorer.
+
+I have attached reference images only for UX inspiration. Do not copy the UI exactly. Use them to understand the interaction pattern and improve the overall experience.
+
+Keep the existing left sidebar navigation. My feedback only applies to the right-side content area.
+
+Objective
+
+Redesign the right-side component interaction experience so users can naturally explore and interact with components imported from Figma.
+
+The experience should feel closer to using a live design system rather than editing JSON.
+
+Important
+
+The Figma Design System remains the single source of truth.
+
+Do not modify:
+
+Components
+Variants
+Properties
+Tokens
+Typography
+Colors
+Layout
+Icons
+
+Only improve how users interact with these components inside the application.
+
+Layout
+
+Keep the current sidebar navigation.
+
+Redesign the remaining screen into two primary sections.
+
+Left Panel
+Component Properties
+
+This panel should automatically generate controls based on the selected component.
+
+Since every Figma component has different properties, the UI must be dynamic.
+
+Examples:
+
+Variant
+State
+Size
+Theme
+Label
+Icons
+Badge
+Avatar
+Position
+Type
+Status
+
+Only display controls that actually exist for that component.
+
+Do not display irrelevant properties.
+
+The controls should be generated directly from the Figma component properties.
+
+Right Panel
+Live Preview
+
+This should become the primary focus of the page.
+
+Render the selected Figma component exactly as it exists.
+
+Every property change should instantly update the preview.
+
+Examples:
+
+Variant changes
+State changes
+Size changes
+Label changes
+Theme changes
+Icon changes
+
+The preview should always stay synchronized with the selected properties.
+
+Component Variants
+
+Many components contain multiple variants.
+
+Instead of placing everything in long property lists, use Tabs where appropriate.
+
+For example:
+
+Button
+
+Primary
+Neutral
+Subtle
+
+Tabs
+
+Default
+Hover
+Active
+
+Navigation
+
+Horizontal
+Vertical
+
+Only use tabs when they improve navigation.
+
+Otherwise generate the correct control automatically.
+
+Theme Switching
+
+Dark and Light Mode are common across the design system.
+
+Provide one global theme switch that updates:
+
+Preview
+Background
+Tokens
+Variables
+
+using the original Figma variables.
+
+JSON / Token Information
+
+The JSON panel is valuable, but it should not always be visible.
+
+Instead:
+
+Hide it by default.
+
+Provide a toggle such as:
+
+Show Design Tokens
+Show JSON
+Developer Mode
+
+When enabled, display:
+
+Tokens
+CSS Variables
+JSON
+References
+
+When disabled, maximize the preview area.
+
+This creates a cleaner experience for designers while still supporting developers.
+
+Dynamic Property Generation
+
+Do not hardcode property controls.
+
+Every component imported from Figma may have different properties.
+
+The interface should inspect the selected component and automatically generate the correct controls.
+
+For example:
+
+A Button may have:
+
+Variant
+State
+Size
+Label
+Icon Start
+Icon End
+
+A Text Field may have:
+
+Placeholder
+Helper Text
+Error
+Prefix
+Suffix
+
+A Badge may have completely different properties.
+
+The UI must adapt automatically.
+
+Responsive Layout
+
+Prioritize the preview area.
+
+Allow the properties panel to collapse if needed.
+
+Allow the token panel to collapse independently.
+
+The preview should receive most of the available space.
+
+Desired User Experience
+
+When someone opens a component they should naturally understand:
+
+What component they are viewing.
+Which variants are available.
+How to interact with it.
+How it behaves in Light and Dark Mode.
+How changing properties affects the live component.
+Optionally inspect the underlying design tokens.
+
+The experience should feel similar to interacting with a professional Design System documentation site, while preserving the exact behavior and appearance of the original Figma components.
+
+Design Goal
+
+Build a designer-first Design System Explorer, not a developer playground.
+
+The application should make it easy to explore, understand, and experiment with Figma components through an intuitive interface, while preserving complete design fidelity and offering developer information only when requested

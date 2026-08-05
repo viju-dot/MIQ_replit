@@ -1,24 +1,20 @@
 /**
- * Icons page — faithful reproduction of the Figma "Icons" catalog frame.
+ * Icons page — interactive browsing playground for the Figma "Icons" catalog frame.
  *
- * The Figma reference (design-refs/icons.md) provides the catalog structure as
- * XML only (no embedded SVG asset URLs for these icons), so the glyphs below are
- * hand-authored inline SVGs matching the Phosphor-style icon set the design uses.
- *
- * Each icon family is rendered as one white card. Within a card every generated
- * variant (Style × Size, and Pointing where the family supports it) is shown with
- * a small gray caption, exactly matching the variant list from the Figma frame.
+ * This is a gallery/asset page, so instead of a single-component props preview it
+ * offers a grid of every icon family, explored via controls (Style, Size and, for
+ * directional families, Pointing). The glyphs are the exact hand-authored inline
+ * SVGs reproduced from the Figma frame — colors, stroke widths and paths unchanged.
  */
+
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
 type IconStyle = "Regular" | "Fill" | "Duotone";
 type Pointing = "Up" | "Down" | "Left" | "Right";
 
 const ICON_COLOR = "#13131a";
 const DUOTONE_FILL = "#71718033"; // subtle neutral accent for duotone bodies
-
-const SIZES = [20, 32, 24, 16] as const;
-const STYLES: IconStyle[] = ["Regular", "Fill", "Duotone"];
-const POINTINGS: Pointing[] = ["Up", "Down", "Left", "Right"];
 
 const rotationForPointing: Record<Pointing, number> = {
   Up: 0,
@@ -363,100 +359,91 @@ const FAMILIES: IconFamily[] = [
 ];
 
 /* ------------------------------------------------------------------ *
- * Presentational helpers
+ * Interactive gallery preview
  * ------------------------------------------------------------------ */
 
-const captionClass = "text-[12px] leading-[18px] text-[#a8a8b2]";
+const STYLE_OPTIONS: IconStyle[] = ["Regular", "Fill", "Duotone"];
+const SIZE_OPTIONS = ["16", "20", "24", "32"] as const;
+const POINTING_OPTIONS: Pointing[] = ["Up", "Down", "Left", "Right"];
 
-function IconCell({
-  glyph: Glyph,
-  size,
-  style,
-  pointing,
-}: {
-  glyph: Glyph;
-  size: number;
-  style: IconStyle;
-  pointing?: Pointing;
-}) {
-  const caption = pointing
-    ? `${style} · ${size} · ${pointing}`
-    : `${style} · ${size}`;
+function IconsGallery({ props, dark }: { props: PropValues; dark: boolean }): JSX.Element {
+  const style = props.style as IconStyle;
+  const size = Number(props.size);
+  const pointing = props.pointing as Pointing;
+
+  const cardCls = dark
+    ? "border-[#33333d] bg-[#26262e] text-[#f7f7fa]"
+    : "border-[#e1e1e8] bg-white text-[#13131a]";
+  const captionCls = dark ? "text-[#a8a8b2]" : "text-[#a8a8b2]";
+
   return (
-    <div className="flex flex-col items-center gap-1.5">
-      <div className="flex h-[48px] w-[48px] items-center justify-center rounded-[6px] border border-[#e1e1e8] bg-white text-[#13131a]">
-        <Glyph size={size} style={style} pointing={pointing} />
-      </div>
-      <span className={captionClass}>{caption}</span>
+    <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+      {FAMILIES.map((family) => (
+        <div
+          key={family.name}
+          className={`flex flex-col items-center gap-2.5 rounded-[6px] border p-4 ${cardCls}`}
+        >
+          <div className="flex h-[48px] w-[48px] items-center justify-center">
+            <family.glyph
+              size={size}
+              style={style}
+              pointing={family.directional ? pointing : undefined}
+            />
+          </div>
+          <span className={`text-[12px] leading-[18px] ${captionCls}`}>
+            {family.name.replace("Icon/", "")}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
 
-function StyleGroup({
-  family,
-  style,
-}: {
-  family: IconFamily;
-  style: IconStyle;
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <span className="text-[12px] font-medium leading-[18px] text-[#4b4b59]">
-        {style}
-      </span>
-      <div className="flex flex-wrap gap-3">
-        {family.directional
-          ? POINTINGS.flatMap((pointing) =>
-              SIZES.map((size) => (
-                <IconCell
-                  key={`${style}-${pointing}-${size}`}
-                  glyph={family.glyph}
-                  size={size}
-                  style={style}
-                  pointing={pointing}
-                />
-              )),
-            )
-          : SIZES.map((size) => (
-              <IconCell
-                key={`${style}-${size}`}
-                glyph={family.glyph}
-                size={size}
-                style={style}
-              />
-            ))}
-      </div>
-    </div>
-  );
-}
-
-function FamilyCard({ family }: { family: IconFamily }) {
-  return (
-    <article className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-      <header className="mb-4 flex items-baseline gap-3">
-        <h3 className="text-[16px] font-medium leading-[24px] tracking-[-0.5px] text-[#13131a]">
-          {family.name}
-        </h3>
-        <span className={captionClass}>
-          Regular / Fill / Duotone · sizes 16 · 20 · 24 · 32
-          {family.directional ? " · Up / Down / Left / Right" : ""}
-        </span>
-      </header>
-      <div className="flex flex-col gap-5">
-        {STYLES.map((style) => (
-          <StyleGroup key={style} family={family} style={style} />
-        ))}
-      </div>
-    </article>
-  );
-}
+const config: PlaygroundConfig = {
+  name: "Icons",
+  description:
+    "Phosphor-style icon catalog — browse every family across Regular / Fill / Duotone styles, four sizes, and directional pointing.",
+  controls: [
+    {
+      kind: "select",
+      name: "style",
+      label: "Style",
+      options: STYLE_OPTIONS,
+      defaultValue: "Regular",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "size",
+      label: "Size",
+      options: [...SIZE_OPTIONS],
+      defaultValue: "24",
+    },
+    {
+      kind: "select",
+      name: "pointing",
+      label: "Pointing (directional)",
+      options: POINTING_OPTIONS,
+      defaultValue: "Up",
+    },
+  ],
+  render: (props, theme) => <IconsGallery props={props} dark={theme === "dark"} />,
+  tokens: {
+    "color/icon/default": ICON_COLOR,
+    "color/icon/duotone-fill": DUOTONE_FILL,
+    "color/caption": "#a8a8b2",
+    "size/16": "16px",
+    "size/20": "20px",
+    "size/24": "24px",
+    "size/32": "32px",
+    "radius/card": "6px",
+  },
+};
 
 export default function IconsPage(): JSX.Element {
   return (
-    <section aria-label="Icon catalog" className="flex flex-col gap-6">
-      {FAMILIES.map((family) => (
-        <FamilyCard key={family.name} family={family} />
-      ))}
+    <section aria-label="Icon catalog playground" className="flex flex-col gap-6">
+      <Playground config={config} />
     </section>
   );
 }

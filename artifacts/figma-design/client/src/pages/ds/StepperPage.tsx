@@ -1,3 +1,6 @@
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
+
 const ASSET = "/figmaAssets/stepper";
 
 type IndicatorState =
@@ -157,8 +160,7 @@ function HLine() {
   );
 }
 
-function StepperHorizontal({ steps }: { steps: 2 | 3 | 4 | 5 }) {
-  const withMetadata = steps === 5;
+function StepperHorizontal({ steps, withMetadata = false }: { steps: number; withMetadata?: boolean }) {
   const items = Array.from({ length: steps }, (_, i) => i + 1);
   return (
     <div className="flex w-full flex-col items-start">
@@ -182,7 +184,7 @@ function StepperHorizontal({ steps }: { steps: 2 | 3 | 4 | 5 }) {
 
 /* ---------- Vertical stepper ---------- */
 
-function StepperVertical({ steps }: { steps: 2 | 3 | 4 | 5 }) {
+function StepperVertical({ steps }: { steps: number }) {
   const items = Array.from({ length: steps }, (_, i) => i + 1);
   return (
     <div className="flex flex-col items-start">
@@ -203,41 +205,132 @@ function StepperVertical({ steps }: { steps: 2 | 3 | 4 | 5 }) {
   );
 }
 
-/* ---------- Small helpers ---------- */
+/* ---------- Playground configs ---------- */
 
-function Caption({ children }: { children: React.ReactNode }) {
-  return <span className="text-[12px] text-[#a8a8b2]">{children}</span>;
-}
+const stateLabelToKey: Record<string, IndicatorState> = {
+  "Active · None": "active-none",
+  "Inactive · None": "inactive-none",
+  "Active · Waiting": "active-waiting",
+  "Active · Warning": "active-warning",
+  "Active · Success": "active-success",
+  "Active · Error": "active-error",
+  "Complete · Success": "complete-success",
+  "Complete · Warning": "complete-warning",
+};
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-4 rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-      <h2 className="text-[16px] font-medium text-[#13131a]">{title}</h2>
-      {children}
+const indicatorConfig: PlaygroundConfig = {
+  name: "Stepper Indicator",
+  description: "The 24px indicator dot — explore each State × Status combination.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State · Status",
+      options: Object.keys(stateLabelToKey),
+      defaultValue: "Active · None",
+      asTabs: true,
+    },
+  ],
+  render: (props) => {
+    const state = stateLabelToKey[String(props.state)] ?? "active-none";
+    return (
+      <div className="flex h-9 items-center justify-center">
+        <StepperIndicator state={state} />
+      </div>
+    );
+  },
+  tokens: {
+    "container/brand/bold": "#7c33b5",
+    "container/neutral/line": "#e1e1e8",
+    "size/indicator": "24px",
+  },
+};
+
+const stageConfig: PlaygroundConfig = {
+  name: "Stage & Metadata",
+  description: "Step label with optional metadata line beside an indicator.",
+  controls: [
+    { kind: "boolean", name: "active", label: "Active", defaultValue: true },
+    { kind: "boolean", name: "hasMetadata", label: "Metadata", defaultValue: true },
+    { kind: "text", name: "stageName", label: "Stage name", defaultValue: "Step 1", placeholder: "Step 1" },
+    {
+      kind: "text",
+      name: "metadata",
+      label: "Metadata text",
+      defaultValue: "Metadata of stage",
+      placeholder: "Metadata of stage",
+    },
+  ],
+  render: (props) => {
+    const active = props.active === true;
+    return (
+      <div className="flex items-start gap-3">
+        <StepperIndicator state={active ? "active-none" : "inactive-none"} />
+        <StageAndMetadata
+          active={active}
+          hasMetadata={props.hasMetadata === true}
+          stageName={String(props.stageName || "Step 1")}
+          metadata={String(props.metadata || "Metadata of stage")}
+        />
+      </div>
+    );
+  },
+  tokens: {
+    "text/heading": "#13131a",
+    "text/subtle": "#717180",
+    "size/label": "14px",
+    "size/metadata": "12px",
+  },
+};
+
+const horizontalConfig: PlaygroundConfig = {
+  name: "Stepper — Horizontal",
+  description: "Horizontal progress stepper with a configurable number of steps.",
+  controls: [
+    {
+      kind: "select",
+      name: "steps",
+      label: "Steps",
+      options: ["2", "3", "4", "5"],
+      defaultValue: "4",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "metadata", label: "Metadata", defaultValue: false },
+  ],
+  render: (props) => (
+    <div className="w-full max-w-[920px]">
+      <StepperHorizontal steps={Number(props.steps) || 4} withMetadata={props.metadata === true} />
     </div>
-  );
-}
+  ),
+  tokens: {
+    "container/brand/bold": "#7c33b5",
+    "container/neutral/line": "#e1e1e8",
+    "size/connector": "2px",
+  },
+};
 
-function GlossaryBadge({ label }: { label: string }) {
-  return (
-    <div className="flex h-[34px] items-center rounded-[2px] bg-[#4b4b59] p-[8px]">
-      <p className="whitespace-nowrap text-center text-[14px] font-medium leading-[20px] text-[#f7f7fa]">{label}</p>
-    </div>
-  );
-}
+const verticalConfig: PlaygroundConfig = {
+  name: "Stepper — Vertical",
+  description: "Vertical progress stepper with a configurable number of steps.",
+  controls: [
+    {
+      kind: "select",
+      name: "steps",
+      label: "Steps",
+      options: ["2", "3", "4", "5"],
+      defaultValue: "4",
+      asTabs: true,
+    },
+  ],
+  render: (props) => <StepperVertical steps={Number(props.steps) || 4} />,
+  tokens: {
+    "container/brand/bold": "#7c33b5",
+    "container/neutral/line": "#e1e1e8",
+    "size/connector": "2px · 40px tall",
+  },
+};
 
-/* ---------- Page ---------- */
-
-const indicatorStates: { state: IndicatorState; label: string }[] = [
-  { state: "active-none", label: "Active · Status None" },
-  { state: "inactive-none", label: "Inactive · Status None" },
-  { state: "active-waiting", label: "Active · Waiting" },
-  { state: "active-warning", label: "Active · Warning" },
-  { state: "active-success", label: "Active · Success" },
-  { state: "active-error", label: "Active · Error" },
-  { state: "complete-success", label: "Complete · Success" },
-  { state: "complete-warning", label: "Complete · Warning" },
-];
+/* ---------- Reference tables (status usage & glossary) ---------- */
 
 const statusUsage: { state: IndicatorState; title: string; desc: string }[] = [
   {
@@ -282,104 +375,65 @@ const statusUsage: { state: IndicatorState; title: string; desc: string }[] = [
   },
 ];
 
+function GlossaryBadge({ label }: { label: string }) {
+  return (
+    <div className="flex h-[34px] items-center rounded-[2px] bg-[#4b4b59] p-[8px]">
+      <p className="whitespace-nowrap text-center text-[14px] font-medium leading-[20px] text-[#f7f7fa]">{label}</p>
+    </div>
+  );
+}
+
+const glossary = [
+  { badge: "Stage", text: "Are the steps of a process, its different phases. They can be linear or non linear." },
+  { badge: "State", text: "The condition of something at a specific time." },
+  {
+    badge: "Status",
+    text: "Express the outcome of a step. When there are background processes involved, they can yield different outcomes.",
+  },
+];
+
+/* ---------- Page ---------- */
+
 export default function StepperPage() {
   return (
-    <section className="flex flex-col gap-8">
-      {/* Glossary */}
-      <Card title="Glossary">
-        <div className="flex flex-col gap-3">
-          {[
-            { badge: "Stage", text: "Are the steps of a process, its different phases. They can be linear or non linear." },
-            { badge: "State", text: "The condition of something at a specific time." },
-            {
-              badge: "Status",
-              text: "Express the outcome of a step. When there are background processes involved, they can yield different outcomes.",
-            },
-          ].map((d) => (
-            <div key={d.badge} className="flex items-start gap-3">
-              <GlossaryBadge label={d.badge} />
-              <p className="pt-[6px] text-[14px] leading-[20px] text-[#13131a]">{d.text}</p>
-            </div>
-          ))}
-        </div>
-      </Card>
+    <section aria-label="Stepper component playground" className="flex flex-col gap-6">
+      <Playground config={indicatorConfig} />
+      <Playground config={stageConfig} />
+      <Playground config={horizontalConfig} />
+      <Playground config={verticalConfig} />
 
-      {/* Indicator states */}
-      <Card title="Stepper indicator — states">
-        <div className="flex flex-wrap gap-6">
-          {indicatorStates.map((s) => (
-            <div key={s.state} className="flex flex-col items-center gap-2">
-              <div className="flex h-9 items-center justify-center">
-                <StepperIndicator state={s.state} />
+      {/* Reference material kept collapsed by default */}
+      <details className="rounded-xl border border-[#e1e1e8] bg-white">
+        <summary className="cursor-pointer px-4 py-3 text-[14px] font-medium text-[#13131a]">
+          Reference — Glossary &amp; status usage
+        </summary>
+        <div className="flex flex-col gap-8 border-t border-[#e1e1e8] px-4 py-5">
+          {/* Glossary */}
+          <div className="flex flex-col gap-3">
+            {glossary.map((d) => (
+              <div key={d.badge} className="flex items-start gap-3">
+                <GlossaryBadge label={d.badge} />
+                <p className="pt-[6px] text-[14px] leading-[20px] text-[#13131a]">{d.text}</p>
               </div>
-              <Caption>{s.label}</Caption>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Status usage */}
-      <Card title="Status usage">
-        <div className="flex flex-col gap-6">
-          {statusUsage.map((row, i) => (
-            <div key={i} className="flex items-start gap-5">
-              <StepperIndicator state={row.state} />
-              <div className="w-[220px] shrink-0 text-[14px] leading-[20px] text-[#13131a]">
-                {row.title.split(" / ").map((t) => (
-                  <p key={t}>{t}</p>
-                ))}
-              </div>
-              <p className="min-w-px flex-[1_0_0] text-[14px] leading-[20px] text-[#717180]">{row.desc}</p>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Horizontal steppers */}
-      <Card title="Stepper — Horizontal">
-        <div className="flex flex-col gap-8">
-          {([2, 3, 4, 5] as const).map((n) => (
-            <div key={n} className="flex flex-col gap-2">
-              <Caption>{`${n} Steps`}</Caption>
-              <div className="max-w-[920px]">
-                <StepperHorizontal steps={n} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Vertical steppers */}
-      <Card title="Stepper — Vertical">
-        <div className="flex flex-wrap items-start gap-12">
-          {([2, 3, 4, 5] as const).map((n) => (
-            <div key={n} className="flex flex-col gap-2">
-              <Caption>{`${n} Steps`}</Caption>
-              <StepperVertical steps={n} />
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Stage + metadata */}
-      <Card title="Stage and metadata">
-        <div className="flex flex-wrap gap-10">
-          <div className="flex flex-col gap-2">
-            <Caption>Active = True</Caption>
-            <div className="flex items-start gap-3">
-              <StepperIndicator state="active-none" />
-              <StageAndMetadata active hasMetadata stageName="Step 1" />
-            </div>
+            ))}
           </div>
-          <div className="flex flex-col gap-2">
-            <Caption>Active = False</Caption>
-            <div className="flex items-start gap-3">
-              <StepperIndicator state="inactive-none" />
-              <StageAndMetadata hasMetadata stageName="Step 1" />
-            </div>
+
+          {/* Status usage */}
+          <div className="flex flex-col gap-6">
+            {statusUsage.map((row, i) => (
+              <div key={i} className="flex items-start gap-5">
+                <StepperIndicator state={row.state} />
+                <div className="w-[220px] shrink-0 text-[14px] leading-[20px] text-[#13131a]">
+                  {row.title.split(" / ").map((t) => (
+                    <p key={t}>{t}</p>
+                  ))}
+                </div>
+                <p className="min-w-px flex-[1_0_0] text-[14px] leading-[20px] text-[#717180]">{row.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
-      </Card>
+      </details>
     </section>
   );
 }

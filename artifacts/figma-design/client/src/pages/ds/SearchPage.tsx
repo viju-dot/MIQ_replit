@@ -1,4 +1,6 @@
 import { JSX } from "react";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
 
 /* ------------------------------------------------------------------ */
 /* Assets                                                              */
@@ -37,12 +39,14 @@ type SearchStandardProps = {
   background?: boolean;
   showIcon?: boolean;
   state?: StandardState;
+  label?: string;
 };
 
 function SearchStandard({
   background = false,
   showIcon = false,
   state = "Default",
+  label,
 }: SearchStandardProps): JSX.Element {
   const isBackgroundAndActiveFocus = background && state === "Active / Focus";
   const isBackgroundAndDisabled = background && state === "Disabled";
@@ -80,7 +84,12 @@ function SearchStandard({
     ? imgMagnifyingGlassFocus
     : imgMagnifyingGlass;
 
-  const label = ["Filled", "Disabled"].includes(state) ? "Filled content..." : "Search…";
+  const resolvedLabel =
+    label && label.length > 0
+      ? label
+      : ["Filled", "Disabled"].includes(state)
+      ? "Filled content..."
+      : "Search…";
 
   return (
     <div
@@ -106,7 +115,7 @@ function SearchStandard({
             className={`relative min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[14px] leading-[20px] [word-break:break-word] ${textColor}`}
             style={{ fontFamily: '"DM Sans", Helvetica' }}
           >
-            {label}
+            {resolvedLabel}
           </p>
           {["Default", "Hover", "Active / Focus", "Filled"].includes(state) && showIcon && (
             <div className="flex size-[20px] shrink-0 items-center justify-center">
@@ -559,32 +568,8 @@ function UniversalSearch({ state = "Zero" }: UniversalSearchProps): JSX.Element 
 }
 
 /* ------------------------------------------------------------------ */
-/* Helpers                                                             */
+/* Playground configs                                                  */
 /* ------------------------------------------------------------------ */
-function Caption({ children }: { children: React.ReactNode }): JSX.Element {
-  return <span className="px-1 text-[12px] text-[#a8a8b2]">{children}</span>;
-}
-
-function GroupCard({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}): JSX.Element {
-  return (
-    <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-      <p
-        className="mb-4 text-[14px] font-medium text-[#13131a]"
-        style={{ fontFamily: '"DM Sans", Helvetica' }}
-      >
-        {title}
-      </p>
-      {children}
-    </div>
-  );
-}
-
 const standardStates: StandardState[] = [
   "Default",
   "Hover",
@@ -593,53 +578,91 @@ const standardStates: StandardState[] = [
   "Disabled",
 ];
 
+const standardConfig: PlaygroundConfig = {
+  name: "Search / Standard",
+  description:
+    "Compact search input — interactive states, optional Background surface, and trailing action icon.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: standardStates,
+      defaultValue: "Default",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "background", label: "Background", defaultValue: false },
+    { kind: "boolean", name: "showIcon", label: "Trailing icon", defaultValue: true },
+    {
+      kind: "text",
+      name: "label",
+      label: "Label text",
+      defaultValue: "",
+      placeholder: "Search…",
+    },
+  ],
+  render: (props) => (
+    <SearchStandard
+      state={props.state as StandardState}
+      background={props.background === true}
+      showIcon={props.showIcon === true}
+      label={typeof props.label === "string" ? props.label : ""}
+    />
+  ),
+  tokens: {
+    "border/default": "#c6c6cc",
+    "border/hover": "#a8a8b2",
+    "border/focus": "#7c33b5",
+    "border/disabled": "#e1e1e8",
+    "surface/background": "#ffffff",
+    "surface/hover": "rgba(113,113,128,0.08)",
+    "surface/disabled": "rgba(113,113,128,0.1)",
+    "text/default": "#4b4b59",
+    "text/filled": "#13131a",
+    "text/disabled": "#a8a8b2",
+    "radius/input": "2px",
+  },
+};
+
+const universalConfig: PlaygroundConfig = {
+  name: "Universal Search",
+  description:
+    "Full command-palette overlay — Zero (recent), Filled (results), and AI-assisted states.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Zero", "Filled", "AI"],
+      defaultValue: "Zero",
+      asTabs: true,
+    },
+  ],
+  render: (props) => <UniversalSearch state={props.state as UniversalState} />,
+  tokens: {
+    "surface/panel": "#ffffff",
+    "surface/footer": "#ebebf0",
+    "surface/ai-prompt": "#f9f8f9",
+    "badge/background": "#ebebf0",
+    "text/heading": "#806683",
+    "text/result": "#2b0030",
+    "text/placeholder": "#4b4b59",
+    "text/link": "#7c33b5",
+    "accent/ai": "#7c33b5",
+    "scrollbar/track": "#ebebf0",
+    "scrollbar/thumb": "#e1e1e8",
+    "radius/panel": "2px",
+  },
+};
+
 /* ------------------------------------------------------------------ */
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
 export default function SearchPage(): JSX.Element {
   return (
-    <section aria-label="Search components" className="flex flex-col gap-8">
-      {/* Search / Standard — Background=Off */}
-      <GroupCard title="Search / Standard — Background=Off">
-        <div className="flex flex-wrap gap-x-[30px] gap-y-4">
-          {standardStates.map((state) => (
-            <div key={state} className="flex flex-col gap-1">
-              <Caption>{state}</Caption>
-              <SearchStandard state={state} showIcon background={false} />
-            </div>
-          ))}
-        </div>
-      </GroupCard>
-
-      {/* Search / Standard — Background=On */}
-      <GroupCard title="Search / Standard — Background=On">
-        <div className="flex flex-wrap gap-x-[30px] gap-y-4">
-          {standardStates.map((state) => (
-            <div key={state} className="flex flex-col gap-1">
-              <Caption>{state}</Caption>
-              <SearchStandard state={state} showIcon background />
-            </div>
-          ))}
-        </div>
-      </GroupCard>
-
-      {/* Universal Search */}
-      <GroupCard title="Universal Search">
-        <div className="flex flex-wrap items-start gap-[40px]">
-          <div className="flex flex-col gap-1">
-            <Caption>State = Zero</Caption>
-            <UniversalSearch state="Zero" />
-          </div>
-          <div className="flex flex-col gap-1">
-            <Caption>State = Filled</Caption>
-            <UniversalSearch state="Filled" />
-          </div>
-          <div className="flex flex-col gap-1">
-            <Caption>State = AI</Caption>
-            <UniversalSearch state="AI" />
-          </div>
-        </div>
-      </GroupCard>
+    <section aria-label="Search components playground" className="flex flex-col gap-6">
+      <Playground config={standardConfig} />
+      <Playground config={universalConfig} />
     </section>
   );
 }

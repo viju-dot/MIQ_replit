@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
 
-const captionClass = "text-[12px] text-[#a8a8b2]";
-const cardClass =
-  "rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5";
+const ASSET = "/figmaAssets/carousel";
 
 type NavButtonProps = {
   direction: "left" | "right";
@@ -23,11 +23,7 @@ function NavButton({ direction, onClick, disabled }: NavButtonProps): JSX.Elemen
         <img
           alt=""
           className="block h-5 w-5"
-          src={
-            direction === "left"
-              ? "/figmaAssets/carousel/caret-left.svg"
-              : "/figmaAssets/carousel/caret-right.svg"
-          }
+          src={direction === "left" ? `${ASSET}/caret-left.svg` : `${ASSET}/caret-right.svg`}
         />
       </span>
     </button>
@@ -40,11 +36,7 @@ type PaginationProps = {
   onSelect?: (index: number) => void;
 };
 
-function CarouselPagination({
-  count,
-  active,
-  onSelect,
-}: PaginationProps): JSX.Element {
+function CarouselPagination({ count, active, onSelect }: PaginationProps): JSX.Element {
   return (
     <div className="flex h-full items-center gap-[12px] overflow-hidden">
       {Array.from({ length: count }).map((_, index) => (
@@ -58,9 +50,7 @@ function CarouselPagination({
         >
           <span
             className="h-2 w-2 rounded-full"
-            style={{
-              backgroundColor: index === active ? "#7c33b5" : "#ebebf0",
-            }}
+            style={{ backgroundColor: index === active ? "#7c33b5" : "#ebebf0" }}
           />
         </button>
       ))}
@@ -96,75 +86,126 @@ function CaruselNavigation({
 }
 
 /** Carousel — slot area with navigation (node 53673:1969). */
-function Carousel(): JSX.Element {
-  const count = 5;
+function Carousel({ count, slotLabel }: { count: number; slotLabel: string }): JSX.Element {
   const [active, setActive] = useState(0);
+
+  // Keep active index within bounds when count changes via controls.
+  useEffect(() => {
+    setActive((i) => (i >= count ? 0 : i));
+  }, [count]);
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4">
       {/* slot */}
       <div className="relative h-[192px] w-full bg-[rgba(234,0,173,0.1)]">
-        <span
-          className="absolute inset-0 flex items-center justify-center text-[14px] text-[#717180]"
-        >
-          slot — swap with any component
+        <span className="absolute inset-0 flex items-center justify-center text-[14px] text-[#717180]">
+          {slotLabel}
         </span>
       </div>
       {/* Carusel Navigation */}
       <div className="flex w-full items-center justify-center gap-2">
-        <NavButton
-          direction="left"
-          onClick={() => setActive((i) => (i - 1 + count) % count)}
-        />
+        <NavButton direction="left" onClick={() => setActive((i) => (i - 1 + count) % count)} />
         <div className="flex flex-row items-center self-stretch">
           <CarouselPagination count={count} active={active} onSelect={setActive} />
         </div>
-        <NavButton
-          direction="right"
-          onClick={() => setActive((i) => (i + 1) % count)}
-        />
+        <NavButton direction="right" onClick={() => setActive((i) => (i + 1) % count)} />
       </div>
     </div>
   );
 }
 
-export default function CarouselPage(): JSX.Element {
-  const [navActive, setNavActive] = useState(0);
-  const navCount = 5;
+/** Standalone navigation with its own interactive state so the pagination is explorable. */
+function InteractiveNavigation({ count }: { count: number }): JSX.Element {
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    setActive((i) => (i >= count ? 0 : i));
+  }, [count]);
 
   return (
-    <section aria-label="Carousel components" className="flex flex-col gap-8">
-      {/* Carousel component */}
-      <div className={cardClass}>
-        <div className="mb-4 flex flex-col gap-1">
-          <h2 className="text-[24px] font-medium tracking-[-0.36px] text-[#13131a]">
-            Carousel Component
-          </h2>
-          <span className={captionClass}>Default</span>
-        </div>
-        <div className="max-w-[900px]">
-          <Carousel />
-        </div>
-      </div>
+    <CaruselNavigation
+      count={count}
+      active={active}
+      onSelect={setActive}
+      onPrev={() => setActive((i) => (i - 1 + count) % count)}
+      onNext={() => setActive((i) => (i + 1) % count)}
+    />
+  );
+}
 
-      {/* Carousel navigation */}
-      <div className={cardClass}>
-        <div className="mb-4 flex flex-col gap-1">
-          <h2 className="text-[24px] font-medium tracking-[-0.36px] text-[#13131a]">
-            Carousel navigation
-          </h2>
-          <span className={captionClass}>Default</span>
-        </div>
-        <div className="flex flex-col items-start">
-          <CaruselNavigation
-            count={navCount}
-            active={navActive}
-            onSelect={setNavActive}
-            onPrev={() => setNavActive((i) => (i - 1 + navCount) % navCount)}
-            onNext={() => setNavActive((i) => (i + 1) % navCount)}
-          />
-        </div>
-      </div>
+const clampCount = (v: string | boolean): number => {
+  const n = typeof v === "string" ? parseInt(v, 10) : NaN;
+  if (Number.isNaN(n)) return 5;
+  return Math.min(8, Math.max(1, n));
+};
+
+const carouselConfig: PlaygroundConfig = {
+  name: "Carousel Component",
+  description: "Slot area with navigation — swap the slot for any component.",
+  controls: [
+    {
+      kind: "select",
+      name: "count",
+      label: "Slides",
+      options: ["3", "4", "5", "6", "7", "8"],
+      defaultValue: "5",
+      asTabs: true,
+    },
+    {
+      kind: "text",
+      name: "slotLabel",
+      label: "Slot label",
+      defaultValue: "slot — swap with any component",
+      placeholder: "Slot content label",
+    },
+  ],
+  render: (props) => (
+    <div className="w-full max-w-[900px]">
+      <Carousel count={clampCount(props.count)} slotLabel={String(props.slotLabel)} />
+    </div>
+  ),
+  tokens: {
+    "pagination/active": "#7c33b5",
+    "pagination/inactive": "#ebebf0",
+    "nav/hover": "rgba(113,113,128,0.1)",
+    "slot/background": "rgba(234,0,173,0.1)",
+    "slot/label": "#717180",
+    "pagination/dot-size": "8px",
+    "pagination/gap": "12px",
+    "slot/height": "192px",
+  },
+};
+
+const navigationConfig: PlaygroundConfig = {
+  name: "Carousel Navigation",
+  description: "Standalone navigation control — carets with pagination dots.",
+  controls: [
+    {
+      kind: "select",
+      name: "count",
+      label: "Dots",
+      options: ["3", "4", "5", "6", "7", "8"],
+      defaultValue: "5",
+      asTabs: true,
+    },
+  ],
+  render: (props) => <InteractiveNavigation count={clampCount(props.count)} />,
+  tokens: {
+    "pagination/active": "#7c33b5",
+    "pagination/inactive": "#ebebf0",
+    "nav/hover": "rgba(113,113,128,0.1)",
+    "nav/button-radius": "2px",
+    "nav/caret-size": "20px",
+    "pagination/dot-size": "8px",
+    "pagination/gap": "12px",
+  },
+};
+
+export default function CarouselPage(): JSX.Element {
+  return (
+    <section aria-label="Carousel component playground" className="flex flex-col gap-6">
+      <Playground config={carouselConfig} />
+      <Playground config={navigationConfig} />
     </section>
   );
 }

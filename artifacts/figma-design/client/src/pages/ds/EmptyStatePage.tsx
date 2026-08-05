@@ -1,3 +1,6 @@
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
+
 const ASSET = "/figmaAssets/empty-state";
 
 const illustrations = {
@@ -13,6 +16,12 @@ const imgEllipseDot1 = `${ASSET}/ellipse-dot-1.svg`;
 const imgEllipseDot2 = `${ASSET}/ellipse-dot-2.svg`;
 
 type IllustrationKey = keyof typeof illustrations;
+
+const ILLUSTRATION_LABELS: Record<string, IllustrationKey> = {
+  ScreenLock: "screenLock",
+  WomanMagnifyingGlass: "womanMagnifying",
+  LaunchAirplane: "launchAirplane",
+};
 
 function ButtonIcon({ src }: { src: string }) {
   return (
@@ -138,102 +147,71 @@ function EmptyState({
   );
 }
 
-function Caption({ children }: { children: React.ReactNode }) {
-  return <span className="text-[12px] text-[#a8a8b2]">{children}</span>;
-}
-
-function GroupCard({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-4 rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-      <span className="text-[12px] font-medium text-[#717180]">{title}</span>
-      <div className="flex flex-wrap gap-x-10 gap-y-8">{children}</div>
-    </div>
-  );
-}
-
-function Variant({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-3">
-      <Caption>{label}</Caption>
-      <div className="rounded-[5px] bg-[#f7f7fa] p-8 flex items-center justify-center">
-        {children}
-      </div>
-    </div>
-  );
-}
+const config: PlaygroundConfig = {
+  name: "Empty State",
+  description:
+    "Placeholder layout with illustration, heading, description, and up to three actions.",
+  controls: [
+    {
+      kind: "select",
+      name: "illustration",
+      label: "Illustration",
+      options: ["ScreenLock", "WomanMagnifyingGlass", "LaunchAirplane"],
+      defaultValue: "ScreenLock",
+      asTabs: true,
+    },
+    {
+      kind: "text",
+      name: "heading",
+      label: "Heading",
+      defaultValue: "Place holder here!",
+      placeholder: "Heading text",
+    },
+    {
+      kind: "text",
+      name: "description",
+      label: "Description",
+      defaultValue: "Sorry. You are not authorized to view this page",
+      placeholder: "Description text",
+    },
+    { kind: "boolean", name: "actions", label: "Show actions", defaultValue: true },
+    { kind: "boolean", name: "prop1Button", label: "Primary button", defaultValue: true },
+    { kind: "boolean", name: "prop2Button", label: "Secondary button", defaultValue: true },
+    { kind: "boolean", name: "prop3Button", label: "Tertiary button", defaultValue: true },
+    { kind: "boolean", name: "ellipse1", label: "Dot separator 1", defaultValue: false },
+    { kind: "boolean", name: "ellipse2", label: "Dot separator 2", defaultValue: false },
+  ],
+  render: (props: PropValues) => (
+    <EmptyState
+      illustration={ILLUSTRATION_LABELS[String(props.illustration)] ?? "screenLock"}
+      heading={String(props.heading)}
+      description={String(props.description)}
+      actions={props.actions === true}
+      prop1Button={props.prop1Button === true}
+      prop2Button={props.prop2Button === true}
+      prop3Button={props.prop3Button === true}
+      ellipse1={props.ellipse1 === true}
+      ellipse2={props.ellipse2 === true}
+    />
+  ),
+  tokens: {
+    "container/brand/bold/background": "#7c33b5",
+    "border/brand": "#7c33b5",
+    "border/neutral": "#4b4b59",
+    "text/heading": "#13131a",
+    "text/description": "#717180",
+    "text/action/neutral": "#4b4b59",
+    "text/action/brand": "#7c33b5",
+    "radius/button": "2px",
+    "size/illustration": "200px",
+    "gap/content": "24px",
+  },
+};
 
 export default function EmptyStatePage(): JSX.Element {
   return (
-    <section aria-label="Empty State component variants" className="flex flex-col gap-6">
-      {/* Default component with full actions */}
-      <GroupCard title="Empty State — default">
-        <Variant label="Default (3 actions)">
-          <EmptyState />
-        </Variant>
-      </GroupCard>
-
-      {/* Action count variants */}
-      <GroupCard title="Action variants">
-        <Variant label="Primary only">
-          <EmptyState prop2Button={false} prop3Button={false} />
-        </Variant>
-        <Variant label="Primary + Secondary">
-          <EmptyState prop3Button={false} />
-        </Variant>
-        <Variant label="No actions">
-          <EmptyState actions={false} />
-        </Variant>
-      </GroupCard>
-
-      {/* Separators between actions */}
-      <GroupCard title="With dot separators">
-        <Variant label="Ellipse separators">
-          <EmptyState ellipse1 ellipse2 />
-        </Variant>
-      </GroupCard>
-
-      {/* Illustration variants */}
-      <GroupCard title="Illustration templates">
-        <Variant label="ScreenLock">
-          <EmptyState
-            illustration="screenLock"
-            heading="Access locked"
-            description="Sorry. You are not authorized to view this page"
-            prop2Button={false}
-            prop3Button={false}
-          />
-        </Variant>
-        <Variant label="WomanMagnifyingGlass">
-          <EmptyState
-            illustration="womanMagnifying"
-            heading="No results found"
-            description="Try adjusting your search or filters to find what you are looking for"
-            prop2Button={false}
-            prop3Button={false}
-          />
-        </Variant>
-        <Variant label="LaunchAirplane">
-          <EmptyState
-            illustration="launchAirplane"
-            heading="Nothing here yet"
-            description="Get started by creating your first item"
-            prop2Button={false}
-            prop3Button={false}
-          />
-        </Variant>
-      </GroupCard>
+    <section aria-label="Empty State component playground" className="flex flex-col gap-6">
+      <Playground config={config} />
     </section>
   );
 }

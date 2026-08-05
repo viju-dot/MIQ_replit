@@ -1,14 +1,20 @@
 import { useState } from "react";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
 
 const ASSET = "/figmaAssets/accordion";
 
 type Border = "top&bottom" | "full";
+type LeftSlot = "Drag" | "Icon" | "Check-box";
 
 type AccordionProps = {
   type: "Collapse" | "Expanded";
+  leftSlot?: LeftSlot;
   background?: boolean;
   border?: Border;
   disabled?: boolean;
+  title?: string;
+  body?: string;
 };
 
 /**
@@ -17,14 +23,17 @@ type AccordionProps = {
  */
 function Accordion({
   type,
+  leftSlot = "Drag",
   background = false,
   border = "top&bottom",
   disabled = false,
+  title = "Accordion Title",
+  body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor labore incididunt et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
 }: AccordionProps) {
   const isExpanded = type === "Expanded";
+  const [checked, setChecked] = useState(false);
 
   // Root background:
-  //  - collapse + background + full => white
   //  - disabled => subtle disabled grey
   //  - otherwise background on => white
   let rootBg = "";
@@ -60,9 +69,7 @@ function Accordion({
       : `${ASSET}/caret-down-collapse.svg`;
 
   return (
-    <div
-      className={`flex w-[600px] max-w-full flex-col items-start ${rootBg}`}
-    >
+    <div className={`flex w-[600px] max-w-full flex-col items-start ${rootBg}`}>
       <div className="flex w-full min-w-[180px] flex-col items-start">
         <div className="flex w-full flex-col items-start">
           {/* Header row */}
@@ -73,20 +80,42 @@ function Accordion({
               <div className="flex w-full items-center gap-5">
                 {/* Title-Left */}
                 <div className="relative flex min-w-px flex-1 items-center gap-1.5">
-                  <div className="flex shrink-0 items-center justify-center rounded-[2px] p-0.5">
-                    <div className="flex size-5 shrink-0 items-center justify-center p-0.5">
-                      <img
-                        alt=""
-                        className="block size-5 max-w-none"
-                        src={dragIcon}
-                      />
+                  {leftSlot === "Check-box" ? (
+                    <button
+                      type="button"
+                      onClick={() => setChecked((c) => !c)}
+                      className="flex shrink-0 items-center justify-center rounded-[2px] p-0.5"
+                      aria-pressed={checked}
+                      aria-label="Toggle"
+                    >
+                      <div className="flex size-5 shrink-0 items-center justify-center rounded-[2px] p-[7px]">
+                        <div className="flex shrink-0 items-center overflow-clip p-0.5">
+                          <div
+                            className={`size-4 shrink-0 overflow-clip rounded-[2px] border-[1.5px] border-solid ${
+                              checked
+                                ? "border-[#7c33b5] bg-[#7c33b5]"
+                                : "border-[#c6c6cc]"
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    </button>
+                  ) : leftSlot === "Icon" ? null : (
+                    <div className="flex shrink-0 items-center justify-center rounded-[2px] p-0.5">
+                      <div className="flex size-5 shrink-0 items-center justify-center p-0.5">
+                        <img
+                          alt=""
+                          className="block size-5 max-w-none"
+                          src={dragIcon}
+                        />
+                      </div>
                     </div>
-                  </div>
+                  )}
                   <div className="flex h-6 min-w-px flex-1 items-center gap-2">
                     <p
                       className={`min-w-px flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[14px] leading-[20px] [font-family:'DM_Sans',Helvetica] ${textColor}`}
                     >
-                      Accordion Title
+                      {title}
                     </p>
                   </div>
                 </div>
@@ -126,10 +155,7 @@ function Accordion({
                   <p
                     className={`min-w-px flex-1 text-[14px] leading-[20px] [font-family:'DM_Sans',Helvetica] [word-break:break-word] ${textColor}`}
                   >
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                    eiusmod tempor labore incididunt et dolore magna aliqua. Ut enim
-                    ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                    aliquip ex ea commodo consequat.
+                    {body}
                   </p>
                 </div>
               </div>
@@ -141,176 +167,81 @@ function Accordion({
   );
 }
 
-/**
- * Header symbol with a checkbox on the left (Left=Check-box variant).
- */
-function AccordionHeaderCheckbox() {
-  const [checked, setChecked] = useState(false);
-  return (
-    <div className="flex w-[600px] max-w-full flex-col items-start">
-      <div className="flex w-full flex-col items-start">
-        <div className="flex w-full flex-col items-start overflow-clip border-b border-t border-solid border-[#e1e1e8] px-3 py-2">
-          <div className="flex w-full items-center gap-5">
-            <div className="flex min-w-px flex-1 items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setChecked((c) => !c)}
-                className="flex shrink-0 items-center justify-center rounded-[2px] p-0.5"
-                aria-pressed={checked}
-                aria-label="Toggle"
-              >
-                <div className="flex size-5 shrink-0 items-center justify-center rounded-[2px] p-[7px]">
-                  <div className="flex shrink-0 items-center overflow-clip p-0.5">
-                    <div
-                      className={`size-4 shrink-0 overflow-clip rounded-[2px] border-[1.5px] border-solid ${
-                        checked
-                          ? "border-[#7c33b5] bg-[#7c33b5]"
-                          : "border-[#c6c6cc]"
-                      }`}
-                    />
-                  </div>
-                </div>
-              </button>
-              <div className="flex h-6 min-w-px flex-1 items-center gap-2">
-                <p className="min-w-px flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[14px] leading-[20px] text-[#13131a] [font-family:'DM_Sans',Helvetica]">
-                  Accordion Title
-                </p>
-              </div>
-            </div>
-            <div className="flex shrink-0 items-center gap-2">
-              <div className="flex shrink-0 items-center justify-center rounded-[2px] p-0.5">
-                <div className="flex size-5 shrink-0 items-center justify-center p-0.5">
-                  <div className="relative h-[16.25px] w-[15px] shrink-0">
-                    <img
-                      alt=""
-                      className="absolute inset-0 block size-full max-w-none"
-                      src={`${ASSET}/action-dots.svg`}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="flex w-6 shrink-0 items-center justify-center rounded-[2px] p-0.5">
-                <div className="flex size-5 shrink-0 items-center justify-center p-0.5">
-                  <img
-                    alt=""
-                    className="block size-5 max-w-none"
-                    src={`${ASSET}/caret-down-collapse.svg`}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Header symbol with an icon on the left (Left=Icon variant).
- */
-function AccordionHeaderIcon() {
-  return <Accordion type="Collapse" />;
-}
-
-type Caption = { label: string };
-
-function VariantBlock({
-  label,
-  children,
-}: Caption & { children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <span className="px-1 text-[12px] text-[#a8a8b2]">{label}</span>
-      {children}
-    </div>
-  );
-}
-
-function CardGroup({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-      <span className="mb-4 block text-[12px] font-medium text-[#a8a8b2]">
-        {title}
-      </span>
-      <div className="flex flex-wrap gap-8">{children}</div>
-    </div>
-  );
-}
+const config: PlaygroundConfig = {
+  name: "Accordion",
+  description:
+    "Collapsible container — Collapse / Expanded types, border style, background, disabled, and an editable left slot.",
+  controls: [
+    {
+      kind: "select",
+      name: "type",
+      label: "Type",
+      options: ["Collapse", "Expanded"],
+      defaultValue: "Collapse",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "leftSlot",
+      label: "Left slot",
+      options: ["Drag", "Icon", "Check-box"],
+      defaultValue: "Drag",
+    },
+    {
+      kind: "select",
+      name: "border",
+      label: "Border",
+      options: ["top&bottom", "full"],
+      defaultValue: "top&bottom",
+    },
+    { kind: "boolean", name: "background", label: "Background", defaultValue: false },
+    { kind: "boolean", name: "disabled", label: "Disabled", defaultValue: false },
+    {
+      kind: "text",
+      name: "title",
+      label: "Title",
+      defaultValue: "Accordion Title",
+      placeholder: "Accordion Title",
+    },
+    {
+      kind: "text",
+      name: "body",
+      label: "Body text",
+      defaultValue:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor labore incididunt et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      placeholder: "Body text (Expanded only)",
+    },
+  ],
+  render: (props) => (
+    <Accordion
+      type={props.type === "Expanded" ? "Expanded" : "Collapse"}
+      leftSlot={props.leftSlot as LeftSlot}
+      border={props.border as Border}
+      background={props.background === true}
+      disabled={props.disabled === true}
+      title={String(props.title)}
+      body={String(props.body)}
+    />
+  ),
+  tokens: {
+    "border/neutral": "#e1e1e8",
+    "text/default": "#13131a",
+    "text/disabled": "#a8a8b2",
+    "container/on/background": "#ffffff",
+    "container/disabled/background": "rgba(113,113,128,0.1)",
+    "checkbox/brand/selected": "#7c33b5",
+    "checkbox/border/inactive": "#c6c6cc",
+    "radius/full-border": "2px",
+    "size/width": "600px (min 180px)",
+    "spacing/header": "px-3 py-2",
+    "spacing/body": "px-4 pt-4 pb-3",
+  },
+};
 
 export default function AccordionPage() {
   return (
-    <section aria-label="Accordion component" className="flex flex-col gap-6">
-      {/* Collapsed states */}
-      <CardGroup title="Collapse">
-        <VariantBlock label="Default · Off · top&bottom">
-          <Accordion type="Collapse" border="top&bottom" />
-        </VariantBlock>
-        <VariantBlock label="Default · Off · full">
-          <Accordion type="Collapse" border="full" />
-        </VariantBlock>
-        <VariantBlock label="Disabled · Off · top&bottom">
-          <Accordion type="Collapse" border="top&bottom" disabled />
-        </VariantBlock>
-        <VariantBlock label="Default · On · top&bottom">
-          <Accordion type="Collapse" border="top&bottom" background />
-        </VariantBlock>
-        <VariantBlock label="Default · On · full">
-          <Accordion type="Collapse" border="full" background />
-        </VariantBlock>
-      </CardGroup>
-
-      {/* Expanded states */}
-      <CardGroup title="Expanded">
-        <VariantBlock label="Default · Off · top&bottom">
-          <Accordion type="Expanded" border="top&bottom" />
-        </VariantBlock>
-        <VariantBlock label="Default · Off · full">
-          <Accordion type="Expanded" border="full" />
-        </VariantBlock>
-        <VariantBlock label="Disabled · Off · top&bottom">
-          <Accordion type="Expanded" border="top&bottom" disabled />
-        </VariantBlock>
-        <VariantBlock label="Default · On · top&bottom">
-          <Accordion type="Expanded" border="top&bottom" background />
-        </VariantBlock>
-        <VariantBlock label="Default · On · full">
-          <Accordion type="Expanded" border="full" background />
-        </VariantBlock>
-      </CardGroup>
-
-      {/* Header left-slot variants */}
-      <CardGroup title="Header left slot">
-        <VariantBlock label="Left = Icon">
-          <AccordionHeaderIcon />
-        </VariantBlock>
-        <VariantBlock label="Left = Check-box (interactive)">
-          <AccordionHeaderCheckbox />
-        </VariantBlock>
-      </CardGroup>
-
-      {/* Row interaction states */}
-      <CardGroup title="Row states">
-        <VariantBlock label="Default">
-          <Accordion type="Collapse" background />
-        </VariantBlock>
-        <VariantBlock label="Hover">
-          <div className="flex w-[600px] max-w-full flex-col bg-[rgba(113,113,128,0.08)]">
-            <Accordion type="Collapse" />
-          </div>
-        </VariantBlock>
-        <VariantBlock label="Hover actions">
-          <div className="flex w-[600px] max-w-full flex-col bg-[rgba(113,113,128,0.08)]">
-            <Accordion type="Collapse" />
-          </div>
-        </VariantBlock>
-      </CardGroup>
+    <section aria-label="Accordion component playground" className="flex flex-col gap-6">
+      <Playground config={config} />
     </section>
   );
 }

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
 
 /* =========================================================================
  * Tab items (underline-style tab) — node 3412:7887
@@ -97,114 +99,46 @@ function TabPill({
 }
 
 /* =========================================================================
- * Composed underline Tabs bar (Amount = N Items, Rounded = No)
+ * Interactive underline Tabs bar (Amount = N Items, Rounded = No)
+ * Click to select, hover to preview — mirrors real Figma variant states.
  * ========================================================================= */
 
-function TabsBarUnderline({
+function InteractiveUnderlineTabs({
   count,
-  selectedIndex = 0,
+  disabled,
 }: {
   count: number;
-  selectedIndex?: number;
+  disabled: boolean;
 }) {
-  return (
-    <div className="flex flex-wrap">
-      {Array.from({ length: count }).map((_, i) => (
-        <TabItem
-          key={i}
-          label={`Tab ${i + 1}`}
-          state={i === selectedIndex ? "Selected" : "Default"}
-        />
-      ))}
-    </div>
-  );
-}
-
-/* =========================================================================
- * Composed rounded Tabs bar (Amount = N Items, Rounded = Yes)
- * ========================================================================= */
-
-function TabsBarRounded({
-  count,
-  selectedIndex = 0,
-}: {
-  count: number;
-  selectedIndex?: number;
-}) {
-  return (
-    <div className="inline-flex flex-wrap items-center gap-1 rounded-[24px] bg-[#71718014] p-0.5">
-      {Array.from({ length: count }).map((_, i) => (
-        <TabPill
-          key={i}
-          label={`Tab ${i + 1}`}
-          state={i === selectedIndex ? "Selected" : "Active"}
-        />
-      ))}
-    </div>
-  );
-}
-
-/* =========================================================================
- * Interactive responsive tabs demo
- * ========================================================================= */
-
-function InteractiveUnderlineTabs() {
   const [active, setActive] = useState(0);
   const [hover, setHover] = useState<number | null>(null);
-  const labels = ["Overview", "Analytics", "Reports", "Notifications"];
   return (
     <div className="flex flex-wrap">
-      {labels.map((label, i) => {
+      {Array.from({ length: count }).map((_, i) => {
         const selected = i === active;
         const hovered = i === hover;
-        const state: TabItemState = selected
-          ? hovered
-            ? "Hover-selected"
-            : "Selected"
-          : hovered
-            ? "Hover"
-            : "Default";
+        const state: TabItemState = disabled
+          ? "Disabled"
+          : selected
+            ? hovered
+              ? "Hover-selected"
+              : "Selected"
+            : hovered
+              ? "Hover"
+              : "Default";
         return (
           <button
-            key={label}
+            key={i}
             type="button"
-            className="cursor-pointer bg-transparent p-0 outline-none"
-            onClick={() => setActive(i)}
-            onMouseEnter={() => setHover(i)}
+            disabled={disabled}
+            className={`bg-transparent p-0 outline-none ${
+              disabled ? "cursor-not-allowed" : "cursor-pointer"
+            }`}
+            onClick={() => !disabled && setActive(i)}
+            onMouseEnter={() => !disabled && setHover(i)}
             onMouseLeave={() => setHover(null)}
           >
-            <TabItem label={label} state={state} />
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-function InteractiveRoundedTabs() {
-  const [active, setActive] = useState(0);
-  const [hover, setHover] = useState<number | null>(null);
-  const labels = ["Day", "Week", "Month", "Year"];
-  return (
-    <div className="inline-flex flex-wrap items-center gap-1 rounded-[24px] bg-[#71718014] p-0.5">
-      {labels.map((label, i) => {
-        const selected = i === active;
-        const hovered = i === hover;
-        const state: TabPillState = selected
-          ? "Selected"
-          : hovered
-            ? "Hover"
-            : "Active";
-        return (
-          <button
-            key={label}
-            type="button"
-            className="cursor-pointer bg-transparent p-0 outline-none"
-            onClick={() => setActive(i)}
-            onMouseEnter={() => setHover(i)}
-            onMouseLeave={() => setHover(null)}
-          >
-            <TabPill label={label} state={state} />
+            <TabItem label={`Tab ${i + 1}`} state={state} />
           </button>
         );
       })}
@@ -213,111 +147,200 @@ function InteractiveRoundedTabs() {
 }
 
 /* =========================================================================
- * Small helpers
+ * Interactive rounded Tabs bar (Amount = N Items, Rounded = Yes)
  * ========================================================================= */
 
-function Caption({ children }: { children: React.ReactNode }) {
-  return <span className="text-[12px] text-[#a8a8b2]">{children}</span>;
-}
-
-function Card({
-  title,
-  children,
+function InteractiveRoundedTabs({
+  count,
+  disabled,
 }: {
-  title: string;
-  children: React.ReactNode;
+  count: number;
+  disabled: boolean;
 }) {
+  const [active, setActive] = useState(0);
+  const [hover, setHover] = useState<number | null>(null);
   return (
-    <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-      <h2 className="mb-4 text-[14px] font-medium text-[#13131a]">{title}</h2>
-      <div className="flex flex-col gap-6">{children}</div>
+    <div className="inline-flex flex-wrap items-center gap-1 rounded-[24px] bg-[#71718014] p-0.5">
+      {Array.from({ length: count }).map((_, i) => {
+        const selected = i === active;
+        const hovered = i === hover;
+        const state: TabPillState = disabled
+          ? "Disabled"
+          : selected
+            ? "Selected"
+            : hovered
+              ? "Hover"
+              : "Active";
+        return (
+          <button
+            key={i}
+            type="button"
+            disabled={disabled}
+            className={`bg-transparent p-0 outline-none ${
+              disabled ? "cursor-not-allowed" : "cursor-pointer"
+            }`}
+            onClick={() => !disabled && setActive(i)}
+            onMouseEnter={() => !disabled && setHover(i)}
+            onMouseLeave={() => setHover(null)}
+          >
+            <TabPill label={`Tab ${i + 1}`} state={state} />
+          </button>
+        );
+      })}
     </div>
   );
 }
+
+/* =========================================================================
+ * Playground configs
+ * ========================================================================= */
+
+const tabItemConfig: PlaygroundConfig = {
+  name: "Tab Item — underline",
+  description:
+    "Single underline-style tab. Explore each Figma state and edit the label.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Default", "Hover", "Selected", "Hover-selected", "Disabled"],
+      defaultValue: "Selected",
+      asTabs: true,
+    },
+    { kind: "text", name: "label", label: "Label", defaultValue: "Tab" },
+  ],
+  render: (props) => (
+    <div className="min-w-[80px]">
+      <TabItem
+        label={String(props.label)}
+        state={props.state as TabItemState}
+      />
+    </div>
+  ),
+  tokens: {
+    "text/default": "#13131a",
+    "text/selected": "#7c33b5",
+    "text/hover-selected": "#662994",
+    "text/disabled": "#a8a8b2",
+    "line/default": "#e1e1e8",
+    "line/selected": "#7c33b5",
+    "line/hover-selected": "#662994",
+    "surface/hover": "rgba(113,113,128,0.08)",
+    "type/size": "14px / 20px DM Sans",
+  },
+};
+
+const tabPillConfig: PlaygroundConfig = {
+  name: "Tab — rounded / pill",
+  description:
+    "Single rounded pill-style tab. Explore each Figma state and edit the label.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Selected", "Active", "Hover", "Disabled"],
+      defaultValue: "Selected",
+      asTabs: true,
+    },
+    { kind: "text", name: "label", label: "Label", defaultValue: "Tab 1" },
+  ],
+  render: (props) => (
+    <div className="rounded-[24px] bg-[#71718014] p-0.5">
+      <TabPill
+        label={String(props.label)}
+        state={props.state as TabPillState}
+      />
+    </div>
+  ),
+  tokens: {
+    "container/selected/background": "#f6ebff",
+    "container/hover/background": "rgba(113,113,128,0.08)",
+    "container/track/background": "#71718014",
+    "text/selected": "#7c33b5",
+    "text/active": "#4b4b59",
+    "text/hover": "#13131a",
+    "text/disabled": "#a8a8b2",
+    "radius/pill": "20px",
+    "size/height": "30px",
+  },
+};
+
+const underlineBarConfig: PlaygroundConfig = {
+  name: "Tabs Bar — underline",
+  description:
+    "Composed underline tabs. Choose the item count; click to select, hover to preview.",
+  controls: [
+    {
+      kind: "select",
+      name: "count",
+      label: "Items",
+      options: ["2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      defaultValue: "4",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "disabled", label: "Disabled", defaultValue: false },
+  ],
+  render: (props) => (
+    <div className="w-full">
+      <InteractiveUnderlineTabs
+        count={Number(props.count)}
+        disabled={props.disabled === true}
+      />
+    </div>
+  ),
+  tokens: {
+    "text/default": "#13131a",
+    "text/selected": "#7c33b5",
+    "line/default": "#e1e1e8",
+    "line/selected": "#7c33b5",
+    "type/size": "14px / 20px DM Sans",
+  },
+};
+
+const roundedBarConfig: PlaygroundConfig = {
+  name: "Tabs Bar — rounded",
+  description:
+    "Composed rounded tabs. Choose the item count; click to select, hover to preview.",
+  controls: [
+    {
+      kind: "select",
+      name: "count",
+      label: "Items",
+      options: ["2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      defaultValue: "4",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "disabled", label: "Disabled", defaultValue: false },
+  ],
+  render: (props) => (
+    <InteractiveRoundedTabs
+      count={Number(props.count)}
+      disabled={props.disabled === true}
+    />
+  ),
+  tokens: {
+    "container/track/background": "#71718014",
+    "container/selected/background": "#f6ebff",
+    "text/selected": "#7c33b5",
+    "text/active": "#4b4b59",
+    "radius/track": "24px",
+    "radius/pill": "20px",
+  },
+};
 
 /* =========================================================================
  * Page
  * ========================================================================= */
 
 export default function TabsPage() {
-  const underlineStates: TabItemState[] = [
-    "Default",
-    "Hover",
-    "Selected",
-    "Hover-selected",
-    "Disabled",
-  ];
-  const pillStates: TabPillState[] = [
-    "Selected",
-    "Active",
-    "Hover",
-    "Disabled",
-  ];
-  const counts = [2, 3, 4, 5, 6, 7, 8, 9, 10];
-
   return (
     <section className="flex flex-col gap-6" aria-label="Tabs components">
-      {/* Underline tab item states */}
-      <Card title="Tab item — states (underline)">
-        <div className="flex flex-wrap gap-x-10 gap-y-5">
-          {underlineStates.map((state) => (
-            <div key={state} className="flex flex-col gap-2">
-              <Caption>{state}</Caption>
-              <TabItem state={state} />
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Rounded (pill) tab states */}
-      <Card title="Tab — states (rounded / pill)">
-        <div className="flex flex-wrap gap-x-10 gap-y-5">
-          {pillStates.map((state) => (
-            <div key={state} className="flex flex-col gap-2">
-              <Caption>{state}</Caption>
-              <div className="rounded-[24px] bg-[#71718014] p-0.5">
-                <TabPill state={state} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Underline tabs bar — 2 to 10 items */}
-      <Card title="Tabs — underline (2–10 items)">
-        <div className="flex flex-col gap-5">
-          {counts.map((count) => (
-            <div key={count} className="flex flex-col gap-2">
-              <Caption>{count} items</Caption>
-              <TabsBarUnderline count={count} />
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Rounded tabs bar — 2 to 10 items */}
-      <Card title="Tabs — rounded (2–10 items)">
-        <div className="flex flex-col gap-5">
-          {counts.map((count) => (
-            <div key={count} className="flex flex-col gap-2">
-              <Caption>{count} items</Caption>
-              <TabsBarRounded count={count} />
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Interactive / responsive demos */}
-      <Card title="Responsive tabs — interactive">
-        <div className="flex flex-col gap-2">
-          <Caption>Underline (click to select, hover to preview)</Caption>
-          <InteractiveUnderlineTabs />
-        </div>
-        <div className="flex flex-col gap-2">
-          <Caption>Rounded (click to select, hover to preview)</Caption>
-          <InteractiveRoundedTabs />
-        </div>
-      </Card>
+      <Playground config={tabItemConfig} />
+      <Playground config={tabPillConfig} />
+      <Playground config={underlineBarConfig} />
+      <Playground config={roundedBarConfig} />
     </section>
   );
 }

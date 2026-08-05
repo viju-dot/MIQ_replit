@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
 
 const TOTAL_PAGES = 20;
 
@@ -60,91 +62,113 @@ function PaginationButton({ direction, disabled, onClick }: PaginationButtonProp
   );
 }
 
-function Pagination() {
+function Pagination({ total }: { total: number }) {
   const [page, setPage] = useState(1);
+  const safeTotal = Math.max(1, total);
+  const current = Math.min(page, safeTotal);
 
   return (
     <div className="flex items-center justify-end">
-      <PaginationLabel labelValue={`${page} of ${TOTAL_PAGES}`} />
+      <PaginationLabel labelValue={`${current} of ${safeTotal}`} />
       <PaginationButton
         direction="left"
-        disabled={page <= 1}
-        onClick={() => setPage((p) => Math.max(1, p - 1))}
+        disabled={current <= 1}
+        onClick={() => setPage(() => Math.max(1, current - 1))}
       />
       <PaginationButton
         direction="right"
-        disabled={page >= TOTAL_PAGES}
-        onClick={() => setPage((p) => Math.min(TOTAL_PAGES, p + 1))}
+        disabled={current >= safeTotal}
+        onClick={() => setPage(() => Math.min(safeTotal, current + 1))}
       />
     </div>
   );
 }
 
-const caption = "text-[12px] text-[#a8a8b2]";
-const cardClass =
-  "rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5";
+const paginationConfig: PlaygroundConfig = {
+  name: "Pagination",
+  description:
+    "Molecule — page label with previous/next icon buttons. Fully interactive.",
+  controls: [
+    {
+      kind: "text",
+      name: "total",
+      label: "Total pages",
+      defaultValue: String(TOTAL_PAGES),
+      placeholder: "20",
+    },
+  ],
+  render: (props) => {
+    const parsed = parseInt(String(props.total), 10);
+    const total = Number.isFinite(parsed) && parsed > 0 ? parsed : TOTAL_PAGES;
+    // Remount when total changes so internal page resets sensibly.
+    return <Pagination key={total} total={total} />;
+  },
+  tokens: {
+    "text/label/default": "#13131a",
+    "text/label/disabled": "#a8a8b2",
+    "container/button/hover": "#71718014",
+    "size/button": "20px (icon), 7px padding",
+    "radius/button": "2px",
+    "typography/label": "DM Sans 14/20",
+  },
+};
 
-const labelVariants: Array<{
-  id: string;
-  label: string;
-  isDisabled: boolean;
-  isInverted: boolean;
-}> = [
-  { id: "default", label: "isDisabled=False, isInverted=False", isDisabled: false, isInverted: false },
-  { id: "disabled", label: "isDisabled=True, isInverted=False", isDisabled: true, isInverted: false },
-  { id: "inverted", label: "isDisabled=False, isInverted=True", isDisabled: false, isInverted: true },
-  { id: "disabled-inverted", label: "isDisabled=True, isInverted=True", isDisabled: true, isInverted: true },
-];
+const labelConfig: PlaygroundConfig = {
+  name: "Pagination Label",
+  description:
+    "Text label showing current/total pages. Axes: isDisabled, isInverted.",
+  controls: [
+    {
+      kind: "boolean",
+      name: "isDisabled",
+      label: "isDisabled",
+      defaultValue: false,
+    },
+    {
+      kind: "boolean",
+      name: "isInverted",
+      label: "isInverted",
+      defaultValue: false,
+    },
+    {
+      kind: "text",
+      name: "labelValue",
+      label: "Label text",
+      defaultValue: "1 of 20",
+      placeholder: "1 of 20",
+    },
+  ],
+  render: (props) => {
+    const isInverted = props.isInverted === true;
+    return (
+      <div
+        className="flex items-center justify-end rounded-[5px] px-4 py-3"
+        style={{ backgroundColor: isInverted ? "#13131a" : "#f7f7fa" }}
+      >
+        <PaginationLabel
+          isDisabled={props.isDisabled === true}
+          isInverted={isInverted}
+          labelValue={String(props.labelValue)}
+        />
+      </div>
+    );
+  },
+  tokens: {
+    "text/default": "#13131a",
+    "text/disabled": "#a8a8b2",
+    "text/inverted": "#ffffff",
+    "text/inverted-disabled": "rgba(255,255,255,0.24)",
+    "container/inverted/background": "#13131a",
+    "container/default/background": "#f7f7fa",
+    "radius/container": "5px",
+  },
+};
 
 export default function PaginationPage(): JSX.Element {
   return (
     <section className="flex flex-col gap-6" aria-label="Pagination component">
-      {/* Pagination molecule */}
-      <div className={cardClass}>
-        <div className="flex flex-col gap-4">
-          <span className={caption}>
-            Pagination — Molecule (label + icon buttons). Interactive.
-          </span>
-          <div className="flex flex-wrap items-center gap-8">
-            <div className="flex flex-col gap-2">
-              <span className={caption}>Button - icon only: true</span>
-              <div className="flex flex-col items-start rounded-[5px] border border-dashed border-[#9747ff] px-[14px] py-5">
-                <Pagination />
-              </div>
-              <span className={caption}>Pagination label</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Pagination label variants */}
-      <div className={cardClass}>
-        <div className="flex flex-col gap-4">
-          <span className={caption}>
-            Pagination label — properties: isDisabled (true/false), isInverted
-            (true/false)
-          </span>
-          <div className="flex flex-wrap gap-6">
-            {labelVariants.map((variant) => (
-              <div key={variant.id} className="flex flex-col gap-2">
-                <span className={caption}>{variant.label}</span>
-                <div
-                  className="flex items-center justify-end rounded-[5px] px-4 py-3"
-                  style={{
-                    backgroundColor: variant.isInverted ? "#13131a" : "#f7f7fa",
-                  }}
-                >
-                  <PaginationLabel
-                    isDisabled={variant.isDisabled}
-                    isInverted={variant.isInverted}
-                    labelValue="1 of 20"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <Playground config={paginationConfig} />
+      <Playground config={labelConfig} />
     </section>
   );
 }

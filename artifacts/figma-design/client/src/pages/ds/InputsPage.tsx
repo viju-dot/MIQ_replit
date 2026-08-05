@@ -1,3 +1,6 @@
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
+
 const A = "/figmaAssets/inputs";
 
 const eyeSlash = {
@@ -82,6 +85,9 @@ type Metadata = "No" | "Right" | "Left";
 function StandardField(props: {
   state: StdState;
   title?: boolean;
+  titleText?: string;
+  placeholderText?: string;
+  errorText?: string;
   iconRight?: boolean;
   metadata?: Metadata;
   compact?: boolean;
@@ -89,6 +95,9 @@ function StandardField(props: {
   const {
     state,
     title = false,
+    titleText = "Title:",
+    placeholderText = "Placeholder",
+    errorText = "Error message",
     iconRight = false,
     metadata = "No",
     compact = false,
@@ -105,7 +114,7 @@ function StandardField(props: {
         ? "Value"
         : state === "Active / Focus"
           ? "Valu"
-          : "Placeholder";
+          : placeholderText;
 
   const fieldH = compact ? "24px" : "34px";
   const fontSize = compact ? "12px" : "14px";
@@ -134,7 +143,7 @@ function StandardField(props: {
             color: "#13131a",
           }}
         >
-          Title:
+          {titleText}
         </div>
       )}
       <div
@@ -208,7 +217,7 @@ function StandardField(props: {
             color: "#da294b",
           }}
         >
-          Error message
+          {errorText}
         </p>
       )}
     </div>
@@ -221,8 +230,16 @@ function PasswordField(props: {
   state: StdState;
   eyeShown: boolean;
   title?: boolean;
+  titleText?: string;
+  errorText?: string;
 }) {
-  const { state, eyeShown, title = false } = props;
+  const {
+    state,
+    eyeShown,
+    title = false,
+    titleText = "Title:",
+    errorText = "Incorrect password",
+  } = props;
   const cs = containerStyle(state);
   const isError = state === "Error";
   const isDisabled = state === "Disabled";
@@ -271,7 +288,7 @@ function PasswordField(props: {
             color: "#13131a",
           }}
         >
-          Title:
+          {titleText}
         </div>
       )}
       <div
@@ -325,7 +342,7 @@ function PasswordField(props: {
             color: "#da294b",
           }}
         >
-          Incorrect password
+          {errorText}
         </p>
       )}
     </div>
@@ -382,8 +399,12 @@ function rangeText(state: RangeState): string {
   return "#4b4b59";
 }
 
-function RangeField(props: { state: RangeState; compact?: boolean }) {
-  const { state, compact = false } = props;
+function RangeField(props: {
+  state: RangeState;
+  compact?: boolean;
+  errorText?: string;
+}) {
+  const { state, compact = false, errorText = "This date range is not valid" } = props;
   const cs = rangeContainer(state);
   const isError = state === "Error";
   const isDisabled = state === "Disabled";
@@ -464,150 +485,154 @@ function RangeField(props: { state: RangeState; compact?: boolean }) {
             color: "#da294b",
           }}
         >
-          This date range is not valid
+          {errorText}
         </p>
       )}
     </div>
   );
 }
 
-/* ---------- layout helpers ---------- */
+/* ---------- Playground configs ---------- */
 
-function Caption({ children }: { children: React.ReactNode }) {
-  return <span className="text-[12px] text-[#a8a8b2]">{children}</span>;
-}
+const sharedTokens = {
+  "border/neutral/default": "#c6c6cc",
+  "border/brand/focus": "#7c33b5",
+  "border/error": "#da294b",
+  "container/hover/background": "rgba(113,113,128,0.08)",
+  "container/disabled/background": "rgba(113,113,128,0.1)",
+  "text/neutral/placeholder": "#4b4b59",
+  "text/neutral/value": "#13131a",
+  "text/disabled": "#a8a8b2",
+  "text/error": "#da294b",
+  "badge/brand/background": "#f6ebff",
+  "badge/brand/text": "#7c33b5",
+  "radius/field": "2px",
+  "size/default/height": "34px",
+  "size/compact/height": "24px",
+};
 
-function Group({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-      <h3 className="mb-4 text-[16px] font-medium text-[#13131a]">{title}</h3>
-      <div className="flex flex-wrap gap-x-8 gap-y-5">{children}</div>
-    </div>
-  );
-}
+const standardConfig: PlaygroundConfig = {
+  name: "Input / Standard",
+  description:
+    "Text field with State, optional Title, right info icon, and metadata badge (left/right).",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: STD_STATES,
+      defaultValue: "Default",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "compact", label: "Compact", defaultValue: false },
+    { kind: "boolean", name: "title", label: "Show title", defaultValue: false },
+    { kind: "boolean", name: "iconRight", label: "Info icon (right)", defaultValue: false },
+    {
+      kind: "select",
+      name: "metadata",
+      label: "Metadata badge",
+      options: ["No", "Right", "Left"],
+      defaultValue: "No",
+    },
+    { kind: "text", name: "titleText", label: "Title text", defaultValue: "Title:" },
+    {
+      kind: "text",
+      name: "placeholderText",
+      label: "Placeholder text",
+      defaultValue: "Placeholder",
+    },
+    { kind: "text", name: "errorText", label: "Error message", defaultValue: "Error message" },
+  ],
+  render: (props: PropValues) => (
+    <StandardField
+      state={props.state as StdState}
+      compact={props.compact === true}
+      title={props.title === true}
+      iconRight={props.iconRight === true}
+      metadata={props.metadata as Metadata}
+      titleText={String(props.titleText)}
+      placeholderText={String(props.placeholderText)}
+      errorText={String(props.errorText)}
+    />
+  ),
+  tokens: sharedTokens,
+};
 
-function VariantCell({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex w-[284px] max-w-full flex-col gap-1">
-      <Caption>{label}</Caption>
-      {children}
-    </div>
-  );
-}
+const passwordConfig: PlaygroundConfig = {
+  name: "Input / Password",
+  description: "Password field with State, optional Title, and toggle to show/hide the value.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: STD_STATES,
+      defaultValue: "Default",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "eyeShown", label: "Show password", defaultValue: false },
+    { kind: "boolean", name: "title", label: "Show title", defaultValue: false },
+    { kind: "text", name: "titleText", label: "Title text", defaultValue: "Title:" },
+    {
+      kind: "text",
+      name: "errorText",
+      label: "Error message",
+      defaultValue: "Incorrect password",
+    },
+  ],
+  render: (props: PropValues) => (
+    <PasswordField
+      state={props.state as StdState}
+      eyeShown={props.eyeShown === true}
+      title={props.title === true}
+      titleText={String(props.titleText)}
+      errorText={String(props.errorText)}
+    />
+  ),
+  tokens: sharedTokens,
+};
+
+const rangeConfig: PlaygroundConfig = {
+  name: "Input / Range",
+  description: "Date range field with per-state appearance and a compact size.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: RANGE_STATES,
+      defaultValue: "Default",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "compact", label: "Compact", defaultValue: false },
+    {
+      kind: "text",
+      name: "errorText",
+      label: "Error message",
+      defaultValue: "This date range is not valid",
+    },
+  ],
+  render: (props: PropValues) => (
+    <RangeField
+      state={props.state as RangeState}
+      compact={props.compact === true}
+      errorText={String(props.errorText)}
+    />
+  ),
+  tokens: {
+    ...sharedTokens,
+    "badge/format": "dd/MM/YYYY",
+  },
+};
 
 /* ---------- Page ---------- */
 
 export default function InputsPage() {
-  const stdConfigs: {
-    key: string;
-    title: boolean;
-    iconRight: boolean;
-    metadata: Metadata;
-    compact: boolean;
-  }[] = [
-    { key: "No title", title: false, iconRight: false, metadata: "No", compact: false },
-    { key: "No title · Metadata right", title: false, iconRight: false, metadata: "Right", compact: false },
-    { key: "No title · Metadata left", title: false, iconRight: false, metadata: "Left", compact: false },
-    { key: "No title · Icon right", title: false, iconRight: true, metadata: "No", compact: false },
-    { key: "No title · Icon right · Metadata right", title: false, iconRight: true, metadata: "Right", compact: false },
-    { key: "No title · Icon right · Metadata left", title: false, iconRight: true, metadata: "Left", compact: false },
-    { key: "Title", title: true, iconRight: false, metadata: "No", compact: false },
-    { key: "Title · Metadata right", title: true, iconRight: false, metadata: "Right", compact: false },
-    { key: "Title · Metadata left", title: true, iconRight: false, metadata: "Left", compact: false },
-    { key: "Title · Icon right", title: true, iconRight: true, metadata: "No", compact: false },
-    { key: "Title · Icon right · Metadata right", title: true, iconRight: true, metadata: "Right", compact: false },
-    { key: "Title · Icon right · Metadata left", title: true, iconRight: true, metadata: "Left", compact: false },
-    { key: "Compact · No title", title: false, iconRight: false, metadata: "No", compact: true },
-    { key: "Compact · No title · Metadata right", title: false, iconRight: false, metadata: "Right", compact: true },
-    { key: "Compact · No title · Metadata left", title: false, iconRight: false, metadata: "Left", compact: true },
-    { key: "Compact · No title · Icon right", title: false, iconRight: true, metadata: "No", compact: true },
-    { key: "Compact · No title · Icon right · Metadata right", title: false, iconRight: true, metadata: "Right", compact: true },
-    { key: "Compact · No title · Icon right · Metadata left", title: false, iconRight: true, metadata: "Left", compact: true },
-    { key: "Compact · Title", title: true, iconRight: false, metadata: "No", compact: true },
-    { key: "Compact · Title · Metadata right", title: true, iconRight: false, metadata: "Right", compact: true },
-    { key: "Compact · Title · Metadata left", title: true, iconRight: false, metadata: "Left", compact: true },
-    { key: "Compact · Title · Icon right", title: true, iconRight: true, metadata: "No", compact: true },
-    { key: "Compact · Title · Icon right · Metadata right", title: true, iconRight: true, metadata: "Right", compact: true },
-    { key: "Compact · Title · Icon right · Metadata left", title: true, iconRight: true, metadata: "Left", compact: true },
-  ];
-
   return (
-    <section className="flex flex-col gap-8">
-      {stdConfigs.map((cfg) => (
-        <Group key={cfg.key} title={`Input / Standard — ${cfg.key}`}>
-          {STD_STATES.map((state) => (
-            <VariantCell key={state} label={state}>
-              <StandardField
-                state={state}
-                title={cfg.title}
-                iconRight={cfg.iconRight}
-                metadata={cfg.metadata}
-                compact={cfg.compact}
-              />
-            </VariantCell>
-          ))}
-        </Group>
-      ))}
-
-      <Group title="Input / Password — Eye hidden">
-        {STD_STATES.map((state) => (
-          <VariantCell key={state} label={state}>
-            <PasswordField state={state} eyeShown={false} />
-          </VariantCell>
-        ))}
-      </Group>
-
-      <Group title="Input / Password — Eye shown">
-        {STD_STATES.map((state) => (
-          <VariantCell key={state} label={state}>
-            <PasswordField state={state} eyeShown={true} />
-          </VariantCell>
-        ))}
-      </Group>
-
-      <Group title="Input / Password — Title · Eye hidden">
-        {STD_STATES.map((state) => (
-          <VariantCell key={state} label={state}>
-            <PasswordField state={state} eyeShown={false} title />
-          </VariantCell>
-        ))}
-      </Group>
-
-      <Group title="Input / Password — Title · Eye shown">
-        {STD_STATES.map((state) => (
-          <VariantCell key={state} label={state}>
-            <PasswordField state={state} eyeShown={true} title />
-          </VariantCell>
-        ))}
-      </Group>
-
-      <Group title="Input / Range">
-        {RANGE_STATES.map((state) => (
-          <VariantCell key={state} label={state}>
-            <RangeField state={state} />
-          </VariantCell>
-        ))}
-      </Group>
-
-      <Group title="Input / Range — Compact">
-        {RANGE_STATES.map((state) => (
-          <VariantCell key={state} label={state}>
-            <RangeField state={state} compact />
-          </VariantCell>
-        ))}
-      </Group>
+    <section aria-label="Inputs component playgrounds" className="flex flex-col gap-8">
+      <Playground config={standardConfig} />
+      <Playground config={passwordConfig} />
+      <Playground config={rangeConfig} />
     </section>
   );
 }

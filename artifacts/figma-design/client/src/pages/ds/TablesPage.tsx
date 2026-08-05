@@ -1,15 +1,14 @@
-import { useState } from "react";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
 /**
- * Tables — Design System page.
- * Renders the atomic table building-block components and their variants that
- * have dedicated reference code on the Figma "Tables" page:
+ * Tables — Design System playground.
+ * Each atomic table building-block from the Figma "Tables" page is now an
+ * interactive Playground with controls mapped to its real Figma variant axes:
  *   - Cell Body Content (Strong / Number)
- *   - Cell/Text (states, children/expand, checkbox, logo, icon-right)
- *   - Cell/Action (icon amount 1-3, states)
- *   - Column Header cell (extracted from Table/Column reference markup)
- * Documentation / annotation frames ("Tables Use Cases", "How to use component")
- * are intentionally skipped.
+ *   - Cell/Text (State, Checkbox, Children/Expand, Logo, Icon-right, Indent, Label)
+ *   - Column Header (Checkbox, Label)
+ *   - Cell/Action (Icon amount, State)
  */
 
 const ASSET = "/figmaAssets/tables";
@@ -26,44 +25,8 @@ const imgActionEdit = `${ASSET}/action-edit.svg`;
 const imgActionDots = `${ASSET}/action-dots.svg`;
 
 /* ------------------------------------------------------------------ */
-/* Shared atoms                                                        */
+/* Shared atoms (unchanged Figma markup)                               */
 /* ------------------------------------------------------------------ */
-
-function Caption({ children }: { children: React.ReactNode }) {
-  return <span className="text-[12px] text-[#a8a8b2]">{children}</span>;
-}
-
-function Group({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-      <h3 className="mb-4 text-[14px] font-medium text-[#282833]">{title}</h3>
-      <div className="flex flex-wrap items-start gap-x-8 gap-y-6">
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function Variant({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <Caption>{label}</Caption>
-      {children}
-    </div>
-  );
-}
 
 function TtdLogo() {
   return (
@@ -135,9 +98,11 @@ function ArrowSquareOut() {
 function CellBodyContent({
   strong = false,
   number = false,
+  text = "Cell content",
 }: {
   strong?: boolean;
   number?: boolean;
+  text?: string;
 }) {
   const numberStyle = number
     ? ({ fontFeatureSettings: '"lnum" 1, "tnum" 1' } as React.CSSProperties)
@@ -152,7 +117,7 @@ function CellBodyContent({
         }`}
         style={numberStyle}
       >
-        {number ? "123" : "Cell content"}
+        {number ? "123" : text}
       </p>
     </div>
   );
@@ -173,6 +138,7 @@ function CellText({
   hasLogo = false,
   hasIconRight = false,
   indent = 0,
+  text = "Cell content",
 }: {
   state?: CellTextState;
   hasCheck?: boolean;
@@ -182,6 +148,7 @@ function CellText({
   hasLogo?: boolean;
   hasIconRight?: boolean;
   indent?: 0 | 1 | 2;
+  text?: string;
 }) {
   const bg =
     state === "Selected"
@@ -227,7 +194,7 @@ function CellText({
         <p
           className={`[word-break:break-word] flex-1 leading-[18px] min-w-px not-italic overflow-hidden relative text-[12px] text-ellipsis whitespace-nowrap ${textCls}`}
         >
-          Cell content
+          {text}
         </p>
       </div>
       {hasIconRight && <ArrowSquareOut />}
@@ -239,7 +206,13 @@ function CellText({
 /* Column Header cell (extracted from Table/Column reference)          */
 /* ------------------------------------------------------------------ */
 
-function ColumnHeader({ hasCheckbox = false }: { hasCheckbox?: boolean }) {
+function ColumnHeader({
+  hasCheckbox = false,
+  text = "Column Header",
+}: {
+  hasCheckbox?: boolean;
+  text?: string;
+}) {
   return (
     <div className="bg-[#f7f7fa] border-[#e1e1e8] border-b border-solid flex h-[40px] items-center py-[10px] relative w-[192px]">
       <div className="flex h-[20px] items-center relative shrink-0 w-[12px]" />
@@ -250,7 +223,7 @@ function ColumnHeader({ hasCheckbox = false }: { hasCheckbox?: boolean }) {
       )}
       <div className="flex flex-1 items-start min-w-px relative">
         <p className="[word-break:break-word] flex-1 font-medium leading-[20px] min-w-px not-italic overflow-hidden relative text-[14px] text-[#282833] text-ellipsis whitespace-nowrap">
-          Column Header
+          {text}
         </p>
       </div>
       <div className="flex h-[20px] items-center justify-end relative shrink-0 w-[16px]">
@@ -326,136 +299,175 @@ function CellAction({
 }
 
 /* ------------------------------------------------------------------ */
+/* Playground configs                                                  */
+/* ------------------------------------------------------------------ */
+
+const cellBodyConfig: PlaygroundConfig = {
+  name: "Cell Body Content",
+  description: "Table body text — Strong weight and Number (tabular/right-aligned) variants.",
+  controls: [
+    { kind: "boolean", name: "strong", label: "Strong", defaultValue: false },
+    { kind: "boolean", name: "number", label: "Number", defaultValue: false },
+    {
+      kind: "text",
+      name: "text",
+      label: "Text",
+      defaultValue: "Cell content",
+      placeholder: "Cell content",
+    },
+  ],
+  render: (p: PropValues) => (
+    <CellBodyContent
+      strong={p.strong === true}
+      number={p.number === true}
+      text={String(p.text)}
+    />
+  ),
+  tokens: {
+    "text/body/color": "#13131a",
+    "text/size/body": "12px",
+    "text/line-height/body": "18px",
+    "font/number-features": '"lnum" 1, "tnum" 1',
+    "size/width": "160px",
+  },
+};
+
+const cellTextConfig: PlaygroundConfig = {
+  name: "Cell / Text",
+  description: "Primary table cell — interaction states plus checkbox, tree, logo and link options.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Default", "Hover", "Selected"],
+      defaultValue: "Default",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "hasCheck", label: "Checkbox", defaultValue: false },
+    { kind: "boolean", name: "checked", label: "Checked", defaultValue: false },
+    { kind: "boolean", name: "hasChildren", label: "Has children", defaultValue: false },
+    { kind: "boolean", name: "isExpanded", label: "Expanded", defaultValue: false },
+    { kind: "boolean", name: "hasLogo", label: "Logo", defaultValue: false },
+    { kind: "boolean", name: "hasIconRight", label: "Icon right", defaultValue: false },
+    {
+      kind: "select",
+      name: "indent",
+      label: "Indent",
+      options: ["0", "1", "2"],
+      defaultValue: "0",
+    },
+    {
+      kind: "text",
+      name: "text",
+      label: "Text",
+      defaultValue: "Cell content",
+      placeholder: "Cell content",
+    },
+  ],
+  render: (p: PropValues) => (
+    <CellText
+      state={p.state as CellTextState}
+      hasCheck={p.hasCheck === true}
+      checked={p.checked === true}
+      hasChildren={p.hasChildren === true}
+      isExpanded={p.isExpanded === true}
+      hasLogo={p.hasLogo === true}
+      hasIconRight={p.hasIconRight === true}
+      indent={Number(p.indent) as 0 | 1 | 2}
+      text={String(p.text)}
+    />
+  ),
+  tokens: {
+    "container/background/default": "#ffffff",
+    "container/background/hover": "rgba(113,113,128,0.08)",
+    "container/background/selected": "#f6ebff",
+    "text/color/default": "#13131a",
+    "text/color/selected": "#7c33b5",
+    "border/divider": "#e1e1e8",
+    "checkbox/border": "#c6c6cc",
+    "checkbox/fill/checked": "#7c33b5",
+    "size/height": "40px",
+    "size/width": "192px",
+    "indent/level-1": "40px",
+    "indent/level-2": "72px",
+  },
+};
+
+const columnHeaderConfig: PlaygroundConfig = {
+  name: "Column Header",
+  description: "Table column header cell — optional selection checkbox.",
+  controls: [
+    { kind: "boolean", name: "hasCheckbox", label: "Checkbox", defaultValue: false },
+    {
+      kind: "text",
+      name: "text",
+      label: "Label",
+      defaultValue: "Column Header",
+      placeholder: "Column Header",
+    },
+  ],
+  render: (p: PropValues) => (
+    <ColumnHeader hasCheckbox={p.hasCheckbox === true} text={String(p.text)} />
+  ),
+  tokens: {
+    "container/background": "#f7f7fa",
+    "text/color": "#282833",
+    "text/size": "14px",
+    "text/line-height": "20px",
+    "border/divider": "#e1e1e8",
+    "size/height": "40px",
+    "size/width": "192px",
+  },
+};
+
+const cellActionConfig: PlaygroundConfig = {
+  name: "Cell / Action",
+  description: "Row action cell — 1 to 3 icon buttons across interaction states.",
+  controls: [
+    {
+      kind: "select",
+      name: "iconAmount",
+      label: "Icon amount",
+      options: ["1", "2", "3"],
+      defaultValue: "1",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Default", "Hover", "Selected"],
+      defaultValue: "Default",
+    },
+  ],
+  render: (p: PropValues) => (
+    <CellAction
+      iconAmount={Number(p.iconAmount) as 1 | 2 | 3}
+      state={p.state as ActionState}
+    />
+  ),
+  tokens: {
+    "container/background/default": "#ffffff",
+    "container/background/hover": "rgba(113,113,128,0.08)",
+    "container/background/selected": "#f6ebff",
+    "border/divider": "#e1e1e8",
+    "size/height": "44px",
+    "size/width": "118px",
+  },
+};
+
+/* ------------------------------------------------------------------ */
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
 
 export default function TablesPage(): JSX.Element {
-  const [demoChecked, setDemoChecked] = useState(false);
-
   return (
     <section aria-label="Tables components" className="flex flex-col gap-6">
-      {/* Cell Body Content */}
-      <Group title="Cell Body Content">
-        <Variant label="Strong=False, Number=False">
-          <CellBodyContent />
-        </Variant>
-        <Variant label="Strong=True, Number=False">
-          <CellBodyContent strong />
-        </Variant>
-        <Variant label="Strong=False, Number=True">
-          <CellBodyContent number />
-        </Variant>
-        <Variant label="Strong=True, Number=True">
-          <CellBodyContent strong number />
-        </Variant>
-      </Group>
-
-      {/* Cell / Text — states */}
-      <Group title="Cell / Text — States">
-        <Variant label="Default">
-          <CellText state="Default" />
-        </Variant>
-        <Variant label="Hover">
-          <CellText state="Hover" />
-        </Variant>
-        <Variant label="Selected">
-          <CellText state="Selected" />
-        </Variant>
-      </Group>
-
-      {/* Cell / Text — checkbox + logo + icon */}
-      <Group title="Cell / Text — Content options">
-        <Variant label="+ Checkbox (unchecked)">
-          <CellText hasCheck />
-        </Variant>
-        <Variant label="+ Checkbox (checked)">
-          <CellText hasCheck checked />
-        </Variant>
-        <Variant label="+ Logo">
-          <CellText hasLogo />
-        </Variant>
-        <Variant label="+ Icon right">
-          <CellText hasIconRight />
-        </Variant>
-        <Variant label="Interactive checkbox">
-          <div
-            className="bg-white border-[#e1e1e8] border-b border-solid flex gap-[4px] h-[40px] items-center pl-[12px] pr-[16px] relative w-[192px] cursor-pointer"
-            onClick={() => setDemoChecked((v) => !v)}
-          >
-            <div className="flex items-center overflow-clip relative shrink-0">
-              {demoChecked ? <CheckboxChecked /> : <CheckboxUnchecked />}
-            </div>
-            <div className="flex flex-1 items-start min-w-px relative">
-              <p className="[word-break:break-word] flex-1 font-normal leading-[18px] min-w-px not-italic overflow-hidden relative text-[12px] text-[#13131a] text-ellipsis whitespace-nowrap">
-                Cell content
-              </p>
-            </div>
-          </div>
-        </Variant>
-      </Group>
-
-      {/* Cell / Text — expandable tree rows */}
-      <Group title="Cell / Text — Expandable rows">
-        <Variant label="Has children, collapsed (lvl 0)">
-          <CellText hasChildren indent={0} />
-        </Variant>
-        <Variant label="Has children, expanded (lvl 0)">
-          <CellText hasChildren isExpanded indent={0} />
-        </Variant>
-        <Variant label="Child (lvl 1)">
-          <CellText indent={1} />
-        </Variant>
-        <Variant label="Child (lvl 2)">
-          <CellText indent={2} />
-        </Variant>
-        <Variant label="Selected child (lvl 1)">
-          <CellText state="Selected" indent={1} />
-        </Variant>
-        <Variant label="Hover child (lvl 1)">
-          <CellText state="Hover" indent={1} />
-        </Variant>
-      </Group>
-
-      {/* Column Header */}
-      <Group title="Column Header">
-        <Variant label="Default">
-          <ColumnHeader />
-        </Variant>
-        <Variant label="Selectable (+ Checkbox)">
-          <ColumnHeader hasCheckbox />
-        </Variant>
-      </Group>
-
-      {/* Cell / Action */}
-      <Group title="Cell / Action">
-        <Variant label="Icon amount=1, Default">
-          <CellAction iconAmount={1} state="Default" />
-        </Variant>
-        <Variant label="Icon amount=1, Hover">
-          <CellAction iconAmount={1} state="Hover" />
-        </Variant>
-        <Variant label="Icon amount=1, Selected">
-          <CellAction iconAmount={1} state="Selected" />
-        </Variant>
-        <Variant label="Icon amount=2, Default">
-          <CellAction iconAmount={2} state="Default" />
-        </Variant>
-        <Variant label="Icon amount=2, Hover">
-          <CellAction iconAmount={2} state="Hover" />
-        </Variant>
-        <Variant label="Icon amount=2, Selected">
-          <CellAction iconAmount={2} state="Selected" />
-        </Variant>
-        <Variant label="Icon amount=3, Default">
-          <CellAction iconAmount={3} state="Default" />
-        </Variant>
-        <Variant label="Icon amount=3, Hover">
-          <CellAction iconAmount={3} state="Hover" />
-        </Variant>
-        <Variant label="Icon amount=3, Selected">
-          <CellAction iconAmount={3} state="Selected" />
-        </Variant>
-      </Group>
+      <Playground config={cellBodyConfig} />
+      <Playground config={cellTextConfig} />
+      <Playground config={columnHeaderConfig} />
+      <Playground config={cellActionConfig} />
     </section>
   );
 }

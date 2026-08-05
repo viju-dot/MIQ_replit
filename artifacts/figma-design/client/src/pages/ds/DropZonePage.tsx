@@ -1,3 +1,6 @@
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
+
 const ASSET = "/figmaAssets/drop-zone";
 
 const imgFilePdf = `${ASSET}/file-pdf.svg`;
@@ -14,9 +17,11 @@ type FileState = "Uploading" | "Uploaded";
 function UploadedFile({
   className,
   fileState = "Uploading",
+  filename = "Filename.pdf",
 }: {
   className?: string;
   fileState?: FileState;
+  filename?: string;
 }) {
   const isUploaded = fileState === "Uploaded";
   return (
@@ -42,7 +47,7 @@ function UploadedFile({
             isUploaded ? "text-[#13131a]" : "text-[#717180]"
           }`}
         >
-          Filename.pdf
+          {filename}
         </p>
         <div className="relative flex shrink-0 items-center gap-3">
           <div className="relative flex shrink-0 items-center gap-2">
@@ -191,26 +196,74 @@ function DropZone({
   );
 }
 
-function Caption({ children }: { children: React.ReactNode }) {
-  return <span className="text-[12px] text-[#a8a8b2]">{children}</span>;
-}
+const dropZoneConfig: PlaygroundConfig = {
+  name: "Drop Zone",
+  description:
+    "File upload drop zone — supports empty, file-listing, and hover states.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Default", "File uploads", "Uploads"],
+      defaultValue: "Default",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "hover", label: "Hover", defaultValue: false },
+  ],
+  render: (props) => (
+    <DropZone
+      state={props.state as DropZoneState}
+      hover={props.hover === true}
+    />
+  ),
+  tokens: {
+    "border/brand/active": "#662994",
+    "border/neutral/idle": "#c6c6cc",
+    "text/brand/link": "#7c33b5",
+    "text/brand/link/hover": "#662994",
+    "text/neutral/strong": "#13131a",
+    "text/neutral/muted": "#717180",
+    "radius/container": "2px",
+  },
+};
 
-function Card({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-      <h2 className="mb-4 font-['DM_Sans',Helvetica] text-[14px] font-medium text-[#13131a]">
-        {title}
-      </h2>
-      {children}
+const uploadedFileConfig: PlaygroundConfig = {
+  name: "Uploaded files",
+  description:
+    "File row shown inside the drop zone — uploading (progress) and uploaded (done) states.",
+  controls: [
+    {
+      kind: "select",
+      name: "fileState",
+      label: "File state",
+      options: ["Uploading", "Uploaded"],
+      defaultValue: "Uploading",
+      asTabs: true,
+    },
+    {
+      kind: "text",
+      name: "filename",
+      label: "Filename",
+      defaultValue: "Filename.pdf",
+      placeholder: "Filename.pdf",
+    },
+  ],
+  render: (props) => (
+    <div className="w-full max-w-[556px]">
+      <UploadedFile
+        fileState={props.fileState as FileState}
+        filename={String(props.filename)}
+      />
     </div>
-  );
-}
+  ),
+  tokens: {
+    "border/neutral/idle": "#e1e1e8",
+    "text/neutral/strong": "#13131a",
+    "text/neutral/muted": "#717180",
+    "radius/row": "4px",
+  },
+};
 
 export default function DropZonePage() {
   return (
@@ -218,43 +271,8 @@ export default function DropZonePage() {
       aria-label="Drop zone components"
       className="flex flex-col gap-6 font-['DM_Sans',Helvetica]"
     >
-      <Card title="Drop Zone">
-        <div className="flex flex-wrap gap-8">
-          <div className="flex flex-col gap-2">
-            <Caption>State=Default, Hover=No</Caption>
-            <DropZone state="Default" hover={false} />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Caption>State=Default, Hover=Yes</Caption>
-            <DropZone state="Default" hover />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Caption>State=File uploads, Hover=No</Caption>
-            <DropZone state="File uploads" hover={false} />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Caption>State=Uploads, Hover=Yes</Caption>
-            <DropZone state="Uploads" hover />
-          </div>
-        </div>
-      </Card>
-
-      <Card title="Uploaded files">
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
-            <Caption>File state=Uploading</Caption>
-            <div className="w-full max-w-[556px]">
-              <UploadedFile fileState="Uploading" />
-            </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <Caption>File state=Uploaded</Caption>
-            <div className="w-full max-w-[556px]">
-              <UploadedFile fileState="Uploaded" />
-            </div>
-          </div>
-        </div>
-      </Card>
+      <Playground config={dropZoneConfig} />
+      <Playground config={uploadedFileConfig} />
     </section>
   );
 }

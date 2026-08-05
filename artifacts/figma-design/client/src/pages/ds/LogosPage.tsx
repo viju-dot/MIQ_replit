@@ -1,14 +1,14 @@
 import { CSSProperties } from "react";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
 
 /**
  * Logos (Figma page 186:2718)
  * Faithful reproduction of the actual UI components/variants:
- *  - MiQ logo
- *  - MiQ-Footer
- *  - Loading (4 variants)
- *  - i-Dot
- *  - Temp-favicon-up
  *  - Sigma Logo (Linear / IconLight / Full / Favicon)
+ *  - MiQ logo + MiQ-Footer
+ *  - Temp-favicon-up + i-Dot
+ *  - Loading (4 variants)
  *  - Text & tokens note (from the "Logos" content frame)
  *
  * All Figma asset URLs downloaded to /figmaAssets/logos/.
@@ -681,40 +681,123 @@ function SigmaLogo({ type }: { type: SigmaType }) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Layout helpers                                                     */
+/* Playground configs                                                 */
 /* ------------------------------------------------------------------ */
 
-function GroupCard({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-      <p className="mb-4 font-['DM_Sans:Medium',_Helvetica] text-[16px] font-medium text-[#13131a]">
-        {title}
-      </p>
-      {children}
-    </div>
-  );
+/** Wrap a fixed-size logo so it scales down nicely inside the preview area. */
+function SigmaFrame({ type }: { type: SigmaType }) {
+  if (type === "Favicon") {
+    return (
+      <div className="size-[240px] max-w-full">
+        <SigmaLogo type="Favicon" />
+      </div>
+    );
+  }
+  return <SigmaLogo type={type} />;
 }
 
-function Variant({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <span className="text-[12px] text-[#a8a8b2]">{label}</span>
-      <div className="flex items-center justify-center">{children}</div>
-    </div>
-  );
-}
+const sigmaConfig: PlaygroundConfig = {
+  name: "Sigma Logo",
+  description: "The Sigma product mark — Linear wordmark, IconLight, Full lockup, and Favicon.",
+  controls: [
+    {
+      kind: "select",
+      name: "type",
+      label: "Type",
+      options: ["Linear", "IconLight", "Full", "Favicon"],
+      defaultValue: "Linear",
+      asTabs: true,
+    },
+  ],
+  render: (props) => <SigmaFrame type={props.type as SigmaType} />,
+  tokens: {
+    "size/linear": "249×28",
+    "size/iconLight": "77×120",
+    "size/full": "180 × aspect 1975.2/1233.98",
+    "size/favicon": "400×400 (aspect 249/300 inner)",
+    "gradient/up": upGradient,
+  },
+};
+
+const miqConfig: PlaygroundConfig = {
+  name: "MiQ",
+  description: "The MiQ master logo and the compact “Powered by MiQ” footer mark.",
+  controls: [
+    {
+      kind: "select",
+      name: "type",
+      label: "Type",
+      options: ["Logo", "Footer"],
+      defaultValue: "Logo",
+      asTabs: true,
+    },
+  ],
+  render: (props) =>
+    props.type === "Footer" ? (
+      <div className="w-[100px]">
+        <MiQFooter />
+      </div>
+    ) : (
+      <div className="w-full max-w-[520px] overflow-hidden">
+        <MiQ className="content-stretch flex flex-col aspect-[2717.57/1148.38] w-full items-start overflow-clip relative" />
+      </div>
+    ),
+  tokens: {
+    "size/logo": "2717.57×1148.38 (scaled to fit)",
+    "size/footer": "100×55.998",
+  },
+};
+
+const faviconConfig: PlaygroundConfig = {
+  name: "Favicon & i-Dot",
+  description: "The gradient favicon tile and the standalone i-Dot mark.",
+  controls: [
+    {
+      kind: "select",
+      name: "type",
+      label: "Type",
+      options: ["Temp-favicon-up", "i-Dot"],
+      defaultValue: "Temp-favicon-up",
+      asTabs: true,
+    },
+  ],
+  render: (props) =>
+    props.type === "i-Dot" ? (
+      <div className="h-[200px] w-[118.7px]">
+        <IDot className="relative size-full" />
+      </div>
+    ) : (
+      <div className="size-[240px] max-w-full">
+        <TempFaviconUp className="overflow-clip relative size-full" />
+      </div>
+    ),
+  tokens: {
+    "gradient/favicon":
+      "linear-gradient(225deg, #ffca01 0%, #ff6500 36.635%, #ff2000 68.292%, #ea00ad 100%)",
+    "size/favicon": "400×400",
+    "size/i-dot": "180×303.36",
+  },
+};
+
+const loadingConfig: PlaygroundConfig = {
+  name: "Loading",
+  description: "Loader spinner — four rotational variants over the UP gradient ring.",
+  controls: [
+    {
+      kind: "select",
+      name: "variant",
+      label: "Variant",
+      options: ["1", "2", "3", "4"],
+      defaultValue: "1",
+      asTabs: true,
+    },
+  ],
+  render: (props) => <Loading2 variant={props.variant as "1" | "2" | "3" | "4"} />,
+  tokens: {
+    "size": "48×48",
+    "gradient/up": upGradient,
+  },
+};
 
 /* ------------------------------------------------------------------ */
 /* Page                                                               */
@@ -722,91 +805,26 @@ function Variant({
 
 export default function LogosPage(): JSX.Element {
   return (
-    <section aria-label="Logos" className="flex flex-col gap-6">
-      {/* Sigma Logo */}
-      <GroupCard title="Sigma Logo">
-        <div className="flex flex-wrap items-end gap-x-12 gap-y-8">
-          <Variant label="Type = Linear">
-            <SigmaLogo type="Linear" />
-          </Variant>
-          <Variant label="Type = IconLight">
-            <SigmaLogo type="IconLight" />
-          </Variant>
-          <Variant label="Type = Full">
-            <SigmaLogo type="Full" />
-          </Variant>
-          <Variant label="Type = Favicon">
-            <div className="size-[200px]">
-              <SigmaLogo type="Favicon" />
-            </div>
-          </Variant>
-        </div>
-      </GroupCard>
+    <section aria-label="Logos component playground" className="flex flex-col gap-6">
+      <Playground config={sigmaConfig} />
+      <Playground config={miqConfig} />
+      <Playground config={faviconConfig} />
+      <Playground config={loadingConfig} />
 
-      {/* MiQ */}
-      <GroupCard title="MiQ">
-        <div className="flex flex-wrap items-center gap-x-12 gap-y-8">
-          <Variant label="MiQ">
-            <div className="w-full max-w-[520px] overflow-hidden">
-              <MiQ className="content-stretch flex flex-col aspect-[2717.57/1148.38] w-full items-start overflow-clip relative" />
-            </div>
-          </Variant>
-          <Variant label="MiQ-Footer">
-            <div className="w-[100px]">
-              <MiQFooter />
-            </div>
-          </Variant>
-        </div>
-      </GroupCard>
-
-      {/* Favicon / i-Dot */}
-      <GroupCard title="Favicon & i-Dot">
-        <div className="flex flex-wrap items-end gap-x-12 gap-y-8">
-          <Variant label="Temp-favicon-up">
-            <div className="size-[200px]">
-              <TempFaviconUp className="overflow-clip relative size-full" />
-            </div>
-          </Variant>
-          <Variant label="i-Dot">
-            <div className="h-[200px] w-[118.7px]">
-              <IDot className="relative size-full" />
-            </div>
-          </Variant>
-        </div>
-      </GroupCard>
-
-      {/* Loading */}
-      <GroupCard title="Loading">
-        <div className="flex flex-wrap items-center gap-x-12 gap-y-8">
-          <Variant label="Variant = 1">
-            <Loading2 variant="1" />
-          </Variant>
-          <Variant label="Variant = 2">
-            <Loading2 variant="2" />
-          </Variant>
-          <Variant label="Variant = 3">
-            <Loading2 variant="3" />
-          </Variant>
-          <Variant label="Variant = 4">
-            <Loading2 variant="4" />
-          </Variant>
-        </div>
-      </GroupCard>
-
-      {/* Text and tokens note */}
-      <GroupCard title="Text and tokens">
+      {/* Text and tokens note (from the "Logos" content frame) */}
+      <div className="rounded-xl border border-[#e1e1e8] bg-white p-6 dark:border-[#33333d] dark:bg-[#26262e]">
         <div className="flex flex-col gap-[10px]">
           <p className="font-['DM_Sans:Medium',_Helvetica] text-[24px] font-medium leading-[32px] tracking-[-0.36px] text-[#717180]">
             Token for text
           </p>
-          <p className="font-['DM_Sans:Medium',_Helvetica] text-[28px] font-medium leading-[36px] tracking-[-0.56px] text-black">
+          <p className="font-['DM_Sans:Medium',_Helvetica] text-[28px] font-medium leading-[36px] tracking-[-0.56px] text-black dark:text-[#f7f7fa]">
             The text in the logos is using lvl2 foreground. Even if the original
             assets had white text, they could not be used in all contexts of the
             application. The change guarantees that the logo can be used in both
             dark and light mode.
           </p>
         </div>
-      </GroupCard>
+      </div>
     </section>
   );
 }

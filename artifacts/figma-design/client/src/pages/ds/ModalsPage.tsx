@@ -1,20 +1,30 @@
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
+
 const ICON_X = "/figmaAssets/modals/icon-x.svg";
 const ICON_WARNING = "/figmaAssets/modals/icon-warning.svg";
-
-const MODAL_SHADOW =
-  "0px 1px 2px 0px rgba(113,113,128,0.08), 0px 8px 8px 0px rgba(113,113,128,0.04)";
 
 const PLACEHOLDER_TEXT =
   "This is place holder text. The basic dialog for modals should contain only valuable and relevant information. Loren ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nec sagittis aliquam malesuada bibendum arcu. Blandit libero volutpat sed cras ornare arcu dui vivamus. Morbi tristique senectus.";
 
 type SwapType = "custom" | "text" | "notification";
 
-function SwapInstance({ type = "custom" }: { type?: SwapType }) {
+function SwapInstance({
+  type = "custom",
+  text = PLACEHOLDER_TEXT,
+  title = "Title",
+  description = "Description",
+}: {
+  type?: SwapType;
+  text?: string;
+  title?: string;
+  description?: string;
+}) {
   if (type === "text") {
     return (
       <div className="flex flex-1 items-start relative">
         <p className="[word-break:break-word] flex-1 font-['DM_Sans',Helvetica] font-normal leading-[20px] min-w-px text-[14px] text-[#13131a]">
-          {PLACEHOLDER_TEXT}
+          {text}
         </p>
       </div>
     );
@@ -34,13 +44,13 @@ function SwapInstance({ type = "custom" }: { type?: SwapType }) {
             </div>
             <div className="flex flex-1 flex-col items-start gap-1 min-w-px overflow-hidden">
               <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[20px] text-[14px] text-[#13131a] w-full shrink-0">
-                Title
+                {title}
               </p>
             </div>
           </div>
           <div className="flex items-start pl-8 pt-[5px] w-full shrink-0">
             <p className="[word-break:break-word] flex-1 font-['DM_Sans',Helvetica] font-normal leading-[20px] min-w-px text-[14px] text-[#13131a]">
-              Description
+              {description}
             </p>
           </div>
         </div>
@@ -147,124 +157,135 @@ function Modal({
   );
 }
 
-const caption = "text-[12px] text-[#a8a8b2]";
-const cardClass =
-  "rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5";
+const modalConfig: PlaygroundConfig = {
+  name: "Modal",
+  description:
+    "Dialog surface with header, swappable content area, and action footer. Explore sizes and content types.",
+  controls: [
+    {
+      kind: "select",
+      name: "size",
+      label: "Size",
+      options: ["400px", "600px", "800px", "1000px"],
+      defaultValue: "400px",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "swap",
+      label: "Content",
+      options: ["custom", "text", "notification"],
+      defaultValue: "text",
+    },
+    {
+      kind: "text",
+      name: "title",
+      label: "Title",
+      defaultValue: "Modal",
+      placeholder: "Modal title",
+    },
+  ],
+  render: (props: PropValues) => (
+    <Modal
+      size={props.size as ModalSize}
+      swap={props.swap as SwapType}
+      title={props.title ? String(props.title) : undefined}
+      fluid
+    />
+  ),
+  tokens: {
+    "container/surface/background": "#ffffff",
+    "container/footer/background": "#f7f7fa",
+    "border/neutral": "#e1e1e8",
+    "text/primary": "#13131a",
+    "text/brand": "#7c33b5",
+    "container/brand/bold/background": "#7c33b5",
+    "radius/modal": "2px",
+    "size/header-height": "50px",
+    "size/footer-height": "56px (large 66px)",
+    "shadow/modal":
+      "0px 1px 2px rgba(113,113,128,0.08), 0px 8px 8px rgba(113,113,128,0.04)",
+  },
+};
 
-export default function ModalsPage() {
-  const sizes: ModalSize[] = ["400px", "600px", "800px", "1000px"];
+const swapConfig: PlaygroundConfig = {
+  name: "Swap Instance",
+  description:
+    "The swappable content slot inside a modal — Text, Notification, or a Custom component placeholder.",
+  controls: [
+    {
+      kind: "select",
+      name: "type",
+      label: "Type",
+      options: ["text", "notification", "custom"],
+      defaultValue: "text",
+      asTabs: true,
+    },
+    {
+      kind: "text",
+      name: "text",
+      label: "Body text",
+      defaultValue: PLACEHOLDER_TEXT,
+      placeholder: "Text content",
+    },
+    {
+      kind: "text",
+      name: "title",
+      label: "Notification title",
+      defaultValue: "Title",
+      placeholder: "Notification title",
+    },
+    {
+      kind: "text",
+      name: "description",
+      label: "Notification description",
+      defaultValue: "Description",
+      placeholder: "Notification description",
+    },
+  ],
+  render: (props: PropValues) => {
+    const type = props.type as SwapType;
+    if (type === "custom") {
+      return (
+        <div className="w-full max-w-[400px] rounded-[2px] border border-solid border-[#e1e1e8] bg-white p-4">
+          <div className="flex h-[76px] w-full items-center justify-center bg-[#f7f7fa] text-[12px] text-[#a8a8b2]">
+            Custom content slot
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="flex w-full max-w-[400px] rounded-[2px] border border-solid border-[#e1e1e8] bg-white p-4">
+        <SwapInstance
+          type={type}
+          text={String(props.text)}
+          title={String(props.title)}
+          description={String(props.description)}
+        />
+      </div>
+    );
+  },
+  tokens: {
+    "container/surface/background": "#ffffff",
+    "border/neutral": "#e1e1e8",
+    "border/danger": "#da294b",
+    "text/primary": "#13131a",
+    "text/muted": "#a8a8b2",
+    "container/custom/background": "#f7f7fa",
+    "radius/swap": "2px",
+    "shadow/notification":
+      "0px 1px 4px rgba(113,113,128,0.08), 0px 16px 24px rgba(113,113,128,0.12)",
+  },
+};
 
+export default function ModalsPage(): JSX.Element {
   return (
-    <section className="flex flex-col gap-8">
-      {/* Modal sizes */}
-      <div className={cardClass}>
-        <p className="mb-4 font-['DM_Sans',Helvetica] font-medium text-[14px] text-[#13131a]">
-          Modal — Sizes
-        </p>
-        <div className="flex flex-col gap-8">
-          {sizes.map((size) => (
-            <div key={size} className="flex flex-col gap-1">
-              <span className={caption}>Size={size}</span>
-              <Modal size={size} swap="custom" fluid />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Swap Instance types */}
-      <div className={cardClass}>
-        <p className="mb-4 font-['DM_Sans',Helvetica] font-medium text-[14px] text-[#13131a]">
-          Swap Instance — Content types
-        </p>
-        <div className="flex flex-wrap gap-8">
-          <div className="flex flex-col gap-1 w-full max-w-[400px]">
-            <span className={caption}>type=text</span>
-            <div className="w-full rounded-[2px] border border-solid border-[#e1e1e8] bg-white p-4">
-              <SwapInstance type="text" />
-            </div>
-          </div>
-          <div className="flex flex-col gap-1 w-full max-w-[400px]">
-            <span className={caption}>type=notification</span>
-            <div className="flex w-full rounded-[2px] border border-solid border-[#e1e1e8] bg-white p-4">
-              <SwapInstance type="notification" />
-            </div>
-          </div>
-          <div className="flex flex-col gap-1 w-full max-w-[400px]">
-            <span className={caption}>type=custom</span>
-            <div className="w-full rounded-[2px] border border-solid border-[#e1e1e8] bg-white p-4">
-              <div className="flex h-[76px] w-full items-center justify-center bg-[#f7f7fa] text-[12px] text-[#a8a8b2]">
-                Custom content slot
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Modals with content examples */}
-      <div className={cardClass}>
-        <p className="mb-4 font-['DM_Sans',Helvetica] font-medium text-[14px] text-[#13131a]">
-          Modal — With content
-        </p>
-        <div className="flex flex-wrap items-start gap-8">
-          <div className="flex flex-col gap-1 w-full max-w-[400px]">
-            <span className={caption}>Modal + Text content</span>
-            <Modal size="400px" title="Modal" swap="text" fluid />
-          </div>
-          <div className="flex flex-col gap-1 w-full max-w-[400px]">
-            <span className={caption}>Modal + Notification</span>
-            <Modal size="400px" title="Modal" swap="notification" fluid />
-          </div>
-        </div>
-      </div>
-
-      {/* Responsive example */}
-      <div className={cardClass}>
-        <p className="mb-2 font-['DM_Sans',Helvetica] font-medium text-[20px] text-[#13131a] tracking-[-0.2px]">
-          Modal Responsive Example
-        </p>
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-          {/* Description */}
-          <div className="flex w-full flex-col items-start gap-5 lg:max-w-[486px]">
-            <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[40px] text-[32px] text-[#13131a] tracking-[-0.64px]">
-              Responsiveness for Modal component
-            </p>
-            <div className="[word-break:break-word] font-['DM_Sans',Helvetica] font-normal text-[16px] text-[#13131a] w-full">
-              <p className="leading-[24px] mb-0">
-                On mobile devices the modal must adjust its size and layout based
-                on the viewport width.
-              </p>
-              <p className="leading-[24px] mb-0">&nbsp;</p>
-              <p className="leading-[24px]">
-                The modal component must be able to accommodate various content
-                types, including text, notifications, and other components,
-                components in the modal should wrap properly.
-              </p>
-            </div>
-          </div>
-
-          {/* Demo area */}
-          <div className="flex flex-1 flex-col gap-10 rounded-[6px] border border-solid border-[#e1e1e8] bg-[#ebebf0] p-8 overflow-hidden">
-            <div className="flex flex-col gap-4">
-              <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[28px] text-[20px] text-[#13131a] tracking-[-0.2px]">
-                Example of Modal Component in Desktop
-              </p>
-              <Modal size="1000px" title="Modal Tablet" swap="text" fluid />
-            </div>
-            <div className="flex flex-col gap-4">
-              <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[28px] text-[20px] text-[#13131a] tracking-[-0.2px]">
-                Example of Modal Component in Tablet
-              </p>
-              <Modal size="768px" title="Modal Tablet" swap="text" fluid />
-            </div>
-            <div className="flex flex-col gap-4">
-              <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[28px] text-[20px] text-[#13131a] tracking-[-0.2px]">
-                Example of Modal Component in Tablet
-              </p>
-              <Modal size="640px" title="Modal Mobile 640px" swap="text" fluid />
-            </div>
-          </div>
-        </div>
-      </div>
+    <section
+      aria-label="Modals component playground"
+      className="flex flex-col gap-8"
+    >
+      <Playground config={modalConfig} />
+      <Playground config={swapConfig} />
     </section>
   );
 }

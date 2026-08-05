@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
 /* Assets downloaded from Figma (temporary URLs) into /public/figmaAssets/list */
 const imgAvatar = "/figmaAssets/list/avatar.png";
@@ -211,197 +212,206 @@ function List({
 }
 
 /* ---------------------------------------------------------------------------
- * Small caption label
+ * List item playground — the interactive component with its real variant axes:
+ * State, leftItem type, description toggle, rightSlot, contentSlot, separator,
+ * and editable heading / description text.
  * ------------------------------------------------------------------------- */
-function Caption({ children }: { children: React.ReactNode }) {
-  return <span className="text-[12px] text-[#a8a8b2]">{children}</span>;
+type StateName = "Default" | "Hover" | "Selected" | "Disabled";
+
+function stateStyles(state: StateName): {
+  backgroundClass: string;
+  headingClass: string;
+  disabled: boolean;
+  checked: boolean;
+} {
+  switch (state) {
+    case "Hover":
+      return {
+        backgroundClass: "bg-[#71718014]",
+        headingClass: "text-[#13131a]",
+        disabled: false,
+        checked: false,
+      };
+    case "Selected":
+      return {
+        backgroundClass: "bg-[#f6ebff]",
+        headingClass: "text-[#7c33b5]",
+        disabled: false,
+        checked: true,
+      };
+    case "Disabled":
+      return {
+        backgroundClass: "",
+        headingClass: "text-[#a8a8b2]",
+        disabled: true,
+        checked: false,
+      };
+    default:
+      return {
+        backgroundClass: "",
+        headingClass: "text-[#13131a]",
+        disabled: false,
+        checked: false,
+      };
+  }
 }
 
-const cardClass =
-  "rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5";
+function renderLeftItem(leftItem: string): React.ReactNode | undefined {
+  if (leftItem === "Avatar") return <Avatar />;
+  // "Checkbox" → undefined lets ListItem fall back to its default LeftCheckbox
+  return undefined;
+}
+
+const listItemConfig: PlaygroundConfig = {
+  name: "List item",
+  description:
+    "A single row of the List component — configure its state, slots and text.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Default", "Hover", "Selected", "Disabled"],
+      defaultValue: "Default",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "leftItem",
+      label: "leftItem",
+      options: ["Checkbox", "Avatar", "None"],
+      defaultValue: "Checkbox",
+    },
+    { kind: "boolean", name: "description", label: "description", defaultValue: true },
+    { kind: "boolean", name: "rightSlot", label: "rightSlot", defaultValue: false },
+    { kind: "boolean", name: "contentSlot", label: "contentSlot", defaultValue: false },
+    { kind: "boolean", name: "hasSeparator", label: "separator", defaultValue: true },
+    {
+      kind: "text",
+      name: "heading",
+      label: "heading",
+      defaultValue: "Placeholder text",
+      placeholder: "Heading",
+    },
+    {
+      kind: "text",
+      name: "descriptionText",
+      label: "description text",
+      defaultValue: "Description",
+      placeholder: "Description",
+    },
+  ],
+  render: (props: PropValues) => {
+    const state = props.state as StateName;
+    const s = stateStyles(state);
+    const leftItemChoice = String(props.leftItem);
+    return (
+      <div className="w-[394px] max-w-full">
+        <ListItem
+          headingValue={String(props.heading)}
+          descriptionValue={String(props.descriptionText)}
+          description={props.description === true}
+          leftSlot={leftItemChoice !== "None"}
+          leftItem={renderLeftItem(leftItemChoice)}
+          rightSlot={props.rightSlot === true}
+          contentSlot={props.contentSlot === true}
+          contentItem={
+            <div className="h-[27px] w-full rounded-[6px] bg-[#f7f7fa]" />
+          }
+          hasSeparator={props.hasSeparator === true}
+          checked={s.checked}
+          disabled={s.disabled}
+          backgroundClass={s.backgroundClass}
+          headingClass={s.headingClass}
+        />
+      </div>
+    );
+  },
+  tokens: {
+    "text/heading": "#13131a",
+    "text/description": "#4b4b59",
+    "text/disabled": "#a8a8b2",
+    "text/selected": "#7c33b5",
+    "container/hover/background": "#71718014",
+    "container/selected/background": "#f6ebff",
+    "container/checkbox/checked": "#7c33b5",
+    "container/checkbox/disabled": "#7171801a",
+    "border/checkbox": "#c6c6cc",
+    "border/separator": "#e1e1e8",
+    "container/content/background": "#f7f7fa",
+    "spacing/padding": "8px",
+    "radius/checkbox": "2px",
+  },
+};
+
+/* ---------------------------------------------------------------------------
+ * List wrapper playground — the container variant axes:
+ * item type (Checkbox / Avatar), item count, and the hasScroll scrollbar.
+ * ------------------------------------------------------------------------- */
+const listConfig: PlaygroundConfig = {
+  name: "List",
+  description: "Wrapper that stacks List items, with an optional scrollbar.",
+  controls: [
+    {
+      kind: "select",
+      name: "type",
+      label: "Type",
+      options: ["Checkbox", "Avatar"],
+      defaultValue: "Checkbox",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "count",
+      label: "Items",
+      options: ["2", "3", "4"],
+      defaultValue: "4",
+    },
+    { kind: "boolean", name: "hasScroll", label: "hasScroll", defaultValue: false },
+  ],
+  render: (props: PropValues) => {
+    const type = String(props.type);
+    const count = parseInt(String(props.count), 10);
+    const items = Array.from({ length: count }, (_, i) => {
+      const last = i === count - 1;
+      if (type === "Avatar") {
+        return (
+          <ListItem
+            key={i}
+            leftItem={<Avatar />}
+            headingValue="Sammy Tailor"
+            description
+            descriptionValue="Agency director"
+            hasSeparator={!last}
+          />
+        );
+      }
+      return (
+        <ListItem key={i} headingValue="Placeholder text" hasSeparator={!last} />
+      );
+    });
+    return <List hasScroll={props.hasScroll === true}>{items}</List>;
+  },
+  tokens: {
+    "container/width": "281px",
+    "container/min-width": "200px",
+    "scrollbar/track": "#e1e1e8",
+    "scrollbar/width": "8px",
+    "border/separator": "#e1e1e8",
+  },
+};
 
 /* ---------------------------------------------------------------------------
  * Page
  * ------------------------------------------------------------------------- */
 export default function ListPage() {
-  const [defaultChecked, setDefaultChecked] = useState(false);
-  const [selectedChecked, setSelectedChecked] = useState(true);
-
   return (
-    <section className="flex flex-col gap-6">
-      {/* ============================ STATES ============================ */}
-      <div className={cardClass}>
-        <p className="mb-4 text-[14px] font-medium text-[#13131a]">
-          List item — States
-        </p>
-        <div className="flex flex-col gap-6">
-          {/* Default (interactive) */}
-          <div className="flex flex-col gap-1">
-            <Caption>Default — the standard resting state</Caption>
-            <div className="w-[211px]">
-              <ListItem
-                checked={defaultChecked}
-                onCheckChange={() => setDefaultChecked((v) => !v)}
-                hasSeparator
-              />
-            </div>
-          </div>
-
-          {/* Hover */}
-          <div className="flex flex-col gap-1">
-            <Caption>Hover — applies a subtle background colour</Caption>
-            <div className="w-[211px]">
-              <ListItem backgroundClass="bg-[#71718014]" hasSeparator />
-            </div>
-          </div>
-
-          {/* Selected */}
-          <div className="flex flex-col gap-1">
-            <Caption>Selected — used in single/multi-selection lists</Caption>
-            <div className="w-[211px]">
-              <ListItem
-                checked={selectedChecked}
-                onCheckChange={() => setSelectedChecked((v) => !v)}
-                backgroundClass="bg-[#f6ebff]"
-                headingClass="text-[#7c33b5]"
-                hasSeparator
-              />
-            </div>
-          </div>
-
-          {/* Disabled */}
-          <div className="flex flex-col gap-1">
-            <Caption>Disabled — a non-selectable item</Caption>
-            <div className="w-[211px]">
-              <ListItem
-                disabled
-                headingClass="text-[#a8a8b2]"
-                hasSeparator
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ========================== PROPERTIES ========================== */}
-      <div className={cardClass}>
-        <p className="mb-4 text-[14px] font-medium text-[#13131a]">
-          List item — Properties &amp; slots
-        </p>
-        <div className="flex flex-wrap gap-8">
-          {/* leftSlot */}
-          <div className="flex flex-col gap-1">
-            <Caption>leftSlot — objects at the start of the row</Caption>
-            <div className="w-[394px] max-w-full">
-              <ListItem description descriptionValue="Description" hasSeparator />
-            </div>
-          </div>
-
-          {/* heading */}
-          <div className="flex flex-col gap-1">
-            <Caption>heading — main label displayed</Caption>
-            <div className="w-[394px] max-w-full">
-              <ListItem
-                headingValue="Placeholder text"
-                description
-                descriptionValue="Description"
-                hasSeparator
-              />
-            </div>
-          </div>
-
-          {/* description */}
-          <div className="flex flex-col gap-1">
-            <Caption>description — text below the heading</Caption>
-            <div className="w-[394px] max-w-full">
-              <ListItem description descriptionValue="Description" hasSeparator />
-            </div>
-          </div>
-
-          {/* rightSlot */}
-          <div className="flex flex-col gap-1">
-            <Caption>rightSlot — objects at the end of the row</Caption>
-            <div className="w-[394px] max-w-full">
-              <ListItem description descriptionValue="Description" rightSlot hasSeparator />
-            </div>
-          </div>
-
-          {/* contentSlot */}
-          <div className="flex flex-col gap-1">
-            <Caption>contentSlot — objects at the bottom of the item</Caption>
-            <div className="w-[394px] max-w-full">
-              <ListItem
-                description
-                descriptionValue="Description"
-                contentSlot
-                contentItem={
-                  <div className="h-[27px] w-full rounded-[6px] bg-[#f7f7fa]" />
-                }
-                hasSeparator
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ============================ LIST ============================= */}
-      <div className={cardClass}>
-        <p className="mb-4 text-[14px] font-medium text-[#13131a]">
-          List — wrapper component
-        </p>
-        <div className="flex flex-wrap gap-8">
-          {/* Default checkbox list */}
-          <div className="flex flex-col gap-1">
-            <Caption>listWrapper — checkbox list items</Caption>
-            <List hasScroll={false}>
-              <ListItem headingValue="Placeholder text" />
-              <ListItem headingValue="Placeholder text" />
-              <ListItem headingValue="Placeholder text" />
-              <ListItem headingValue="Placeholder text" hasSeparator={false} />
-            </List>
-          </div>
-
-          {/* Avatar list */}
-          <div className="flex flex-col gap-1">
-            <Caption>Avatar leftItem + description</Caption>
-            <List hasScroll={false}>
-              <ListItem
-                leftItem={<Avatar />}
-                headingValue="Sammy Tailor"
-                description
-                descriptionValue="Agency director"
-              />
-              <ListItem
-                leftItem={<Avatar />}
-                headingValue="Sammy Tailor"
-                description
-                descriptionValue="Agency director"
-                hasSeparator={false}
-              />
-            </List>
-          </div>
-
-          {/* hasScroll */}
-          <div className="flex flex-col gap-1">
-            <Caption>hasScroll — displays a scrollbar</Caption>
-            <List hasScroll>
-              <ListItem
-                leftItem={<Avatar />}
-                headingValue="Sammy Tailor"
-                description
-                descriptionValue="Agency director"
-              />
-              <ListItem
-                leftItem={<Avatar />}
-                headingValue="Sammy Tailor"
-                description
-                descriptionValue="Agency director"
-                hasSeparator={false}
-              />
-            </List>
-          </div>
-        </div>
-      </div>
+    <section
+      aria-label="List component playground"
+      className="flex flex-col gap-6"
+    >
+      <Playground config={listItemConfig} />
+      <Playground config={listConfig} />
     </section>
   );
 }

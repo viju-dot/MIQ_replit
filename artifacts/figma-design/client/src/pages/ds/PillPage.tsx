@@ -1,6 +1,6 @@
-const caption = "text-[12px] text-[#a8a8b2]";
-const cardClass =
-  "rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
+
 const fontMedium = { fontFamily: '"DM Sans", Helvetica', fontWeight: 500 } as const;
 
 const ASSET = "/figmaAssets/pill";
@@ -70,120 +70,8 @@ function Pill({
 }
 
 /* ------------------------------------------------------------------ *
- * Colour tables                                                       *
+ * Colour resolution (exact Figma values from the original file)       *
  * ------------------------------------------------------------------ */
-
-type VariantRow = {
-  caption: string;
-  colors: PillColors;
-};
-
-// Removable pill — label "Label title"
-const removableVariants: VariantRow[] = [
-  {
-    caption: "Brand (Bold) / Filled / Active",
-    colors: { bg: "#7c33b5", fg: "#ffffff", icon: "close-white.svg" },
-  },
-  {
-    caption: "Brand (Bold) / Filled / Hover",
-    colors: { bg: "#662994", fg: "#ffffff", icon: "close-white-hover.svg" },
-  },
-  {
-    caption: "Brand (Subtle) / Filled / Active",
-    colors: { bg: "#f6ebff", fg: "#7c33b5", icon: "close-brand.svg" },
-  },
-  {
-    caption: "Brand (Subtle) / Filled / Hover",
-    colors: { bg: "#e7c7ff", fg: "#662994", icon: "close-brand-hover.svg" },
-  },
-  {
-    caption: "Brand (Bold) / Outline / Active",
-    colors: { bg: "#ffffff", border: "#7c33b5", fg: "#7c33b5", icon: "close-brand.svg" },
-  },
-  {
-    caption: "Brand (Bold) / Outline / Hover",
-    colors: {
-      bg: "rgba(113,113,128,0.08)",
-      border: "#662994",
-      fg: "#662994",
-      icon: "close-brand-hover.svg",
-    },
-  },
-  {
-    caption: "Warning / Filled / Active",
-    colors: { bg: "#f8c500", fg: "#241c00", icon: "close-warning.svg" },
-  },
-  {
-    caption: "Warning / Filled / Hover",
-    colors: { bg: "#d1a600", fg: "#241c00", icon: "close-warning-hover.svg" },
-  },
-  {
-    caption: "Warning / Outline / Active",
-    colors: {
-      bg: "#ffffff",
-      border: "#f8c500",
-      fg: "#483800",
-      icon: "close-warning-outline.svg",
-    },
-  },
-  {
-    caption: "Warning / Outline / Hover",
-    colors: {
-      bg: "#ffffff",
-      border: "#d1a600",
-      fg: "#241c00",
-      icon: "close-warning-outline-hover.svg",
-    },
-  },
-];
-
-const removableDisabled: { caption: string; size: Size; icon: string }[] = [
-  { caption: "Disabled / Compact", size: "Compact", icon: "close-disabled-compact.svg" },
-  { caption: "Disabled / Standard", size: "Standard", icon: "close-disabled-standard.svg" },
-];
-
-// Draggable pill — label "Collect"
-const draggableVariants: VariantRow[] = [
-  {
-    caption: "Brand (Bold) / Filled / Active",
-    colors: { bg: "#7c33b5", fg: "#ffffff", icon: "drag-close-white.svg" },
-  },
-  {
-    caption: "Brand (Bold) / Filled / Hover",
-    colors: { bg: "#662994", fg: "#ffffff", icon: "drag-close-white-hover.svg" },
-  },
-  {
-    caption: "Brand (Bold) / Filled / Pressed",
-    colors: { bg: "#662994", fg: "#ffffff", icon: "drag-close-white-hover.svg" },
-  },
-  {
-    caption: "Brand (Bold) / Outline / Active",
-    colors: { bg: "#ffffff", border: "#7c33b5", fg: "#7c33b5", icon: "drag-close-brand.svg" },
-  },
-  {
-    caption: "Brand (Bold) / Outline / Hover",
-    colors: {
-      bg: "rgba(113,113,128,0.08)",
-      border: "#662994",
-      fg: "#662994",
-      icon: "drag-close-brand-hover.svg",
-    },
-  },
-  {
-    caption: "Brand (Bold) / Outline / Pressed",
-    colors: {
-      bg: "rgba(113,113,128,0.08)",
-      border: "#662994",
-      fg: "#662994",
-      icon: "drag-close-brand-hover.svg",
-    },
-  },
-];
-
-const draggableDisabled: { caption: string; size: Size; icon: string }[] = [
-  { caption: "Disabled / Compact", size: "Compact", icon: "drag-close-disabled.svg" },
-  { caption: "Disabled / Standard", size: "Standard", icon: "drag-close-disabled.svg" },
-];
 
 const disabledColors = (icon: string): PillColors => ({
   bg: "rgba(113,113,128,0.1)",
@@ -191,116 +79,210 @@ const disabledColors = (icon: string): PillColors => ({
   icon,
 });
 
-/* ------------------------------------------------------------------ *
- * A labelled cell showing both Compact & Standard sizes               *
- * ------------------------------------------------------------------ */
-function VariantCell({
-  caption: cap,
-  label,
-  colors,
-}: {
-  caption: string;
-  label: string;
-  colors: PillColors;
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <span className={caption}>{cap}</span>
-      <div className="flex flex-wrap items-center gap-3">
-        <Pill label={label} size="Compact" colors={colors} />
-        <Pill label={label} size="Standard" colors={colors} />
-      </div>
-    </div>
-  );
+// Removable pill — resolves colors from Style / Fill / State axes
+function resolveRemovable(
+  style: string,
+  fill: string,
+  state: string,
+): PillColors {
+  const hover = state === "Hover";
+  if (style === "Brand (Bold)") {
+    if (fill === "Filled") {
+      return hover
+        ? { bg: "#662994", fg: "#ffffff", icon: "close-white-hover.svg" }
+        : { bg: "#7c33b5", fg: "#ffffff", icon: "close-white.svg" };
+    }
+    // Outline
+    return hover
+      ? {
+          bg: "rgba(113,113,128,0.08)",
+          border: "#662994",
+          fg: "#662994",
+          icon: "close-brand-hover.svg",
+        }
+      : { bg: "#ffffff", border: "#7c33b5", fg: "#7c33b5", icon: "close-brand.svg" };
+  }
+  if (style === "Brand (Subtle)") {
+    // Subtle only has Filled variants in Figma
+    return hover
+      ? { bg: "#e7c7ff", fg: "#662994", icon: "close-brand-hover.svg" }
+      : { bg: "#f6ebff", fg: "#7c33b5", icon: "close-brand.svg" };
+  }
+  // Warning
+  if (fill === "Filled") {
+    return hover
+      ? { bg: "#d1a600", fg: "#241c00", icon: "close-warning-hover.svg" }
+      : { bg: "#f8c500", fg: "#241c00", icon: "close-warning.svg" };
+  }
+  // Warning / Outline
+  return hover
+    ? { bg: "#ffffff", border: "#d1a600", fg: "#241c00", icon: "close-warning-outline-hover.svg" }
+    : { bg: "#ffffff", border: "#f8c500", fg: "#483800", icon: "close-warning-outline.svg" };
 }
 
-function DisabledCell({
-  caption: cap,
-  label,
-  size,
-  icon,
-}: {
-  caption: string;
-  label: string;
-  size: Size;
-  icon: string;
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <span className={caption}>{cap}</span>
-      <div className="flex flex-wrap items-center gap-3">
-        <Pill label={label} size={size} colors={disabledColors(icon)} />
-      </div>
-    </div>
-  );
+// Draggable pill — Brand (Bold) only, Fill / State axes
+function resolveDraggable(fill: string, state: string): PillColors {
+  const activeState = state === "Active";
+  if (fill === "Filled") {
+    return activeState
+      ? { bg: "#7c33b5", fg: "#ffffff", icon: "drag-close-white.svg" }
+      : { bg: "#662994", fg: "#ffffff", icon: "drag-close-white-hover.svg" };
+  }
+  // Outline
+  return activeState
+    ? { bg: "#ffffff", border: "#7c33b5", fg: "#7c33b5", icon: "drag-close-brand.svg" }
+    : {
+        bg: "rgba(113,113,128,0.08)",
+        border: "#662994",
+        fg: "#662994",
+        icon: "drag-close-brand-hover.svg",
+      };
 }
+
+/* ------------------------------------------------------------------ *
+ * Playground configs                                                  *
+ * ------------------------------------------------------------------ */
+
+const removableConfig: PlaygroundConfig = {
+  name: "Pill / Removable",
+  description:
+    "Dismissible tag with a close affordance. Style, fill and state axes with Compact & Standard sizes.",
+  controls: [
+    {
+      kind: "select",
+      name: "style",
+      label: "Style",
+      options: ["Brand (Bold)", "Brand (Subtle)", "Warning"],
+      defaultValue: "Brand (Bold)",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "fill",
+      label: "Fill",
+      options: ["Filled", "Outline"],
+      defaultValue: "Filled",
+    },
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Active", "Hover", "Disabled"],
+      defaultValue: "Active",
+    },
+    {
+      kind: "select",
+      name: "size",
+      label: "Size",
+      options: ["Compact", "Standard"],
+      defaultValue: "Standard",
+    },
+    { kind: "text", name: "label", label: "Label", defaultValue: "Label title" },
+  ],
+  render: (props: PropValues) => {
+    const style = String(props.style);
+    const fill = String(props.fill);
+    const state = String(props.state);
+    const size = props.size === "Compact" ? "Compact" : "Standard";
+    const label = String(props.label);
+
+    // Brand (Subtle) has no Outline variant in Figma — fall back to Filled.
+    const effectiveFill = style === "Brand (Subtle)" ? "Filled" : fill;
+
+    if (state === "Disabled") {
+      const icon =
+        size === "Compact" ? "close-disabled-compact.svg" : "close-disabled-standard.svg";
+      return <Pill label={label} size={size} colors={disabledColors(icon)} />;
+    }
+    return (
+      <Pill
+        label={label}
+        size={size}
+        colors={resolveRemovable(style, effectiveFill, state)}
+      />
+    );
+  },
+  tokens: {
+    "container/brand/bold/background": "#7c33b5",
+    "container/brand/bold/hover": "#662994",
+    "container/brand/subtle/background": "#f6ebff",
+    "container/brand/subtle/hover": "#e7c7ff",
+    "container/warning/background": "#f8c500",
+    "container/warning/hover": "#d1a600",
+    "container/disabled/background": "rgba(113,113,128,0.1)",
+    "outline/hover/overlay": "rgba(113,113,128,0.08)",
+    "foreground/on-brand": "#ffffff",
+    "foreground/brand": "#7c33b5",
+    "foreground/warning": "#241c00",
+    "foreground/disabled": "#a8a8b2",
+    "radius/pill": "100px",
+    "size/compact": "h 18 (font 12/18)",
+    "size/standard": "h 24 (font 14/20)",
+  },
+};
+
+const draggableConfig: PlaygroundConfig = {
+  name: "Pill / Draggable",
+  description:
+    "Draggable tag with drag handle + close affordance. Brand (Bold) fill and state axes with Compact & Standard sizes.",
+  controls: [
+    {
+      kind: "select",
+      name: "fill",
+      label: "Fill",
+      options: ["Filled", "Outline"],
+      defaultValue: "Filled",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Active", "Hover", "Pressed", "Disabled"],
+      defaultValue: "Active",
+    },
+    {
+      kind: "select",
+      name: "size",
+      label: "Size",
+      options: ["Compact", "Standard"],
+      defaultValue: "Standard",
+    },
+    { kind: "text", name: "label", label: "Label", defaultValue: "Collect" },
+  ],
+  render: (props: PropValues) => {
+    const fill = String(props.fill);
+    const state = String(props.state);
+    const size = props.size === "Compact" ? "Compact" : "Standard";
+    const label = String(props.label);
+
+    if (state === "Disabled") {
+      return (
+        <Pill label={label} size={size} colors={disabledColors("drag-close-disabled.svg")} />
+      );
+    }
+    // Hover and Pressed share the same appearance in Figma.
+    return <Pill label={label} size={size} colors={resolveDraggable(fill, state)} />;
+  },
+  tokens: {
+    "container/brand/bold/background": "#7c33b5",
+    "container/brand/bold/hover": "#662994",
+    "container/disabled/background": "rgba(113,113,128,0.1)",
+    "outline/hover/overlay": "rgba(113,113,128,0.08)",
+    "foreground/on-brand": "#ffffff",
+    "foreground/brand": "#7c33b5",
+    "foreground/disabled": "#a8a8b2",
+    "radius/pill": "100px",
+    "size/compact": "h 18 (font 12/18)",
+    "size/standard": "h 24 (font 14/20)",
+  },
+};
 
 export default function PillPage() {
   return (
-    <section className="flex flex-col gap-8">
-      {/* Pill / Removable */}
-      <div className={cardClass}>
-        <div className="mb-4 flex flex-col gap-1">
-          <h2
-            style={{ ...fontMedium, fontSize: 16, color: "#13131a" }}
-          >
-            Pill / Removable
-          </h2>
-          <span className={caption}>
-            Compact &amp; Standard sizes shown per variant
-          </span>
-        </div>
-        <div className="flex flex-wrap gap-x-10 gap-y-6">
-          {removableVariants.map((v) => (
-            <VariantCell
-              key={v.caption}
-              caption={v.caption}
-              label="Label title"
-              colors={v.colors}
-            />
-          ))}
-          {removableDisabled.map((d) => (
-            <DisabledCell
-              key={d.caption}
-              caption={d.caption}
-              label="Disabled"
-              size={d.size}
-              icon={d.icon}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Pill / Draggable */}
-      <div className={cardClass}>
-        <div className="mb-4 flex flex-col gap-1">
-          <h2 style={{ ...fontMedium, fontSize: 16, color: "#13131a" }}>
-            Pill / Draggable
-          </h2>
-          <span className={caption}>
-            Compact &amp; Standard sizes shown per variant
-          </span>
-        </div>
-        <div className="flex flex-wrap gap-x-10 gap-y-6">
-          {draggableVariants.map((v) => (
-            <VariantCell
-              key={v.caption}
-              caption={v.caption}
-              label="Collect"
-              colors={v.colors}
-            />
-          ))}
-          {draggableDisabled.map((d) => (
-            <DisabledCell
-              key={d.caption}
-              caption={d.caption}
-              label="Collect"
-              size={d.size}
-              icon={d.icon}
-            />
-          ))}
-        </div>
-      </div>
+    <section aria-label="Pill component playground" className="flex flex-col gap-6">
+      <Playground config={removableConfig} />
+      <Playground config={draggableConfig} />
     </section>
   );
 }

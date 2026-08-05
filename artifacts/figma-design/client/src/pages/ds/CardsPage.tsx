@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
 
 /* =========================================================================
  * Cards (Figma page node 65:24)
  * Component groups: Smart Card, Smart Wide Card, Header, Footer, Content,
  * Swap Instance, Terms & Policy Card.
- * Documentation / annotation frames are intentionally skipped.
+ * Each distinct component is exposed as an interactive Playground whose
+ * controls map to the real Figma variant axes. All JSX/classes/assets are
+ * reused verbatim from the original Figma import — only interaction changed.
  * ========================================================================= */
 
 const STAR = "/figmaAssets/cards/star.svg";
@@ -588,185 +591,229 @@ function TermsPolicyCard() {
   );
 }
 
+/* =========================================================================
+ * Playground configs — one per distinct component.
+ * ========================================================================= */
+
+const smartCardConfig: PlaygroundConfig = {
+  name: "Smart Card",
+  description: "Container card with header, content and footer slots.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Default", "Selected", "Disabled", "Hover"],
+      defaultValue: "Default",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "showHeader", label: "Header", defaultValue: true },
+    { kind: "boolean", name: "showFooter", label: "Footer", defaultValue: true },
+    {
+      kind: "boolean",
+      name: "showDragSection",
+      label: "Drag handle",
+      defaultValue: false,
+    },
+  ],
+  render: (props) => {
+    const map: Record<string, SmartCardState> = {
+      Default: "default",
+      Selected: "selected",
+      Disabled: "disabled",
+      Hover: "hover",
+    };
+    return (
+      <div className="w-[440px] max-w-full">
+        <SmartCard
+          state={map[String(props.state)] ?? "default"}
+          showHeader={props.showHeader === true}
+          showFooter={props.showFooter === true}
+          showDragSection={props.showDragSection === true}
+        />
+      </div>
+    );
+  },
+  tokens: {
+    "container/background": "#ffffff",
+    "container/disabled/background": "rgba(113,113,128,0.1)",
+    "border/brand/selected": "#7c33b5",
+    "border/neutral/subtle": "#e1e1e8",
+    "radius/card": "2px",
+    "shadow/hover": "0px 12px 20px rgba(113,113,128,0.1)",
+    "shadow/selected": "0px 16px 24px rgba(113,113,128,0.12)",
+    "size/content-width": "400px",
+  },
+};
+
+const smartWideCardConfig: PlaygroundConfig = {
+  name: "Smart Wide Card",
+  description: "Full-width card with multiple layout styles.",
+  controls: [
+    {
+      kind: "select",
+      name: "style",
+      label: "Style",
+      options: [
+        "Simple",
+        "Simple Filled",
+        "Line",
+        "Line Filled",
+        "Box Filled",
+        "Box",
+        "Draggable",
+      ],
+      defaultValue: "Simple",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "footer", label: "Footer", defaultValue: true },
+  ],
+  render: (props) => (
+    <div className="w-full max-w-[600px]">
+      <SmartWideCard
+        style={String(props.style) as WideStyle}
+        footer={props.footer === true}
+      />
+    </div>
+  ),
+  tokens: {
+    "container/background": "#ffffff",
+    "border/neutral/subtle": "#e1e1e8",
+    "radius/card": "2px",
+    "spacing/padding": "16px",
+    "spacing/gap": "16px",
+    "shadow/card": "0px 8px 8px rgba(113,113,128,0.04)",
+  },
+};
+
+const headerConfig: PlaygroundConfig = {
+  name: "Header",
+  description: "Card header — with optional right-aligned tabs.",
+  controls: [
+    { kind: "boolean", name: "rightTab", label: "Right tabs", defaultValue: false },
+    { kind: "boolean", name: "disabled", label: "Disabled", defaultValue: false },
+  ],
+  render: (props) => (
+    <div className="w-[400px] max-w-full bg-white">
+      <CardHeader
+        rightTab={props.rightTab === true}
+        disabled={props.disabled === true}
+      />
+    </div>
+  ),
+  tokens: {
+    "text/title": "#13131a",
+    "text/title/disabled": "#a8a8b2",
+    "text/brand/tab-active": "#7c33b5",
+    "border/neutral/subtle": "#e1e1e8",
+    "border/brand/tab-active": "#7c33b5",
+    "spacing/padding": "16px",
+  },
+};
+
+const footerConfig: PlaygroundConfig = {
+  name: "Footer",
+  description: "Card footer — left and right action groups toggle independently.",
+  controls: [
+    { kind: "boolean", name: "leftFooter", label: "Left group", defaultValue: true },
+    { kind: "boolean", name: "rightFooter", label: "Right group", defaultValue: true },
+  ],
+  render: (props) => (
+    <StandaloneFooter
+      leftFooter={props.leftFooter === true}
+      rightFooter={props.rightFooter === true}
+    />
+  ),
+  tokens: {
+    "container/brand/bold/background": "#7c33b5",
+    "border/neutral/bold": "#4b4b59",
+    "text/brand/link": "#7c33b5",
+    "spacing/gap": "8px",
+  },
+};
+
+const contentConfig: PlaygroundConfig = {
+  name: "Content",
+  description: "Card content area — three layout types.",
+  controls: [
+    {
+      kind: "select",
+      name: "type",
+      label: "Type",
+      options: ["box with line", "outlined box", "two box"],
+      defaultValue: "box with line",
+      asTabs: true,
+    },
+  ],
+  render: (props) => (
+    <CardContent
+      type={String(props.type) as "box with line" | "outlined box" | "two box"}
+    />
+  ),
+  tokens: {
+    "container/background": "#ffffff",
+    "border/neutral/subtle": "#e1e1e8",
+    "placeholder/fill": "rgba(209,148,255,0.2)",
+    "placeholder/border": "#d194ff",
+    "spacing/padding": "16px",
+  },
+};
+
+const swapInstanceConfig: PlaygroundConfig = {
+  name: "Swap Instance",
+  description: "Swappable content slot — dashed container or text.",
+  controls: [
+    {
+      kind: "select",
+      name: "type",
+      label: "Type",
+      options: ["container", "text"],
+      defaultValue: "container",
+      asTabs: true,
+    },
+  ],
+  render: (props) => (
+    <SwapInstance type={String(props.type) as "container" | "text"} />
+  ),
+  tokens: {
+    "placeholder/fill": "rgba(209,148,255,0.2)",
+    "placeholder/border": "#d194ff",
+    "text/body": "#13131a",
+    "size/slot": "200×168",
+  },
+};
+
+const termsPolicyConfig: PlaygroundConfig = {
+  name: "Terms & Policy Card",
+  description: "Long-form policy content card with a titled header band.",
+  controls: [],
+  render: () => (
+    <div className="w-full max-w-[588px]">
+      <TermsPolicyCard />
+    </div>
+  ),
+  tokens: {
+    "container/background": "#ffffff",
+    "border/neutral/subtle": "#e1e1e8",
+    "text/title": "#13131a",
+    "text/body": "#13131a",
+    "radius/card": "2px",
+    "shadow/card": "0px 8px 8px rgba(113,113,128,0.04)",
+  },
+};
+
 /* ========================================================================= */
 
-const groupCard =
-  "rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5";
-const caption = "text-[12px] text-[#a8a8b2]";
-
-function Variant({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <span className={caption}>{label}</span>
-      {children}
-    </div>
-  );
-}
-
 export default function CardsPage(): JSX.Element {
-  const [dragDemo, setDragDemo] = useState(true);
-
   return (
-    <section className="flex flex-col gap-8" aria-label="Cards">
-      {/* Smart Card */}
-      <div className={groupCard}>
-        <span className={`${caption} mb-4 block`}>Smart Card — states</span>
-        <div className="flex flex-wrap gap-8">
-          <Variant label="Default">
-            <div className="w-[400px] max-w-full">
-              <SmartCard state="default" showFooter />
-            </div>
-          </Variant>
-          <Variant label="Selected">
-            <div className="w-[400px] max-w-full">
-              <SmartCard state="selected" showFooter />
-            </div>
-          </Variant>
-          <Variant label="Disabled">
-            <div className="w-[400px] max-w-full">
-              <SmartCard state="disabled" showFooter />
-            </div>
-          </Variant>
-          <Variant label="Hover">
-            <div className="w-[400px] max-w-full">
-              <SmartCard state="hover" showFooter />
-            </div>
-          </Variant>
-          <Variant label="With drag handle">
-            <div className="w-[440px] max-w-full">
-              <SmartCard state="default" showFooter showDragSection />
-            </div>
-          </Variant>
-          <Variant label="No footer">
-            <div className="w-[400px] max-w-full">
-              <SmartCard state="default" />
-            </div>
-          </Variant>
-        </div>
-      </div>
-
-      {/* Smart Wide Card */}
-      <div className={groupCard}>
-        <span className={`${caption} mb-4 block`}>
-          Smart Wide Card — style × footer
-        </span>
-        <div className="flex flex-col gap-6 max-w-[1200px]">
-          {(
-            [
-              "Simple",
-              "Simple Filled",
-              "Line",
-              "Line Filled",
-              "Box Filled",
-              "Box",
-            ] as WideStyle[]
-          ).map((style) => (
-            <div key={style} className="flex flex-col gap-4">
-              <Variant label={`${style}, Footer On`}>
-                <SmartWideCard style={style} footer />
-              </Variant>
-              <Variant label={`${style}, Footer Off`}>
-                <SmartWideCard style={style} footer={false} />
-              </Variant>
-            </div>
-          ))}
-          <Variant label="Draggable, Footer Off">
-            <SmartWideCard style="Draggable" footer={false} />
-          </Variant>
-        </div>
-      </div>
-
-      {/* Header */}
-      <div className={groupCard}>
-        <span className={`${caption} mb-4 block`}>Header</span>
-        <div className="flex flex-col gap-6 max-w-[400px]">
-          <Variant label="right-tab = false">
-            <div className="bg-white">
-              <CardHeader />
-            </div>
-          </Variant>
-          <Variant label="right-tab = true">
-            <div className="bg-white">
-              <CardHeader rightTab />
-            </div>
-          </Variant>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className={groupCard}>
-        <span className={`${caption} mb-4 block`}>Footer</span>
-        <div className="flex flex-col gap-6 max-w-[400px]">
-          <Variant label="left = true, right = true">
-            <StandaloneFooter leftFooter rightFooter />
-          </Variant>
-          <Variant label="left = false, right = true">
-            <StandaloneFooter leftFooter={false} rightFooter />
-          </Variant>
-          <Variant label="left = true, right = false">
-            <StandaloneFooter leftFooter rightFooter={false} />
-          </Variant>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className={groupCard}>
-        <span className={`${caption} mb-4 block`}>Content</span>
-        <div className="flex flex-wrap gap-8">
-          <Variant label="box with line">
-            <CardContent type="box with line" />
-          </Variant>
-          <Variant label="outlined box">
-            <CardContent type="outlined box" />
-          </Variant>
-          <Variant label="two box">
-            <CardContent type="two box" />
-          </Variant>
-        </div>
-      </div>
-
-      {/* Swap Instance */}
-      <div className={groupCard}>
-        <span className={`${caption} mb-4 block`}>Swap Instance</span>
-        <div className="flex flex-wrap gap-8">
-          <Variant label="type = container">
-            <SwapInstance type="container" />
-          </Variant>
-          <Variant label="type = text">
-            <SwapInstance type="text" />
-          </Variant>
-        </div>
-      </div>
-
-      {/* Terms & Policy Card */}
-      <div className={groupCard}>
-        <span className={`${caption} mb-4 block`}>Terms &amp; Policy Card</span>
-        <TermsPolicyCard />
-      </div>
-
-      {/* Interactive drag demo (real state) */}
-      <div className={groupCard}>
-        <span className={`${caption} mb-4 block`}>
-          Smart Card — interactive drag toggle
-        </span>
-        <button
-          type="button"
-          onClick={() => setDragDemo((v) => !v)}
-          className="mb-3 rounded-[2px] bg-[#7c33b5] px-3 py-1.5 text-[14px] text-white"
-          style={{ fontFamily: '"DM Sans", Helvetica' }}
-        >
-          {dragDemo ? "Hide drag handle" : "Show drag handle"}
-        </button>
-        <div className="w-[440px] max-w-full">
-          <SmartCard state="default" showFooter showDragSection={dragDemo} />
-        </div>
-      </div>
+    <section className="flex flex-col gap-6" aria-label="Cards">
+      <Playground config={smartCardConfig} />
+      <Playground config={smartWideCardConfig} />
+      <Playground config={headerConfig} />
+      <Playground config={footerConfig} />
+      <Playground config={contentConfig} />
+      <Playground config={swapInstanceConfig} />
+      <Playground config={termsPolicyConfig} />
     </section>
   );
 }

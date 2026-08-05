@@ -1,29 +1,8 @@
 import { useState } from "react";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
 
 const A = "/figmaAssets/navigation";
-
-/* ------------------------------------------------------------------ */
-/* Reusable caption + card group helpers                               */
-/* ------------------------------------------------------------------ */
-
-function Caption({ children }: { children: React.ReactNode }): JSX.Element {
-  return <span className="text-[12px] text-[#a8a8b2]">{children}</span>;
-}
-
-function Group({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}): JSX.Element {
-  return (
-    <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-      <h3 className="mb-4 text-[14px] font-medium text-[#13131a]">{title}</h3>
-      <div className="flex flex-col gap-6">{children}</div>
-    </div>
-  );
-}
 
 /* ------------------------------------------------------------------ */
 /* Sigma Logo (Primary Navigation)                                     */
@@ -152,7 +131,15 @@ function SigmaLogo(): JSX.Element {
 /* Primary Navigation                                                  */
 /* ------------------------------------------------------------------ */
 
-function PrimaryNavigation(): JSX.Element {
+function PrimaryNavigation({
+  activeLabel,
+  showMenuCaret,
+  language,
+}: {
+  activeLabel: string;
+  showMenuCaret: boolean;
+  language: string;
+}): JSX.Element {
   return (
     <div className="relative flex h-[64px] w-full items-center justify-between bg-[#2b0030] p-[24px]">
       {/* Menu item (Intelligence) */}
@@ -160,22 +147,24 @@ function PrimaryNavigation(): JSX.Element {
         <div className="relative flex h-[64px] shrink-0 items-center justify-center gap-[32px]">
           <div className="relative h-full w-[100px]">
             <p className="absolute left-[calc(50%-43.23px)] top-[calc(50%-10px)] whitespace-nowrap text-[16px] font-medium not-italic leading-[24px] text-white">
-              Intelligence
+              {activeLabel}
             </p>
             <div className="absolute bottom-0 left-[calc(50%-1px)] h-[4px] w-[100px] -translate-x-1/2 rounded-tl-[2px] rounded-tr-[2px] bg-gradient-to-r from-[#d71982] via-[#ff540c] to-[#dad310] from-[25.521%] via-[59.375%]" />
           </div>
         </div>
-        <div className="flex flex-row items-center self-stretch">
-          <div className="relative flex h-full w-[24px] shrink-0 items-center justify-center px-[4px] pb-[2px] pt-[6px]">
-            <div className="relative size-[24px] shrink-0">
-              <img
-                alt=""
-                className="absolute inset-0 block size-full max-w-none"
-                src={`${A}/pn-caret.svg`}
-              />
+        {showMenuCaret && (
+          <div className="flex flex-row items-center self-stretch">
+            <div className="relative flex h-full w-[24px] shrink-0 items-center justify-center px-[4px] pb-[2px] pt-[6px]">
+              <div className="relative size-[24px] shrink-0">
+                <img
+                  alt=""
+                  className="absolute inset-0 block size-full max-w-none"
+                  src={`${A}/pn-caret.svg`}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Logo (centered) */}
@@ -197,7 +186,7 @@ function PrimaryNavigation(): JSX.Element {
               </div>
             </div>
             <p className="whitespace-nowrap text-[14px] font-normal not-italic leading-[20px] text-white">
-              English
+              {language}
             </p>
           </div>
           <div className="relative flex size-[20px] shrink-0 items-center justify-center">
@@ -355,7 +344,7 @@ function SecondaryNavigation({
 /* Navigation Secondary (title + action buttons bar)                   */
 /* ------------------------------------------------------------------ */
 
-function NavigationSecondaryBar(): JSX.Element {
+function NavigationSecondaryBar({ title }: { title: string }): JSX.Element {
   return (
     <div className="relative h-[56px] w-full bg-white">
       <div className="absolute inset-x-0 bottom-0">
@@ -367,7 +356,7 @@ function NavigationSecondaryBar(): JSX.Element {
       </div>
       <div className="absolute left-[24px] right-[24px] top-[11px] flex items-center justify-between">
         <p className="whitespace-nowrap text-[20px] font-medium not-italic leading-[28px] tracking-[-0.2px] text-[#13131a] [word-break:break-word]">
-          Placeholder…
+          {title}
         </p>
         <div className="relative flex flex-1 items-start justify-end gap-[12px]">
           <div className="relative flex h-[34px] shrink-0 items-start rounded-[2px]">
@@ -689,96 +678,226 @@ function Avatar({
 }
 
 /* ------------------------------------------------------------------ */
+/* Playground configs                                                  */
+/* ------------------------------------------------------------------ */
+
+const primaryNavConfig: PlaygroundConfig = {
+  name: "Primary Navigation",
+  description:
+    "Top-level app bar — active module, centered Sigma logo, language selector and Pro+ avatar.",
+  controls: [
+    {
+      kind: "text",
+      name: "activeLabel",
+      label: "Active module",
+      defaultValue: "Intelligence",
+      placeholder: "Module name",
+    },
+    { kind: "boolean", name: "menu", label: "Show menu caret", defaultValue: true },
+    {
+      kind: "text",
+      name: "language",
+      label: "Language",
+      defaultValue: "English",
+      placeholder: "Language",
+    },
+  ],
+  render: (props) => (
+    <div className="w-full min-w-[640px] overflow-hidden rounded-[4px]">
+      <PrimaryNavigation
+        activeLabel={String(props.activeLabel)}
+        showMenuCaret={props.menu === true}
+        language={String(props.language)}
+      />
+    </div>
+  ),
+  tokens: {
+    "surface/primary-nav/background": "#2b0030",
+    "surface/pill/background": "rgba(255,255,255,0.2)",
+    "text/on-dark": "#ffffff",
+    "gradient/active-indicator": "#d71982 → #ff540c → #dad310",
+    "gradient/pro-plus": "#d71982 → #ff540c → #f0e812",
+    "size/bar-height": "64px",
+    "spacing/bar-padding": "24px",
+  },
+};
+
+const MODULES: Module[] = [
+  "Audiences",
+  "Intelligence",
+  "Campaigns",
+  "Reports",
+  "Creatives",
+];
+
+const secondaryNavConfig: PlaygroundConfig = {
+  name: "Secondary Navigation",
+  description: "Module sub-navigation bar. Switch modules and toggle the dark surface.",
+  controls: [
+    {
+      kind: "select",
+      name: "module",
+      label: "Module",
+      options: MODULES as string[],
+      defaultValue: "Audiences",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "dark", label: "Dark surface", defaultValue: false },
+  ],
+  render: (props) => (
+    <div className="w-full min-w-[320px] overflow-hidden rounded-[4px] border border-[#f0f0f4]">
+      <SecondaryNavigation
+        module={props.module as Module}
+        dark={props.dark === true}
+      />
+    </div>
+  ),
+  tokens: {
+    "surface/light": "#ffffff",
+    "surface/dark": "#2d2b34",
+    "text/active/light": "#13131a",
+    "text/regular/light": "#4b4b59",
+    "text/active/dark": "#e1e1e8",
+    "text/regular/dark": "#c6c6cc",
+    "badge/background": "#4b4b59",
+    "size/bar-height": "56px",
+  },
+};
+
+const navSecondaryBarConfig: PlaygroundConfig = {
+  name: "Navigation Secondary (title + actions)",
+  description: "Page title bar with secondary, primary and brand action buttons.",
+  controls: [
+    {
+      kind: "text",
+      name: "title",
+      label: "Title",
+      defaultValue: "Placeholder…",
+      placeholder: "Page title",
+    },
+  ],
+  render: (props) => (
+    <div className="w-full min-w-[520px] overflow-hidden rounded-[4px] border border-[#f0f0f4]">
+      <NavigationSecondaryBar title={String(props.title)} />
+    </div>
+  ),
+  tokens: {
+    "surface/background": "#ffffff",
+    "button/secondary/border": "#4b4b59",
+    "button/primary/background": "#4b4b59",
+    "button/brand/background": "#7c33b5",
+    "text/title": "#13131a",
+    "size/bar-height": "56px",
+  },
+};
+
+const userMenuRowConfig: PlaygroundConfig = {
+  name: "User Menu Row",
+  description: "Single menu row — Default and Hover states, with editable label.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Default", "Hover"],
+      defaultValue: "Default",
+      asTabs: true,
+    },
+    {
+      kind: "text",
+      name: "label",
+      label: "Label",
+      defaultValue: "Pixels and searches",
+      placeholder: "Menu label",
+    },
+  ],
+  render: (props) => (
+    <UserMenuRow
+      state={props.state as "Default" | "Hover"}
+      menu={String(props.label)}
+    />
+  ),
+  tokens: {
+    "surface/default": "#ffffff",
+    "surface/hover": "rgba(113,113,128,0.08)",
+    "text/label": "#13131a",
+    "radius/row": "2px",
+    "size/row-height": "32px",
+  },
+};
+
+const userMenuConfig: PlaygroundConfig = {
+  name: "User Menu",
+  description: "Profile dropdown card — Type=MiQer, Platform=UFP. Toggles are interactive.",
+  controls: [],
+  render: () => <UserMenu />,
+  tokens: {
+    "surface/card": "#ffffff",
+    "separator/border": "#e1e1e8",
+    "toggle/on": "#7c33b5",
+    "toggle/off": "#ebebf0",
+    "text/name": "#13131a",
+    "text/role": "#717180",
+    "size/card-width": "274px",
+  },
+};
+
+const avatarConfig: PlaygroundConfig = {
+  name: "Avatar",
+  description: "Account avatar — Pro/Standard plan, Picture/Initials state, and two sizes.",
+  controls: [
+    {
+      kind: "select",
+      name: "plan",
+      label: "Plan",
+      options: ["Pro", "Standard"],
+      defaultValue: "Pro",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Picture", "Initials"],
+      defaultValue: "Picture",
+    },
+    {
+      kind: "select",
+      name: "size",
+      label: "Size",
+      options: ["40", "44"],
+      defaultValue: "40",
+    },
+  ],
+  render: (props) => (
+    <Avatar
+      plan={props.plan as AvatarPlan}
+      state={props.state as AvatarState}
+      size={props.size === "44" ? 44 : 40}
+    />
+  ),
+  tokens: {
+    "text/initials": "#13131a",
+    "gradient/pro": "#d71a82 → #f456ca",
+    "gradient/pro-plus": "#d71982 → #ff540c → #f0e812",
+    "size/small": "40px",
+    "size/large": "44px",
+  },
+};
+
+/* ------------------------------------------------------------------ */
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
 
 export default function NavigationPage(): JSX.Element {
   return (
-    <section aria-label="Navigation components" className="flex flex-col gap-8">
-      <Group title="Primary Navigation">
-        <div className="flex flex-col gap-2">
-          <Caption>State=Default, Menu=False</Caption>
-          <div className="overflow-hidden rounded-[4px]">
-            <PrimaryNavigation />
-          </div>
-        </div>
-      </Group>
-
-      <Group title="Secondary Navigation">
-        {(
-          [
-            "Audiences",
-            "Intelligence",
-            "Campaigns",
-            "Reports",
-            "Creatives",
-          ] as Module[]
-        ).map((m) => (
-          <div key={m} className="flex flex-col gap-2">
-            <Caption>Module={m}</Caption>
-            <div className="overflow-hidden rounded-[4px] border border-[#f0f0f4]">
-              <SecondaryNavigation module={m} />
-            </div>
-          </div>
-        ))}
-        <div className="flex flex-col gap-2">
-          <Caption>Module=Audiences (dark)</Caption>
-          <div className="overflow-hidden rounded-[4px]">
-            <SecondaryNavigation module="Audiences" dark />
-          </div>
-        </div>
-      </Group>
-
-      <Group title="Navigation Secondary (title + actions)">
-        <div className="flex flex-col gap-2">
-          <Caption>Placeholder title with buttons</Caption>
-          <div className="overflow-hidden rounded-[4px] border border-[#f0f0f4]">
-            <NavigationSecondaryBar />
-          </div>
-        </div>
-      </Group>
-
-      <Group title="User Menu Row">
-        <div className="flex flex-wrap gap-8">
-          <div className="flex flex-col gap-2">
-            <Caption>State=Default</Caption>
-            <UserMenuRow state="Default" />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Caption>State=Hover</Caption>
-            <UserMenuRow state="Hover" />
-          </div>
-        </div>
-      </Group>
-
-      <Group title="User Menu">
-        <div className="flex flex-col gap-2">
-          <Caption>Type=MiQer, Platform=UFP</Caption>
-          <UserMenu />
-        </div>
-      </Group>
-
-      <Group title="Avatar">
-        <div className="flex flex-wrap items-end gap-x-10 gap-y-6">
-          {(
-            [
-              { plan: "Pro", state: "Picture", size: 40 },
-              { plan: "Pro", state: "Picture", size: 44 },
-              { plan: "Standard", state: "Picture", size: 40 },
-              { plan: "Standard", state: "Picture", size: 44 },
-              { plan: "Pro", state: "Initials", size: 40 },
-              { plan: "Pro", state: "Initials", size: 44 },
-              { plan: "Standard", state: "Initials", size: 44 },
-              { plan: "Standard", state: "Initials", size: 40 },
-            ] as { plan: AvatarPlan; state: AvatarState; size: 40 | 44 }[]
-          ).map((v, i) => (
-            <div key={i} className="flex flex-col items-center gap-2">
-              <Caption>{`${v.state}, ${v.plan}, ${v.size}`}</Caption>
-              <Avatar plan={v.plan} state={v.state} size={v.size} />
-            </div>
-          ))}
-        </div>
-      </Group>
+    <section aria-label="Navigation component playgrounds" className="flex flex-col gap-6">
+      <Playground config={primaryNavConfig} />
+      <Playground config={secondaryNavConfig} />
+      <Playground config={navSecondaryBarConfig} />
+      <Playground config={userMenuRowConfig} />
+      <Playground config={userMenuConfig} />
+      <Playground config={avatarConfig} />
     </section>
   );
 }

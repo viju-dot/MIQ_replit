@@ -1,13 +1,16 @@
 import { useState } from "react";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
 /**
  * Fiber Design System — Button page.
  *
- * Faithful reproduction of the "Buttons" Figma page. All Tailwind v4
- * CSS-variable arbitrary values from the reference have been replaced with
- * their plain fallback hex values for Tailwind v3.
+ * Faithful reproduction of the "Buttons" Figma page, refactored into
+ * interactive Playground blocks. All Tailwind v4 CSS-variable arbitrary
+ * values from the reference have been replaced with their plain fallback
+ * hex values for Tailwind v3.
  *
- * Design tokens extracted from design-refs/button.md:
+ * Design tokens extracted from the original file:
  *  - brand bold background default  #7c33b5
  *  - brand bold background hover    #702ea3
  *  - brand bold foreground          #ffffff
@@ -31,28 +34,6 @@ const sizeBox: Record<Size, { h: string; text: string; px: string; icon: string 
   default: { h: "h-[34px]", text: "text-[14px] leading-[20px]", px: "px-[12px] py-[7px]", icon: "size-[20px]" },
   compact: { h: "h-[24px]", text: "text-[12px] leading-[18px]", px: "px-[8px] py-[3px]", icon: "size-[16px]" },
 };
-
-function Caption({ children }: { children: React.ReactNode }) {
-  return <span className="text-[12px] text-[#a8a8b2]">{children}</span>;
-}
-
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-      <h3 className="mb-4 text-[16px] font-medium text-[#13131a]">{title}</h3>
-      <div className="flex flex-wrap gap-x-8 gap-y-5">{children}</div>
-    </div>
-  );
-}
-
-function Cell({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col items-start gap-2">
-      <Caption>{label}</Caption>
-      <div className="flex flex-wrap items-center gap-3">{children}</div>
-    </div>
-  );
-}
 
 // A simple caret icon used by dropdown buttons.
 function Caret({ size = "size-[20px]", invert = false }: { size?: string; invert?: boolean }) {
@@ -171,6 +152,8 @@ function DemoButton({
       disabled={disabled}
       style={style}
       className={`inline-flex items-center justify-center gap-[6px] rounded-[2px] font-medium ${box.h} ${
+        fullWidth ? "w-full" : ""
+      } ${
         iconOnly ? (size === "compact" ? "w-[24px] px-0" : "w-[34px] px-0") : box.px
       } ${box.text} ${disabled ? "cursor-not-allowed" : ""}`}
     >
@@ -221,7 +204,7 @@ function AnimatedHoverButton({ dark = false }: { dark?: boolean }) {
 function AnimationFrames() {
   const positions = [-52.79, -40.79, -28.79, -17.33];
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex flex-wrap items-center justify-center gap-3">
       <div className="flex flex-col items-center gap-1">
         <div
           className="inline-flex h-[34px] items-center justify-center rounded-[2px] px-[12px] py-[7px] text-[14px] font-medium leading-[20px] text-white"
@@ -229,7 +212,7 @@ function AnimationFrames() {
         >
           Default
         </div>
-        <Caption>Default</Caption>
+        <span className="text-[12px] text-[#a8a8b2]">Default</span>
       </div>
       {positions.map((left, i) => (
         <div key={i} className="flex flex-col items-center gap-1">
@@ -247,7 +230,7 @@ function AnimationFrames() {
             </span>
             <span className="relative z-10 whitespace-nowrap">Default</span>
           </div>
-          <Caption>{`hover${i + 1}`}</Caption>
+          <span className="text-[12px] text-[#a8a8b2]">{`hover${i + 1}`}</span>
         </div>
       ))}
     </div>
@@ -291,163 +274,204 @@ function BackToTop() {
 }
 
 // ----------------------------------------------------------------------------
+// Playground configs
+// ----------------------------------------------------------------------------
+
+const buttonConfig: PlaygroundConfig = {
+  name: "Button",
+  description:
+    "Core action button — Fill / Outline / Ghost appearances × Primary / Secondary / Destructive, with size, state, icon-only and label controls.",
+  controls: [
+    {
+      kind: "select",
+      name: "appearance",
+      label: "Appearance",
+      options: ["Solid (fill)", "Outline", "Ghost (none)"],
+      defaultValue: "Solid (fill)",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "variant",
+      label: "Variant",
+      options: ["Primary", "Secondary", "Destructive"],
+      defaultValue: "Primary",
+    },
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Default", "Hover", "Disabled"],
+      defaultValue: "Default",
+    },
+    {
+      kind: "select",
+      name: "size",
+      label: "Size",
+      options: ["Default", "Compact"],
+      defaultValue: "Default",
+    },
+    { kind: "boolean", name: "iconOnly", label: "Icon only", defaultValue: false },
+    { kind: "text", name: "label", label: "Label", defaultValue: "Default", placeholder: "Button label" },
+  ],
+  render: (props) => {
+    const appearance: Appearance =
+      props.appearance === "Outline"
+        ? "outline"
+        : props.appearance === "Ghost (none)"
+          ? "none"
+          : "fill";
+    const variant = String(props.variant).toLowerCase() as Variant;
+    const state = String(props.state).toLowerCase() as State;
+    const size: Size = props.size === "Compact" ? "compact" : "default";
+    return (
+      <DemoButton
+        appearance={appearance}
+        variant={variant}
+        state={state}
+        size={size}
+        iconOnly={props.iconOnly === true}
+        label={String(props.label)}
+      />
+    );
+  },
+  tokens: {
+    "container/brand/bold/background": "#7c33b5",
+    "container/brand/bold/background-hover": "#702ea3",
+    "container/secondary/background": "#71718014",
+    "container/destructive/bold/background": "#d92d20",
+    "container/destructive/bold/background-hover": "#b42318",
+    "container/disabled/background": "#7171801a",
+    "foreground/on-bold": "#ffffff",
+    "foreground/brand": "#7c33b5",
+    "foreground/disabled": "#a8a8b2",
+    "border/neutral": "#c6c6cc",
+    "radius/button": "2px",
+    "size/default": "h 34px · text 14px",
+    "size/compact": "h 24px · text 12px",
+  },
+};
+
+const inverseConfig: PlaygroundConfig = {
+  name: "Button — Inverse",
+  description: "Buttons placed on a dark surface. Solid inverts to a white fill; outline/ghost use white foreground.",
+  previewBackground: { light: "#1b181f", dark: "#1b181f" },
+  controls: [
+    {
+      kind: "select",
+      name: "appearance",
+      label: "Appearance",
+      options: ["Solid (fill)", "Outline", "Ghost (none)"],
+      defaultValue: "Solid (fill)",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Default", "Disabled"],
+      defaultValue: "Default",
+    },
+    { kind: "text", name: "label", label: "Label", defaultValue: "Default", placeholder: "Button label" },
+  ],
+  render: (props) => {
+    const appearance: Appearance =
+      props.appearance === "Outline"
+        ? "outline"
+        : props.appearance === "Ghost (none)"
+          ? "none"
+          : "fill";
+    const state = String(props.state).toLowerCase() as State;
+    // Solid inverse uses primary; outline/ghost inverse use secondary (per Figma).
+    const variant: Variant = appearance === "fill" ? "primary" : "secondary";
+    return (
+      <DemoButton
+        appearance={appearance}
+        variant={variant}
+        state={state}
+        inverse
+        label={String(props.label)}
+      />
+    );
+  },
+  tokens: {
+    "container/inverse/background": "#ffffff",
+    "foreground/inverse": "#7c33b5",
+    "surface/dark": "#1b181f",
+    "container/inverse/disabled": "#ffffff29",
+    "foreground/inverse/disabled": "#ffffff8a",
+  },
+};
+
+const dropdownConfig: PlaygroundConfig = {
+  name: "Dropdown Button",
+  description: "Solid primary button with a trailing caret. Toggle the rounded (pill) shape.",
+  controls: [{ kind: "boolean", name: "rounded", label: "Rounded (pill)", defaultValue: false }],
+  render: (props) => <ButtonDropdown rounded={props.rounded === true} />,
+  tokens: {
+    "container/brand/bold/background": "#7c33b5",
+    "foreground/on-bold": "#ffffff",
+    "radius/standard": "2px",
+    "radius/rounded": "100px",
+  },
+};
+
+const backToTopConfig: PlaygroundConfig = {
+  name: "Back-to-top",
+  description: "Collapsed icon button that expands into a labelled button on hover. Hover the preview to try it.",
+  controls: [],
+  render: () => <BackToTop />,
+  tokens: {
+    "container/brand/bold/background": "#7c33b5",
+    "container/brand/bold/background-hover": "#9f2d98",
+    "foreground/on-bold": "#ffffff",
+    "radius/button": "2px",
+  },
+};
+
+const hoverAnimationConfig: PlaygroundConfig = {
+  name: "Button hover animation",
+  description: "Primary solid button with the sliding multi-colour reveal on hover. Hover the button in the preview.",
+  controls: [
+    { kind: "boolean", name: "dark", label: "Dark base", defaultValue: false },
+  ],
+  render: (props, theme) => {
+    const dark = props.dark === true || theme === "dark";
+    return (
+      <div className="flex flex-col items-center gap-6">
+        <AnimatedHoverButton dark={dark} />
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-[12px] text-[#a8a8b2]">Animation frames (Default → hover4)</span>
+          <AnimationFrames />
+        </div>
+      </div>
+    );
+  },
+  tokens: {
+    "container/brand/bold/background": "#7c33b5",
+    "container/brand/bold/background-dark": "#a857e5",
+    "slide/1": "#7c33b5",
+    "slide/2": "#702ea3",
+    "slide/3": "#7c2ea3",
+    "slide/4": "#882ea3",
+    "slide/5": "#902d9f",
+    "slide/6": "#9b2d9f",
+    "slide/7": "#9f2d98",
+  },
+};
+
+// ----------------------------------------------------------------------------
 // Page
 // ----------------------------------------------------------------------------
 
-const variants: Variant[] = ["primary", "secondary", "destructive"];
-
 export default function ButtonPage(): JSX.Element {
   return (
-    <section aria-label="Button component variants" className="flex flex-col gap-6">
-      {/* Solid (fill) buttons */}
-      <Card title="Solid (fill)">
-        {variants.map((v) => (
-          <Cell key={v} label={v[0].toUpperCase() + v.slice(1)}>
-            <div className="flex flex-col gap-1">
-              <DemoButton variant={v} appearance="fill" state="default" />
-              <Caption>Default</Caption>
-            </div>
-            <div className="flex flex-col gap-1">
-              <DemoButton variant={v} appearance="fill" state="hover" />
-              <Caption>Hover</Caption>
-            </div>
-            <div className="flex flex-col gap-1">
-              <DemoButton variant={v} appearance="fill" state="disabled" />
-              <Caption>Disabled</Caption>
-            </div>
-          </Cell>
-        ))}
-      </Card>
-
-      {/* Outline buttons */}
-      <Card title="Outline">
-        {variants.map((v) => (
-          <Cell key={v} label={v[0].toUpperCase() + v.slice(1)}>
-            <div className="flex flex-col gap-1">
-              <DemoButton variant={v} appearance="outline" state="default" />
-              <Caption>Default</Caption>
-            </div>
-            <div className="flex flex-col gap-1">
-              <DemoButton variant={v} appearance="outline" state="hover" />
-              <Caption>Hover</Caption>
-            </div>
-            <div className="flex flex-col gap-1">
-              <DemoButton variant={v} appearance="outline" state="disabled" />
-              <Caption>Disabled</Caption>
-            </div>
-          </Cell>
-        ))}
-      </Card>
-
-      {/* Ghost (none) buttons */}
-      <Card title="Ghost (none)">
-        {variants.map((v) => (
-          <Cell key={v} label={v[0].toUpperCase() + v.slice(1)}>
-            <div className="flex flex-col gap-1">
-              <DemoButton variant={v} appearance="none" state="default" />
-              <Caption>Default</Caption>
-            </div>
-            <div className="flex flex-col gap-1">
-              <DemoButton variant={v} appearance="none" state="hover" />
-              <Caption>Hover</Caption>
-            </div>
-            <div className="flex flex-col gap-1">
-              <DemoButton variant={v} appearance="none" state="disabled" />
-              <Caption>Disabled</Caption>
-            </div>
-          </Cell>
-        ))}
-      </Card>
-
-      {/* Compact size */}
-      <Card title="Compact size">
-        <Cell label="Solid">
-          <DemoButton variant="primary" appearance="fill" size="compact" />
-          <DemoButton variant="secondary" appearance="fill" size="compact" />
-          <DemoButton variant="destructive" appearance="fill" size="compact" />
-        </Cell>
-        <Cell label="Outline">
-          <DemoButton variant="primary" appearance="outline" size="compact" />
-          <DemoButton variant="secondary" appearance="outline" size="compact" />
-          <DemoButton variant="destructive" appearance="outline" size="compact" />
-        </Cell>
-        <Cell label="Ghost">
-          <DemoButton variant="primary" appearance="none" size="compact" />
-          <DemoButton variant="secondary" appearance="none" size="compact" />
-          <DemoButton variant="destructive" appearance="none" size="compact" />
-        </Cell>
-      </Card>
-
-      {/* Icon-only buttons */}
-      <Card title="Icon only">
-        <Cell label="Default size">
-          <DemoButton variant="primary" appearance="fill" iconOnly />
-          <DemoButton variant="secondary" appearance="fill" iconOnly />
-          <DemoButton variant="primary" appearance="outline" iconOnly />
-          <DemoButton variant="destructive" appearance="fill" iconOnly />
-        </Cell>
-        <Cell label="Compact size">
-          <DemoButton variant="primary" appearance="fill" iconOnly size="compact" />
-          <DemoButton variant="secondary" appearance="fill" iconOnly size="compact" />
-          <DemoButton variant="primary" appearance="outline" iconOnly size="compact" />
-          <DemoButton variant="destructive" appearance="fill" iconOnly size="compact" />
-        </Cell>
-      </Card>
-
-      {/* Inverse buttons (on dark surface) */}
-      <Card title="Inverse (on dark surface)">
-        <div className="flex w-full flex-wrap items-start gap-8 rounded-[6px] bg-[#1b181f] p-6">
-          <div className="flex flex-col gap-1">
-            <DemoButton variant="primary" appearance="fill" inverse />
-            <span className="text-[12px] text-[#c6c6cc]">Solid</span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <DemoButton variant="secondary" appearance="outline" inverse />
-            <span className="text-[12px] text-[#c6c6cc]">Outline</span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <DemoButton variant="secondary" appearance="none" inverse />
-            <span className="text-[12px] text-[#c6c6cc]">Ghost</span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <DemoButton variant="primary" appearance="fill" inverse state="disabled" />
-            <span className="text-[12px] text-[#c6c6cc]">Disabled</span>
-          </div>
-        </div>
-      </Card>
-
-      {/* Dropdown buttons */}
-      <Card title="Dropdown buttons">
-        <Cell label="Solid dropdown, standard">
-          <ButtonDropdown />
-        </Cell>
-        <Cell label="Solid round dropdown, standard">
-          <ButtonDropdown rounded />
-        </Cell>
-      </Card>
-
-      {/* Back to top */}
-      <Card title="Back-to-top (hover to expand)">
-        <Cell label="Collapsed / Hover">
-          <BackToTop />
-        </Cell>
-      </Card>
-
-      {/* Hover animation */}
-      <Card title="Button hover animation (primary solid, standard)">
-        <Cell label="Light mode (hover me)">
-          <AnimatedHoverButton />
-        </Cell>
-        <Cell label="Dark mode (hover me)">
-          <div className="rounded-[6px] bg-[#1b181f] p-4">
-            <AnimatedHoverButton dark />
-          </div>
-        </Cell>
-        <div className="flex w-full flex-col items-start gap-2">
-          <Caption>Animation frames (Default → hover4)</Caption>
-          <AnimationFrames />
-        </div>
-      </Card>
+    <section aria-label="Button component playground" className="flex flex-col gap-6">
+      <Playground config={buttonConfig} />
+      <Playground config={inverseConfig} />
+      <Playground config={dropdownConfig} />
+      <Playground config={backToTopConfig} />
+      <Playground config={hoverAnimationConfig} />
     </section>
   );
 }

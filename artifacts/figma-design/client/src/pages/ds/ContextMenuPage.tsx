@@ -1,3 +1,6 @@
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
+
 const ASSET = "/figmaAssets/context-menu";
 
 const shadowStyle = {
@@ -19,6 +22,7 @@ type MenuItemState =
 type MenuItemProps = {
   state?: MenuItemState;
   addIconRight?: boolean;
+  label?: string;
 };
 
 function XCircleIcon({ src }: { src: string }) {
@@ -79,7 +83,11 @@ function CheckboxBox({ checked }: { checked?: boolean }) {
   );
 }
 
-function MenuItem({ state = "Default", addIconRight = false }: MenuItemProps) {
+function MenuItem({
+  state = "Default",
+  addIconRight = false,
+  label = "Item",
+}: MenuItemProps) {
   const isDefault = state === "Default";
   const isHover = state === "Hover";
   const isDisabled = state === "Disabled";
@@ -91,7 +99,7 @@ function MenuItem({ state = "Default", addIconRight = false }: MenuItemProps) {
       <div className="flex items-center gap-[4px] bg-white border-b border-[#e1e1e8] border-solid pl-[8px] pr-[12px] py-[8px]">
         <XCircleIcon src={`${ASSET}/x-circle-disabled.svg`} />
         <p className="font-['DM_Sans'] leading-[20px] text-[14px] text-[#a8a8b2] whitespace-nowrap">
-          Item
+          {label}
         </p>
         {addIconRight && <CaretIcon src={`${ASSET}/caret-disabled.svg`} />}
       </div>
@@ -120,7 +128,7 @@ function MenuItem({ state = "Default", addIconRight = false }: MenuItemProps) {
               isHover ? "text-[#13131a]" : "text-[#4b4b59]"
             }`}
           >
-            Item
+            {label}
           </p>
           {addIconRight && (
             <CaretIcon
@@ -140,7 +148,7 @@ function MenuItem({ state = "Default", addIconRight = false }: MenuItemProps) {
                 isSelected ? "text-[#7c33b5]" : "text-[#13131a]"
               }`}
             >
-              Item
+              {label}
             </p>
           </div>
           {addIconRight && (
@@ -162,7 +170,7 @@ function MenuItem({ state = "Default", addIconRight = false }: MenuItemProps) {
 /* Context Menus component (Amount = 1..5 items)                       */
 /* ------------------------------------------------------------------ */
 
-function ContextMenuRow() {
+function ContextMenuRow({ label }: { label: string }) {
   return (
     <div className="bg-white border-b border-[#e1e1e8] border-solid flex gap-[4px] items-center pl-[8px] pr-[12px] py-[8px] shrink-0 w-full">
       <div className="flex items-center p-[2px] shrink-0 size-[24px]">
@@ -177,20 +185,20 @@ function ContextMenuRow() {
         </div>
       </div>
       <p className="font-['DM_Sans'] leading-[20px] text-[14px] text-[#4b4b59] whitespace-nowrap">
-        Item
+        {label}
       </p>
     </div>
   );
 }
 
-function ContextMenus({ amount }: { amount: number }) {
+function ContextMenus({ amount, label }: { amount: number; label: string }) {
   return (
     <div
       className="flex flex-col items-start w-[141px] rounded-[2px] overflow-hidden"
       style={shadowStyle}
     >
       {Array.from({ length: amount }).map((_, i) => (
-        <ContextMenuRow key={i} />
+        <ContextMenuRow key={i} label={label} />
       ))}
     </div>
   );
@@ -200,25 +208,31 @@ function ContextMenus({ amount }: { amount: number }) {
 /* Context Menu - Checkbox component (1..5 items)                      */
 /* ------------------------------------------------------------------ */
 
-function CheckboxRow() {
+function CheckboxRow({ label }: { label: string }) {
   return (
     <div className="bg-white border-b border-[#e1e1e8] border-solid flex gap-[4px] items-center pl-[8px] pr-[12px] py-[8px] shrink-0 w-full">
       <CheckboxBox />
       <p className="font-['DM_Sans'] leading-[20px] text-[14px] text-[#13131a] whitespace-nowrap">
-        Option
+        {label}
       </p>
     </div>
   );
 }
 
-function ContextMenuCheckbox({ amount }: { amount: number }) {
+function ContextMenuCheckbox({
+  amount,
+  label,
+}: {
+  amount: number;
+  label: string;
+}) {
   return (
     <div
       className="flex flex-col items-start w-[130px] rounded-[2px] overflow-hidden"
       style={shadowStyle}
     >
       {Array.from({ length: amount }).map((_, i) => (
-        <CheckboxRow key={i} />
+        <CheckboxRow key={i} label={label} />
       ))}
     </div>
   );
@@ -253,129 +267,168 @@ function Alert() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Shared layout helpers                                               */
+/* Playground configs                                                  */
 /* ------------------------------------------------------------------ */
 
-const cardClass =
-  "rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5";
-const captionClass = "text-[12px] text-[#a8a8b2]";
-
-function Variant({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <span className={captionClass}>{label}</span>
-      {children}
+const menuItemConfig: PlaygroundConfig = {
+  name: "Menu Item",
+  description:
+    "Single menu row — explore each interaction State, optional right caret icon, and the label text.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Default", "Hover", "Disabled", "Selected", "Unselected"],
+      defaultValue: "Default",
+      asTabs: true,
+    },
+    {
+      kind: "boolean",
+      name: "addIconRight",
+      label: "Add icon right (caret)",
+      defaultValue: false,
+    },
+    {
+      kind: "text",
+      name: "label",
+      label: "Label",
+      defaultValue: "Item",
+      placeholder: "Item",
+    },
+  ],
+  render: (props: PropValues) => (
+    <div
+      className="w-[141px] rounded-[2px] overflow-hidden"
+      style={shadowStyle}
+    >
+      <MenuItem
+        state={props.state as MenuItemState}
+        addIconRight={props.addIconRight === true}
+        label={String(props.label)}
+      />
     </div>
-  );
-}
+  ),
+  tokens: {
+    "container/default/background": "#ffffff",
+    "container/hover/background": "rgba(113,113,128,0.08)",
+    "container/selected/background": "#f6ebff",
+    "border/divider": "#e1e1e8",
+    "text/default": "#4b4b59",
+    "text/hover": "#13131a",
+    "text/disabled": "#a8a8b2",
+    "text/selected": "#7c33b5",
+    "checkbox/checked/background": "#7c33b5",
+    "checkbox/unchecked/border": "#c6c6cc",
+    "radius/menu": "2px",
+    "spacing/padding": "pl-8 pr-12 py-8",
+  },
+};
+
+const contextMenusConfig: PlaygroundConfig = {
+  name: "Context Menu",
+  description: "Stacked menu rows — set how many items appear and their label.",
+  controls: [
+    {
+      kind: "select",
+      name: "amount",
+      label: "Amount",
+      options: ["1", "2", "3", "4", "5"],
+      defaultValue: "3",
+      asTabs: true,
+    },
+    {
+      kind: "text",
+      name: "label",
+      label: "Item label",
+      defaultValue: "Item",
+      placeholder: "Item",
+    },
+  ],
+  render: (props: PropValues) => (
+    <ContextMenus
+      amount={Number(props.amount)}
+      label={String(props.label)}
+    />
+  ),
+  tokens: {
+    "container/background": "#ffffff",
+    "border/divider": "#e1e1e8",
+    "text/item": "#4b4b59",
+    "width/menu": "141px",
+    "radius/menu": "2px",
+    "shadow/menu":
+      "0px 1px 2px rgba(113,113,128,0.08), 0px 8px 8px rgba(113,113,128,0.04)",
+  },
+};
+
+const contextMenuCheckboxConfig: PlaygroundConfig = {
+  name: "Context Menu — Checkbox",
+  description:
+    "Stacked checkbox rows — set how many options appear and their label.",
+  controls: [
+    {
+      kind: "select",
+      name: "amount",
+      label: "Amount",
+      options: ["1", "2", "3", "4", "5"],
+      defaultValue: "3",
+      asTabs: true,
+    },
+    {
+      kind: "text",
+      name: "label",
+      label: "Option label",
+      defaultValue: "Option",
+      placeholder: "Option",
+    },
+  ],
+  render: (props: PropValues) => (
+    <ContextMenuCheckbox
+      amount={Number(props.amount)}
+      label={String(props.label)}
+    />
+  ),
+  tokens: {
+    "container/background": "#ffffff",
+    "border/divider": "#e1e1e8",
+    "text/option": "#13131a",
+    "checkbox/unchecked/border": "#c6c6cc",
+    "width/menu": "130px",
+    "radius/menu": "2px",
+    "shadow/menu":
+      "0px 1px 2px rgba(113,113,128,0.08), 0px 8px 8px rgba(113,113,128,0.04)",
+  },
+};
+
+const alertConfig: PlaygroundConfig = {
+  name: "Implementation Note",
+  description:
+    "Info alert documenting that the context menu does not yet reuse the menu item component.",
+  controls: [],
+  render: () => <Alert />,
+  tokens: {
+    "container/background": "#ffffff",
+    "border/info": "#2360db",
+    "text/body": "#000000",
+    "radius/alert": "2px",
+  },
+};
 
 /* ------------------------------------------------------------------ */
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
 
-const menuItemStates: MenuItemState[] = [
-  "Default",
-  "Hover",
-  "Disabled",
-  "Selected",
-  "Unselected",
-];
-
-export default function ContextMenuPage() {
+export default function ContextMenuPage(): JSX.Element {
   return (
-    <section className="flex flex-col gap-6 font-['DM_Sans']">
-      {/* Alert */}
-      <div className={cardClass}>
-        <Variant label="Alert / Info">
-          <Alert />
-        </Variant>
-      </div>
-
-      {/* Menu Items — States */}
-      <div className={cardClass}>
-        <div className="flex flex-col gap-4">
-          <span className="text-[14px] font-medium text-[#13131a]">
-            Menu items
-          </span>
-          <div className="flex flex-wrap gap-8">
-            {menuItemStates.map((state) => (
-              <Variant key={state} label={`State = ${state}`}>
-                <div
-                  className="w-[141px] rounded-[2px] overflow-hidden"
-                  style={shadowStyle}
-                >
-                  <MenuItem state={state} />
-                </div>
-              </Variant>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Menu Items — with right icon (caret) */}
-      <div className={cardClass}>
-        <div className="flex flex-col gap-4">
-          <span className="text-[14px] font-medium text-[#13131a]">
-            Menu items — Add icon right
-          </span>
-          <div className="flex flex-wrap gap-8">
-            {menuItemStates.map((state) => (
-              <Variant key={state} label={`State = ${state}`}>
-                <div
-                  className="w-[141px] rounded-[2px] overflow-hidden"
-                  style={shadowStyle}
-                >
-                  <MenuItem state={state} addIconRight />
-                </div>
-              </Variant>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Context Menus — Amount */}
-      <div className={cardClass}>
-        <div className="flex flex-col gap-4">
-          <span className="text-[14px] font-medium text-[#13131a]">
-            Context Menus
-          </span>
-          <div className="flex flex-wrap gap-8 items-start">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <Variant
-                key={n}
-                label={`Amount = ${n} ${n === 1 ? "item" : "items"}`}
-              >
-                <ContextMenus amount={n} />
-              </Variant>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Context Menu - Checkbox */}
-      <div className={cardClass}>
-        <div className="flex flex-col gap-4">
-          <span className="text-[14px] font-medium text-[#13131a]">
-            Context Menu - Checkbox
-          </span>
-          <div className="flex flex-wrap gap-8 items-start">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <Variant
-                key={n}
-                label={`Property = ${n} ${n === 1 ? "item" : "items"}`}
-              >
-                <ContextMenuCheckbox amount={n} />
-              </Variant>
-            ))}
-          </div>
-        </div>
-      </div>
+    <section
+      aria-label="Context Menu component playground"
+      className="flex flex-col gap-6 font-['DM_Sans']"
+    >
+      <Playground config={menuItemConfig} />
+      <Playground config={contextMenusConfig} />
+      <Playground config={contextMenuCheckboxConfig} />
+      <Playground config={alertConfig} />
     </section>
   );
 }

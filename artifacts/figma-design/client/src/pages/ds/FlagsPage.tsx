@@ -1,21 +1,23 @@
 /**
  * Flags page — faithful reproduction of the Figma "Flags" catalog frame
- * (page node 22716:902).
+ * (page node 22716:902), refactored into an interactive gallery playground.
  *
- * The Figma reference (design-refs/flags.md) provides the catalog structure as
- * XML metadata only — a list of flag symbols by Country and Size (24 / 20 / 16),
- * with no embedded asset URLs and no generated React code. The flag artwork
- * below is therefore authored as standalone SVG assets (one per country) stored
- * in /figmaAssets/flags/ and rendered at the three documented sizes.
+ * The Figma reference provides the catalog structure as a list of flag symbols
+ * by Country and Size (24 / 20 / 16). The flag artwork is authored as standalone
+ * SVG assets (one per country) stored in /figmaAssets/flags/ and rendered at the
+ * three documented sizes.
  *
- * Each country is rendered as one white "component group" card. Within a card,
- * every Size variant is shown with a small gray caption, matching the variant
- * list from the Figma frame. Flags are displayed at a 4:3 aspect ratio with the
- * documented pixel dimensions:
+ * Because this is an asset gallery (no meaningful per-instance props/preview), it
+ * uses a single Playground with a Size control (the real variant axis) and a
+ * text filter to browse countries. The preview renders a themed grid of cards.
+ * Flags are displayed at a 4:3 aspect ratio with the documented pixel dimensions:
  *   Size=24 -> 32 x 24
  *   Size=20 -> 27 x 20
  *   Size=16 -> 21 x 16
  */
+
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
 
 type FlagSize = 24 | 20 | 16;
 
@@ -26,11 +28,11 @@ type SizeSpec = {
 };
 
 // Documented dimensions per size from the Figma frame metadata.
-const SIZE_SPECS: SizeSpec[] = [
-  { size: 24, width: 32, height: 24 },
-  { size: 20, width: 27, height: 20 },
-  { size: 16, width: 21, height: 16 },
-];
+const SIZE_SPECS: Record<string, SizeSpec> = {
+  "24": { size: 24, width: 32, height: 24 },
+  "20": { size: 20, width: 27, height: 20 },
+  "16": { size: 16, width: 21, height: 16 },
+};
 
 type Country = {
   name: string;
@@ -83,34 +85,93 @@ function FlagImage({
   );
 }
 
+function FlagsGallery({
+  spec,
+  filter,
+  dark,
+}: {
+  spec: SizeSpec;
+  filter: string;
+  dark: boolean;
+}): JSX.Element {
+  const q = filter.trim().toLowerCase();
+  const countries = q
+    ? COUNTRIES.filter((c) => c.name.toLowerCase().includes(q))
+    : COUNTRIES;
+
+  const cardCls = dark
+    ? "border-[#33333d] bg-[#26262e]"
+    : "border-[#e1e1e8] bg-white";
+  const nameCls = dark ? "text-[#f7f7fa]" : "text-[#13131a]";
+
+  if (countries.length === 0) {
+    return (
+      <p className={`text-[13px] ${dark ? "text-[#a8a8b2]" : "text-[#71717a]"}`}>
+        No countries match “{filter}”.
+      </p>
+    );
+  }
+
+  return (
+    <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+      {countries.map((country) => (
+        <div
+          key={country.name}
+          className={`flex flex-col items-center gap-3 rounded-[5px] border p-4 ${cardCls}`}
+        >
+          <div className="flex h-8 items-center justify-center">
+            <FlagImage country={country} spec={spec} />
+          </div>
+          <span className={`text-center text-[12px] leading-[16px] ${nameCls}`}>
+            {country.name}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const config: PlaygroundConfig = {
+  name: "Flags",
+  description:
+    "Country flag assets at the three documented sizes. Filter by name to browse.",
+  controls: [
+    {
+      kind: "select",
+      name: "size",
+      label: "Size",
+      options: ["24", "20", "16"],
+      defaultValue: "24",
+      asTabs: true,
+    },
+    {
+      kind: "text",
+      name: "filter",
+      label: "Filter",
+      defaultValue: "",
+      placeholder: "Search country…",
+    },
+  ],
+  render: (props, theme) => (
+    <FlagsGallery
+      spec={SIZE_SPECS[String(props.size)] ?? SIZE_SPECS["24"]}
+      filter={String(props.filter ?? "")}
+      dark={theme === "dark"}
+    />
+  ),
+  tokens: {
+    "flag/ring": "#71718014",
+    "flag/radius": "2px",
+    "size/24": "32×24",
+    "size/20": "27×20",
+    "size/16": "21×16",
+  },
+};
+
 export default function FlagsPage(): JSX.Element {
   return (
-    <section aria-label="Flags" className="flex flex-wrap gap-5">
-      {COUNTRIES.map((country) => (
-        <article
-          key={country.name}
-          className="flex flex-col gap-4 rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5"
-        >
-          <h3 className="font-body-md-medium text-[length:var(--body-md-medium-font-size)] font-[number:var(--body-md-medium-font-weight)] leading-[var(--body-md-medium-line-height)] text-[#13131a]">
-            {country.name}
-          </h3>
-          <div className="flex flex-wrap items-end gap-6">
-            {SIZE_SPECS.map((spec) => (
-              <div
-                key={spec.size}
-                className="flex flex-col items-center gap-2"
-              >
-                <div className="flex h-6 items-center justify-center">
-                  <FlagImage country={country} spec={spec} />
-                </div>
-                <span className="text-[12px] leading-[18px] text-[#a8a8b2]">
-                  Size {spec.size}
-                </span>
-              </div>
-            ))}
-          </div>
-        </article>
-      ))}
+    <section aria-label="Flags" className="flex flex-col gap-6">
+      <Playground config={config} />
     </section>
   );
 }

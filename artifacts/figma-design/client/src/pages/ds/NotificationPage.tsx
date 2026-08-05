@@ -1,61 +1,24 @@
 /**
- * Notification page — faithful reproduction of the Figma "Notification" page
- * (page node 185:804, design-refs/notification.md).
+ * Notification page — interactive playground reproduction of the Figma
+ * "Notification" page (page node 185:804, design-refs/notification.md).
  *
- * Component groups reproduced:
- *  - Notification Global Banner (Standard / Paragraph x Good News / Informative / Bad News / Celebratory)
- *  - Alert (State x Border x Compact x Description variants)
- *  - Notification Card (new / read / new-hover / read-hover)
- *  - Notification Dropdown (Default with items / Empty)
+ * Each distinct component is refactored into a parametric render function and
+ * exposed via a shared <Playground/> block:
+ *  - Notification Global Banner (State tabs x Type x Close)
+ *  - Alert (State tabs x Border x Compact x Description x Close + editable text)
+ *  - Notification Card (State tabs: new / read x Hover x editable text)
+ *  - Notification Dropdown (Empty toggle)
  *
- * Tailwind v4 CSS-variable arbitrary values from the reference have been
- * replaced with their plain fallback hex values (this project is Tailwind v3).
- * Figma asset URLs were downloaded to /figmaAssets/notification/.
+ * Figma fidelity (colors / spacing / typography / icons / assets) is preserved
+ * exactly from the original static reproduction — only the interaction model
+ * changed. Tailwind v4 CSS-variable arbitrary values have been replaced with
+ * their plain fallback hex values (this project is Tailwind v3).
  */
 
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
+
 const ASSET = "/figmaAssets/notification";
-
-/* ------------------------------------------------------------------ */
-/* Shared helpers                                                      */
-/* ------------------------------------------------------------------ */
-
-function Caption({ children }: { children: React.ReactNode }) {
-  return <span className="text-[12px] text-[#a8a8b2] px-1">{children}</span>;
-}
-
-function GroupCard({
-  title,
-  children,
-  className = "",
-}: {
-  title: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className="flex flex-col gap-4 rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-      <span className="text-[12px] font-medium uppercase tracking-wide text-[#7c33b5]">
-        {title}
-      </span>
-      <div className={className}>{children}</div>
-    </div>
-  );
-}
-
-function VariantBlock({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-1">
-      <Caption>{label}</Caption>
-      {children}
-    </div>
-  );
-}
 
 /* ------------------------------------------------------------------ */
 /* Notification Global Banner                                          */
@@ -81,11 +44,16 @@ const BANNER_ICON: Record<BannerState, string> = {
 function GlobalBanner({
   state,
   type,
+  close,
+  headline,
+  body,
 }: {
   state: BannerState;
   type: BannerType;
+  close: boolean;
+  headline: string;
+  body: string;
 }) {
-  const showClose = state !== "Bad News"; // Bad News has no right close icon
   return (
     <div
       className="relative flex w-full items-start gap-2 pl-[52px] pr-[19px]"
@@ -108,19 +76,17 @@ function GlobalBanner({
       {/* Text */}
       <div className="flex min-w-0 flex-1 flex-col items-start">
         <p className="[word-break:break-word] font-medium text-[14px] leading-[20px] text-white">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean
-          euismod bibendum laoreet.
+          {headline}
         </p>
         {type === "Paragraph" && (
           <p className="[word-break:break-word] text-[12px] leading-[18px] text-white">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean
-            euismod bibendum laoreet.
+            {body}
           </p>
         )}
       </div>
 
       {/* Right close icon */}
-      {showClose && (
+      {close && (
         <div className="flex size-6 shrink-0 items-center justify-center">
           <img
             alt=""
@@ -134,32 +100,63 @@ function GlobalBanner({
   );
 }
 
-const BANNER_STATES: BannerState[] = [
-  "Good News",
-  "Informative",
-  "Bad News",
-  "Celebratory",
-];
-
-function GlobalBannerGroup() {
-  return (
-    <GroupCard title="Notification Global Banner" className="flex flex-col gap-6">
-      {(["Paragraph", "Standard"] as BannerType[]).map((type) => (
-        <div key={type} className="flex flex-col gap-3">
-          <Caption>Type = {type}</Caption>
-          <div className="flex flex-col gap-3">
-            {BANNER_STATES.map((state) => (
-              <div key={state} className="flex flex-col gap-1">
-                <Caption>{state}</Caption>
-                <GlobalBanner state={state} type={type} />
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </GroupCard>
-  );
-}
+const bannerConfig: PlaygroundConfig = {
+  name: "Notification Global Banner",
+  description:
+    "Full-width page-level banner — Good News / Informative / Bad News / Celebratory, Standard or Paragraph.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Good News", "Informative", "Bad News", "Celebratory"],
+      defaultValue: "Good News",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "type",
+      label: "Type",
+      options: ["Standard", "Paragraph"],
+      defaultValue: "Standard",
+    },
+    { kind: "boolean", name: "close", label: "Close icon", defaultValue: true },
+    {
+      kind: "text",
+      name: "headline",
+      label: "Headline",
+      defaultValue:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
+    },
+    {
+      kind: "text",
+      name: "body",
+      label: "Paragraph body",
+      defaultValue:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
+    },
+  ],
+  render: (props) => (
+    <div className="w-full max-w-[640px]">
+      <GlobalBanner
+        state={props.state as BannerState}
+        type={props.type as BannerType}
+        close={props.close === true}
+        headline={String(props.headline)}
+        body={String(props.body)}
+      />
+    </div>
+  ),
+  tokens: {
+    "banner/good-news/background": "#1e8158",
+    "banner/informative/background": "#2360db",
+    "banner/bad-news/background": "#da294b",
+    "banner/celebratory/background": "#2b0030",
+    "banner/text": "#ffffff",
+    "banner/padding/standard": "11.5px",
+    "banner/padding/paragraph": "15.5px",
+  },
+};
 
 /* ------------------------------------------------------------------ */
 /* Alert                                                               */
@@ -221,9 +218,9 @@ type AlertProps = {
   border: boolean;
   compact: boolean;
   description: boolean;
-  headline?: string;
-  body?: string;
-  close?: boolean;
+  headline: string;
+  body: string;
+  close: boolean;
 };
 
 function Alert({
@@ -231,11 +228,11 @@ function Alert({
   border,
   compact,
   description,
-  headline = "Title",
-  body = "Description",
-  close = true,
+  headline,
+  body,
+  close,
 }: AlertProps) {
-  const width = description ? 440 : compact ? 288 : 288;
+  const width = description ? 440 : 288;
   const containerStyle: React.CSSProperties = border
     ? {
         border: `1px solid ${ALERT_BORDER[state]}`,
@@ -283,72 +280,77 @@ function Alert({
   );
 }
 
-const ALERT_STATES: AlertState[] = ["Danger", "Info", "Success", "Warning"];
-
-function AlertGroup() {
-  return (
-    <GroupCard title="Alert" className="flex flex-col gap-6">
-      {ALERT_STATES.map((state) => (
-        <div key={state} className="flex flex-col gap-2">
-          <Caption>State = {state}</Caption>
-          <div className="flex flex-wrap items-start gap-6">
-            <VariantBlock label="Border, Description">
-              <Alert
-                state={state}
-                border
-                compact={false}
-                description
-                headline="Title"
-                body="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet."
-              />
-            </VariantBlock>
-            <VariantBlock label="Border, No description">
-              <Alert state={state} border compact={false} description={false} />
-            </VariantBlock>
-            <VariantBlock label="Border, Compact">
-              <Alert
-                state={state}
-                border
-                compact
-                description={false}
-                close={false}
-              />
-            </VariantBlock>
-            <VariantBlock label="No border">
-              <Alert
-                state={state}
-                border={false}
-                compact={false}
-                description={false}
-                close={false}
-              />
-            </VariantBlock>
-            <VariantBlock label="No border, Compact">
-              <Alert
-                state={state}
-                border={false}
-                compact
-                description={false}
-                close={false}
-              />
-            </VariantBlock>
-          </div>
-        </div>
-      ))}
-    </GroupCard>
-  );
-}
+const alertConfig: PlaygroundConfig = {
+  name: "Alert",
+  description:
+    "Inline alert — Danger / Info / Success / Warning, with optional border, compact size, description and close.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Danger", "Info", "Success", "Warning"],
+      defaultValue: "Info",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "border", label: "Border", defaultValue: true },
+    { kind: "boolean", name: "compact", label: "Compact", defaultValue: false },
+    {
+      kind: "boolean",
+      name: "description",
+      label: "Description",
+      defaultValue: true,
+    },
+    { kind: "boolean", name: "close", label: "Close icon", defaultValue: true },
+    { kind: "text", name: "headline", label: "Title", defaultValue: "Title" },
+    {
+      kind: "text",
+      name: "body",
+      label: "Description text",
+      defaultValue:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.",
+    },
+  ],
+  render: (props) => (
+    <Alert
+      state={props.state as AlertState}
+      border={props.border === true}
+      compact={props.compact === true}
+      description={props.description === true}
+      close={props.close === true}
+      headline={String(props.headline)}
+      body={String(props.body)}
+    />
+  ),
+  tokens: {
+    "alert/danger/border": "#da294b",
+    "alert/info/border": "#2360db",
+    "alert/success/border": "#1e8158",
+    "alert/warning/border": "#f8c500",
+    "alert/text": "#13131a",
+    "alert/background": "#ffffff",
+    "alert/radius": "2px",
+    "alert/width/description": "440px",
+    "alert/width/default": "288px",
+  },
+};
 
 /* ------------------------------------------------------------------ */
 /* Notification Card                                                   */
 /* ------------------------------------------------------------------ */
 
-type CardStyle = "new" | "read" | "new-hover" | "read-hover";
-
-function NotificationCard({ styleName }: { styleName: CardStyle }) {
-  const isNew = styleName === "new" || styleName === "new-hover";
-  const isHover = styleName === "new-hover" || styleName === "read-hover";
-  const isRead = styleName === "read" || styleName === "read-hover";
+function NotificationCard({
+  isNew,
+  isHover,
+  title,
+  body,
+}: {
+  isNew: boolean;
+  isHover: boolean;
+  title: string;
+  body: string;
+}) {
+  const isRead = !isNew;
 
   return (
     <div
@@ -368,7 +370,7 @@ function NotificationCard({ styleName }: { styleName: CardStyle }) {
           />
         </div>
         <p className="[word-break:break-word] w-[310px] overflow-hidden text-ellipsis whitespace-nowrap font-medium text-[14px] leading-[20px] text-[#13131a]">
-          Title here
+          {title}
         </p>
         <div className="absolute right-0 top-0 flex size-6 items-center justify-center">
           <img
@@ -386,9 +388,7 @@ function NotificationCard({ styleName }: { styleName: CardStyle }) {
             isRead ? "font-normal" : "font-medium"
           }`}
         >
-          Lorem ipsum dolor sit amet tempor consectetur adipiscing elit, sed
-          do.Lorem ipsum dolor sit amet tempor consectetur adipiscing elit, sed
-          do.
+          {body}
         </p>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1">
@@ -431,27 +431,49 @@ function NotificationCard({ styleName }: { styleName: CardStyle }) {
   );
 }
 
-const CARD_STYLES: { style: CardStyle; label: string }[] = [
-  { style: "new", label: "new" },
-  { style: "new-hover", label: "new-hover" },
-  { style: "read", label: "read" },
-  { style: "read-hover", label: "read-hover" },
-];
-
-function NotificationCardGroup() {
-  return (
-    <GroupCard
-      title="Notification Card"
-      className="flex flex-wrap items-start gap-6"
-    >
-      {CARD_STYLES.map(({ style, label }) => (
-        <VariantBlock key={style} label={`style = ${label}`}>
-          <NotificationCard styleName={style} />
-        </VariantBlock>
-      ))}
-    </GroupCard>
-  );
-}
+const cardConfig: PlaygroundConfig = {
+  name: "Notification Card",
+  description:
+    "Single notification card — new (bold, unread dot) or read, with an optional hover background.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["new", "read"],
+      defaultValue: "new",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "hover", label: "Hover", defaultValue: false },
+    { kind: "text", name: "title", label: "Title", defaultValue: "Title here" },
+    {
+      kind: "text",
+      name: "body",
+      label: "Body",
+      defaultValue:
+        "Lorem ipsum dolor sit amet tempor consectetur adipiscing elit, sed do.Lorem ipsum dolor sit amet tempor consectetur adipiscing elit, sed do.",
+    },
+  ],
+  render: (props) => (
+    <NotificationCard
+      isNew={props.state === "new"}
+      isHover={props.hover === true}
+      title={String(props.title)}
+      body={String(props.body)}
+    />
+  ),
+  tokens: {
+    "card/border": "#e1e1e8",
+    "card/background": "#ffffff",
+    "card/hover/background": "rgba(113,113,128,0.08)",
+    "card/title": "#13131a",
+    "card/meta": "#a8a8b2",
+    "card/category/background": "#ebebf0",
+    "card/category/text": "#4b4b59",
+    "card/action/border": "#7c33b5",
+    "card/radius": "2px",
+  },
+};
 
 /* ------------------------------------------------------------------ */
 /* Notification Dropdown                                               */
@@ -608,21 +630,30 @@ function NotificationDropdown({ empty }: { empty: boolean }) {
   );
 }
 
-function NotificationDropdownGroup() {
-  return (
-    <GroupCard
-      title="Notification Dropdown"
-      className="flex flex-wrap items-start gap-6"
-    >
-      <VariantBlock label="Property 1 = Default">
-        <NotificationDropdown empty={false} />
-      </VariantBlock>
-      <VariantBlock label="Property 1 = Empty">
-        <NotificationDropdown empty />
-      </VariantBlock>
-    </GroupCard>
-  );
-}
+const dropdownConfig: PlaygroundConfig = {
+  name: "Notification Dropdown",
+  description:
+    "Notifications panel — default list of items or the empty state.",
+  controls: [
+    {
+      kind: "boolean",
+      name: "empty",
+      label: "Empty state",
+      defaultValue: false,
+    },
+  ],
+  render: (props) => <NotificationDropdown empty={props.empty === true} />,
+  tokens: {
+    "dropdown/background": "#ffffff",
+    "dropdown/divider": "#e1e1e8",
+    "dropdown/title": "#13131a",
+    "dropdown/tab/active": "#7c33b5",
+    "dropdown/meta": "#a8a8b2",
+    "dropdown/radius": "4px",
+    "dropdown/shadow":
+      "0px 1px 2px rgba(106,76,110,0.08), 0px 12px 10px rgba(106,76,110,0.1)",
+  },
+};
 
 /* ------------------------------------------------------------------ */
 /* Page                                                                */
@@ -631,13 +662,13 @@ function NotificationDropdownGroup() {
 export default function NotificationPage(): JSX.Element {
   return (
     <section
-      aria-label="Notification components"
+      aria-label="Notification component playgrounds"
       className="flex flex-col gap-6"
     >
-      <GlobalBannerGroup />
-      <AlertGroup />
-      <NotificationCardGroup />
-      <NotificationDropdownGroup />
+      <Playground config={bannerConfig} />
+      <Playground config={alertConfig} />
+      <Playground config={cardConfig} />
+      <Playground config={dropdownConfig} />
     </section>
   );
 }

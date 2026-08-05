@@ -1,3 +1,6 @@
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
+
 const A = "/figmaAssets/tooltip";
 
 // Descriptive tooltip arrows
@@ -557,159 +560,179 @@ function NumberTooltip({
 }
 
 /* ------------------------------------------------------------------ */
-/* Shared layout helpers                                              */
+/* Playground configs                                                 */
 /* ------------------------------------------------------------------ */
 
-function Caption({ children }: { children: React.ReactNode }) {
-  return <span className="text-[12px] text-[#a8a8b2]">{children}</span>;
-}
+const tooltipTokens = {
+  "container/dark/background": "#282833",
+  "container/light/background": "#ffffff",
+  "text/dark/on-light": "#13131a",
+  "text/light/on-dark": "#ffffff",
+  "radius/box": "2px",
+  "shadow/1": "0px 1px 2px rgba(113,113,128,0.08)",
+  "shadow/2": "0px 12px 10px rgba(113,113,128,0.1)",
+};
 
-function Cell({
-  label,
-  dark,
-  children,
-}: {
-  label: string;
-  dark?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <Caption>{label}</Caption>
-      <div
-        className={`flex min-h-[120px] items-center justify-center rounded-[4px] p-6 ${
-          dark ? "bg-[#3a3a47]" : "bg-[#f4f4f6]"
-        }`}
-      >
-        {children}
-      </div>
-    </div>
-  );
-}
+const standardConfig: PlaygroundConfig = {
+  name: "Standard Tooltip",
+  description:
+    "Compact label tooltip with a directional arrow. Dark and Light colours.",
+  controls: [
+    {
+      kind: "select",
+      name: "arrowPosition",
+      label: "Arrow position",
+      options: ["Top-Middle", "Bottom-Middle", "Top-Left", "Top-Right"],
+      defaultValue: "Top-Middle",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "colour",
+      label: "Colour",
+      options: ["Dark", "Light"],
+      defaultValue: "Dark",
+    },
+    {
+      kind: "text",
+      name: "text",
+      label: "Label",
+      defaultValue: "Tooltip",
+      placeholder: "Tooltip label",
+    },
+  ],
+  render: (props: PropValues) => (
+    <StandardTooltip
+      arrowPosition={props.arrowPosition as StdArrow}
+      colour={props.colour as "Dark" | "Light"}
+      text={String(props.text)}
+    />
+  ),
+  tokens: tooltipTokens,
+};
 
-const descPositions: DescArrow[] = [
-  "Top-Left",
-  "Top-Middle",
-  "Top-Right",
-  "Right",
-  "Bottom-Right",
-  "Bottom-Middle",
-  "Bottom-Left",
-  "Left",
-];
+const descriptiveConfig: PlaygroundConfig = {
+  name: "Descriptive Tooltip",
+  description:
+    "Multi-line explanatory tooltip. Arrow can attach from any edge; Dark and Light colours.",
+  controls: [
+    {
+      kind: "select",
+      name: "arrowPosition",
+      label: "Arrow position",
+      options: [
+        "Top-Left",
+        "Top-Middle",
+        "Top-Right",
+        "Right",
+        "Bottom-Right",
+        "Bottom-Middle",
+        "Bottom-Left",
+        "Left",
+      ],
+      defaultValue: "Top-Middle",
+    },
+    {
+      kind: "select",
+      name: "colour",
+      label: "Colour",
+      options: ["Dark", "Light"],
+      defaultValue: "Dark",
+      asTabs: true,
+    },
+  ],
+  render: (props: PropValues) => (
+    <DescriptiveTooltip
+      arrowPosition={props.arrowPosition as DescArrow}
+      colour={props.colour as "Dark" | "Light"}
+    />
+  ),
+  tokens: tooltipTokens,
+};
 
-// Dark descriptive omits Top-Left in Figma; kept full set for Light.
-const descDarkPositions: DescArrow[] = [
-  "Top-Middle",
-  "Top-Right",
-  "Right",
-  "Bottom-Right",
-  "Bottom-Middle",
-  "Bottom-Left",
-  "Left",
-];
+const interactiveConfig: PlaygroundConfig = {
+  name: "Interactive Tooltip",
+  description:
+    "Rich tooltip with an optional title, body copy, and action buttons.",
+  controls: [
+    {
+      kind: "select",
+      name: "colour",
+      label: "Colour",
+      options: ["Dark", "Light"],
+      defaultValue: "Dark",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "arrowPosition",
+      label: "Arrow position",
+      options: ["Top right", "Top left"],
+      defaultValue: "Top right",
+    },
+    { kind: "boolean", name: "title", label: "Show title", defaultValue: true },
+  ],
+  render: (props: PropValues) => (
+    <InteractiveTooltip
+      arrowPosition={props.arrowPosition as "Top right" | "Top left"}
+      colour={props.colour as "Dark" | "Light"}
+      title={props.title === true}
+    />
+  ),
+  tokens: {
+    ...tooltipTokens,
+    "container/footer/muted": "#4b4b59",
+    "border/divider": "#e1e1e8",
+    "link/brand": "#7c33b5",
+  },
+};
 
-const stdPositions: StdArrow[] = [
-  "Top-Middle",
-  "Bottom-Middle",
-  "Top-Left",
-  "Top-Right",
-];
+const numberConfig: PlaygroundConfig = {
+  name: "Number Tooltip",
+  description:
+    "Small numeric badge with a pointer triangle. Four colour variants.",
+  controls: [
+    {
+      kind: "select",
+      name: "colour",
+      label: "Colour",
+      options: ["Light Purple", "Light", "Dark", "Disabled Light"],
+      defaultValue: "Light Purple",
+      asTabs: true,
+    },
+    {
+      kind: "text",
+      name: "text",
+      label: "Value",
+      defaultValue: "50",
+      placeholder: "Number",
+    },
+  ],
+  render: (props: PropValues) => (
+    <NumberTooltip
+      colour={
+        props.colour as "Dark" | "Light Purple" | "Light" | "Disabled Light"
+      }
+      text={String(props.text)}
+    />
+  ),
+  tokens: {
+    "container/light-purple/background": "#717180",
+    "container/light/background": "#ffffff",
+    "container/dark/background": "#282833",
+    "container/disabled/background": "rgba(113,113,128,0.1)",
+    "text/disabled": "#a8a8b2",
+    "radius/box": "2px",
+  },
+};
 
 export default function TooltipPage() {
   return (
-    <section className="flex flex-col gap-8">
-      {/* Standard Tooltip */}
-      <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-        <h2 className="mb-4 text-[16px] font-medium text-[#13131a]">
-          Standard Tooltip
-        </h2>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-5">
-          {stdPositions.map((pos) => (
-            <Cell key={`std-dark-${pos}`} label={`Dark · ${pos}`} dark>
-              <StandardTooltip colour="Dark" arrowPosition={pos} />
-            </Cell>
-          ))}
-          {stdPositions.map((pos) => (
-            <Cell key={`std-light-${pos}`} label={`Light · ${pos}`}>
-              <StandardTooltip colour="Light" arrowPosition={pos} />
-            </Cell>
-          ))}
-        </div>
-      </div>
-
-      {/* Descriptive Tooltip */}
-      <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-        <h2 className="mb-4 text-[16px] font-medium text-[#13131a]">
-          Descriptive Tooltip
-        </h2>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-5">
-          {descDarkPositions.map((pos) => (
-            <Cell key={`desc-dark-${pos}`} label={`Dark · ${pos}`} dark>
-              <DescriptiveTooltip colour="Dark" arrowPosition={pos} />
-            </Cell>
-          ))}
-          {descPositions.map((pos) => (
-            <Cell key={`desc-light-${pos}`} label={`Light · ${pos}`}>
-              <DescriptiveTooltip colour="Light" arrowPosition={pos} />
-            </Cell>
-          ))}
-        </div>
-      </div>
-
-      {/* Interactive Tooltip */}
-      <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-        <h2 className="mb-4 text-[16px] font-medium text-[#13131a]">
-          Interactive Tooltip
-        </h2>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-5">
-          <Cell label="Dark · Title · Top right" dark>
-            <InteractiveTooltip colour="Dark" title arrowPosition="Top right" />
-          </Cell>
-          <Cell label="Dark · Title · Top left" dark>
-            <InteractiveTooltip colour="Dark" title arrowPosition="Top left" />
-          </Cell>
-          <Cell label="Dark · No title · Top right" dark>
-            <InteractiveTooltip colour="Dark" title={false} arrowPosition="Top right" />
-          </Cell>
-          <Cell label="Dark · No title · Top left" dark>
-            <InteractiveTooltip colour="Dark" title={false} arrowPosition="Top left" />
-          </Cell>
-          <Cell label="Light · Title · Top right">
-            <InteractiveTooltip colour="Light" title arrowPosition="Top right" />
-          </Cell>
-          <Cell label="Light · Title · Top left">
-            <InteractiveTooltip colour="Light" title arrowPosition="Top left" />
-          </Cell>
-          <Cell label="Light · No title · Top left">
-            <InteractiveTooltip colour="Light" title={false} arrowPosition="Top left" />
-          </Cell>
-          <Cell label="Light · No title · Top right">
-            <InteractiveTooltip colour="Light" title={false} arrowPosition="Top right" />
-          </Cell>
-        </div>
-      </div>
-
-      {/* Number Tooltip */}
-      <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-        <h2 className="mb-4 text-[16px] font-medium text-[#13131a]">
-          Number Tooltip
-        </h2>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-5">
-          <Cell label="Light Purple">
-            <NumberTooltip colour="Light Purple" />
-          </Cell>
-          <Cell label="Light">
-            <NumberTooltip colour="Light" />
-          </Cell>
-          <Cell label="Dark" dark>
-            <NumberTooltip colour="Dark" />
-          </Cell>
-          <Cell label="Disabled Light">
-            <NumberTooltip colour="Disabled Light" />
-          </Cell>
-        </div>
-      </div>
+    <section aria-label="Tooltip component playgrounds" className="flex flex-col gap-6">
+      <Playground config={standardConfig} />
+      <Playground config={descriptiveConfig} />
+      <Playground config={interactiveConfig} />
+      <Playground config={numberConfig} />
     </section>
   );
 }

@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
 /**
- * Slider design-system page.
+ * Slider design-system playground.
  *
- * Faithful reproduction of the Figma "Slider" page. Two core primitives are
- * modeled:
+ * Faithful reproduction of the Figma "Slider" page, refactored into interactive
+ * playgrounds. Two core primitives are modeled:
  *   - Indicator  : the draggable knob/thumb (with optional number tooltip)
  *   - SliderTrack: the full slider (track background + fill + one or two knobs)
  *
@@ -286,66 +287,103 @@ function SliderTrack({
 }
 
 /* ------------------------------------------------------------------ */
-/* Interactive demo slider                                             */
+/* Playground configs                                                  */
 /* ------------------------------------------------------------------ */
 
-function InteractiveSlider(): JSX.Element {
-  const [value, setValue] = useState(50);
-  return (
-    <div className="flex w-[300px] max-w-full flex-col gap-2">
-      <input
-        type="range"
-        min={0}
-        max={100}
-        value={value}
-        onChange={(e) => setValue(Number(e.target.value))}
-        className="w-full accent-[#7c33b5]"
-        aria-label="Interactive slider"
-      />
-      <span className="font-body-sm-medium text-[12px] font-medium leading-[18px] text-[#717180]">
-        Value: {value}
-      </span>
-    </div>
-  );
-}
+const sliderConfig: PlaygroundConfig = {
+  name: "Slider",
+  description:
+    "Track with fill and one or two knobs. Discrete (stepped) or Continuous, in Active and Disabled states.",
+  controls: [
+    {
+      kind: "select",
+      name: "type",
+      label: "Type",
+      options: ["Discrete", "Continuous"],
+      defaultValue: "Discrete",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Active", "Disabled"],
+      defaultValue: "Active",
+    },
+    {
+      kind: "select",
+      name: "sliderCount",
+      label: "Knob count",
+      options: ["1", "2"],
+      defaultValue: "2",
+    },
+  ],
+  render: (props: PropValues) => (
+    <SliderTrack
+      type={props.type as SliderType}
+      state={props.state as SliderState}
+      sliderCount={props.sliderCount as SliderCount}
+    />
+  ),
+  tokens: {
+    "container/brand/bold/background": "#7c33b5",
+    "container/neutral/background/inactive": "#e1e1e8",
+    "container/fill/track": "#ebebf0",
+    "container/disabled/background": "rgba(113,113,128,0.1)",
+    "container/step/on": "#ffffff",
+    "container/step/disabled": "#c6c6cc",
+    "radius/fill": "4px",
+    "size/discrete/track": "8px",
+    "size/continuous/track": "4px",
+    "size/frame": "300px wide",
+  },
+};
 
-/* ------------------------------------------------------------------ */
-/* Page layout helpers                                                 */
-/* ------------------------------------------------------------------ */
-
-function Caption({ children }: { children: React.ReactNode }): JSX.Element {
-  return <span className="text-[12px] text-[#a8a8b2]">{children}</span>;
-}
-
-function Card({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}): JSX.Element {
-  return (
-    <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-      <h2 className="mb-4 text-[14px] font-medium text-[#13131a]">{title}</h2>
-      {children}
-    </div>
-  );
-}
-
-function Variant({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}): JSX.Element {
-  return (
-    <div className="flex flex-col gap-2">
-      <Caption>{label}</Caption>
-      <div className="flex min-h-[40px] items-center">{children}</div>
-    </div>
-  );
-}
+const indicatorConfig: PlaygroundConfig = {
+  name: "Indicator (Knob)",
+  description:
+    "The draggable thumb. Discrete or Continuous, in Default, Active and Disabled states, with an optional value tooltip.",
+  controls: [
+    {
+      kind: "select",
+      name: "type",
+      label: "Type",
+      options: ["Discrete", "Continuous"],
+      defaultValue: "Discrete",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Default", "Active", "Disabled"],
+      defaultValue: "Active",
+    },
+    {
+      kind: "boolean",
+      name: "showNumberTooltip",
+      label: "Number tooltip",
+      defaultValue: false,
+    },
+  ],
+  render: (props: PropValues) => (
+    <Indicator
+      type={props.type as IndicatorType}
+      state={props.state as IndicatorState}
+      showNumberTooltip={props.showNumberTooltip === true}
+    />
+  ),
+  tokens: {
+    "container/tooltip/background": "#717180",
+    "container/tooltip/disabled": "rgba(113,113,128,0.1)",
+    "text/tooltip/on": "#ffffff",
+    "text/tooltip/disabled": "#a8a8b2",
+    "radius/tooltip": "2px",
+    "size/discrete": "24px",
+    "size/continuous": "18px",
+    "size/continuous/active-marker": "32×11",
+  },
+};
 
 /* ------------------------------------------------------------------ */
 /* Page                                                                */
@@ -353,94 +391,12 @@ function Variant({
 
 export default function SliderPage(): JSX.Element {
   return (
-    <section className="flex flex-col gap-8" aria-label="Slider component variants">
-      {/* Sliders — Active state */}
-      <Card title="Slider — Active">
-        <div className="flex flex-wrap gap-x-16 gap-y-8">
-          <Variant label="Discrete · Count 2">
-            <SliderTrack type="Discrete" state="Active" sliderCount="2" />
-          </Variant>
-          <Variant label="Discrete · Count 1">
-            <SliderTrack type="Discrete" state="Active" sliderCount="1" />
-          </Variant>
-          <Variant label="Continuous · Count 2">
-            <SliderTrack type="Continuous" state="Active" sliderCount="2" />
-          </Variant>
-          <Variant label="Continuous · Count 1">
-            <SliderTrack type="Continuous" state="Active" sliderCount="1" />
-          </Variant>
-        </div>
-      </Card>
-
-      {/* Sliders — Disabled state */}
-      <Card title="Slider — Disabled">
-        <div className="flex flex-wrap gap-x-16 gap-y-8">
-          <Variant label="Discrete · Count 2">
-            <SliderTrack type="Discrete" state="Disabled" sliderCount="2" />
-          </Variant>
-          <Variant label="Discrete · Count 1">
-            <SliderTrack type="Discrete" state="Disabled" sliderCount="1" />
-          </Variant>
-          <Variant label="Continuous · Count 2">
-            <SliderTrack type="Continuous" state="Disabled" sliderCount="2" />
-          </Variant>
-          <Variant label="Continuous · Count 1">
-            <SliderTrack type="Continuous" state="Disabled" sliderCount="1" />
-          </Variant>
-        </div>
-      </Card>
-
-      {/* Indicators (knobs) */}
-      <Card title="Indicator (Knob)">
-        <div className="flex flex-wrap gap-x-12 gap-y-8">
-          <Variant label="Discrete · Default">
-            <Indicator type="Discrete" state="Default" />
-          </Variant>
-          <Variant label="Discrete · Active">
-            <Indicator type="Discrete" state="Active" />
-          </Variant>
-          <Variant label="Discrete · Disabled">
-            <Indicator type="Discrete" state="Disabled" />
-          </Variant>
-          <Variant label="Continuous · Default">
-            <Indicator type="Continuous" state="Default" />
-          </Variant>
-          <Variant label="Continuous · Active">
-            <Indicator type="Continuous" state="Active" />
-          </Variant>
-          <Variant label="Continuous · Disabled">
-            <Indicator type="Continuous" state="Disabled" />
-          </Variant>
-        </div>
-      </Card>
-
-      {/* Indicators with number tooltip */}
-      <Card title="Indicator — with Number Tooltip">
-        <div className="flex flex-wrap gap-x-12 gap-y-10 pt-6">
-          <Variant label="Discrete · Default">
-            <Indicator type="Discrete" state="Default" showNumberTooltip />
-          </Variant>
-          <Variant label="Discrete · Active">
-            <Indicator type="Discrete" state="Active" showNumberTooltip />
-          </Variant>
-          <Variant label="Discrete · Disabled">
-            <Indicator type="Discrete" state="Disabled" showNumberTooltip />
-          </Variant>
-          <Variant label="Continuous · Active">
-            <Indicator type="Continuous" state="Active" showNumberTooltip />
-          </Variant>
-          <Variant label="Continuous · Disabled">
-            <Indicator type="Continuous" state="Disabled" showNumberTooltip />
-          </Variant>
-        </div>
-      </Card>
-
-      {/* Interactive example */}
-      <Card title="Interactive">
-        <Variant label="Drag to change value">
-          <InteractiveSlider />
-        </Variant>
-      </Card>
+    <section
+      aria-label="Slider component playground"
+      className="flex flex-col gap-6"
+    >
+      <Playground config={sliderConfig} />
+      <Playground config={indicatorConfig} />
     </section>
   );
 }

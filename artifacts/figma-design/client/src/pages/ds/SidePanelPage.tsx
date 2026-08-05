@@ -1,3 +1,6 @@
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
+
 const A = "/figmaAssets/side-panel";
 
 /* ------------------------------------------------------------------ */
@@ -256,79 +259,104 @@ function SidePanel({
 }
 
 /* ------------------------------------------------------------------ */
+/* Playground configs                                                  */
+/* ------------------------------------------------------------------ */
+
+const sidePanelConfig: PlaygroundConfig = {
+  name: "Side Panel",
+  description:
+    "Slide-over panel — Size (400/600/800) with optional sub-navigation, subtitle, and title icon.",
+  controls: [
+    {
+      kind: "select",
+      name: "size",
+      label: "Size",
+      options: ["400", "600", "800"],
+      defaultValue: "600",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "subnav", label: "Sub-navigation", defaultValue: true },
+    { kind: "boolean", name: "subtitle", label: "Subtitle", defaultValue: true },
+    { kind: "boolean", name: "titleIcon", label: "Title icon", defaultValue: false },
+  ],
+  render: (props) => (
+    <SidePanel
+      size={props.size as "400" | "600" | "800"}
+      subnav={props.subnav === true}
+      subtitle={props.subtitle === true}
+      titleIcon={props.titleIcon === true}
+    />
+  ),
+  tokens: {
+    "container/surface/background": "#f7f7fa",
+    "container/header/background": "#ebebf0",
+    "container/body/background": "#ebebf0",
+    "container/footer/background": "#ffffff",
+    "border/divider": "#e1e1e8",
+    "text/title": "#13131a",
+    "text/subtitle": "#282833",
+    "text/brand": "#7c33b5",
+    "size/400": "400px",
+    "size/600": "600px",
+    "size/800": "800px",
+    "size/height": "720px",
+  },
+};
+
+const headerActionConfig: PlaygroundConfig = {
+  name: "Header Action",
+  description: "Trailing header controls — Pagination (caret prev/next) or Close.",
+  controls: [
+    {
+      kind: "select",
+      name: "type",
+      label: "Type",
+      options: ["Pagination", "Close"],
+      defaultValue: "Pagination",
+      asTabs: true,
+    },
+  ],
+  render: (props) => (
+    <div className="bg-[#ebebf0] p-2">
+      {props.type === "Close" ? <HeaderActionClose /> : <HeaderActionPagination />}
+    </div>
+  ),
+  tokens: {
+    "container/action/background": "#ffffff",
+    "radius/action": "2px",
+    "size/icon": "20px",
+  },
+};
+
+const footerConfig: PlaygroundConfig = {
+  name: "Side Panel Footer",
+  description: "Actions-right footer — Link, Default outline button, and Default filled button.",
+  controls: [],
+  render: () => (
+    <div className="w-full max-w-[1075px]">
+      <SidePanelFooter />
+    </div>
+  ),
+  tokens: {
+    "container/footer/background": "#ffffff",
+    "button/primary/background": "#7c33b5",
+    "button/secondary/border": "#4b4b59",
+    "text/link": "#7c33b5",
+    "text/default": "#4b4b59",
+    "radius/button": "2px",
+  },
+};
+
+/* ------------------------------------------------------------------ */
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
 
-const cardClass = "rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5";
-const captionClass = "text-[12px] text-[#a8a8b2]";
-
 export default function SidePanelPage() {
   return (
-    <section className="flex flex-col gap-8">
-      {/* Sizes */}
-      <div className={cardClass}>
-        <p className={`${captionClass} mb-4`}>Side panel — sizes</p>
-        <div className="flex flex-wrap gap-8">
-          <div className="flex flex-col gap-2">
-            <span className={captionClass}>Size = 400</span>
-            <SidePanel size="400" />
-          </div>
-          <div className="flex flex-col gap-2">
-            <span className={captionClass}>Size = 600</span>
-            <SidePanel size="600" />
-          </div>
-          <div className="flex flex-col gap-2">
-            <span className={captionClass}>Size = 800</span>
-            <SidePanel size="800" />
-          </div>
-        </div>
-      </div>
-
-      {/* Property variations (on the 600 size) */}
-      <div className={cardClass}>
-        <p className={`${captionClass} mb-4`}>Property variations</p>
-        <div className="flex flex-wrap gap-8">
-          <div className="flex flex-col gap-2">
-            <span className={captionClass}>Title icon</span>
-            <SidePanel size="600" titleIcon />
-          </div>
-          <div className="flex flex-col gap-2">
-            <span className={captionClass}>No subtitle</span>
-            <SidePanel size="600" subtitle={false} />
-          </div>
-          <div className="flex flex-col gap-2">
-            <span className={captionClass}>No subnav</span>
-            <SidePanel size="600" subnav={false} />
-          </div>
-        </div>
-      </div>
-
-      {/* Header Action */}
-      <div className={cardClass}>
-        <p className={`${captionClass} mb-4`}>Header Action</p>
-        <div className="flex flex-wrap items-start gap-8">
-          <div className="flex flex-col gap-2">
-            <span className={captionClass}>Pagination</span>
-            <div className="w-fit bg-[#ebebf0] p-2">
-              <HeaderActionPagination />
-            </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <span className={captionClass}>Close</span>
-            <div className="w-fit bg-[#ebebf0] p-2">
-              <HeaderActionClose />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className={cardClass}>
-        <p className={`${captionClass} mb-4`}>Footer — Actions right (Default)</p>
-        <div className="max-w-[1075px]">
-          <SidePanelFooter />
-        </div>
-      </div>
+    <section aria-label="Side Panel component playground" className="flex flex-col gap-6">
+      <Playground config={sidePanelConfig} />
+      <Playground config={headerActionConfig} />
+      <Playground config={footerConfig} />
     </section>
   );
 }

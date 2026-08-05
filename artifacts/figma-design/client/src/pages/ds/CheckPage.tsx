@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
 const CHECK_ICON = "/figmaAssets/check/check.svg";
 const CHECK_ICON_DISABLED = "/figmaAssets/check/check-disabled.svg";
@@ -40,10 +41,6 @@ function Checkbox({
   const isChecked = variant === "Checked" || variant === "Checked Error";
   const isPartial = variant === "Partial" || variant === "Partial Error";
   const isUnchecked = variant === "Unchecked" || variant === "Unchecked Error";
-  const isError =
-    variant === "Unchecked Error" ||
-    variant === "Checked Error" ||
-    variant === "Partial Error";
   const isFilled = isChecked || isPartial;
 
   // 16px container box styling
@@ -161,143 +158,74 @@ function Checkbox({
   );
 }
 
-/** An interactive compact checkbox demoing real toggle behavior. */
-function InteractiveCheckbox() {
-  const [checked, setChecked] = useState(false);
-  const [hover, setHover] = useState(false);
-  return (
-    <button
-      type="button"
-      className="all-unset cursor-pointer"
-      onClick={() => setChecked((c) => !c)}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      aria-pressed={checked}
-    >
-      <Checkbox
-        variant={checked ? "Checked" : "Unchecked"}
-        state={hover ? "Hover" : "Default"}
-        labelValue="Toggle me"
-      />
-    </button>
-  );
+/** Map the primary "Checkbox" selection + Error toggle into the concrete variant. */
+function toVariant(checkbox: string, error: boolean): Variant {
+  const base =
+    checkbox === "Checked"
+      ? "Checked"
+      : checkbox === "Partial"
+        ? "Partial"
+        : "Unchecked";
+  return (error ? `${base} Error` : base) as Variant;
 }
 
-type VariantSpec = {
-  caption: string;
-  variant: Variant;
-  state: State;
-  disabled: boolean;
+const checkboxConfig: PlaygroundConfig = {
+  name: "Checkbox",
+  description:
+    "Selection control — Unchecked / Checked / Partial, with error, hover, disabled and compact axes.",
+  controls: [
+    {
+      kind: "select",
+      name: "checkbox",
+      label: "Checkbox",
+      options: ["Unchecked", "Checked", "Partial"],
+      defaultValue: "Unchecked",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "error", label: "Error", defaultValue: false },
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Default", "Hover"],
+      defaultValue: "Default",
+    },
+    { kind: "boolean", name: "disabled", label: "Disabled", defaultValue: false },
+    { kind: "boolean", name: "isCompact", label: "Compact", defaultValue: true },
+    { kind: "boolean", name: "hasLabel", label: "Show label", defaultValue: true },
+    { kind: "text", name: "labelValue", label: "Label", defaultValue: "Option" },
+  ],
+  render: (props: PropValues) => (
+    <Checkbox
+      variant={toVariant(String(props.checkbox), props.error === true)}
+      state={props.state === "Hover" ? "Hover" : "Default"}
+      disabled={props.disabled === true}
+      isCompact={props.isCompact === true}
+      hasLabel={props.hasLabel === true}
+      labelValue={String(props.labelValue)}
+    />
+  ),
+  tokens: {
+    "container/brand/bold/background": "#7c33b5",
+    "border/error": "#da294b",
+    "border/default": "#c6c6cc",
+    "border/hover": "#a8a8b2",
+    "border/disabled": "#e1e1e8",
+    "container/disabled/background": "rgba(113,113,128,0.1)",
+    "container/hover/background": "rgba(113,113,128,0.08)",
+    "text/label": "#13131a",
+    "text/label/disabled": "#a8a8b2",
+    "radius/box": "2px",
+    "size/box": "16×16",
+    "padding/compact": "2px",
+    "padding/standard": "7px",
+  },
 };
-
-const VARIANT_MATRIX: VariantSpec[] = [
-  { caption: "Default", variant: "Unchecked", state: "Default", disabled: false },
-  { caption: "Hover", variant: "Unchecked", state: "Hover", disabled: false },
-  { caption: "Disabled", variant: "Unchecked", state: "Default", disabled: true },
-  { caption: "Checked", variant: "Checked", state: "Default", disabled: false },
-  { caption: "Checked · Hover", variant: "Checked", state: "Hover", disabled: false },
-  { caption: "Checked · Disabled", variant: "Checked", state: "Default", disabled: true },
-  { caption: "Partial", variant: "Partial", state: "Default", disabled: false },
-  { caption: "Partial · Hover", variant: "Partial", state: "Hover", disabled: false },
-  { caption: "Partial · Disabled", variant: "Partial", state: "Default", disabled: true },
-];
-
-const ERROR_MATRIX: VariantSpec[] = [
-  { caption: "Unchecked Error", variant: "Unchecked Error", state: "Default", disabled: false },
-  { caption: "Unchecked Error · Hover", variant: "Unchecked Error", state: "Hover", disabled: false },
-  { caption: "Unchecked Error · Disabled", variant: "Unchecked Error", state: "Default", disabled: true },
-  { caption: "Checked Error", variant: "Checked Error", state: "Default", disabled: false },
-  { caption: "Checked Error · Hover", variant: "Checked Error", state: "Hover", disabled: false },
-  { caption: "Checked Error · Disabled", variant: "Checked Error", state: "Default", disabled: true },
-  { caption: "Partial Error", variant: "Partial Error", state: "Default", disabled: false },
-  { caption: "Partial Error · Hover", variant: "Partial Error", state: "Hover", disabled: false },
-  { caption: "Partial Error · Disabled", variant: "Partial Error", state: "Default", disabled: true },
-];
-
-function VariantGrid({
-  specs,
-  isCompact,
-}: {
-  specs: VariantSpec[];
-  isCompact: boolean;
-}) {
-  return (
-    <div className="flex flex-wrap gap-x-8 gap-y-5">
-      {specs.map((spec) => (
-        <div key={spec.caption} className="flex min-w-[140px] flex-col gap-1.5">
-          <span className="text-[12px] text-[#a8a8b2]">{spec.caption}</span>
-          <Checkbox
-            variant={spec.variant}
-            state={spec.state}
-            disabled={spec.disabled}
-            isCompact={isCompact}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-const cardClass =
-  "rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5";
 
 export default function CheckPage() {
   return (
-    <section className="flex flex-col gap-6">
-      {/* Compact checkboxes */}
-      <div className={cardClass}>
-        <p className="mb-4 text-[12px] text-[#a8a8b2]">
-          Checkbox · Compact
-        </p>
-        <VariantGrid specs={VARIANT_MATRIX} isCompact={true} />
-      </div>
-
-      {/* Compact error checkboxes */}
-      <div className={cardClass}>
-        <p className="mb-4 text-[12px] text-[#a8a8b2]">
-          Checkbox · Compact · Error
-        </p>
-        <VariantGrid specs={ERROR_MATRIX} isCompact={true} />
-      </div>
-
-      {/* Non-compact checkboxes */}
-      <div className={cardClass}>
-        <p className="mb-4 text-[12px] text-[#a8a8b2]">
-          Checkbox · Standard
-        </p>
-        <VariantGrid specs={VARIANT_MATRIX} isCompact={false} />
-      </div>
-
-      {/* Non-compact error checkboxes */}
-      <div className={cardClass}>
-        <p className="mb-4 text-[12px] text-[#a8a8b2]">
-          Checkbox · Standard · Error
-        </p>
-        <VariantGrid specs={ERROR_MATRIX} isCompact={false} />
-      </div>
-
-      {/* Checkbox-Element (control only, no label) */}
-      <div className={cardClass}>
-        <p className="mb-4 text-[12px] text-[#a8a8b2]">
-          Checkbox-Element (control only)
-        </p>
-        <div className="flex flex-wrap gap-x-8 gap-y-5">
-          <div className="flex min-w-[140px] flex-col gap-1.5">
-            <span className="text-[12px] text-[#a8a8b2]">isCompact = true</span>
-            <Checkbox variant="Unchecked" isCompact={true} hasLabel={false} />
-          </div>
-          <div className="flex min-w-[140px] flex-col gap-1.5">
-            <span className="text-[12px] text-[#a8a8b2]">isCompact = false</span>
-            <Checkbox variant="Unchecked" isCompact={false} hasLabel={false} />
-          </div>
-        </div>
-      </div>
-
-      {/* Interactive */}
-      <div className={cardClass}>
-        <p className="mb-4 text-[12px] text-[#a8a8b2]">Interactive</p>
-        <InteractiveCheckbox />
-      </div>
+    <section aria-label="Checkbox component playground" className="flex flex-col gap-6">
+      <Playground config={checkboxConfig} />
     </section>
   );
 }

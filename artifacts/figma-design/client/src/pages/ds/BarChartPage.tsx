@@ -14,10 +14,10 @@
  *   - Borders/gridlines: border/static/subtle/neutral (#e1e1e8)
  *   - Data vis palette: datavis/qualitative/1..n
  * built with the Fiber design-system tokens used across the app.
- *
- * Documentation / annotation frames (page titles, prototype notes, arrows,
- * measurement callouts) are intentionally skipped.
  * ========================================================================= */
+
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
 const FONT = '"DM Sans", Helvetica';
 
@@ -25,9 +25,10 @@ const FONT = '"DM Sans", Helvetica';
 const DATAVIS = ["#7c33b5", "#d194ff", "#3b82c4", "#5ac8b0"];
 
 const GRID = "#e1e1e8"; // border/static/subtle/neutral
+const GRID_DARK = "#3a3a45";
 const AXIS_LABEL = "#4b4b59"; // surface/foreground/static/neutral/lvl1
+const AXIS_LABEL_DARK = "#c6c6cc";
 const TITLE = "#13131a";
-const MUTED = "#a8a8b2";
 
 /* ---------- shared chart primitives ---------- */
 
@@ -38,7 +39,10 @@ const CATEGORIES = ["Jan", "Feb", "Mar", "Apr", "May"];
 /* Y axis tick values (fixed for the mock) */
 const Y_TICKS = [100, 75, 50, 25, 0];
 
-function Legend({ series }: { series: Series[] }) {
+type ChartKind = "grouped" | "stacked" | "combo";
+
+function Legend({ series, dark }: { series: Series[]; dark: boolean }) {
+  const labelColor = dark ? AXIS_LABEL_DARK : AXIS_LABEL;
   return (
     <div className="flex flex-wrap items-center gap-x-[16px] gap-y-[6px]">
       {series.map((s) => (
@@ -49,7 +53,7 @@ function Legend({ series }: { series: Series[] }) {
           />
           <span
             className="whitespace-nowrap text-[14px] leading-[20px]"
-            style={{ fontFamily: FONT, color: AXIS_LABEL }}
+            style={{ fontFamily: FONT, color: labelColor }}
           >
             {s.name}
           </span>
@@ -59,18 +63,18 @@ function Legend({ series }: { series: Series[] }) {
   );
 }
 
-type ChartKind = "grouped" | "stacked" | "combo";
-
 function ColumnChart({
   series,
   kind = "grouped",
   line,
   height = 220,
+  dark = false,
 }: {
   series: Series[];
   kind?: ChartKind;
   line?: { name: string; color: string; values: number[] };
   height?: number;
+  dark?: boolean;
 }) {
   const plotW = 460;
   const plotH = height;
@@ -84,6 +88,9 @@ function ColumnChart({
 
   const scaleY = (v: number) => (v / max) * plotH;
 
+  const gridColor = dark ? GRID_DARK : GRID;
+  const labelColor = dark ? AXIS_LABEL_DARK : AXIS_LABEL;
+
   const linePoints =
     line &&
     line.values.map((v, i) => {
@@ -95,7 +102,10 @@ function ColumnChart({
   return (
     <div className="flex w-full flex-col gap-[12px]">
       {/* Legend */}
-      <Legend series={line ? [...series, { name: line.name, color: line.color, values: [] }] : series} />
+      <Legend
+        series={line ? [...series, { name: line.name, color: line.color, values: [] }] : series}
+        dark={dark}
+      />
 
       {/* Plot container: Y axis + plot area, X axis below */}
       <div className="flex w-full">
@@ -108,7 +118,7 @@ function ColumnChart({
             <span
               key={t}
               className="text-[14px] leading-[20px]"
-              style={{ fontFamily: FONT, color: AXIS_LABEL }}
+              style={{ fontFamily: FONT, color: labelColor }}
             >
               {t}
             </span>
@@ -124,7 +134,7 @@ function ColumnChart({
                 key={t}
                 className="absolute left-0 right-0 h-0 border-t border-solid"
                 style={{
-                  borderColor: GRID,
+                  borderColor: gridColor,
                   top: `${(i / (Y_TICKS.length - 1)) * 100}%`,
                 }}
               />
@@ -223,7 +233,7 @@ function ColumnChart({
               <span
                 key={c}
                 className="text-[14px] leading-[20px]"
-                style={{ fontFamily: FONT, color: AXIS_LABEL }}
+                style={{ fontFamily: FONT, color: labelColor }}
               >
                 {c}
               </span>
@@ -239,54 +249,41 @@ function ColumnChart({
 
 function SmartCard({
   title,
+  dark,
   children,
 }: {
   title: string;
+  dark: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div
-      className="flex w-full min-w-[300px] max-w-[560px] flex-col overflow-hidden rounded-[2px] bg-white"
-      style={{
-        boxShadow:
-          "0px 1px 4px 0px rgba(113,113,128,0.08), 0px 8px 16px 0px rgba(113,113,128,0.04)",
-      }}
+      className={`flex w-full min-w-[300px] max-w-[560px] flex-col overflow-hidden rounded-[2px] ${
+        dark ? "bg-[#1c1c24]" : "bg-white"
+      }`}
+      style={
+        dark
+          ? undefined
+          : {
+              boxShadow:
+                "0px 1px 4px 0px rgba(113,113,128,0.08), 0px 8px 16px 0px rgba(113,113,128,0.04)",
+            }
+      }
     >
       {/* header */}
       <div className="flex items-center gap-[8px] p-[16px]">
         <p
           className="text-[16px] font-medium leading-[24px] tracking-[-0.08px]"
-          style={{ fontFamily: FONT, color: TITLE }}
+          style={{ fontFamily: FONT, color: dark ? "#ffffff" : TITLE }}
         >
           {title}
         </p>
       </div>
-      <div className="h-0 w-full border-t border-solid" style={{ borderColor: GRID }} />
+      <div
+        className="h-0 w-full border-t border-solid"
+        style={{ borderColor: dark ? GRID_DARK : GRID }}
+      />
       {/* content / plot */}
-      <div className="p-[16px]">{children}</div>
-    </div>
-  );
-}
-
-/* dark-mode Smart Card variant */
-function SmartCardDark({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex w-full min-w-[300px] max-w-[560px] flex-col overflow-hidden rounded-[2px] bg-[#1c1c24]">
-      <div className="flex items-center gap-[8px] p-[16px]">
-        <p
-          className="text-[16px] font-medium leading-[24px] tracking-[-0.08px]"
-          style={{ fontFamily: FONT, color: "#ffffff" }}
-        >
-          {title}
-        </p>
-      </div>
-      <div className="h-0 w-full border-t border-solid" style={{ borderColor: "#3a3a45" }} />
       <div className="p-[16px]">{children}</div>
     </div>
   );
@@ -310,160 +307,79 @@ const STACKED_SERIES: Series[] = [
 
 const COMBO_LINE = { name: "Trend", color: "#3b82c4", values: [45, 70, 58, 88, 66] };
 
-/* dark palette re-tinted for dark card */
-function darkSeries(s: Series[]): Series[] {
-  return s;
+/* ---------- config: Column chart ---------- */
+
+function renderChart(props: PropValues, theme: "light" | "dark") {
+  const dark = theme === "dark";
+  const type = String(props.type);
+  const title = String(props.title);
+
+  let chart: React.ReactNode;
+  switch (type) {
+    case "2 series":
+      chart = <ColumnChart series={TWO_SERIES} kind="grouped" dark={dark} />;
+      break;
+    case "Stacked":
+      chart = <ColumnChart series={STACKED_SERIES} kind="stacked" dark={dark} />;
+      break;
+    case "Column + line":
+      chart = <ColumnChart series={ONE_SERIES} kind="combo" line={COMBO_LINE} dark={dark} />;
+      break;
+    case "1 series":
+    default:
+      chart = <ColumnChart series={ONE_SERIES} kind="grouped" dark={dark} />;
+      break;
+  }
+
+  if (props.smartCard === false) {
+    return <div className="w-full max-w-[520px]">{chart}</div>;
+  }
+
+  return (
+    <SmartCard title={title} dark={dark}>
+      {chart}
+    </SmartCard>
+  );
 }
 
-/* ---------- caption helper ---------- */
-function Caption({ children }: { children: React.ReactNode }) {
-  return <p className="text-[12px] text-[#a8a8b2]" style={{ fontFamily: FONT }}>{children}</p>;
-}
+const config: PlaygroundConfig = {
+  name: "Column chart",
+  description:
+    "Data-vis column chart inside the Smart Card. Explore the 4 nested variants — 1 series, 2 series, stacked, and column + line combo.",
+  controls: [
+    {
+      kind: "select",
+      name: "type",
+      label: "Type",
+      options: ["1 series", "2 series", "Stacked", "Column + line"],
+      defaultValue: "2 series",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "smartCard", label: "Smart Card frame", defaultValue: true },
+    { kind: "text", name: "title", label: "Title", defaultValue: "Column chart" },
+  ],
+  render: renderChart,
+  tokens: {
+    "border/static/subtle/neutral": GRID,
+    "surface/foreground/static/neutral/lvl1": AXIS_LABEL,
+    "datavis/qualitative/1": DATAVIS[0],
+    "datavis/qualitative/2": DATAVIS[1],
+    "datavis/qualitative/3": DATAVIS[2],
+    "datavis/qualitative/4": DATAVIS[3],
+    "surface/background/dark": "#1c1c24",
+    "radius/card": "2px",
+    "size/column-min": "16px",
+    "size/column-max": "24px",
+    "typography/body-lg": "14 / 20",
+  },
+};
 
 /* ---------- page ---------- */
 
 export default function BarChartPage() {
   return (
-    <section className="flex flex-col gap-[24px]" aria-label="Bar chart component variants">
-      {/* Overview */}
-      <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-        <p className="text-[12px]" style={{ fontFamily: FONT, color: MUTED }}>
-          Overview
-        </p>
-        <p className="mt-[4px] max-w-[900px] text-[14px] leading-[20px]" style={{ fontFamily: FONT, color: AXIS_LABEL }}>
-          The column chart component consists of a legend at the top and a plot
-          container below. The plot container includes the Y and X axes,
-          gridlines, and the plot area, and sits within the Smart Card
-          component.
-        </p>
-        <div className="mt-[16px] flex flex-wrap gap-[24px]">
-          <div className="flex flex-col gap-[8px]">
-            <Caption>Column chart</Caption>
-            <div className="w-full max-w-[520px] rounded-[2px] border border-solid p-[16px]" style={{ borderColor: GRID }}>
-              <ColumnChart series={ONE_SERIES} kind="grouped" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Variants */}
-      <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-        <p className="text-[12px]" style={{ fontFamily: FONT, color: MUTED }}>
-          Variants
-        </p>
-        <p className="mt-[4px] max-w-[900px] text-[14px] leading-[20px]" style={{ fontFamily: FONT, color: AXIS_LABEL }}>
-          The column chart includes 4 nested instances — 1 series, 2 series,
-          stacked, and column + line combo.
-        </p>
-        <div className="mt-[16px] flex flex-wrap gap-[24px]">
-          <div className="flex flex-col gap-[8px]">
-            <Caption>1 series</Caption>
-            <SmartCard title="Column chart">
-              <ColumnChart series={ONE_SERIES} kind="grouped" />
-            </SmartCard>
-          </div>
-          <div className="flex flex-col gap-[8px]">
-            <Caption>2 series</Caption>
-            <SmartCard title="Column chart">
-              <ColumnChart series={TWO_SERIES} kind="grouped" />
-            </SmartCard>
-          </div>
-          <div className="flex flex-col gap-[8px]">
-            <Caption>Stacked</Caption>
-            <SmartCard title="Column chart">
-              <ColumnChart series={STACKED_SERIES} kind="stacked" />
-            </SmartCard>
-          </div>
-          <div className="flex flex-col gap-[8px]">
-            <Caption>Column + line</Caption>
-            <SmartCard title="Column chart">
-              <ColumnChart series={ONE_SERIES} kind="combo" line={COMBO_LINE} />
-            </SmartCard>
-          </div>
-        </div>
-      </div>
-
-      {/* Light and dark mode */}
-      <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-        <p className="text-[12px]" style={{ fontFamily: FONT, color: MUTED }}>
-          Light &amp; dark mode
-        </p>
-        <p className="mt-[4px] max-w-[900px] text-[14px] leading-[20px]" style={{ fontFamily: FONT, color: AXIS_LABEL }}>
-          The component has an auto light &amp; dark mode token enabled.
-        </p>
-        <div className="mt-[16px] flex flex-wrap gap-[24px]">
-          <div className="flex flex-col gap-[8px]">
-            <div className="flex items-center gap-[8px]">
-              <img src="/figmaAssets/bar-chart/sun.svg" alt="" className="h-[20px] w-[20px]" />
-              <Caption>Light mode</Caption>
-            </div>
-            <SmartCard title="Column chart">
-              <ColumnChart series={TWO_SERIES} kind="grouped" />
-            </SmartCard>
-          </div>
-          <div className="flex flex-col gap-[8px]">
-            <div className="flex items-center gap-[8px]">
-              <img src="/figmaAssets/bar-chart/moon.svg" alt="" className="h-[20px] w-[20px]" />
-              <Caption>Dark mode</Caption>
-            </div>
-            <SmartCardDark title="Column chart">
-              <ColumnChart series={darkSeries(TWO_SERIES)} kind="grouped" />
-            </SmartCardDark>
-          </div>
-        </div>
-      </div>
-
-      {/* Color tokens */}
-      <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-        <p className="text-[12px]" style={{ fontFamily: FONT, color: MUTED }}>
-          Color tokens
-        </p>
-        <p className="mt-[4px] max-w-[900px] text-[14px] leading-[20px]" style={{ fontFamily: FONT, color: AXIS_LABEL }}>
-          All elements of the column chart are linked to Fiber through a system
-          of color tokens, ensuring consistent appearance across themes and
-          products.
-        </p>
-        <div className="mt-[16px] flex flex-wrap gap-[32px]">
-          <SmartCard title="Column chart">
-            <ColumnChart series={TWO_SERIES} kind="grouped" />
-          </SmartCard>
-          <ul className="flex flex-col gap-[12px]">
-            {[
-              { label: "border/static/subtle/neutral", swatch: GRID },
-              { label: "surface/foreground/static/neutral/lvl1", swatch: AXIS_LABEL },
-              { label: "datavis/qualitative/1", swatch: DATAVIS[0] },
-              { label: "datavis/qualitative/2", swatch: DATAVIS[1] },
-              { label: "datavis/qualitative/3", swatch: DATAVIS[2] },
-            ].map((t) => (
-              <li key={t.label} className="flex items-center gap-[10px]">
-                <span
-                  className="block h-[20px] w-[20px] shrink-0 rounded-[3px] border border-solid"
-                  style={{ backgroundColor: t.swatch, borderColor: GRID }}
-                />
-                <span className="text-[14px] leading-[20px]" style={{ fontFamily: FONT, color: TITLE }}>
-                  {t.label}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* Anatomy variables */}
-      <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-        <p className="text-[12px]" style={{ fontFamily: FONT, color: MUTED }}>
-          Anatomy variables
-        </p>
-        <p className="mt-[4px] max-w-[900px] text-[14px] leading-[20px]" style={{ fontFamily: FONT, color: AXIS_LABEL }}>
-          To ensure smooth performance and visual consistency, the component
-          maintains fixed minimum and maximum dimensions.
-        </p>
-        <ul className="mt-[12px] flex flex-col gap-[6px] text-[14px] leading-[20px]" style={{ fontFamily: FONT, color: TITLE }}>
-          <li>Frame — minimum height: 300px · minimum width: 580px</li>
-          <li>Columns — minimum width: 16px · maximum width: 24px</li>
-          <li>All font sizes are fixed: Body Lg / Regular 14 / 20</li>
-        </ul>
-      </div>
+    <section className="flex flex-col gap-[24px]" aria-label="Bar chart component playground">
+      <Playground config={config} />
     </section>
   );
 }

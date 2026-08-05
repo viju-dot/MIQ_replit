@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
 const PILL_CLOSE = "/figmaAssets/multiselect/pill-close.svg";
 const CARET_DOWN = "/figmaAssets/multiselect/caret-down.svg";
@@ -7,12 +9,8 @@ const SEARCH = "/figmaAssets/multiselect/search.svg";
 const CHECK = "/figmaAssets/icon-check.svg";
 
 /* ------------------------------------------------------------------ */
-/* Small building blocks                                               */
+/* Small building blocks (exact Figma JSX/classes)                     */
 /* ------------------------------------------------------------------ */
-
-function Caption({ children }: { children: React.ReactNode }): JSX.Element {
-  return <span className="text-[12px] text-[#a8a8b2]">{children}</span>;
-}
 
 function BadgePill({ label }: { label: string }): JSX.Element {
   return (
@@ -41,7 +39,7 @@ function CountPill({ label }: { label: string }): JSX.Element {
   );
 }
 
-/* The closed dropdown field (as in the "Dropdown Closed" instance). */
+/* The dropdown field (as in the "Dropdown Closed"/"Open" instance). */
 function DropdownField({
   pills,
   extra,
@@ -55,9 +53,9 @@ function DropdownField({
 }): JSX.Element {
   return (
     <div
-      className={`flex w-full flex-col items-start justify-center rounded-[2px] border border-solid ${
-        open ? "border-[#7c33b5]" : "border-[#7c33b5]"
-      } ${disabled ? "bg-[#7171800a]" : "bg-white"}`}
+      className={`flex w-full flex-col items-start justify-center rounded-[2px] border border-solid border-[#7c33b5] ${
+        disabled ? "bg-[#7171800a]" : "bg-white"
+      }`}
     >
       <div className="flex w-full items-center gap-2 pl-3 pr-1.5">
         <div className="flex min-w-0 flex-1 flex-wrap content-start items-start gap-1.5 py-2">
@@ -150,158 +148,208 @@ function Menu({ children }: { children: React.ReactNode }): JSX.Element {
   );
 }
 
-function VariantBlock({
-  caption,
-  children,
-}: {
-  caption: string;
-  children: React.ReactNode;
-}): JSX.Element {
+/* ------------------------------------------------------------------ */
+/* Component 1: Dropdown field (closed)                                */
+/* ------------------------------------------------------------------ */
+
+const CAMPAIGN_DISPLAY = "Campaign name goes here - display";
+const CAMPAIGN_VIDEO = "Campaign name goes here - video";
+const CAMPAIGN_LONG =
+  "Campaign name goes here - display -  other details - 2 june 2020";
+
+function renderClosedField(props: PropValues): JSX.Element {
+  const selection = String(props.selection);
+  const disabled = props.disabled === true;
+
+  let pills: string[] = [CAMPAIGN_DISPLAY];
+  let extra: string | undefined;
+
+  if (selection === "1 selected") {
+    pills = [CAMPAIGN_DISPLAY];
+  } else if (selection === "2 selected") {
+    pills = [CAMPAIGN_DISPLAY, CAMPAIGN_VIDEO];
+  } else if (selection === "Overflow (+count)") {
+    pills = [CAMPAIGN_LONG, CAMPAIGN_VIDEO, CAMPAIGN_VIDEO];
+    extra = "+4";
+  } else if (selection === "All selected") {
+    pills = [CAMPAIGN_DISPLAY, CAMPAIGN_VIDEO];
+    extra = "+4";
+  }
+
   return (
-    <div className="flex w-full max-w-[320px] flex-col gap-1">
-      <Caption>{caption}</Caption>
-      {children}
+    <div className="w-full max-w-[320px]">
+      <DropdownField pills={pills} extra={extra} disabled={disabled} />
     </div>
   );
 }
+
+const closedConfig: PlaygroundConfig = {
+  name: "Multiselect — Dropdown (closed)",
+  description:
+    "Closed field showing selected values as pills, with overflow count and disabled state.",
+  controls: [
+    {
+      kind: "select",
+      name: "selection",
+      label: "Selection",
+      options: ["1 selected", "2 selected", "Overflow (+count)", "All selected"],
+      defaultValue: "1 selected",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "disabled", label: "Disabled", defaultValue: false },
+  ],
+  render: (props) => renderClosedField(props),
+  tokens: {
+    "field/border": "#7c33b5",
+    "field/background": "#ffffff",
+    "field/background/disabled": "rgba(113,113,128,0.04)",
+    "pill/brand/background": "#7c33b5",
+    "pill/count/background": "#f6ebff",
+    "pill/count/text": "#662994",
+    "radius/field": "2px",
+    "pill/height": "18px",
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* Component 2: Dropdown (open) with menu                              */
+/* ------------------------------------------------------------------ */
+
+const OPTION_LABELS = [
+  "Option one",
+  "Option two",
+  "Option three",
+  "Option four",
+  "Option five",
+];
+
+function OpenDropdown({ props }: { props: PropValues }): JSX.Element {
+  const state = String(props.state);
+  const searchValue = String(props.searchValue);
+  const disabled = props.disabled === true;
+
+  const [selected, setSelected] = useState<Record<string, boolean>>({
+    "Option one": true,
+  });
+  const toggle = (label: string) =>
+    setSelected((s) => ({ ...s, [label]: !s[label] }));
+
+  // Field pills reflect the state.
+  let fieldPills: string[] = ["Option one"];
+  let fieldExtra: string | undefined;
+  if (state === "All selected") {
+    fieldPills = ["Option one", "Option two"];
+    fieldExtra = "+3";
+  } else if (state === "Selected (interactive)") {
+    const chosen = OPTION_LABELS.filter((l) => selected[l]);
+    fieldPills = chosen.length ? chosen.slice(0, 2) : ["Option one"];
+    fieldExtra = chosen.length > 2 ? `+${chosen.length - 2}` : undefined;
+  }
+
+  return (
+    <div className="flex w-full max-w-[320px] flex-col gap-1">
+      <DropdownField
+        pills={fieldPills}
+        extra={fieldExtra}
+        open
+        disabled={state === "All selected" && disabled}
+      />
+      <Menu>
+        {state === "No results" ? (
+          <>
+            <SearchRow value={searchValue} />
+            <div className="flex w-full items-center justify-center px-3 py-4">
+              <span className="font-['DM_Sans'] text-[14px] font-normal leading-[20px] text-[#a8a8b2]">
+                No results found
+              </span>
+            </div>
+          </>
+        ) : state === "Search suggestions" ? (
+          <>
+            <SearchRow value={searchValue} />
+            {OPTION_LABELS.map((label) => (
+              <OptionRow key={label} label={label} />
+            ))}
+          </>
+        ) : state === "All selected" ? (
+          <>
+            {!disabled ? <SearchRow value={searchValue} /> : null}
+            {OPTION_LABELS.map((label) => (
+              <OptionRow key={label} label={label} checked disabled={disabled} />
+            ))}
+          </>
+        ) : (
+          // Selected (interactive)
+          <>
+            <SearchRow value={searchValue} />
+            {OPTION_LABELS.map((label) => (
+              <OptionRow
+                key={label}
+                label={label}
+                checked={!!selected[label]}
+                onToggle={() => toggle(label)}
+              />
+            ))}
+          </>
+        )}
+      </Menu>
+    </div>
+  );
+}
+
+const openConfig: PlaygroundConfig = {
+  name: "Multiselect — Dropdown (open)",
+  description:
+    "Open menu states: live search, suggestions, interactive selection, all-selected and disabled.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: [
+        "Selected (interactive)",
+        "Search suggestions",
+        "No results",
+        "All selected",
+      ],
+      defaultValue: "Selected (interactive)",
+      asTabs: true,
+    },
+    {
+      kind: "text",
+      name: "searchValue",
+      label: "Search text",
+      defaultValue: "Search",
+      placeholder: "Search",
+    },
+    { kind: "boolean", name: "disabled", label: "Disabled", defaultValue: false },
+  ],
+  render: (props) => <OpenDropdown props={props} />,
+  tokens: {
+    "menu/border": "#7c33b5",
+    "menu/background": "#ffffff",
+    "option/row/border": "#e1e1e8",
+    "option/selected/background": "#f6ebff",
+    "option/hover/background": "rgba(113,113,128,0.08)",
+    "checkbox/checked": "#7c33b5",
+    "checkbox/unchecked/border": "#c6c6cc",
+    "checkbox/disabled/background": "rgba(113,113,128,0.1)",
+    "option/text": "#13131a",
+    "option/text/selected": "#7c33b5",
+    "option/text/disabled": "#a8a8b2",
+    "search/placeholder": "rgba(113,113,128,0.6)",
+  },
+};
 
 /* ------------------------------------------------------------------ */
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
 
 export default function MultiselectPage(): JSX.Element {
-  const optionLabels = [
-    "Option one",
-    "Option two",
-    "Option three",
-    "Option four",
-    "Option five",
-  ];
-
-  const [selected, setSelected] = useState<Record<string, boolean>>({
-    "Option one": true,
-  });
-
-  const toggle = (label: string) =>
-    setSelected((s) => ({ ...s, [label]: !s[label] }));
-
   return (
-    <section aria-label="Multiselect" className="flex flex-col gap-8">
-      {/* Closed states -------------------------------------------------- */}
-      <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-        <h2 className="mb-4 text-[14px] font-medium text-[#13131a]">
-          Dropdown closed
-        </h2>
-        <div className="flex flex-wrap gap-8">
-          <VariantBlock caption="1 option selected — closed">
-            <DropdownField pills={["Campaign name goes here - display"]} />
-          </VariantBlock>
-
-          <VariantBlock caption="2 options selected — closed">
-            <DropdownField
-              pills={[
-                "Campaign name goes here - display",
-                "Campaign name goes here - video",
-              ]}
-            />
-          </VariantBlock>
-
-          <VariantBlock caption="Overflow (+count) — closed">
-            <DropdownField
-              pills={[
-                "Campaign name goes here - display -  other details - 2 june 2020",
-                "Campaign name goes here - video",
-                "Campaign name goes here - video",
-              ]}
-              extra="+4"
-            />
-          </VariantBlock>
-
-          <VariantBlock caption="All selected (Disabled)">
-            <DropdownField
-              pills={[
-                "Campaign name goes here - display",
-                "Campaign name goes here - video",
-              ]}
-              extra="+4"
-              disabled
-            />
-          </VariantBlock>
-        </div>
-      </div>
-
-      {/* Open menu states ---------------------------------------------- */}
-      <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-        <h2 className="mb-4 text-[14px] font-medium text-[#13131a]">
-          Dropdown open
-        </h2>
-        <div className="flex flex-wrap items-start gap-8">
-          <VariantBlock caption="No results">
-            <DropdownField pills={["Campaign name goes here - display"]} open />
-            <Menu>
-              <SearchRow value="Searching…" />
-              <div className="flex w-full items-center justify-center px-3 py-4">
-                <span className="font-['DM_Sans'] text-[14px] font-normal leading-[20px] text-[#a8a8b2]">
-                  No results found
-                </span>
-              </div>
-            </Menu>
-          </VariantBlock>
-
-          <VariantBlock caption="Search suggestions">
-            <DropdownField pills={["Campaign name goes here - display"]} open />
-            <Menu>
-              <SearchRow value="Opt" />
-              {optionLabels.map((label) => (
-                <OptionRow key={label} label={label} />
-              ))}
-            </Menu>
-          </VariantBlock>
-
-          <VariantBlock caption="1 option selected — open (interactive)">
-            <DropdownField pills={["Option one"]} open />
-            <Menu>
-              <SearchRow value="Search" />
-              {optionLabels.map((label) => (
-                <OptionRow
-                  key={label}
-                  label={label}
-                  checked={!!selected[label]}
-                  onToggle={() => toggle(label)}
-                />
-              ))}
-            </Menu>
-          </VariantBlock>
-
-          <VariantBlock caption="All selected — open">
-            <DropdownField
-              pills={["Option one", "Option two"]}
-              extra="+3"
-              open
-            />
-            <Menu>
-              <SearchRow value="Search" />
-              {optionLabels.map((label) => (
-                <OptionRow key={label} label={label} checked />
-              ))}
-            </Menu>
-          </VariantBlock>
-
-          <VariantBlock caption="All selected (Disabled) — open">
-            <DropdownField
-              pills={["Option one", "Option two"]}
-              extra="+3"
-              open
-              disabled
-            />
-            <Menu>
-              {optionLabels.map((label) => (
-                <OptionRow key={label} label={label} checked disabled />
-              ))}
-            </Menu>
-          </VariantBlock>
-        </div>
-      </div>
+    <section aria-label="Multiselect component playground" className="flex flex-col gap-6">
+      <Playground config={closedConfig} />
+      <Playground config={openConfig} />
     </section>
   );
 }

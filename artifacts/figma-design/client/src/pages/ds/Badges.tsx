@@ -1,12 +1,11 @@
 import { useState } from "react";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
 
 /* ------------------------------------------------------------------ *
  * Shared design tokens (Tailwind v4 var() fallbacks flattened to v3) *
  * ------------------------------------------------------------------ */
 
-const caption = "text-[12px] text-[#a8a8b2]";
-const cardClass =
-  "rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5";
 const fontMedium = { fontFamily: '"DM Sans", Helvetica', fontWeight: 500 } as const;
 const fontRegular = { fontFamily: '"DM Sans", Helvetica', fontWeight: 400 } as const;
 
@@ -78,6 +77,7 @@ type BadgeStandardProps = {
   style?: StdStyle;
   icon?: boolean;
   compact?: boolean;
+  label?: string;
 };
 
 function BadgeStandard({
@@ -85,6 +85,7 @@ function BadgeStandard({
   style = "Filled",
   icon = false,
   compact = false,
+  label,
 }: BadgeStandardProps) {
   const c = stdColors(type, style);
   const iconSrc = stdIcon(type, style, compact);
@@ -117,7 +118,7 @@ function BadgeStandard({
           className="whitespace-nowrap text-center text-[12px] leading-[18px]"
           style={{ ...fontMedium, color: c.fg }}
         >
-          Badge Small
+          {label ?? "Badge Small"}
         </p>
       </div>
     );
@@ -148,7 +149,7 @@ function BadgeStandard({
         className="whitespace-nowrap text-center text-[14px] leading-[20px]"
         style={{ ...fontMedium, color: c.fg }}
       >
-        Badge Large
+        {label ?? "Badge Large"}
       </p>
     </div>
   );
@@ -198,9 +199,10 @@ type BadgeRoundedProps = {
   type: RoundedType;
   size: RoundedSize;
   style: RoundedStyle;
+  label?: string;
 };
 
-function BadgeRounded({ type, size, style }: BadgeRoundedProps) {
+function BadgeRounded({ type, size, style, label }: BadgeRoundedProps) {
   const c = roundedColors(type, style);
   const compact = size === "Compact";
   return (
@@ -221,7 +223,7 @@ function BadgeRounded({ type, size, style }: BadgeRoundedProps) {
           lineHeight: compact ? "18px" : "20px",
         }}
       >
-        Label title
+        {label ?? "Label title"}
       </p>
     </div>
   );
@@ -324,9 +326,16 @@ function BadgeCircular({ size }: { size: 24 | 32 | 40 }) {
 type DescriptionProps = {
   checkbox: boolean;
   disabled?: boolean;
+  title?: string;
+  metadata?: string;
 };
 
-function BadgeDescription({ checkbox, disabled = false }: DescriptionProps) {
+function BadgeDescription({
+  checkbox,
+  disabled = false,
+  title = "Title",
+  metadata = "Metadata",
+}: DescriptionProps) {
   const [checked, setChecked] = useState(false);
 
   const bg = disabled ? "rgba(113,113,128,0.1)" : "#ebebf0";
@@ -387,8 +396,8 @@ function BadgeDescription({ checkbox, disabled = false }: DescriptionProps) {
               className="flex-1 text-[12px] leading-[18px]"
               style={{ color: titleColor }}
             >
-              <span style={fontMedium}>Title: </span>
-              <span style={fontRegular}>Metadata</span>
+              <span style={fontMedium}>{title}: </span>
+              <span style={fontRegular}>{metadata}</span>
             </p>
           </div>
         </div>
@@ -405,183 +414,247 @@ function BadgeDescription({ checkbox, disabled = false }: DescriptionProps) {
 }
 
 /* ------------------------------------------------------------------ *
- * Layout helpers                                                      *
+ * Playground configs                                                  *
  * ------------------------------------------------------------------ */
 
-function VariantCell({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-1">
-      <span className={`${caption} px-1`} style={fontRegular}>
-        {label}
-      </span>
-      <div className="flex min-h-[34px] items-center">{children}</div>
-    </div>
-  );
-}
+const standardConfig: PlaygroundConfig = {
+  name: "Badge / Standard",
+  description:
+    "Rectangular status badge — Type, Style, optional icon, and Compact/Standard size.",
+  controls: [
+    {
+      kind: "select",
+      name: "type",
+      label: "Type",
+      options: ["neutral", "brand", "info", "success", "warning", "danger"],
+      defaultValue: "brand",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "style",
+      label: "Style",
+      options: ["Filled", "Outline", "duotone"],
+      defaultValue: "Filled",
+    },
+    { kind: "boolean", name: "compact", label: "Compact", defaultValue: false },
+    { kind: "boolean", name: "icon", label: "Icon", defaultValue: false },
+    {
+      kind: "text",
+      name: "label",
+      label: "Label",
+      defaultValue: "",
+      placeholder: "Badge Large",
+    },
+  ],
+  render: (props) => (
+    <BadgeStandard
+      type={props.type as StdType}
+      style={props.style as StdStyle}
+      compact={props.compact === true}
+      icon={props.icon === true}
+      label={typeof props.label === "string" && props.label ? props.label : undefined}
+    />
+  ),
+  tokens: {
+    "container/neutral/filled": "#4b4b59",
+    "container/brand/filled": "#7c33b5",
+    "container/info/filled": "#2360db",
+    "container/success/filled": "#1e8158",
+    "container/warning/filled": "#f8c500",
+    "container/danger/filled": "#da294b",
+    "radius/badge": "2px",
+    "size/standard": "h 34px · text 14px",
+    "size/compact": "h 18px · text 12px",
+  },
+};
+
+const roundedConfig: PlaygroundConfig = {
+  name: "Badge / Rounded",
+  description:
+    "Pill badge — Type, Filled/Outline style, and Standard/Compact size. Pro variants use brand gradients.",
+  controls: [
+    {
+      kind: "select",
+      name: "type",
+      label: "Type",
+      options: [
+        "Brand (Bold)",
+        "Neutral (Subtle)",
+        "Brand (Subtle)",
+        "Info",
+        "Success",
+        "Warning",
+        "Danger",
+        "Pro",
+        "Pro+",
+      ],
+      defaultValue: "Brand (Bold)",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "style",
+      label: "Style",
+      options: ["Filled", "Outline"],
+      defaultValue: "Filled",
+    },
+    {
+      kind: "select",
+      name: "size",
+      label: "Size",
+      options: ["Standard", "Compact"],
+      defaultValue: "Standard",
+    },
+    {
+      kind: "text",
+      name: "label",
+      label: "Label",
+      defaultValue: "",
+      placeholder: "Label title",
+    },
+  ],
+  render: (props) => {
+    if (props.type === "Pro" || props.type === "Pro+") {
+      return <BadgePro variant={props.type as "Pro" | "Pro+"} />;
+    }
+    return (
+      <BadgeRounded
+        type={props.type as RoundedType}
+        style={props.style as RoundedStyle}
+        size={props.size as RoundedSize}
+        label={
+          typeof props.label === "string" && props.label ? props.label : undefined
+        }
+      />
+    );
+  },
+  tokens: {
+    "container/brand/bold": "#7c33b5",
+    "container/neutral/subtle": "#ebebf0",
+    "container/brand/subtle": "#f6ebff",
+    "radius/pill": "100px",
+    "gradient/pro": "#d71a82 → #f456ca",
+    "gradient/pro+": "#d71982 → #ff540c → #f0e812",
+    "size/standard": "h 24px · text 14px",
+    "size/compact": "h 18px · text 12px",
+  },
+};
+
+const digitsConfig: PlaygroundConfig = {
+  name: "Badge / With digits",
+  description: "Numeric counter pill — Single, Brand, Disabled, Double, or Max value.",
+  controls: [
+    {
+      kind: "select",
+      name: "variant",
+      label: "Variant",
+      options: ["Single", "Brand (Subtle)", "Disabled", "Double", "Max"],
+      defaultValue: "Single",
+      asTabs: true,
+    },
+  ],
+  render: (props) => <BadgeDigits variant={props.variant as DigitsVariant} />,
+  tokens: {
+    "container/neutral": "#ebebf0",
+    "container/brand/subtle": "#f6ebff",
+    "container/disabled": "rgba(113,113,128,0.1)",
+    "text/neutral": "#4b4b59",
+    "text/brand": "#662994",
+    "text/disabled": "#a8a8b2",
+    "radius/pill": "100px",
+  },
+};
+
+const circularConfig: PlaygroundConfig = {
+  name: "Badge / Circular",
+  description: "Circular avatar-style badge — 24, 32, or 40px.",
+  controls: [
+    {
+      kind: "select",
+      name: "size",
+      label: "Size",
+      options: ["24", "32", "40"],
+      defaultValue: "40",
+      asTabs: true,
+    },
+  ],
+  render: (props) => (
+    <BadgeCircular size={Number(props.size) as 24 | 32 | 40} />
+  ),
+  tokens: {
+    "text/color": "#4b4b59",
+    "size/sm": "24px · text 12px",
+    "size/md": "32px · text 14px",
+    "size/lg": "40px · text 16px",
+  },
+};
+
+const descriptionConfig: PlaygroundConfig = {
+  name: "Badge / Description",
+  description:
+    "Metadata chip with optional checkbox and dismiss — supports Active and Disabled states.",
+  controls: [
+    {
+      kind: "boolean",
+      name: "checkbox",
+      label: "Checkbox",
+      defaultValue: true,
+    },
+    {
+      kind: "boolean",
+      name: "disabled",
+      label: "Disabled",
+      defaultValue: false,
+    },
+    {
+      kind: "text",
+      name: "title",
+      label: "Title",
+      defaultValue: "Title",
+      placeholder: "Title",
+    },
+    {
+      kind: "text",
+      name: "metadata",
+      label: "Metadata",
+      defaultValue: "Metadata",
+      placeholder: "Metadata",
+    },
+  ],
+  render: (props) => (
+    <BadgeDescription
+      key={`${props.checkbox}-${props.disabled}`}
+      checkbox={props.checkbox === true}
+      disabled={props.disabled === true}
+      title={typeof props.title === "string" ? props.title : "Title"}
+      metadata={typeof props.metadata === "string" ? props.metadata : "Metadata"}
+    />
+  ),
+  tokens: {
+    "container/active": "#ebebf0",
+    "container/disabled": "rgba(113,113,128,0.1)",
+    "border/active": "#c6c6cc",
+    "border/disabled": "#e1e1e8",
+    "checkbox/checked": "#7c33b5",
+    "text/title/active": "#13131a",
+    "text/title/disabled": "#a8a8b2",
+    "radius/badge": "4px",
+  },
+};
 
 /* ------------------------------------------------------------------ *
  * Page                                                                *
  * ------------------------------------------------------------------ */
 
-const STANDARD_TYPES: StdType[] = [
-  "neutral",
-  "brand",
-  "info",
-  "success",
-  "warning",
-  "danger",
-];
-const STANDARD_STYLES: StdStyle[] = ["Filled", "Outline", "duotone"];
-
-const ROUNDED_TYPES: RoundedType[] = [
-  "Brand (Bold)",
-  "Neutral (Subtle)",
-  "Brand (Subtle)",
-  "Info",
-  "Success",
-  "Warning",
-  "Danger",
-];
-
 export default function Badges(): JSX.Element {
   return (
-    <section className="flex flex-col gap-8" aria-label="Badges">
-      {/* ---------------------------------------------------------- */}
-      {/* Badge / Standard */}
-      {/* ---------------------------------------------------------- */}
-      <div className={cardClass}>
-        <h2 className="mb-4 text-[14px]" style={fontMedium}>
-          Badge / Standard
-        </h2>
-        <div className="flex flex-col gap-6">
-          {STANDARD_TYPES.map((type) => (
-            <div key={type} className="flex flex-col gap-2">
-              <span className={caption} style={fontMedium}>
-                Type = {type}
-              </span>
-              <div className="flex flex-wrap gap-x-8 gap-y-4">
-                {STANDARD_STYLES.map((style) =>
-                  [false, true].map((compact) =>
-                    [false, true].map((icon) => (
-                      <VariantCell
-                        key={`${style}-${compact}-${icon}`}
-                        label={`${style} · ${compact ? "compact" : "standard"} · ${
-                          icon ? "icon" : "no icon"
-                        }`}
-                      >
-                        <BadgeStandard
-                          type={type}
-                          style={style}
-                          compact={compact}
-                          icon={icon}
-                        />
-                      </VariantCell>
-                    )),
-                  ),
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ---------------------------------------------------------- */}
-      {/* Badge / Rounded */}
-      {/* ---------------------------------------------------------- */}
-      <div className={cardClass}>
-        <h2 className="mb-4 text-[14px]" style={fontMedium}>
-          Badge / Rounded
-        </h2>
-        <div className="flex flex-wrap gap-x-8 gap-y-4">
-          {ROUNDED_TYPES.map((type) =>
-            (["Filled", "Outline"] as RoundedStyle[]).map((style) =>
-              (["Standard", "Compact"] as RoundedSize[]).map((size) => (
-                <VariantCell
-                  key={`${type}-${style}-${size}`}
-                  label={`${type} · ${style} · ${size}`}
-                >
-                  <BadgeRounded type={type} style={style} size={size} />
-                </VariantCell>
-              )),
-            ),
-          )}
-          <VariantCell label="pro · Compact · Filled">
-            <BadgePro variant="Pro" />
-          </VariantCell>
-          <VariantCell label="pro+ · Compact · Filled">
-            <BadgePro variant="Pro+" />
-          </VariantCell>
-        </div>
-      </div>
-
-      {/* ---------------------------------------------------------- */}
-      {/* Badge / With digits */}
-      {/* ---------------------------------------------------------- */}
-      <div className={cardClass}>
-        <h2 className="mb-4 text-[14px]" style={fontMedium}>
-          Badge / With digits
-        </h2>
-        <div className="flex flex-wrap gap-x-8 gap-y-4">
-          {(
-            [
-              "Single",
-              "Brand (Subtle)",
-              "Disabled",
-              "Double",
-              "Max",
-            ] as DigitsVariant[]
-          ).map((variant) => (
-            <VariantCell key={variant} label={variant}>
-              <BadgeDigits variant={variant} />
-            </VariantCell>
-          ))}
-        </div>
-      </div>
-
-      {/* ---------------------------------------------------------- */}
-      {/* Badge / Circular */}
-      {/* ---------------------------------------------------------- */}
-      <div className={cardClass}>
-        <h2 className="mb-4 text-[14px]" style={fontMedium}>
-          Badge / Circular
-        </h2>
-        <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
-          {([24, 32, 40] as const).map((size) => (
-            <VariantCell key={size} label={`${size}px`}>
-              <BadgeCircular size={size} />
-            </VariantCell>
-          ))}
-        </div>
-      </div>
-
-      {/* ---------------------------------------------------------- */}
-      {/* Badge / Description */}
-      {/* ---------------------------------------------------------- */}
-      <div className={cardClass}>
-        <h2 className="mb-4 text-[14px]" style={fontMedium}>
-          Badge / Description
-        </h2>
-        <div className="flex flex-wrap gap-x-8 gap-y-4">
-          <VariantCell label="Active · Checkbox off">
-            <BadgeDescription checkbox={false} />
-          </VariantCell>
-          <VariantCell label="Active · Checkbox on">
-            <BadgeDescription checkbox={true} />
-          </VariantCell>
-          <VariantCell label="Disabled · Checkbox off">
-            <BadgeDescription checkbox={false} disabled />
-          </VariantCell>
-          <VariantCell label="Disabled · Checkbox on">
-            <BadgeDescription checkbox={true} disabled />
-          </VariantCell>
-        </div>
-      </div>
+    <section className="flex flex-col gap-6" aria-label="Badges">
+      <Playground config={standardConfig} />
+      <Playground config={roundedConfig} />
+      <Playground config={digitsConfig} />
+      <Playground config={circularConfig} />
+      <Playground config={descriptionConfig} />
     </section>
   );
 }

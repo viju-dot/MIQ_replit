@@ -11,20 +11,15 @@
  * Variants (nested instances): 2, 3, 4, 5, 6 and 7 slices.
  * Also documented: Light & dark mode, Color tokens, Anatomy variables.
  *
- * NOTE: The design reference (design-refs/pie-chart.md) only provided the
- * Figma XML metadata (structure, sizes, token names) — no per-frame generated
- * React/Tailwind code and no downloadable figma.com asset URLs were available.
- * The pie chart is therefore reconstructed from the documented anatomy:
- *   - Frame min 608 x 300 (max height 400)
- *   - Labels: surface/foreground/static/neutral/lvl1 (#4b4b59)
- *   - Borders: datavis/border (#ffffff separators between slices)
- *   - Data vis palette: datavis/qualitative/1..7
- *   - All font styles fixed: Body Md / Regular 14 / 20
- * built with the Fiber design-system tokens used across the app.
- *
- * Documentation / annotation frames (page titles, prototype notes, arrows,
- * measurement callouts, do's & don'ts text) are intentionally skipped.
+ * Interactive playground: the number-of-slices variant axis is explored via
+ * tabs, and legend / data-label visibility via boolean controls. The Smart
+ * Card title is editable text. Light & dark mode is driven by the global
+ * theme passed into config.render (Playground supplies the preview
+ * background); the exact Figma dark tokens are reused for the dark card.
  * ========================================================================= */
+
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
 
 const FONT = '"DM Sans", Helvetica';
 
@@ -42,8 +37,13 @@ const DATAVIS = [
 const GRID = "#e1e1e8"; // border/static/subtle/neutral
 const AXIS_LABEL = "#4b4b59"; // surface/foreground/static/neutral/lvl1
 const TITLE = "#13131a";
-const MUTED = "#a8a8b2";
 const SLICE_BORDER = "#ffffff"; // datavis/border (slice separators)
+
+/* dark-mode tokens (auto light & dark mode) */
+const DARK_CARD_BG = "#1c1c24";
+const DARK_BORDER = "#3a3a45";
+const DARK_TITLE = "#ffffff";
+const DARK_LABEL = "#c6c6cc";
 
 /* ---------- types & data ---------- */
 
@@ -108,7 +108,15 @@ function arcPath(cx: number, cy: number, r: number, start: number, end: number) 
 
 /* ---------- pie plot ---------- */
 
-function Pie({ slices, size = 200 }: { slices: Slice[]; size?: number }) {
+function Pie({
+  slices,
+  size = 200,
+  showLabels,
+}: {
+  slices: Slice[];
+  size?: number;
+  showLabels: boolean;
+}) {
   const total = slices.reduce((sum, s) => sum + s.value, 0);
   const cx = size / 2;
   const cy = size / 2;
@@ -142,30 +150,31 @@ function Pie({ slices, size = 200 }: { slices: Slice[]; size?: number }) {
         />
       ))}
       {/* data labels for slices >= 4% */}
-      {segments.map((seg) => {
-        if (seg.pct < 4) return null;
-        const p = polar(cx, cy, r * 0.62, seg.mid);
-        return (
-          <text
-            key={`lbl-${seg.name}`}
-            x={p.x}
-            y={p.y}
-            textAnchor="middle"
-            dominantBaseline="central"
-            style={{ fontFamily: FONT, fontSize: 12, fontWeight: 500 }}
-            fill="#ffffff"
-          >
-            {seg.pct.toFixed(1)}
-          </text>
-        );
-      })}
+      {showLabels &&
+        segments.map((seg) => {
+          if (seg.pct < 4) return null;
+          const p = polar(cx, cy, r * 0.62, seg.mid);
+          return (
+            <text
+              key={`lbl-${seg.name}`}
+              x={p.x}
+              y={p.y}
+              textAnchor="middle"
+              dominantBaseline="central"
+              style={{ fontFamily: FONT, fontSize: 12, fontWeight: 500 }}
+              fill="#ffffff"
+            >
+              {seg.pct.toFixed(1)}
+            </text>
+          );
+        })}
     </svg>
   );
 }
 
 /* ---------- legend ---------- */
 
-function Legend({ slices }: { slices: Slice[] }) {
+function Legend({ slices, dark }: { slices: Slice[]; dark: boolean }) {
   return (
     <ul className="flex flex-col gap-[10px]">
       {slices.map((s, i) => (
@@ -176,7 +185,7 @@ function Legend({ slices }: { slices: Slice[] }) {
           />
           <span
             className="whitespace-nowrap text-[14px] leading-[20px]"
-            style={{ fontFamily: FONT, color: AXIS_LABEL }}
+            style={{ fontFamily: FONT, color: dark ? DARK_LABEL : AXIS_LABEL }}
           >
             {s.name}
           </span>
@@ -188,280 +197,136 @@ function Legend({ slices }: { slices: Slice[] }) {
 
 /* ---------- pie chart component (plot + legend) ---------- */
 
-function PieChart({ slices }: { slices: Slice[] }) {
+function PieChart({
+  slices,
+  showLegend,
+  showLabels,
+  dark,
+}: {
+  slices: Slice[];
+  showLegend: boolean;
+  showLabels: boolean;
+  dark: boolean;
+}) {
   return (
     <div className="flex w-full flex-wrap items-center justify-center gap-[32px]">
-      <Pie slices={slices} size={200} />
-      <Legend slices={slices} />
+      <Pie slices={slices} size={200} showLabels={showLabels} />
+      {showLegend && <Legend slices={slices} dark={dark} />}
     </div>
   );
 }
 
 /* ---------- Smart Card wrapper (matches the DS Smart Card) ---------- */
+/* Auto light & dark mode token: swaps surface + border + title colours. */
 
 function SmartCard({
   title,
+  dark,
   children,
 }: {
   title: string;
+  dark: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div
-      className="flex w-full min-w-[300px] max-w-[608px] flex-col overflow-hidden rounded-[2px] bg-white"
-      style={{
-        boxShadow:
-          "0px 1px 4px 0px rgba(113,113,128,0.08), 0px 8px 16px 0px rgba(113,113,128,0.04)",
-      }}
+      className={`flex w-full min-w-[300px] max-w-[608px] flex-col overflow-hidden rounded-[2px] ${
+        dark ? "bg-[#1c1c24]" : "bg-white"
+      }`}
+      style={
+        dark
+          ? undefined
+          : {
+              boxShadow:
+                "0px 1px 4px 0px rgba(113,113,128,0.08), 0px 8px 16px 0px rgba(113,113,128,0.04)",
+            }
+      }
     >
       <div className="flex items-center gap-[8px] p-[16px]">
         <p
           className="text-[16px] font-medium leading-[24px] tracking-[-0.08px]"
-          style={{ fontFamily: FONT, color: TITLE }}
+          style={{ fontFamily: FONT, color: dark ? DARK_TITLE : TITLE }}
         >
           {title}
         </p>
       </div>
-      <div className="h-0 w-full border-t border-solid" style={{ borderColor: GRID }} />
+      <div
+        className="h-0 w-full border-t border-solid"
+        style={{ borderColor: dark ? DARK_BORDER : GRID }}
+      />
       <div className="p-[16px]">{children}</div>
     </div>
   );
 }
 
-/* dark-mode Smart Card variant */
-function SmartCardDark({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex w-full min-w-[300px] max-w-[608px] flex-col overflow-hidden rounded-[2px] bg-[#1c1c24]">
-      <div className="flex items-center gap-[8px] p-[16px]">
-        <p
-          className="text-[16px] font-medium leading-[24px] tracking-[-0.08px]"
-          style={{ fontFamily: FONT, color: "#ffffff" }}
-        >
-          {title}
-        </p>
-      </div>
-      <div className="h-0 w-full border-t border-solid" style={{ borderColor: "#3a3a45" }} />
-      <div className="p-[16px]">{children}</div>
-    </div>
-  );
-}
+/* ---------- config ---------- */
 
-/* legend for dark card (lighter label text) */
-function LegendDark({ slices }: { slices: Slice[] }) {
-  return (
-    <ul className="flex flex-col gap-[10px]">
-      {slices.map((s, i) => (
-        <li key={s.name} className="flex items-center gap-[8px]">
-          <span
-            className="block h-[12px] w-[12px] shrink-0 rounded-[2px]"
-            style={{ backgroundColor: DATAVIS[i % DATAVIS.length] }}
-          />
-          <span
-            className="whitespace-nowrap text-[14px] leading-[20px]"
-            style={{ fontFamily: FONT, color: "#c6c6cc" }}
-          >
-            {s.name}
-          </span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function PieChartDark({ slices }: { slices: Slice[] }) {
-  return (
-    <div className="flex w-full flex-wrap items-center justify-center gap-[32px]">
-      <Pie slices={slices} size={200} />
-      <LegendDark slices={slices} />
-    </div>
-  );
-}
-
-/* ---------- caption helper ---------- */
-function Caption({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-[12px] text-[#a8a8b2]" style={{ fontFamily: FONT }}>
-      {children}
-    </p>
-  );
-}
+const config: PlaygroundConfig = {
+  name: "Pie chart",
+  description:
+    "Plot container + legend inside a Smart Card. Supports 2–7 slices (the 7th being “Others”), with auto light & dark mode.",
+  controls: [
+    {
+      kind: "select",
+      name: "slices",
+      label: "Slices",
+      options: ["2", "3", "4", "5", "6", "7"],
+      defaultValue: "4",
+      asTabs: true,
+    },
+    { kind: "boolean", name: "showLegend", label: "Legend", defaultValue: true },
+    { kind: "boolean", name: "showLabels", label: "Data labels", defaultValue: true },
+    {
+      kind: "text",
+      name: "title",
+      label: "Card title",
+      defaultValue: "Pie chart",
+      placeholder: "Pie chart",
+    },
+  ],
+  render: (props, theme) => {
+    const dark = theme === "dark";
+    const n = Number(props.slices);
+    const slices = DATASETS[n] ?? DATASETS[4];
+    return (
+      <SmartCard title={String(props.title)} dark={dark}>
+        <PieChart
+          slices={slices}
+          showLegend={props.showLegend === true}
+          showLabels={props.showLabels === true}
+          dark={dark}
+        />
+      </SmartCard>
+    );
+  },
+  tokens: {
+    "surface/foreground/static/neutral/lvl1": AXIS_LABEL,
+    "datavis/border": SLICE_BORDER,
+    "datavis/qualitative/1": DATAVIS[0],
+    "datavis/qualitative/2": DATAVIS[1],
+    "datavis/qualitative/3": DATAVIS[2],
+    "datavis/qualitative/4": DATAVIS[3],
+    "datavis/qualitative/5": DATAVIS[4],
+    "datavis/qualitative/6": DATAVIS[5],
+    "datavis/qualitative/7 (Others)": DATAVIS[6],
+    "border/static/subtle/neutral": GRID,
+    "surface/dark/lvl1": DARK_CARD_BG,
+    "gap/pie-to-legend": "32px",
+    "frame/min-width": "608px",
+    "frame/min-height": "300px · max 400px",
+    "font/body-md-regular": "14 / 20",
+  },
+};
 
 /* ---------- page ---------- */
 
 export default function PieChartPage() {
   return (
     <section
-      className="flex flex-col gap-[24px]"
-      aria-label="Pie chart component variants"
+      className="flex flex-col gap-6"
+      aria-label="Pie chart component playground"
     >
-      {/* Overview */}
-      <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-        <p className="text-[12px]" style={{ fontFamily: FONT, color: MUTED }}>
-          Overview
-        </p>
-        <p
-          className="mt-[4px] max-w-[900px] text-[14px] leading-[20px]"
-          style={{ fontFamily: FONT, color: AXIS_LABEL }}
-        >
-          The pie chart component consists of a plot container on the left and a
-          legend on the right. Each slice is color-encoded, supporting up to 6
-          categories. When more than 6 categories are present, the top 6 are
-          color-encoded and the remaining ones are grouped into a seventh slice
-          labelled &ldquo;Others&rdquo; (&ldquo;Series 7&rdquo;). The pie chart
-          sits within the Smart Card component.
-        </p>
-        <div className="mt-[16px] flex flex-wrap gap-[24px]">
-          <div className="flex flex-col gap-[8px]">
-            <Caption>Pie chart</Caption>
-            <SmartCard title="Pie chart">
-              <PieChart slices={DATASETS[4]} />
-            </SmartCard>
-          </div>
-        </div>
-      </div>
-
-      {/* Variants (nested instances) */}
-      <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-        <p className="text-[12px]" style={{ fontFamily: FONT, color: MUTED }}>
-          Variants
-        </p>
-        <p
-          className="mt-[4px] max-w-[900px] text-[14px] leading-[20px]"
-          style={{ fontFamily: FONT, color: AXIS_LABEL }}
-        >
-          The pie chart includes 6 nested instances to select the number of
-          slices &mdash; 2, 3, 4, 5, 6 and 7 slices (the 7th being
-          &ldquo;Others&rdquo;).
-        </p>
-        <div className="mt-[16px] flex flex-wrap gap-[24px]">
-          {[2, 3, 4, 5, 6, 7].map((n) => (
-            <div key={n} className="flex flex-col gap-[8px]">
-              <Caption>{n} slices</Caption>
-              <SmartCard title="Pie chart">
-                <PieChart slices={DATASETS[n]} />
-              </SmartCard>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Light and dark mode */}
-      <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-        <p className="text-[12px]" style={{ fontFamily: FONT, color: MUTED }}>
-          Light &amp; dark mode
-        </p>
-        <p
-          className="mt-[4px] max-w-[900px] text-[14px] leading-[20px]"
-          style={{ fontFamily: FONT, color: AXIS_LABEL }}
-        >
-          The pie chart component has an auto light &amp; dark mode token
-          enabled.
-        </p>
-        <div className="mt-[16px] flex flex-wrap gap-[24px]">
-          <div className="flex flex-col gap-[8px]">
-            <div className="flex items-center gap-[8px]">
-              <img
-                src="/figmaAssets/pie-chart/sun.svg"
-                alt=""
-                className="h-[20px] w-[20px]"
-              />
-              <Caption>Light mode</Caption>
-            </div>
-            <SmartCard title="Pie chart">
-              <PieChart slices={DATASETS[5]} />
-            </SmartCard>
-          </div>
-          <div className="flex flex-col gap-[8px]">
-            <div className="flex items-center gap-[8px]">
-              <img
-                src="/figmaAssets/pie-chart/moon.svg"
-                alt=""
-                className="h-[20px] w-[20px]"
-              />
-              <Caption>Dark mode</Caption>
-            </div>
-            <SmartCardDark title="Pie chart">
-              <PieChartDark slices={DATASETS[5]} />
-            </SmartCardDark>
-          </div>
-        </div>
-      </div>
-
-      {/* Color tokens */}
-      <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-        <p className="text-[12px]" style={{ fontFamily: FONT, color: MUTED }}>
-          Color tokens
-        </p>
-        <p
-          className="mt-[4px] max-w-[900px] text-[14px] leading-[20px]"
-          style={{ fontFamily: FONT, color: AXIS_LABEL }}
-        >
-          All elements of the pie chart are linked to Fiber through a system of
-          color tokens, ensuring consistent appearance across themes and
-          products. Labels: surface/foreground/static/neutral/lvl1. Borders:
-          datavis/border. Data vis colour palette: datavis/qualitative/1&hellip;
-        </p>
-        <div className="mt-[16px] flex flex-wrap gap-[32px]">
-          <SmartCard title="Pie chart">
-            <PieChart slices={DATASETS[6]} />
-          </SmartCard>
-          <ul className="flex flex-col gap-[12px]">
-            {[
-              { label: "surface/foreground/static/neutral/lvl1", swatch: AXIS_LABEL },
-              { label: "datavis/border", swatch: SLICE_BORDER },
-              { label: "datavis/qualitative/1", swatch: DATAVIS[0] },
-              { label: "datavis/qualitative/2", swatch: DATAVIS[1] },
-              { label: "datavis/qualitative/3", swatch: DATAVIS[2] },
-              { label: "datavis/qualitative/4", swatch: DATAVIS[3] },
-              { label: "datavis/qualitative/5", swatch: DATAVIS[4] },
-              { label: "datavis/qualitative/6", swatch: DATAVIS[5] },
-            ].map((t) => (
-              <li key={t.label} className="flex items-center gap-[10px]">
-                <span
-                  className="block h-[20px] w-[20px] shrink-0 rounded-[3px] border border-solid"
-                  style={{ backgroundColor: t.swatch, borderColor: GRID }}
-                />
-                <span
-                  className="text-[14px] leading-[20px]"
-                  style={{ fontFamily: FONT, color: TITLE }}
-                >
-                  {t.label}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* Anatomy variables */}
-      <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-        <p className="text-[12px]" style={{ fontFamily: FONT, color: MUTED }}>
-          Anatomy variables
-        </p>
-        <p
-          className="mt-[4px] max-w-[900px] text-[14px] leading-[20px]"
-          style={{ fontFamily: FONT, color: AXIS_LABEL }}
-        >
-          To ensure smooth performance, visual consistency, and prevent
-          overflow, the pie chart component maintains fixed minimum and maximum
-          dimensions.
-        </p>
-        <ul
-          className="mt-[12px] flex flex-col gap-[6px] text-[14px] leading-[20px]"
-          style={{ fontFamily: FONT, color: TITLE }}
-        >
-          <li>Frame &mdash; minimum height: 300px · maximum height: 400px</li>
-          <li>Frame &mdash; minimum width: 608px (no maximum width)</li>
-          <li>Gap between pie and legend: 32px · label gap: 16px</li>
-          <li>All font styles and sizes are fixed: Body Md / Regular 14 / 20</li>
-        </ul>
-      </div>
+      <Playground config={config} />
     </section>
   );
 }

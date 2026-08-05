@@ -1,3 +1,6 @@
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
+
 const A = "/figmaAssets/date-pickers";
 
 const rangeCalendar = `${A}/range-icon-calendar-a.svg`;
@@ -17,61 +20,71 @@ const dateTime = {
   clock: `${A}/datetime-clock.svg`,
 };
 
-const cardClass = "rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5";
-const captionClass = "text-[12px] text-[#a8a8b2]";
+const pickerShadow = {
+  filter:
+    "drop-shadow(0px 1px 2px rgba(113,113,128,0.08)) drop-shadow(0px 12px 10px rgba(113,113,128,0.1))",
+} as const;
 
 /* ------------------------------------------------------------------ */
 /* Input / Range field                                                */
 /* ------------------------------------------------------------------ */
 
-function RangeInputWithTime() {
-  return (
-    <div className="bg-white border border-solid border-[#7c33b5] flex flex-col items-start relative rounded-[2px] w-[316px] max-w-full">
-      <div className="flex gap-[8px] h-[34px] items-center pl-[12px] pr-[8px] py-0 relative rounded-[2px] shrink-0 w-full">
-        <div className="flex items-start relative shrink-0">
-          <div className="bg-[#f6ebff] flex h-[18px] items-center justify-center px-[3px] relative rounded-[2px] shrink-0">
-            <p className="font-['DM_Sans'] not-italic relative shrink-0 text-[14px] text-[#7c33b5] text-center whitespace-nowrap">
-              <span className="leading-[20px]">16/02/2025</span>
-              <span className="leading-[20px]">{` 12:00 AM`}</span>
-            </p>
+function RangeInput({
+  showTime,
+  startDate,
+  endDate,
+}: {
+  showTime: boolean;
+  startDate: string;
+  endDate: string;
+}): JSX.Element {
+  if (showTime) {
+    return (
+      <div className="bg-white border border-solid border-[#7c33b5] flex flex-col items-start relative rounded-[2px] w-[316px] max-w-full">
+        <div className="flex gap-[8px] h-[34px] items-center pl-[12px] pr-[8px] py-0 relative rounded-[2px] shrink-0 w-full">
+          <div className="flex items-start relative shrink-0">
+            <div className="bg-[#f6ebff] flex h-[18px] items-center justify-center px-[3px] relative rounded-[2px] shrink-0">
+              <p className="font-['DM_Sans'] not-italic relative shrink-0 text-[14px] text-[#7c33b5] text-center whitespace-nowrap">
+                <span className="leading-[20px]">{startDate}</span>
+                <span className="leading-[20px]">{` 12:00 AM`}</span>
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="flex flex-col font-['DM_Sans'] justify-center not-italic relative shrink-0 text-[14px] text-[#4b4b59] whitespace-nowrap">
-          <p className="leading-[20px]">-</p>
-        </div>
-        <div className="flex items-start relative shrink-0">
-          <div className="bg-[#f6ebff] flex h-[18px] items-center justify-center px-[3px] relative rounded-[2px] shrink-0">
-            <p className="font-['DM_Sans'] not-italic relative shrink-0 text-[14px] text-[#7c33b5] text-center whitespace-nowrap">
-              <span className="leading-[20px]">16/02/2025</span>
-              <span className="leading-[20px]">{` 12:00 AM`}</span>
-            </p>
+          <div className="flex flex-col font-['DM_Sans'] justify-center not-italic relative shrink-0 text-[14px] text-[#4b4b59] whitespace-nowrap">
+            <p className="leading-[20px]">-</p>
           </div>
-        </div>
-        <div className="flex-1 h-[34px] min-w-px relative" />
-        <div className="flex h-[24px] items-start relative shrink-0">
-          <div className="flex items-center justify-center px-[3px] py-[2px] relative shrink-0 size-[24px]">
-            <div className="h-[19.5px] relative shrink-0 w-[18px]">
-              <img
-                alt=""
-                className="absolute block inset-0 max-w-none size-full"
-                src={rangeCalendar}
-              />
+          <div className="flex items-start relative shrink-0">
+            <div className="bg-[#f6ebff] flex h-[18px] items-center justify-center px-[3px] relative rounded-[2px] shrink-0">
+              <p className="font-['DM_Sans'] not-italic relative shrink-0 text-[14px] text-[#7c33b5] text-center whitespace-nowrap">
+                <span className="leading-[20px]">{endDate}</span>
+                <span className="leading-[20px]">{` 12:00 AM`}</span>
+              </p>
+            </div>
+          </div>
+          <div className="flex-1 h-[34px] min-w-px relative" />
+          <div className="flex h-[24px] items-start relative shrink-0">
+            <div className="flex items-center justify-center px-[3px] py-[2px] relative shrink-0 size-[24px]">
+              <div className="h-[19.5px] relative shrink-0 w-[18px]">
+                <img
+                  alt=""
+                  className="absolute block inset-0 max-w-none size-full"
+                  src={rangeCalendar}
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-function RangeInputSingle() {
   return (
     <div className="bg-white border border-solid border-[#7c33b5] flex flex-col items-start relative rounded-[2px] w-[316px] max-w-full">
       <div className="flex gap-[8px] h-[34px] items-center pl-[12px] pr-[8px] py-0 relative rounded-[2px] shrink-0 w-full">
         <div className="flex items-start relative shrink-0">
           <div className="bg-[#f6ebff] flex h-[18px] items-center justify-center px-[3px] relative rounded-[2px] shrink-0">
             <p className="font-['DM_Sans'] leading-[20px] not-italic relative shrink-0 text-[14px] text-[#7c33b5] text-center whitespace-nowrap">
-              16/02/2025
+              {startDate}
             </p>
           </div>
         </div>
@@ -80,7 +93,7 @@ function RangeInputSingle() {
         </div>
         <div className="flex flex-1 gap-[8px] h-[34px] items-start min-w-px py-[8px] relative">
           <div className="flex flex-1 flex-col font-['DM_Sans'] justify-center min-w-px not-italic overflow-hidden relative text-[14px] text-[#13131a] text-ellipsis whitespace-nowrap">
-            <p className="leading-[20px] overflow-hidden text-ellipsis">16/02/2025</p>
+            <p className="leading-[20px] overflow-hidden text-ellipsis">{endDate}</p>
           </div>
         </div>
         <div className="flex h-[24px] items-start relative shrink-0">
@@ -99,16 +112,44 @@ function RangeInputSingle() {
   );
 }
 
+const rangeConfig: PlaygroundConfig = {
+  name: "Range input field",
+  description: "Date range field — with Date + Time badges or a single date badge.",
+  controls: [
+    {
+      kind: "select",
+      name: "type",
+      label: "Type",
+      options: ["Date + Time", "Single date"],
+      defaultValue: "Date + Time",
+      asTabs: true,
+    },
+    { kind: "text", name: "startDate", label: "Start date", defaultValue: "16/02/2025" },
+    { kind: "text", name: "endDate", label: "End date", defaultValue: "16/02/2025" },
+  ],
+  render: (props) => (
+    <RangeInput
+      showTime={props.type === "Date + Time"}
+      startDate={String(props.startDate)}
+      endDate={String(props.endDate)}
+    />
+  ),
+  tokens: {
+    "border/brand": "#7c33b5",
+    "badge/background": "#f6ebff",
+    "badge/foreground": "#7c33b5",
+    "text/neutral": "#4b4b59",
+    "text/strong": "#13131a",
+    "radius/field": "2px",
+    "size/field": "316px wide · 34px tall",
+  },
+};
+
 /* ------------------------------------------------------------------ */
 /* Time Only picker                                                   */
 /* ------------------------------------------------------------------ */
 
-const pickerShadow = {
-  filter:
-    "drop-shadow(0px 1px 2px rgba(113,113,128,0.08)) drop-shadow(0px 12px 10px rgba(113,113,128,0.1))",
-} as const;
-
-function TimeOnlyPicker() {
+function TimeOnlyPicker(): JSX.Element {
   return (
     <div className="relative h-[158px] w-[260px]" style={pickerShadow}>
       <div className="-translate-y-1/2 absolute h-[158px] left-0 right-0 top-1/2">
@@ -185,6 +226,21 @@ function TimeOnlyPicker() {
     </div>
   );
 }
+
+const timeConfig: PlaygroundConfig = {
+  name: "Time Only picker",
+  description: "Compact time selector with hours, minutes and AM/PM steppers.",
+  controls: [],
+  render: () => <TimeOnlyPicker />,
+  tokens: {
+    "surface/base": "#ffffff",
+    "header/background": "#717180",
+    "header/foreground": "#ffffff",
+    "text/strong": "#13131a",
+    "radius/picker": "2px",
+    "size/picker": "260×158",
+  },
+};
 
 /* ------------------------------------------------------------------ */
 /* Date + Time picker                                                 */
@@ -287,7 +343,7 @@ function dayColor(tone: Day["tone"]): string {
 
 const colLeft = [16, 50, 87, 121, 159, 193, 227];
 
-function DateTimePicker() {
+function DateTimePicker({ month }: { month: string }): JSX.Element {
   return (
     <div
       className="bg-white relative h-[305px] w-[260px] rounded-[2px]"
@@ -338,7 +394,7 @@ function DateTimePicker() {
         <div className="absolute bg-[#717180] inset-[0_0_86.23%_0] rounded-tl-[2px] rounded-tr-[2px]" />
         <div className="absolute flex items-start left-[16px] py-0 top-[12px]">
           <p className="font-['DM_Sans'] leading-[18px] not-italic relative shrink-0 text-[12px] text-white whitespace-nowrap">
-            FEBRUARY 2020
+            {month}
           </p>
         </div>
         <div className="absolute flex items-center justify-end left-[192px] top-[8px]">
@@ -382,46 +438,36 @@ function DateTimePicker() {
   );
 }
 
+const dateTimeConfig: PlaygroundConfig = {
+  name: "Date + Time picker",
+  description: "Standard calendar with a selected week highlight and a time footer.",
+  controls: [
+    { kind: "text", name: "month", label: "Header label", defaultValue: "FEBRUARY 2020" },
+  ],
+  render: (props: PropValues) => <DateTimePicker month={String(props.month)} />,
+  tokens: {
+    "surface/base": "#ffffff",
+    "header/background": "#717180",
+    "border/footer": "#e1e1e8",
+    "day/brand": "#7c33b5",
+    "day/selected-foreground": "#ffffff",
+    "day/disabled": "#a8a8b2",
+    "day/default": "#13131a",
+    "radius/picker": "2px",
+    "size/picker": "260×305",
+  },
+};
+
 /* ------------------------------------------------------------------ */
 /* Page                                                               */
 /* ------------------------------------------------------------------ */
 
 export default function DatePickersPage(): JSX.Element {
   return (
-    <section aria-label="Date pickers" className="flex flex-col gap-8">
-      {/* Range input field */}
-      <div className={cardClass}>
-        <div className="flex flex-wrap gap-8">
-          <div className="flex flex-col gap-2">
-            <span className={captionClass}>Range input · Date + Time badges</span>
-            <RangeInputWithTime />
-          </div>
-          <div className="flex flex-col gap-2">
-            <span className={captionClass}>Range input · Single date badge</span>
-            <RangeInputSingle />
-          </div>
-        </div>
-      </div>
-
-      {/* Time Only picker */}
-      <div className={cardClass}>
-        <div className="flex flex-wrap gap-8">
-          <div className="flex flex-col gap-2">
-            <span className={captionClass}>Time Only · Compact</span>
-            <TimeOnlyPicker />
-          </div>
-        </div>
-      </div>
-
-      {/* Date + Time picker */}
-      <div className={cardClass}>
-        <div className="flex flex-wrap gap-8">
-          <div className="flex flex-col gap-2">
-            <span className={captionClass}>Date + Time · Standard, Apply = False</span>
-            <DateTimePicker />
-          </div>
-        </div>
-      </div>
+    <section aria-label="Date pickers playground" className="flex flex-col gap-6">
+      <Playground config={rangeConfig} />
+      <Playground config={timeConfig} />
+      <Playground config={dateTimeConfig} />
     </section>
   );
 }

@@ -1,3 +1,6 @@
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
+
 const ASSET = "/figmaAssets/button-group";
 
 type Side = "Left" | "Middle" | "Right";
@@ -94,9 +97,10 @@ type TextSegmentProps = {
   state: State;
   compact: boolean;
   overlap?: boolean;
+  label?: string;
 };
 
-function TextSegment({ side, state, compact, overlap = false }: TextSegmentProps) {
+function TextSegment({ side, state, compact, overlap = false, label = "Button" }: TextSegmentProps) {
   return (
     <div
       className={`relative flex shrink-0 items-center justify-center px-[24px] border border-solid ${
@@ -114,7 +118,7 @@ function TextSegment({ side, state, compact, overlap = false }: TextSegmentProps
         }`}
         style={{ color: TEXT[state] }}
       >
-        Button
+        {label}
       </p>
     </div>
   );
@@ -129,9 +133,9 @@ function sideForIndex(index: number, total: number): Side {
   return "Middle";
 }
 
-type TextGroupProps = { amount: number; compact: boolean };
+type TextGroupProps = { amount: number; compact: boolean; label?: string };
 
-function TextButtonGroup({ amount, compact }: TextGroupProps) {
+function TextButtonGroup({ amount, compact, label }: TextGroupProps) {
   // First item selected, remaining unselected — matches the Figma composite.
   return (
     <div className="flex items-start">
@@ -142,6 +146,7 @@ function TextButtonGroup({ amount, compact }: TextGroupProps) {
           state={i === 0 ? "Selected" : "Unselected"}
           compact={compact}
           overlap={i < amount - 1}
+          label={label}
         />
       ))}
     </div>
@@ -168,162 +173,175 @@ function IconButtonGroup({ amount, compact }: IconGroupProps) {
 }
 
 // ---------------------------------------------------------------------------
-// Helpers for the showcase layout
+// Shared token maps for Developer Mode
 // ---------------------------------------------------------------------------
-function Card({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5">
-      <h2 className="mb-4 text-[14px] font-medium text-[#13131a] font-['DM_Sans']">
-        {title}
-      </h2>
-      {children}
+const SHARED_TOKENS: Record<string, string> = {
+  "container/selected/background": "#ebebf0",
+  "container/unselected/background": "#ffffff",
+  "container/hover/background": "rgba(113,113,128,0.08)",
+  "container/disabled/background": "rgba(113,113,128,0.1)",
+  "text/selected": "#13131a",
+  "text/unselected": "#4b4b59",
+  "text/disabled": "#a8a8b2",
+  "border/default": "#c6c6cc",
+  "border/disabled": "#e1e1e8",
+  "radius/end": "2px",
+  "size/large": "h 34px",
+  "size/compact": "h 24px",
+};
+
+// ---------------------------------------------------------------------------
+// Playground configs
+// ---------------------------------------------------------------------------
+const AMOUNT_OPTIONS = ["2", "3", "4", "5"];
+
+const textGroupConfig: PlaygroundConfig = {
+  name: "Button Group",
+  description: "Segmented text buttons — first segment selected, remaining unselected.",
+  controls: [
+    {
+      kind: "select",
+      name: "size",
+      label: "Size",
+      options: ["Large", "Compact"],
+      defaultValue: "Large",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "items",
+      label: "Items",
+      options: AMOUNT_OPTIONS,
+      defaultValue: "3",
+    },
+    {
+      kind: "text",
+      name: "label",
+      label: "Label",
+      defaultValue: "Button",
+      placeholder: "Button",
+    },
+  ],
+  render: (props: PropValues) => (
+    <TextButtonGroup
+      amount={Number(props.items)}
+      compact={props.size === "Compact"}
+      label={String(props.label)}
+    />
+  ),
+  tokens: SHARED_TOKENS,
+};
+
+const iconGroupConfig: PlaygroundConfig = {
+  name: "Button Icon Group",
+  description: "Segmented icon buttons — first segment selected, remaining unselected.",
+  controls: [
+    {
+      kind: "select",
+      name: "size",
+      label: "Size",
+      options: ["Large", "Compact"],
+      defaultValue: "Large",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "items",
+      label: "Items",
+      options: AMOUNT_OPTIONS,
+      defaultValue: "3",
+    },
+  ],
+  render: (props: PropValues) => (
+    <IconButtonGroup
+      amount={Number(props.items)}
+      compact={props.size === "Compact"}
+    />
+  ),
+  tokens: SHARED_TOKENS,
+};
+
+const textSegmentConfig: PlaygroundConfig = {
+  name: "Button Group [individuals]",
+  description: "A single text segment — explore each side, state and size.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Selected", "Unselected", "Hover", "Disabled"],
+      defaultValue: "Selected",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "side",
+      label: "Side",
+      options: ["Left", "Middle", "Right"],
+      defaultValue: "Left",
+    },
+    {
+      kind: "text",
+      name: "label",
+      label: "Label",
+      defaultValue: "Button",
+      placeholder: "Button",
+    },
+    { kind: "boolean", name: "compact", label: "Compact", defaultValue: false },
+  ],
+  render: (props: PropValues) => (
+    <div className="flex">
+      <TextSegment
+        side={props.side as Side}
+        state={props.state as State}
+        compact={props.compact === true}
+        label={String(props.label)}
+      />
     </div>
-  );
-}
+  ),
+  tokens: SHARED_TOKENS,
+};
 
-function Caption({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="text-[12px] leading-[18px] text-[#a8a8b2] font-['DM_Sans']">
-      {children}
-    </span>
-  );
-}
-
-function Variant({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <Caption>{label}</Caption>
-      {children}
+const iconSegmentConfig: PlaygroundConfig = {
+  name: "Button Group Icon [individuals]",
+  description: "A single icon segment — explore each side, state and size.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: ["Selected", "Unselected", "Hover", "Disabled"],
+      defaultValue: "Selected",
+      asTabs: true,
+    },
+    {
+      kind: "select",
+      name: "side",
+      label: "Side",
+      options: ["Left", "Middle", "Right"],
+      defaultValue: "Left",
+    },
+    { kind: "boolean", name: "compact", label: "Compact", defaultValue: false },
+  ],
+  render: (props: PropValues) => (
+    <div className="flex">
+      <IconSegment
+        side={props.side as Side}
+        state={props.state as State}
+        compact={props.compact === true}
+      />
     </div>
-  );
-}
-
-const STATES: State[] = ["Selected", "Unselected", "Hover", "Disabled"];
-const SIDES: Side[] = ["Left", "Middle", "Right"];
-const AMOUNTS = [2, 3, 4, 5];
+  ),
+  tokens: SHARED_TOKENS,
+};
 
 export default function ButtonGroupPage() {
   return (
-    <section className="flex flex-col gap-6">
-      {/* Text button group — composed */}
-      <Card title="Button Group">
-        <div className="flex flex-wrap gap-x-12 gap-y-6">
-          <div className="flex flex-col gap-4">
-            <Caption>Compact=No</Caption>
-            <div className="flex flex-col gap-4">
-              {AMOUNTS.map((n) => (
-                <Variant key={n} label={`${n} Items`}>
-                  <TextButtonGroup amount={n} compact={false} />
-                </Variant>
-              ))}
-            </div>
-          </div>
-          <div className="flex flex-col gap-4">
-            <Caption>Compact=Yes</Caption>
-            <div className="flex flex-col gap-4">
-              {AMOUNTS.map((n) => (
-                <Variant key={n} label={`${n} Items`}>
-                  <TextButtonGroup amount={n} compact />
-                </Variant>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Icon button group — composed */}
-      <Card title="Button Icon Group">
-        <div className="flex flex-wrap gap-x-12 gap-y-6">
-          <div className="flex flex-col gap-4">
-            <Caption>Compact=No</Caption>
-            <div className="flex flex-col gap-4">
-              {AMOUNTS.map((n) => (
-                <Variant key={n} label={`${n} Items`}>
-                  <IconButtonGroup amount={n} compact={false} />
-                </Variant>
-              ))}
-            </div>
-          </div>
-          <div className="flex flex-col gap-4">
-            <Caption>Compact=Yes</Caption>
-            <div className="flex flex-col gap-4">
-              {AMOUNTS.map((n) => (
-                <Variant key={n} label={`${n} Items`}>
-                  <IconButtonGroup amount={n} compact />
-                </Variant>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Text individuals — every side / state / size */}
-      <Card title="Button Group [individuals]">
-        <div className="flex flex-col gap-6">
-          {[false, true].map((compact) => (
-            <div key={compact ? "c" : "n"} className="flex flex-col gap-4">
-              <Caption>{compact ? "Compact=Yes" : "Compact=No"}</Caption>
-              <div className="flex flex-wrap gap-x-10 gap-y-4">
-                {SIDES.map((side) => (
-                  <div key={side} className="flex flex-col gap-4">
-                    {STATES.map((state) => (
-                      <Variant key={state} label={`${side} / ${state}`}>
-                        <div className="flex">
-                          <TextSegment
-                            side={side}
-                            state={state}
-                            compact={compact}
-                          />
-                        </div>
-                      </Variant>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Icon individuals — every side / state / size */}
-      <Card title="Button Group Icon [individuals]">
-        <div className="flex flex-col gap-6">
-          {[false, true].map((compact) => (
-            <div key={compact ? "c" : "n"} className="flex flex-col gap-4">
-              <Caption>{compact ? "Compact=Yes" : "Compact=No"}</Caption>
-              <div className="flex flex-wrap gap-x-10 gap-y-4">
-                {SIDES.map((side) => (
-                  <div key={side} className="flex flex-col gap-4">
-                    {STATES.map((state) => (
-                      <Variant key={state} label={`${side} / ${state}`}>
-                        <div className="flex">
-                          <IconSegment
-                            side={side}
-                            state={state}
-                            compact={compact}
-                          />
-                        </div>
-                      </Variant>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
+    <section aria-label="Button Group component playground" className="flex flex-col gap-6">
+      <Playground config={textGroupConfig} />
+      <Playground config={iconGroupConfig} />
+      <Playground config={textSegmentConfig} />
+      <Playground config={iconSegmentConfig} />
     </section>
   );
 }

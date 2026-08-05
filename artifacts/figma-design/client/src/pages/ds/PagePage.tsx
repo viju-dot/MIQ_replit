@@ -1,3 +1,6 @@
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
+
 const A = "/figmaAssets/page/";
 
 const imgVectorContainer = `${A}vector-container.svg`;
@@ -25,9 +28,9 @@ const imgScreenshotStep1 = `${A}screenshot-step1.png`;
 const imgScreenshotStep2 = `${A}screenshot-step2.png`;
 const imgScreenshotStep3 = `${A}screenshot-step3.png`;
 
-function Caption({ children }: { children: React.ReactNode }) {
-  return <span className="text-[12px] text-[#a8a8b2]">{children}</span>;
-}
+/* ------------------------------------------------------------------ */
+/* Figma components (unchanged JSX/classes)                           */
+/* ------------------------------------------------------------------ */
 
 function SingleDiamond({ className }: { className?: string }) {
   return (
@@ -209,38 +212,127 @@ function Page({ className, pageFooter = false, swap = null }: PageProps) {
   );
 }
 
-type Cat = { label: string; src: string; w: string; active?: boolean; boxClass: string };
+type Cat = { label: string; src: string; w: string; boxClass: string };
 
 const categories: Cat[] = [
   { label: "Atoms", src: imgCatAtom, w: "w-[74px]", boxClass: "items-center justify-center p-[3px]" },
   { label: "Molecules", src: imgCatMolecule, w: "w-[115px]", boxClass: "items-center p-[3px]" },
   { label: "Organisms", src: imgCatOrganism, w: "w-[122px]", boxClass: "items-center p-[3px]" },
   { label: "Templates", src: imgCatTemplate, w: "w-[118px]", boxClass: "items-center overflow-clip px-[5px] py-[3px]" },
-  { label: "Pages", src: imgCatPages, w: "w-[67px]", active: true, boxClass: "items-start" },
+  { label: "Pages", src: imgCatPages, w: "w-[67px]", boxClass: "items-start" },
 ];
 
-function AtomicCategoryGroup() {
+function AtomicCategoryGroup({ active }: { active: string }) {
   return (
     <div className="content-stretch flex flex-wrap gap-[48px] items-center justify-center relative shrink-0" data-name="Atomic design component category group">
-      {categories.map((cat) => (
-        <div key={cat.label} className={`content-stretch flex flex-col gap-[5px] items-center relative shrink-0 ${cat.w}`}>
-          <div className={`content-stretch flex relative shrink-0 size-[52px] ${cat.boxClass}`}>
-            <div className="flex-[1_0_0] h-full min-w-px relative" data-name="Vector wrap">
-              <img alt="" className="absolute block inset-0 max-w-none size-full" src={cat.src} />
+      {categories.map((cat) => {
+        const isActive = cat.label === active;
+        return (
+          <div key={cat.label} className={`content-stretch flex flex-col gap-[5px] items-center relative shrink-0 ${cat.w}`}>
+            <div className={`content-stretch flex relative shrink-0 size-[52px] ${cat.boxClass}`}>
+              <div className="flex-[1_0_0] h-full min-w-px relative" data-name="Vector wrap">
+                <img alt="" className="absolute block inset-0 max-w-none size-full" src={cat.src} />
+              </div>
             </div>
+            <p
+              className={`[word-break:break-word] font-['DM_Sans'] font-semibold leading-[32px] not-italic relative shrink-0 text-[24px] tracking-[-0.36px] whitespace-nowrap ${
+                isActive ? "text-[#4b4b59]" : "text-[#c6c6cc]"
+              }`}
+            >
+              {cat.label}
+            </p>
           </div>
-          <p
-            className={`[word-break:break-word] font-['DM_Sans'] font-semibold leading-[32px] not-italic relative shrink-0 text-[24px] tracking-[-0.36px] whitespace-nowrap ${
-              cat.active ? "text-[#4b4b59]" : "text-[#c6c6cc]"
-            }`}
-          >
-            {cat.label}
-          </p>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Playground configs                                                 */
+/* ------------------------------------------------------------------ */
+
+const pageConfig: PlaygroundConfig = {
+  name: "Page",
+  description:
+    "Responsive layout template: navigation + swap instance body, with an optional page footer.",
+  controls: [
+    { kind: "boolean", name: "footer", label: "Page footer", defaultValue: false },
+  ],
+  render: (props) => (
+    <div className="w-full max-w-[767px]">
+      <Page pageFooter={props.footer === true} />
+    </div>
+  ),
+  tokens: {
+    "surface/page/background": "#f7f7fa",
+    "surface/footer/background": "#ffffff",
+    "spacing/400 (nav↔content)": "32px",
+    "margin/horizontal": "16px",
+    "swap/placeholder/background": "rgba(209,148,255,0.2)",
+    "swap/placeholder/border": "#d194ff",
+    "action/brand/bold": "#7c33b5",
+    "action/neutral/border": "#4b4b59",
+    "radius/button": "2px",
+  },
+};
+
+const navigationConfig: PlaygroundConfig = {
+  name: "Navigation",
+  description:
+    "Primary navigation bar (brand, menu, language, avatar) plus the secondary navigation strip.",
+  controls: [],
+  render: () => (
+    <div className="w-full max-w-[767px]">
+      <Navigation />
+    </div>
+  ),
+  tokens: {
+    "surface/primary-nav/background": "#2b0030",
+    "surface/secondary-nav/background": "#ffffff",
+    "text/on-brand": "#ffffff",
+    "text/secondary-nav/active": "#13131a",
+    "text/secondary-nav/inactive": "#4b4b59",
+    "badge/gradient/from": "#d71982",
+    "badge/gradient/via": "#ff540c",
+    "badge/gradient/to": "#f0e812",
+    "language/pill/background": "rgba(255,255,255,0.2)",
+    "height/primary-nav": "64px",
+    "height/secondary-nav": "56px",
+  },
+};
+
+const categoryConfig: PlaygroundConfig = {
+  name: "Atomic design category",
+  description:
+    "The atomic-design hierarchy group. Select which category is highlighted as the current level.",
+  controls: [
+    {
+      kind: "select",
+      name: "active",
+      label: "Active category",
+      options: ["Atoms", "Molecules", "Organisms", "Templates", "Pages"],
+      defaultValue: "Pages",
+      asTabs: true,
+    },
+  ],
+  render: (props) => (
+    <div className="w-full overflow-x-auto">
+      <AtomicCategoryGroup active={String(props.active)} />
+    </div>
+  ),
+  tokens: {
+    "text/category/active": "#4b4b59",
+    "text/category/inactive": "#c6c6cc",
+    "icon/size": "52px",
+    "type/category": "24px / 32px (DM Sans, -0.36px)",
+    "gap/group": "48px",
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* Static documentation helpers (unchanged assets/styles)             */
+/* ------------------------------------------------------------------ */
 
 function StepScreenshot({ title, aspect, src }: { title: string; aspect: string; src: string }) {
   return (
@@ -256,129 +348,97 @@ function StepScreenshot({ title, aspect, src }: { title: string; aspect: string;
 }
 
 export default function PagePage(): JSX.Element {
-  const cardClass = "rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5";
-
   return (
-    <section aria-label="Page component" className="flex flex-col gap-8">
-      {/* Introduction */}
-      <div className={cardClass}>
-        <Caption>Introduction</Caption>
-        <p className="mt-2 font-['DM_Sans'] leading-[32px] text-[24px] text-[#4b4b59] tracking-[-0.36px]">
-          The page component is used to create responsive layouts and will replace manually created pages using frames.
-        </p>
-      </div>
+    <section aria-label="Page component playground" className="flex flex-col gap-6">
+      <Playground config={pageConfig} />
+      <Playground config={navigationConfig} />
+      <Playground config={categoryConfig} />
 
-      {/* Atomic design category group */}
-      <div className={cardClass}>
-        <Caption>Atomic design category — Pages</Caption>
-        <div className="mt-4 overflow-x-auto">
-          <AtomicCategoryGroup />
-        </div>
-      </div>
+      {/* Anatomy & usage documentation (reference imagery, unchanged) */}
+      <details className="rounded-xl border border-[#e1e1e8] bg-white">
+        <summary className="cursor-pointer select-none px-4 py-3 text-[13px] font-semibold text-[#4b4b59]">
+          Anatomy &amp; usage guidelines
+        </summary>
+        <div className="flex flex-col gap-8 px-4 pb-6">
+          {/* Introduction */}
+          <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[#4b4b59] tracking-[-0.36px]">
+            The page component is used to create responsive layouts and will replace manually created pages using frames.
+          </p>
 
-      {/* Component — the Page component (only one variant) */}
-      <div className={cardClass}>
-        <div className="mb-4 flex flex-col gap-1">
-          <Caption>Component — Page (default variant, with swap placeholder)</Caption>
-        </div>
-        <div
-          className="bg-[#ebebf0] border-2 border-[#9747ff] border-dashed flex flex-col items-center overflow-x-auto p-6 sm:px-[80px] sm:py-[64px] rounded-[56px]"
-        >
-          <Page />
-        </div>
-      </div>
-
-      {/* Component — with footer */}
-      <div className={cardClass}>
-        <div className="mb-4 flex flex-col gap-1">
-          <Caption>Page — with page footer</Caption>
-        </div>
-        <div className="bg-[#ebebf0] border-2 border-[#9747ff] border-dashed flex flex-col items-center overflow-x-auto p-6 sm:px-[80px] sm:py-[64px] rounded-[56px]">
-          <Page pageFooter />
-        </div>
-      </div>
-
-      {/* Anatomy */}
-      <div className={cardClass}>
-        <Caption>Anatomy</Caption>
-        <p className="mt-2 mb-4 font-['DM_Sans'] leading-[32px] text-[20px] text-[#282833]">
-          The page component contains the navigation component and a swap instance component that designers replace with
-          their content. It has a responsive grid, a <span className="font-semibold">margin variable</span> for horizontal
-          padding and <span className="font-semibold">spacing 400 (32px)</span> between the page content and navigation. The
-          grid and margins <span className="font-semibold">automatically change</span> according to the selected{" "}
-          <span className="font-semibold">responsive mode</span>.
-        </p>
-        <div className="flex flex-col gap-6">
-          {/* Mode SM */}
-          <div className="relative overflow-hidden rounded-[40px]">
-            <img alt="Mode SM layout" className="block w-full" src={imgScreenshotSm} />
-            <p className="absolute font-['DM_Sans'] font-semibold leading-[19px] left-1/2 -translate-x-1/2 not-italic text-[#ea00ad] text-[24px] top-[4%] tracking-[-0.15px]">
-              Mode - SM
+          {/* Anatomy */}
+          <div className="flex flex-col gap-4">
+            <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[#282833]">
+              The page component contains the navigation component and a swap instance component that designers replace with
+              their content. It has a responsive grid, a <span className="font-semibold">margin variable</span> for horizontal
+              padding and <span className="font-semibold">spacing 400 (32px)</span> between the page content and navigation. The
+              grid and margins <span className="font-semibold">automatically change</span> according to the selected{" "}
+              <span className="font-semibold">responsive mode</span>.
             </p>
-            <img
-              alt="Mode SM detail"
-              className="absolute right-[2%] top-[3%] w-[20%] rounded-[16px] shadow-[0px_24px_24px_-10px_rgba(0,0,0,0.08)]"
-              src={imgScreenshotSmInset}
-            />
+            <div className="flex flex-col gap-6">
+              <div className="relative overflow-hidden rounded-[40px]">
+                <img alt="Mode SM layout" className="block w-full" src={imgScreenshotSm} />
+                <p className="absolute font-['DM_Sans'] font-semibold leading-[19px] left-1/2 -translate-x-1/2 not-italic text-[#ea00ad] text-[24px] top-[4%] tracking-[-0.15px]">
+                  Mode - SM
+                </p>
+                <img
+                  alt="Mode SM detail"
+                  className="absolute right-[2%] top-[3%] w-[20%] rounded-[16px] shadow-[0px_24px_24px_-10px_rgba(0,0,0,0.08)]"
+                  src={imgScreenshotSmInset}
+                />
+              </div>
+              <div className="relative overflow-hidden rounded-[40px]">
+                <img alt="Mode XL layout" className="block w-full" src={imgScreenshotXl} />
+                <p className="absolute font-['DM_Sans'] font-semibold leading-[19px] left-1/2 -translate-x-1/2 not-italic text-[#ea00ad] text-[24px] top-[4%] tracking-[-0.15px]">
+                  Mode - XL
+                </p>
+                <img
+                  alt="Mode XL detail"
+                  className="absolute right-[2%] top-[3%] w-[20%] rounded-[16px] shadow-[0px_24px_24px_-10px_rgba(0,0,0,0.08)]"
+                  src={imgScreenshotXlInset}
+                />
+              </div>
+            </div>
           </div>
-          {/* Mode XL */}
-          <div className="relative overflow-hidden rounded-[40px]">
-            <img alt="Mode XL layout" className="block w-full" src={imgScreenshotXl} />
-            <p className="absolute font-['DM_Sans'] font-semibold leading-[19px] left-1/2 -translate-x-1/2 not-italic text-[#ea00ad] text-[24px] top-[4%] tracking-[-0.15px]">
-              Mode - XL
-            </p>
-            <img
-              alt="Mode XL detail"
-              className="absolute right-[2%] top-[3%] w-[20%] rounded-[16px] shadow-[0px_24px_24px_-10px_rgba(0,0,0,0.08)]"
-              src={imgScreenshotXlInset}
-            />
-          </div>
-        </div>
-      </div>
 
-      {/* Usage */}
-      <div className={cardClass}>
-        <Caption>Usage</Caption>
-        <div className="mt-4 flex flex-col gap-6">
-          <div className="flex flex-col gap-3">
-            <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[#282833] tracking-[-0.36px]">
-              <span className="font-semibold">Step 1.</span> To insert content into the page component, wrap the content in a{" "}
-              <span className="font-semibold">component</span> with <span className="font-semibold">auto-layout</span> applied.
-              Elements that transform from vertical to horizontal layout should use the{" "}
-              <span className="font-semibold">gutter variable</span> as a gap between them.
-            </p>
-            <StepScreenshot title="Step 1" aspect="aspect-[1985/1347]" src={imgScreenshotStep1} />
+          {/* Usage */}
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-3">
+              <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[#282833] tracking-[-0.36px]">
+                <span className="font-semibold">Step 1.</span> To insert content into the page component, wrap the content in a{" "}
+                <span className="font-semibold">component</span> with <span className="font-semibold">auto-layout</span> applied.
+                Elements that transform from vertical to horizontal layout should use the{" "}
+                <span className="font-semibold">gutter variable</span> as a gap between them.
+              </p>
+              <StepScreenshot title="Step 1" aspect="aspect-[1985/1347]" src={imgScreenshotStep1} />
+            </div>
+            <div className="flex flex-col gap-3">
+              <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[#282833] tracking-[-0.36px]">
+                <span className="font-semibold">Step 2.</span> Once the content is a component, it can be replaced with a{" "}
+                <span className="font-semibold">Swap Instance frame</span>.
+              </p>
+              <StepScreenshot title="Step 2" aspect="aspect-[2382/896]" src={imgScreenshotStep2} />
+            </div>
+            <div className="flex flex-col gap-3">
+              <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[#282833] tracking-[-0.36px]">
+                <span className="font-semibold">Step 3.</span> Now the page can be{" "}
+                <span className="font-semibold">duplicated</span> to illustrate designs for larger screens by simply having a{" "}
+                <span className="font-semibold">different mode applied to it in the appearance settings</span>. The designs adapt
+                and adjust automatically, provided the page content component uses correct auto-layout and variable settings.
+              </p>
+              <StepScreenshot title="Step 3" aspect="aspect-[2904/1398]" src={imgScreenshotStep3} />
+            </div>
           </div>
-          <div className="flex flex-col gap-3">
-            <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[#282833] tracking-[-0.36px]">
-              <span className="font-semibold">Step 2.</span> Once the content is a component, it can be replaced with a{" "}
-              <span className="font-semibold">Swap Instance frame</span>.
-            </p>
-            <StepScreenshot title="Step 2" aspect="aspect-[2382/896]" src={imgScreenshotStep2} />
-          </div>
-          <div className="flex flex-col gap-3">
-            <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[#282833] tracking-[-0.36px]">
-              <span className="font-semibold">Step 3.</span> Now the page can be <span className="font-semibold">duplicated</span>{" "}
-              to illustrate designs for larger screens by simply having a{" "}
-              <span className="font-semibold">different mode applied to it in the appearance settings</span>. The designs adapt
-              and adjust automatically, provided the page content component uses correct auto-layout and variable settings.
-            </p>
-            <StepScreenshot title="Step 3" aspect="aspect-[2904/1398]" src={imgScreenshotStep3} />
-          </div>
-        </div>
-      </div>
 
-      {/* Fiber footer mark */}
-      <div className={cardClass}>
-        <Caption>Fiber design system mark</Caption>
-        <div className="mt-3 inline-flex flex-col gap-2">
-          <div className="h-[2px] w-[33.677px] relative">
-            <img alt="" className="absolute inset-0 max-w-none object-cover size-full" src={imgImage1} />
+          {/* Fiber footer mark */}
+          <div className="inline-flex flex-col gap-2">
+            <div className="h-[2px] w-[33.677px] relative">
+              <img alt="" className="absolute inset-0 max-w-none object-cover size-full" src={imgImage1} />
+            </div>
+            <p className="font-['DM_Sans'] leading-[20px] text-[14px] text-[#717180]">FIBER DESIGN SYSTEM</p>
+            <img alt="" className="mt-1 block w-[300px] max-w-full" src={imgFiberLine} />
           </div>
-          <p className="font-['DM_Sans'] leading-[20px] text-[14px] text-[#717180]">FIBER DESIGN SYSTEM</p>
-          <img alt="" className="mt-1 block w-[300px] max-w-full" src={imgFiberLine} />
         </div>
-      </div>
+      </details>
     </section>
   );
 }

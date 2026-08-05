@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { Playground } from "@/components/playground/Playground";
+import type { PlaygroundConfig } from "@/components/playground/types";
 
 const ASSET = {
   television: "/figmaAssets/tile/television-default.svg",
@@ -19,9 +20,11 @@ type State = "Default" | "Hover" | "Selected" | "Disabled";
 function StaticCompactTile({
   heading = "Place holder",
   description = false,
+  descriptionText = "Placeholder text",
 }: {
   heading?: string;
   description?: boolean;
+  descriptionText?: string;
 }) {
   return (
     <div className="flex w-[363px] max-w-full min-w-[240px] flex-col items-start justify-center overflow-clip rounded-[2px] border border-solid border-[#e1e1e8] bg-white px-2 py-1.5">
@@ -52,7 +55,7 @@ function StaticCompactTile({
       {description && (
         <div className="flex w-full items-center gap-[10px]">
           <div className="flex h-full w-[120px] flex-col justify-center overflow-hidden text-ellipsis whitespace-nowrap font-['DM_Sans'] text-[14px] font-normal leading-[20px] text-[#4b4b59] [word-break:break-word]">
-            <p className="overflow-hidden text-ellipsis leading-[20px]">Placeholder text</p>
+            <p className="overflow-hidden text-ellipsis leading-[20px]">{descriptionText}</p>
           </div>
         </div>
       )}
@@ -114,7 +117,15 @@ function StandardCheckbox({ state }: { state: State }) {
   );
 }
 
-function DynamicStandardTile({ state }: { state: State }) {
+function DynamicStandardTile({
+  state,
+  title = "Title of selection",
+  description = "Descriptive text for selection",
+}: {
+  state: State;
+  title?: string;
+  description?: string;
+}) {
   const s = standardStyles[state];
   return (
     <div
@@ -133,7 +144,7 @@ function DynamicStandardTile({ state }: { state: State }) {
           <div
             className={`flex w-full flex-col justify-center overflow-hidden text-ellipsis whitespace-nowrap font-['DM_Sans'] text-[14px] font-medium leading-[0] [word-break:break-word] ${s.title}`}
           >
-            <p className="overflow-hidden text-ellipsis leading-[20px]">Title of selection</p>
+            <p className="overflow-hidden text-ellipsis leading-[20px]">{title}</p>
           </div>
         </div>
       </div>
@@ -143,7 +154,7 @@ function DynamicStandardTile({ state }: { state: State }) {
           <p
             className={`min-w-px flex-1 font-['DM_Sans'] text-[14px] font-normal leading-[20px] [word-break:break-word] ${s.desc}`}
           >
-            Descriptive text for selection
+            {description}
           </p>
         </div>
       </div>
@@ -177,7 +188,7 @@ const compactStyles: Record<State, { container: string; text: string; icon: stri
   },
 };
 
-function DynamicCompactTile({ state }: { state: State }) {
+function DynamicCompactTile({ state, label = "CTV" }: { state: State; label?: string }) {
   const s = compactStyles[state];
   return (
     <div
@@ -193,7 +204,7 @@ function DynamicCompactTile({ state }: { state: State }) {
           <div
             className={`flex flex-col justify-center overflow-hidden text-ellipsis whitespace-nowrap text-center font-['DM_Sans'] text-[12px] font-medium leading-[0] [word-break:break-word] ${s.text}`}
           >
-            <p className="overflow-hidden text-ellipsis leading-[18px]">CTV</p>
+            <p className="overflow-hidden text-ellipsis leading-[18px]">{label}</p>
           </div>
         </div>
       </div>
@@ -222,118 +233,140 @@ function DynamicMiniTile({ state }: { state: State }) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Interactive dynamic-standard demo                                   */
+/* Playground configs                                                  */
 /* ------------------------------------------------------------------ */
-function InteractiveStandardTile() {
-  const [checked, setChecked] = useState(false);
-  const state: State = checked ? "Selected" : "Default";
-  const s = standardStyles[state];
-  return (
-    <button
-      type="button"
-      onClick={() => setChecked((c) => !c)}
-      className={`flex w-[363px] max-w-full min-w-[180px] cursor-pointer flex-col items-start gap-2 overflow-clip rounded-[2px] border border-solid p-4 text-left transition-colors ${s.container}`}
-    >
-      <div className="flex w-full items-center gap-2">
-        <div className="relative size-[24px] shrink-0">
-          <div className="absolute left-0 top-1/2 size-[24px] -translate-y-1/2">
-            <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1">
-              <StandardCheckbox state={state} />
-            </div>
-          </div>
-        </div>
-        <div className="flex min-w-px flex-1 flex-col items-start justify-center gap-[10px]">
-          <div
-            className={`flex w-full flex-col justify-center overflow-hidden text-ellipsis whitespace-nowrap font-['DM_Sans'] text-[14px] font-medium leading-[0] [word-break:break-word] ${s.title}`}
-          >
-            <p className="overflow-hidden text-ellipsis leading-[20px]">Title of selection</p>
-          </div>
-        </div>
-      </div>
-      <div className="flex w-full flex-wrap content-start items-start">
-        <div className="flex min-w-px flex-1 items-center">
-          <p
-            className={`min-w-px flex-1 font-['DM_Sans'] text-[14px] font-normal leading-[20px] [word-break:break-word] ${s.desc}`}
-          >
-            Descriptive text for selection
-          </p>
-        </div>
-      </div>
-    </button>
-  );
-}
+const STATE_OPTIONS = ["Default", "Hover", "Selected", "Disabled"];
+
+const commonTokens = {
+  "container/brand/bold/background": "#7c33b5",
+  "container/brand/subtle/background": "#f6ebff",
+  "container/neutral/background": "#ffffff",
+  "container/neutral/hover": "rgba(113,113,128,0.08)",
+  "container/disabled/background": "rgba(113,113,128,0.1)",
+  "border/neutral/default": "#c6c6cc",
+  "border/neutral/hover": "#a8a8b2",
+  "border/brand/selected": "#7c33b5",
+  "border/disabled": "#e1e1e8",
+  "text/neutral/bold": "#13131a",
+  "text/neutral/subtle": "#4b4b59",
+  "text/brand": "#7c33b5",
+  "text/disabled": "#a8a8b2",
+  "radius/tile": "2px",
+};
+
+const staticCompactConfig: PlaygroundConfig = {
+  name: "Tile — Static / Compact",
+  description: "Compact static tile with leading icon, info + action button, and optional description row.",
+  controls: [
+    { kind: "text", name: "heading", label: "Heading", defaultValue: "Place holder", placeholder: "Heading" },
+    { kind: "boolean", name: "description", label: "Show description", defaultValue: false },
+    {
+      kind: "text",
+      name: "descriptionText",
+      label: "Description text",
+      defaultValue: "Placeholder text",
+      placeholder: "Description",
+    },
+  ],
+  render: (props) => (
+    <StaticCompactTile
+      heading={String(props.heading)}
+      description={props.description === true}
+      descriptionText={String(props.descriptionText)}
+    />
+  ),
+  tokens: {
+    "container/neutral/background": "#ffffff",
+    "border/neutral/subtle": "#e1e1e8",
+    "border/brand/action": "#7c33b5",
+    "text/heading": "#282833",
+    "text/description": "#4b4b59",
+    "radius/tile": "2px",
+  },
+};
+
+const dynamicStandardConfig: PlaygroundConfig = {
+  name: "Tile — Dynamic / Standard",
+  description: "Selectable tile with checkbox, title and description across interaction states.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: STATE_OPTIONS,
+      defaultValue: "Default",
+      asTabs: true,
+    },
+    {
+      kind: "text",
+      name: "title",
+      label: "Title",
+      defaultValue: "Title of selection",
+      placeholder: "Title",
+    },
+    {
+      kind: "text",
+      name: "description",
+      label: "Description",
+      defaultValue: "Descriptive text for selection",
+      placeholder: "Description",
+    },
+  ],
+  render: (props) => (
+    <DynamicStandardTile
+      state={props.state as State}
+      title={String(props.title)}
+      description={String(props.description)}
+    />
+  ),
+  tokens: commonTokens,
+};
+
+const dynamicCompactConfig: PlaygroundConfig = {
+  name: "Tile — Dynamic / Compact",
+  description: "Selectable compact tile with icon and label across interaction states.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: STATE_OPTIONS,
+      defaultValue: "Default",
+      asTabs: true,
+    },
+    { kind: "text", name: "label", label: "Label", defaultValue: "CTV", placeholder: "Label" },
+  ],
+  render: (props) => <DynamicCompactTile state={props.state as State} label={String(props.label)} />,
+  tokens: commonTokens,
+};
+
+const dynamicMiniConfig: PlaygroundConfig = {
+  name: "Tile — Dynamic / Mini",
+  description: "Selectable icon-only tile across interaction states.",
+  controls: [
+    {
+      kind: "select",
+      name: "state",
+      label: "State",
+      options: STATE_OPTIONS,
+      defaultValue: "Default",
+      asTabs: true,
+    },
+  ],
+  render: (props) => <DynamicMiniTile state={props.state as State} />,
+  tokens: commonTokens,
+};
 
 /* ------------------------------------------------------------------ */
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
-const STATES: State[] = ["Default", "Hover", "Selected", "Disabled"];
-
-const cardClass = "rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5";
-const captionClass = "text-[12px] text-[#a8a8b2]";
-
-function Variant({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <span className={captionClass}>{label}</span>
-      {children}
-    </div>
-  );
-}
-
 export default function TilePage() {
   return (
-    <section className="flex flex-col gap-8 font-['DM_Sans']" aria-label="Tile component variants">
-      {/* Static / Compact */}
-      <div className={cardClass}>
-        <p className="mb-4 text-[14px] font-medium text-[#13131a]">Type = Static, Size = Compact</p>
-        <div className="flex flex-wrap gap-8">
-          <Variant label="Default">
-            <StaticCompactTile />
-          </Variant>
-          <Variant label="With description">
-            <StaticCompactTile description />
-          </Variant>
-        </div>
-      </div>
-
-      {/* Dynamic / Standard */}
-      <div className={cardClass}>
-        <p className="mb-4 text-[14px] font-medium text-[#13131a]">Type = Dynamic, Size = Standard</p>
-        <div className="flex flex-wrap gap-8">
-          {STATES.map((state) => (
-            <Variant key={state} label={state}>
-              <DynamicStandardTile state={state} />
-            </Variant>
-          ))}
-          <Variant label="Interactive (click to select)">
-            <InteractiveStandardTile />
-          </Variant>
-        </div>
-      </div>
-
-      {/* Dynamic / Compact */}
-      <div className={cardClass}>
-        <p className="mb-4 text-[14px] font-medium text-[#13131a]">Type = Dynamic, Size = Compact</p>
-        <div className="flex flex-wrap gap-8">
-          {STATES.map((state) => (
-            <Variant key={state} label={state}>
-              <DynamicCompactTile state={state} />
-            </Variant>
-          ))}
-        </div>
-      </div>
-
-      {/* Dynamic / Mini */}
-      <div className={cardClass}>
-        <p className="mb-4 text-[14px] font-medium text-[#13131a]">Type = Dynamic, Size = Mini</p>
-        <div className="flex flex-wrap gap-8">
-          {STATES.map((state) => (
-            <Variant key={state} label={state}>
-              <DynamicMiniTile state={state} />
-            </Variant>
-          ))}
-        </div>
-      </div>
+    <section className="flex flex-col gap-6 font-['DM_Sans']" aria-label="Tile component playground">
+      <Playground config={staticCompactConfig} />
+      <Playground config={dynamicStandardConfig} />
+      <Playground config={dynamicCompactConfig} />
+      <Playground config={dynamicMiniConfig} />
     </section>
   );
 }
