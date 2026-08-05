@@ -1,0 +1,69 @@
+Task: Build MIQ Design System Explorer with Page-Based Navigation
+Context
+
+I understand that Figma MCP cannot automatically enumerate all pages in my Design System file. I will manually provide the Figma URL (with the node-id) for each page or component set.
+
+Each URL represents a section of the Design System that should be imported into the application.
+
+Requirements
+
+As I provide each Figma page URL:
+
+Fetch that page using the provided node-id.
+Import everything available on that page.
+Preserve all components, variants, properties, tokens, typography, colors, icons, and assets exactly as defined in Figma.
+Do not redesign, simplify, or modify any design information.
+
+The Figma page is always the single source of truth.
+
+Application Structure
+
+Do not place every imported component on one long scrolling page.
+
+Instead, create a navigation structure similar to a Design System documentation site.
+
+Left Sidebar
+
+Create a permanent sidebar that automatically grows as new Figma pages are imported.
+
+Example:
+
+Foundations
+Colors
+Typography
+Icons
+Buttons
+Inputs
+Dropdowns
+Tables
+Navigation
+Cards
+Charts
+…continue adding pages as I provide them.
+
+Each imported Figma page should become its own navigation item.
+
+Content Area
+
+When a sidebar item is selected:
+
+Display only that page's content.
+Show all components and variants from that page.
+Keep the layout clean and easy to browse.
+Avoid excessive vertical scrolling where possible.
+Organize content logically while preserving the original Figma structure.
+Future Imports
+
+The application should be incremental.
+
+Whenever I provide another Figma page URL:
+
+Fetch the new page.
+Add it as a new item in the sidebar.
+Do not overwrite previously imported pages.
+Preserve the existing navigation structure.
+Goal
+
+The final application should behave like an interactive Design System Explorer rather than one large page.
+
+I should be able to navigate between Design System pages from the sidebar, making it easy to browse components without scrolling through the entire Design System.

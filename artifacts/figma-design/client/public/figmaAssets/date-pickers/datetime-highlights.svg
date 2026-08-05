@@ -1,0 +1,9 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="237" height="123.5" viewBox="0 0 237 123.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Highlights">
+<path id="Range BKG" d="M143 78.5C143 71.3203 148.82 65.5 156 65.5H224C231.18 65.5 237 71.3203 237 78.5V78.5C237 85.6797 231.18 91.5 224 91.5H156C148.82 91.5 143 85.6797 143 78.5V78.5Z" fill="#F6EBFF"/>
+<path id="Range BKG_2" d="M0 110.5C0 103.32 5.8203 97.5 13 97.5H190C197.18 97.5 203 103.32 203 110.5V110.5C203 117.68 197.18 123.5 190 123.5H13C5.8203 123.5 0 117.68 0 110.5V110.5Z" fill="#F6EBFF"/>
+<circle id="Last day range" cx="190" cy="110.5" r="13" fill="#7C33B5"/>
+<circle id="First day range" cx="156" cy="78.5" r="13" fill="#7C33B5"/>
+<circle id="Current day" cx="120" cy="13.5" r="13" stroke="#7C33B5"/>
+</g>
+</svg>

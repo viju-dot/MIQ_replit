@@ -112,7 +112,7 @@ const fieldVariants: FieldVariant[] = [
   },
 ];
 
-export const Box = (): JSX.Element => {
+export default function Dropdowns(): JSX.Element {
   const [checkedFields, setCheckedFields] = useState<Record<string, boolean>>(
     () =>
       fieldVariants.reduce<Record<string, boolean>>((fields, field) => {
@@ -143,22 +143,10 @@ export const Box = (): JSX.Element => {
   };
 
   return (
-    <main className="min-h-screen bg-[#f5f5f8] py-12 px-6" aria-label="Field state examples">
-      {/* Page header */}
-      <div className="mx-auto max-w-5xl mb-10">
-        <h1
-          className="font-headline-md-semibold text-[length:var(--headline-md-semibold-font-size)] font-[number:var(--headline-md-semibold-font-weight)] leading-[var(--headline-md-semibold-line-height)] tracking-[var(--headline-md-semibold-letter-spacing)] text-[#13131a]"
-        >
-          Fiber Design System
-        </h1>
-        <p className="mt-1 font-body-md-regular text-[length:var(--body-md-regular-font-size)] font-[number:var(--body-md-regular-font-weight)] leading-[var(--body-md-regular-line-height)] text-[#71717a]">
-          Field component — all states
-        </p>
-      </div>
-
+    <section aria-label="Dropdown row states">
       {/* Field states grid */}
       <div
-        className="mx-auto max-w-5xl flex flex-wrap gap-[30px] rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5"
+        className="flex max-w-5xl flex-wrap gap-[30px] rounded-[5px] border border-dashed border-[#9747ff] bg-white p-5"
       >
         {fieldVariants.map((field) => (
           <div key={field.id} className="flex flex-col gap-1">
@@ -250,6 +238,6 @@ export const Box = (): JSX.Element => {
           </article>
         </div>
       </div>
-    </main>
+    </section>
   );
-};
+}

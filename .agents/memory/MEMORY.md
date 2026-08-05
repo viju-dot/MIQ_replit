@@ -1,0 +1,1 @@
+- [Figma import pipeline](figma-import.md) — Fiber file hides pages from enumeration; fetch per-frame via node IDs, convert Tailwind v4 vars to hex, localize temp asset URLs.
