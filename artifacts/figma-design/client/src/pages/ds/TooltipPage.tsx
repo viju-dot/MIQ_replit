@@ -39,7 +39,7 @@ const nTri2 = `${A}/num-triangle-2.svg`;
 const nTri3 = `${A}/num-triangle-3.svg`;
 
 const shadow =
-  "drop-shadow-[0px_1px_2px_rgba(113,113,128,0.08)] drop-shadow-[0px_12px_10px_rgba(113,113,128,0.1)]";
+  "drop-shadow-[0px_1px_2px_var(--shadow-lvl8,rgba(113,113,128,0.08))] drop-shadow-[0px_12px_10px_var(--shadow-lvl10,rgba(113,113,128,0.1))]";
 
 const descText =
   "Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore sed et.";
@@ -91,7 +91,7 @@ function DescriptiveTooltip({
   const rootGap =
     colour === "Dark" && ["Top-Right", "Bottom-Left"].includes(arrowPosition)
       ? ""
-      : "gap-[10px]";
+      : "gap-[var(--odd-numbers-10,10px)]";
 
   const allLayout = isLightAndTopLeft
     ? "flex-col items-start"
@@ -102,26 +102,26 @@ function DescriptiveTooltip({
         : "flex-col items-center";
 
   const boxBottomRight = isLightBottomRow
-    ? "bg-white mb-[-14px]"
+    ? "bg-[var(--surface-background-lvl1,#ffffff)] mb-[-14px]"
     : isLightAndRight
-      ? "bg-white mr-[-14px]"
+      ? "bg-[var(--surface-background-lvl1,#ffffff)] mr-[-14px]"
       : colour === "Dark" && isBottomRow
-        ? "bg-[#282833] mb-[-14px]"
-        : "bg-[#282833] mr-[-14px]";
+        ? "bg-[var(--surface-background-lvl6,#282833)] mb-[-14px]"
+        : "bg-[var(--surface-background-lvl6,#282833)] mr-[-14px]";
 
   const textBottomRight = isLightBottomRow
-    ? "text-[#13131a]"
+    ? "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]"
     : isLightAndRight
-      ? "text-[#282833]"
-      : "text-white";
+      ? "text-[var(--surface-foreground-static-neutral-lvl2,#282833)]"
+      : "text-[var(--surface-foreground-static-neutral-inversed,#ffffff)]";
 
   const boxTop = isLightTopRowOrLeft
-    ? "bg-white gap-[10px]"
+    ? "bg-[var(--surface-background-lvl1,#ffffff)] gap-[var(--odd-numbers-10,10px)]"
     : colour === "Dark" && ["Top-Right", "Left"].includes(arrowPosition)
-      ? "bg-[#282833] gap-[10px]"
-      : "bg-[#282833] flex-col gap-[4px]";
+      ? "bg-[var(--surface-background-lvl6,#282833)] gap-[var(--odd-numbers-10,10px)]"
+      : "bg-[var(--surface-background-lvl6,#282833)] flex-col gap-[var(--numbers-4,4px)]";
 
-  const textTop = isLightTopRowOrLeft ? "text-[#13131a]" : "text-white";
+  const textTop = isLightTopRowOrLeft ? "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]" : "text-[var(--surface-foreground-static-neutral-inversed,#ffffff)]";
 
   return (
     <div
@@ -135,11 +135,11 @@ function DescriptiveTooltip({
           arrowPosition,
         ) && (
           <div
-            className={`flex gap-[10px] items-start px-4 py-3 relative rounded-[2px] shrink-0 ${boxBottomRight}`}
+            className={`flex gap-[var(--odd-numbers-10,10px)] items-start px-4 py-3 relative rounded-[var(--radiuses-small,2px)] shrink-0 ${boxBottomRight}`}
             data-name="Box"
           >
             <p
-              className={`[word-break:break-word] font-['DM_Sans',Helvetica] leading-[20px] not-italic relative shrink-0 text-[14px] w-[228px] ${textBottomRight}`}
+              className={`[word-break:break-word] font-['DM_Sans',Helvetica] leading-[var(--body-md-regular-line-height,20px)] not-italic relative shrink-0 text-[length:var(--body-md-regular-size,14px)] w-[228px] ${textBottomRight}`}
             >
               {descText}
             </p>
@@ -242,11 +242,11 @@ function DescriptiveTooltip({
         {(["Top-Middle", "Top-Right", "Left"].includes(arrowPosition) ||
           isLightAndTopLeft) && (
           <div
-            className={`flex items-start px-4 py-3 relative rounded-[2px] shrink-0 ${boxTop}`}
+            className={`flex items-start px-4 py-3 relative rounded-[var(--radiuses-small,2px)] shrink-0 ${boxTop}`}
             data-name="Box"
           >
             <p
-              className={`[word-break:break-word] font-['DM_Sans',Helvetica] leading-[20px] not-italic relative shrink-0 text-[14px] w-[228px] ${textTop}`}
+              className={`[word-break:break-word] font-['DM_Sans',Helvetica] leading-[var(--body-md-regular-line-height,20px)] not-italic relative shrink-0 text-[length:var(--body-md-regular-size,14px)] w-[228px] ${textTop}`}
             >
               {descText}
             </p>
@@ -284,15 +284,15 @@ function StandardTooltip({
         : "items-center";
 
   const boxBg = isLightAndBottomMiddle
-    ? "bg-white mb-[-14px]"
+    ? "bg-[var(--surface-background-lvl1,#ffffff)] mb-[-14px]"
     : colour === "Light" && ["Top-Middle", "Top-Left", "Top-Right"].includes(arrowPosition)
-      ? "bg-white"
+      ? "bg-[var(--surface-background-lvl1,#ffffff)]"
       : isDarkAndBottomMiddle
-        ? "bg-[#282833] mb-[-14px]"
-        : "bg-[#282833]";
+        ? "bg-[var(--surface-background-lvl6,#282833)] mb-[-14px]"
+        : "bg-[var(--surface-background-lvl6,#282833)]";
 
   return (
-    <div className={`${shadow} flex flex-col gap-[10px] items-start relative`}>
+    <div className={`${shadow} flex flex-col gap-[var(--odd-numbers-10,10px)] items-start relative`}>
       <div className={`flex flex-col gap-0 relative shrink-0 ${allAlign}`} data-name="All">
         {["Top-Middle", "Top-Left", "Top-Right"].includes(arrowPosition) && (
           <div
@@ -319,16 +319,16 @@ function StandardTooltip({
           </div>
         )}
         <div
-          className={`flex gap-[10px] items-start pb-[2px] pt-[3px] px-3 relative rounded-[2px] shrink-0 ${boxBg}`}
+          className={`flex gap-[var(--odd-numbers-10,10px)] items-start pb-[2px] pt-[3px] px-3 relative rounded-[var(--radiuses-small,2px)] shrink-0 ${boxBg}`}
           data-name="Box"
         >
           {colour === "Dark" && (
-            <p className="[word-break:break-word] font-['DM_Sans',Helvetica] leading-[20px] not-italic relative shrink-0 text-[14px] text-white whitespace-nowrap">
+            <p className="[word-break:break-word] font-['DM_Sans',Helvetica] leading-[var(--body-md-regular-line-height,20px)] not-italic relative shrink-0 text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-inversed,#ffffff)] whitespace-nowrap">
               {text}
             </p>
           )}
           {colour === "Light" && (
-            <p className="[word-break:break-word] font-['DM_Sans',Helvetica] leading-[20px] not-italic relative shrink-0 text-[14px] text-[#13131a] whitespace-nowrap">
+            <p className="[word-break:break-word] font-['DM_Sans',Helvetica] leading-[var(--body-md-regular-line-height,20px)] not-italic relative shrink-0 text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] whitespace-nowrap">
               {text}
             </p>
           )}
@@ -375,30 +375,30 @@ function InteractiveTooltip({
   const isDarkAndNotTitleAndTopRight =
     colour === "Dark" && !title && arrowPosition === "Top right";
 
-  const boxBg = isLight ? "bg-white" : "bg-[#282833]";
+  const boxBg = isLight ? "bg-[var(--surface-background-lvl1,#ffffff)]" : "bg-[var(--surface-background-lvl6,#282833)]";
 
   const contentText =
     colour === "Light" && title
-      ? "[word-break:break-word] leading-[20px] not-italic text-[14px] text-[#13131a]"
+      ? "[word-break:break-word] leading-[var(--body-md-regular-line-height,20px)] not-italic text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]"
       : isNotTitle
         ? ""
-        : "[word-break:break-word] leading-[20px] not-italic text-[14px] text-white";
+        : "[word-break:break-word] leading-[var(--body-md-regular-line-height,20px)] not-italic text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-inversed,#ffffff)]";
 
   const titleTextCls =
     colour === "Light" && !title
-      ? "[word-break:break-word] font-['DM_Sans',Helvetica] leading-[20px] not-italic text-[14px] text-[#13131a]"
+      ? "[word-break:break-word] font-['DM_Sans',Helvetica] leading-[var(--body-md-regular-line-height,20px)] not-italic text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]"
       : colour === "Dark" && !title
-        ? "[word-break:break-word] font-['DM_Sans',Helvetica] leading-[20px] not-italic text-[14px] text-white"
+        ? "[word-break:break-word] font-['DM_Sans',Helvetica] leading-[var(--body-md-regular-line-height,20px)] not-italic text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-inversed,#ffffff)]"
         : "font-['DM_Sans',Helvetica] font-medium";
 
   const footerBg = isLightAndTitleAndTopLeft
-    ? "bg-white"
+    ? "bg-[var(--surface-background-lvl1,#ffffff)]"
     : colour === "Light" &&
         (arrowPosition === "Top right" || (!title && arrowPosition === "Top left"))
-      ? "bg-white"
-      : "bg-[#282833]";
+      ? "bg-[var(--surface-background-lvl1,#ffffff)]"
+      : "bg-[var(--surface-background-lvl6,#282833)]";
 
-  const linkText = isLight ? "text-[#7c33b5]" : "text-white";
+  const linkText = isLight ? "text-[var(--container-dynamic-brand-bold-background-default,#7c33b5)]" : "text-[var(--surface-foreground-static-neutral-inversed,#ffffff)]";
 
   const arrowLeft = isLightAndNotTitleAndTopRight
     ? "left-[219px]"
@@ -413,11 +413,11 @@ function InteractiveTooltip({
   return (
     <div className={`${shadow} flex flex-col items-start relative w-[260px]`}>
       <div
-        className={`flex flex-col items-start overflow-clip relative rounded-[2px] shrink-0 w-full ${boxBg}`}
+        className={`flex flex-col items-start overflow-clip relative rounded-[var(--radiuses-small,2px)] shrink-0 w-full ${boxBg}`}
         data-name="Box"
       >
         <div
-          className={`flex flex-col gap-[4px] items-start px-4 py-3 relative shrink-0 ${contentText}`}
+          className={`flex flex-col gap-[var(--numbers-4,4px)] items-start px-4 py-3 relative shrink-0 ${contentText}`}
         >
           <p className={`relative shrink-0 w-[228px] ${titleTextCls}`}>
             {isNotTitle
@@ -431,7 +431,7 @@ function InteractiveTooltip({
           )}
         </div>
         <div
-          className={`border-[#e1e1e8] border-solid border-t-[1px] flex items-center p-4 relative shrink-0 w-[260px] ${footerBg}`}
+          className={`border-[var(--border-static-subtle-neutral,#e1e1e8)] border-solid border-t-[length:var(--old-stroke-thickness-1,1px)] flex items-center p-4 relative shrink-0 w-[260px] ${footerBg}`}
           data-name="Link Buttons wrap"
         >
           <div
@@ -441,7 +441,7 @@ function InteractiveTooltip({
             data-name="Link Buttons"
           >
             <p
-              className={`[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-center whitespace-nowrap ${linkText}`}
+              className={`[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] not-italic relative shrink-0 text-[length:var(--body-md-medium-size,14px)] text-center whitespace-nowrap ${linkText}`}
             >
               Learn more
             </p>
@@ -459,20 +459,20 @@ function InteractiveTooltip({
               data-name="Button"
             >
               <div
-                className={`flex gap-[10px] h-[24px] items-center justify-center pl-[6px] pr-[6px] py-[2px] relative rounded-[2px] shrink-0 ${
+                className={`flex gap-[var(--odd-numbers-10,10px)] h-[24px] items-center justify-center pl-[6px] pr-[6px] py-[2px] relative rounded-[var(--radiuses-small,2px)] shrink-0 ${
                   isLight
-                    ? "border-[1px] border-[#7c33b5] border-solid"
-                    : "bg-[#4b4b59]"
+                    ? "border-[length:var(--old-stroke-thickness-1,1px)] border-[var(--border-dynamic-brand-default,#7c33b5)] border-solid"
+                    : "bg-[var(--container-dynamic-neutral-bold-background-default,#4b4b59)]"
                 }`}
                 data-name="button-small"
               >
                 {colour === "Dark" && (
-                  <div className="[word-break:break-word] flex flex-col font-['DM_Sans',Helvetica] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[14px] text-white text-center whitespace-nowrap">
-                    <p className="leading-[20px]">Confirm</p>
+                  <div className="[word-break:break-word] flex flex-col font-['DM_Sans',Helvetica] font-medium justify-center leading-[0] not-italic relative shrink-0 text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-inversed,#ffffff)] text-center whitespace-nowrap">
+                    <p className="leading-[var(--body-md-medium-line-height,20px)]">Confirm</p>
                   </div>
                 )}
                 {isLight && (
-                  <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[#7c33b5] text-center whitespace-nowrap">
+                  <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] not-italic relative shrink-0 text-[length:var(--body-md-medium-size,14px)] text-[var(--container-dynamic-brand-bold-background-default,#7c33b5)] text-center whitespace-nowrap">
                     Confirm
                   </p>
                 )}
@@ -511,31 +511,31 @@ function NumberTooltip({
   const isLight = colour === "Light";
 
   const bg = isDisabledLight
-    ? "bg-[rgba(113,113,128,0.1)]"
+    ? "bg-[var(--container-dynamic-neutral-subtle-background-disabled,rgba(113,113,128,0.1))]"
     : isDark
-      ? "bg-[#282833]"
+      ? "bg-[var(--surface-background-lvl6,#282833)]"
       : isLight
-        ? "bg-white"
-        : "bg-[#717180]";
+        ? "bg-[var(--surface-background-lvl1,#ffffff)]"
+        : "bg-[var(--surface-background-lvl5,#717180)]";
 
   return (
     <div className={`${shadow} flex flex-col items-center relative`}>
       <div
-        className={`flex flex-col items-center justify-center px-[4px] relative rounded-[2px] shrink-0 ${bg}`}
+        className={`flex flex-col items-center justify-center px-[var(--numbers-4,4px)] relative rounded-[var(--radiuses-small,2px)] shrink-0 ${bg}`}
         data-name="Number"
       >
         {["Light Purple", "Dark"].includes(colour) && (
-          <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[18px] not-italic relative shrink-0 text-[12px] text-white whitespace-nowrap">
+          <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-sm-medium-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-medium-size,12px)] text-[var(--surface-foreground-static-neutral-inversed,#ffffff)] whitespace-nowrap">
             {text}
           </p>
         )}
         {isLight && (
-          <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[18px] not-italic relative shrink-0 text-[12px] text-[#13131a] whitespace-nowrap">
+          <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-sm-medium-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-medium-size,12px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] whitespace-nowrap">
             {text}
           </p>
         )}
         {isDisabledLight && (
-          <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[18px] not-italic relative shrink-0 text-[12px] text-[#a8a8b2] whitespace-nowrap">
+          <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-sm-medium-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-medium-size,12px)] text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)] whitespace-nowrap">
             {text}
           </p>
         )}
@@ -564,13 +564,17 @@ function NumberTooltip({
 /* ------------------------------------------------------------------ */
 
 const tooltipTokens = {
-  "container/dark/background": "#282833",
-  "container/light/background": "#ffffff",
-  "text/dark/on-light": "#13131a",
-  "text/light/on-dark": "#ffffff",
-  "radius/box": "2px",
-  "shadow/1": "0px 1px 2px rgba(113,113,128,0.08)",
-  "shadow/2": "0px 12px 10px rgba(113,113,128,0.1)",
+  "surface/background/lvl6": "var(--surface-background-lvl6)",
+  "surface/background/lvl1": "var(--surface-background-lvl1)",
+  "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+  "surface/foreground/static/neutral/inversed": "var(--surface-foreground-static-neutral-inversed)",
+  "Radiuses/small": "var(--radiuses-small)",
+  "numbers/16": "var(--numbers-16)",
+  "numbers/4": "var(--numbers-4)",
+  "odd_numbers/10": "var(--odd-numbers-10)",
+  "Body Md/Regular": "var(--body-md-regular-size)",
+  "shadow/lvl8": "var(--shadow-lvl8)",
+  "shadow/lvl10": "var(--shadow-lvl10)",
 };
 
 const standardConfig: PlaygroundConfig = {
@@ -681,9 +685,12 @@ const interactiveConfig: PlaygroundConfig = {
   ),
   tokens: {
     ...tooltipTokens,
-    "container/footer/muted": "#4b4b59",
-    "border/divider": "#e1e1e8",
-    "link/brand": "#7c33b5",
+    "container/dynamic/neutral/bold/background/default": "var(--container-dynamic-neutral-bold-background-default)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "border/dynamic/brand/default": "var(--border-dynamic-brand-default)",
+    "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
+    "[old]Stroke Thickness/1": "var(--old-stroke-thickness-1)",
+    "Body Md/Medium": "var(--body-md-medium-size)",
   },
 };
 
@@ -717,12 +724,16 @@ const numberConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "container/light-purple/background": "#717180",
-    "container/light/background": "#ffffff",
-    "container/dark/background": "#282833",
-    "container/disabled/background": "rgba(113,113,128,0.1)",
-    "text/disabled": "#a8a8b2",
-    "radius/box": "2px",
+    "surface/background/lvl5": "var(--surface-background-lvl5)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "surface/background/lvl6": "var(--surface-background-lvl6)",
+    "container/dynamic/neutral/subtle/background/disabled": "var(--container-dynamic-neutral-subtle-background-disabled)",
+    "surface/foreground/dynamic/neutral/disabled": "var(--surface-foreground-dynamic-neutral-disabled)",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/static/neutral/inversed": "var(--surface-foreground-static-neutral-inversed)",
+    "Radiuses/small": "var(--radiuses-small)",
+    "numbers/4": "var(--numbers-4)",
+    "Body Sm/Medium": "var(--body-sm-medium-size)",
   },
 };
 

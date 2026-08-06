@@ -1,0 +1,74 @@
+{
+  "Body Md/Regular": {
+    "cssVar": "--body-md-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 14, weight: 400, lineHeight: 20, letterSpacing: 0)"
+  },
+  "Radiuses/small": {
+    "cssVar": "--radiuses-small",
+    "value": "2"
+  },
+  "[old]Sizing/34": {
+    "cssVar": "--old-sizing-34",
+    "value": "34"
+  },
+  "[old]Stroke Thickness/1": {
+    "cssVar": "--old-stroke-thickness-1",
+    "value": "1"
+  },
+  "border/dynamic/brand/default": {
+    "cssVar": "--border-dynamic-brand-default",
+    "value": "#7c33b5"
+  },
+  "border/dynamic/neutral/subtle/default": {
+    "cssVar": "--border-dynamic-neutral-subtle-default",
+    "value": "#c6c6cc"
+  },
+  "border/dynamic/neutral/subtle/disabled": {
+    "cssVar": "--border-dynamic-neutral-subtle-disabled",
+    "value": "#e1e1e8"
+  },
+  "border/dynamic/neutral/subtle/hover": {
+    "cssVar": "--border-dynamic-neutral-subtle-hover",
+    "value": "#a8a8b2"
+  },
+  "container/dynamic/brand/subtle/foreground/delected": {
+    "cssVar": "--container-dynamic-brand-subtle-foreground-delected",
+    "value": "#7c33b5"
+  },
+  "container/dynamic/neutral/subtle/background/default/regular": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-default-regular",
+    "value": "#ffffff"
+  },
+  "container/dynamic/neutral/subtle/background/disabled": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-disabled",
+    "value": "#7171801a"
+  },
+  "container/dynamic/neutral/subtle/background/hover": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-hover",
+    "value": "#71718014"
+  },
+  "container/dynamic/neutral/subtle/foreground/default/regular": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-default-regular",
+    "value": "#4b4b59"
+  },
+  "container/dynamic/neutral/subtle/foreground/default/variation": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-default-variation",
+    "value": "#13131a"
+  },
+  "container/dynamic/neutral/subtle/foreground/disabled": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-disabled",
+    "value": "#a8a8b2"
+  },
+  "numbers/6": {
+    "cssVar": "--numbers-6",
+    "value": "6"
+  },
+  "numbers/8": {
+    "cssVar": "--numbers-8",
+    "value": "8"
+  },
+  "odd_numbers/10": {
+    "cssVar": "--odd-numbers-10",
+    "value": "10"
+  }
+}

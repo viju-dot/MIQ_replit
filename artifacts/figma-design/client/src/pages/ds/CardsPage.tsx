@@ -38,12 +38,12 @@ function DragSection({
   return (
     <div className="flex items-center self-stretch shrink-0">
       <div
-        className={`flex h-full w-[40px] items-center justify-center border-r border-solid border-[#e1e1e8] rounded-l-[2px] shrink-0 ${
+        className={`flex h-full w-[40px] items-center justify-center border-r border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] rounded-l-[var(--radius-25,2px)] shrink-0 ${
           hover
-            ? "bg-[rgba(113,113,128,0.08)]"
+            ? "bg-[var(--surface-background-hover,rgba(113,113,128,0.08))]"
             : disabled
               ? ""
-              : "bg-white"
+              : "bg-[var(--surface-background-lvl1,#ffffff)]"
         }`}
       >
         <span className="flex items-center justify-center shrink-0 w-[24px] h-[24px] overflow-hidden">
@@ -57,17 +57,19 @@ function DragSection({
 /* Small solid brand button */
 function BtnCompactSolid({ disabled = false }: { disabled?: boolean }) {
   return (
-    <div className="flex h-[24px] items-start rounded-[2px] shrink-0">
+    <div className="flex h-[24px] items-start rounded-[var(--radius-25,2px)] shrink-0">
       <div
-        className={`flex h-[24px] items-center justify-center pl-[6px] pr-[6px] py-[2px] rounded-[2px] shrink-0 ${
-          disabled ? "bg-[rgba(113,113,128,0.1)]" : "bg-[#7c33b5]"
+        className={`flex h-[24px] items-center justify-center pl-[var(--spacing-75,6px)] pr-[var(--spacing-75,6px)] py-[2px] rounded-[var(--radius-25,2px)] shrink-0 ${
+          disabled ? "bg-[rgba(113,113,128,0.1)]" : "bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)]"
         }`}
       >
         <p
-          className="font-medium leading-[20px] text-[14px] text-center whitespace-nowrap"
+          className="font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-center whitespace-nowrap"
           style={{
             fontFamily: '"DM Sans", Helvetica',
-            color: disabled ? "#a8a8b2" : "white",
+            color: disabled
+              ? "var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)"
+              : "var(--container-dynamic-brand-bold-foreground-default,#ffffff)",
           }}
         >
           Compact
@@ -80,17 +82,19 @@ function BtnCompactSolid({ disabled = false }: { disabled?: boolean }) {
 /* Small outline button */
 function BtnCompactOutline({ disabled = false }: { disabled?: boolean }) {
   return (
-    <div className="flex h-[24px] items-start rounded-[2px] shrink-0">
+    <div className="flex h-[24px] items-start rounded-[var(--radius-25,2px)] shrink-0">
       <div
-        className={`flex h-[24px] items-center justify-center pl-[6px] pr-[6px] py-[2px] rounded-[2px] border border-solid shrink-0 ${
-          disabled ? "border-[#a8a8b2]" : "border-[#4b4b59]"
+        className={`flex h-[24px] items-center justify-center pl-[var(--spacing-75,6px)] pr-[var(--spacing-75,6px)] py-[2px] rounded-[var(--radius-25,2px)] border border-solid shrink-0 ${
+          disabled ? "border-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)]" : "border-[var(--border-dynamic-neutral-bold-default,#4b4b59)]"
         }`}
       >
         <p
-          className="font-medium leading-[20px] text-[14px] text-center whitespace-nowrap"
+          className="font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-center whitespace-nowrap"
           style={{
             fontFamily: '"DM Sans", Helvetica',
-            color: disabled ? "#a8a8b2" : "#4b4b59",
+            color: disabled
+              ? "var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)"
+              : "var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)",
           }}
         >
           Compact
@@ -104,10 +108,12 @@ function LinkButton({ disabled = false }: { disabled?: boolean }) {
   return (
     <div className="flex items-start shrink-0">
       <p
-        className="font-medium leading-[20px] text-[14px] text-center whitespace-nowrap"
+        className="font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-center whitespace-nowrap"
         style={{
           fontFamily: '"DM Sans", Helvetica',
-          color: disabled ? "#a8a8b2" : "#7c33b5",
+          color: disabled
+            ? "var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)"
+            : "var(--surface-foreground-dynamic-brand-default,#7c33b5)",
         }}
       >
         Link
@@ -118,7 +124,7 @@ function LinkButton({ disabled = false }: { disabled?: boolean }) {
 
 function IconButton({ src = STAR, size = 20 }: { src?: string; size?: number }) {
   return (
-    <div className="flex items-center p-[2px] rounded-[2px] shrink-0">
+    <div className="flex items-center p-[2px] rounded-[var(--radius-25,2px)] shrink-0">
       <StarIcon size={size} src={src} />
     </div>
   );
@@ -127,13 +133,13 @@ function IconButton({ src = STAR, size = 20 }: { src?: string; size?: number }) 
 /* Card footer used inside Smart Card / Smart Wide Card */
 function CardFooter({ disabled = false }: { disabled?: boolean }) {
   return (
-    <div className="flex flex-wrap content-end items-end justify-between overflow-hidden border-t border-solid border-[#e1e1e8] p-[16px] w-full shrink-0 gap-2">
-      <div className="flex gap-[8px] items-center shrink-0">
+    <div className="flex flex-wrap content-end items-end justify-between overflow-hidden border-t border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] p-[var(--spacing-200,16px)] w-full shrink-0 gap-2">
+      <div className="flex gap-[var(--spacing-100,8px)] items-center shrink-0">
         <IconButton src={disabled ? STAR_DISABLED : STAR} />
         <BtnCompactSolid disabled={disabled} />
         <LinkButton disabled={disabled} />
       </div>
-      <div className="flex gap-[8px] items-center justify-end shrink-0">
+      <div className="flex gap-[var(--spacing-100,8px)] items-center justify-end shrink-0">
         <LinkButton disabled={disabled} />
         <BtnCompactOutline disabled={disabled} />
         <BtnCompactSolid disabled={disabled} />
@@ -151,17 +157,19 @@ function CardHeader({
   disabled?: boolean;
   rightTab?: boolean;
 }) {
-  const titleColor = disabled ? "#a8a8b2" : "#13131a";
+  const titleColor = disabled
+    ? "var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)"
+    : "var(--surface-foreground-static-neutral-lvl1,#13131a)";
   const starSrc = disabled ? STAR_DISABLED : STAR;
   if (rightTab) {
     return (
       <div className="flex flex-col w-full">
-        <div className="flex flex-wrap content-end items-end gap-[8px] px-[16px] w-full">
-          <div className="flex flex-1 min-w-0 items-center gap-[8px] py-[16px]">
+        <div className="flex flex-wrap content-end items-end gap-[var(--spacing-100,8px)] px-[var(--spacing-200,16px)] w-full">
+          <div className="flex flex-1 min-w-0 items-center gap-[var(--spacing-100,8px)] py-[var(--spacing-200,16px)]">
             <IconButton src={starSrc} />
-            <div className="flex flex-1 min-w-0 items-center gap-[8px] pr-[8px]">
+            <div className="flex flex-1 min-w-0 items-center gap-[var(--spacing-100,8px)] pr-[var(--spacing-100,8px)]">
               <p
-                className="font-medium leading-[24px] text-[16px] tracking-[-0.08px] whitespace-nowrap"
+                className="font-medium leading-[var(--headline-xs-medium-line-height,24px)] text-[length:var(--headline-xs-medium-size,16px)] tracking-[-0.08px] whitespace-nowrap"
                 style={{ fontFamily: '"DM Sans", Helvetica', color: titleColor }}
               >
                 Card Title
@@ -170,41 +178,41 @@ function CardHeader({
             </div>
           </div>
           <div className="flex items-end justify-center shrink-0">
-            <div className="flex flex-col items-center justify-end gap-[8px]">
-              <div className="flex items-center px-[16px]">
+            <div className="flex flex-col items-center justify-end gap-[var(--spacing-100,8px)]">
+              <div className="flex items-center px-[var(--spacing-200,16px)]">
                 <p
-                  className="leading-[20px] text-[14px] whitespace-nowrap"
-                  style={{ fontFamily: '"DM Sans", Helvetica', color: "#7c33b5" }}
+                  className="leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] whitespace-nowrap"
+                  style={{ fontFamily: '"DM Sans", Helvetica', color: "var(--surface-foreground-dynamic-brand-default,#7c33b5)" }}
                 >
                   Tab
                 </p>
               </div>
-              <div className="w-full h-0 border-t border-solid border-[#7c33b5]" />
+              <div className="w-full h-0 border-t border-solid border-[var(--border-dynamic-brand-selected,#7c33b5)]" />
             </div>
-            <div className="flex flex-col items-center justify-end gap-[8px]">
-              <div className="flex items-center px-[16px]">
+            <div className="flex flex-col items-center justify-end gap-[var(--spacing-100,8px)]">
+              <div className="flex items-center px-[var(--spacing-200,16px)]">
                 <p
-                  className="leading-[20px] text-[14px] whitespace-nowrap"
-                  style={{ fontFamily: '"DM Sans", Helvetica', color: "#13131a" }}
+                  className="leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] whitespace-nowrap"
+                  style={{ fontFamily: '"DM Sans", Helvetica', color: "var(--surface-foreground-static-neutral-lvl1,#13131a)" }}
                 >
                   Tab
                 </p>
               </div>
-              <div className="w-full h-0 border-t border-solid border-[#e1e1e8]" />
+              <div className="w-full h-0 border-t border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)]" />
             </div>
           </div>
         </div>
-        <div className="w-full h-0 border-t border-solid border-[#e1e1e8]" />
+        <div className="w-full h-0 border-t border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)]" />
       </div>
     );
   }
   return (
     <div className="flex flex-col w-full">
-      <div className="flex items-center gap-[8px] p-[16px] w-full">
+      <div className="flex items-center gap-[var(--spacing-100,8px)] p-[var(--spacing-200,16px)] w-full">
         <IconButton src={starSrc} />
-        <div className="flex flex-1 min-w-0 items-center gap-[8px] pr-[8px]">
+        <div className="flex flex-1 min-w-0 items-center gap-[var(--spacing-100,8px)] pr-[var(--spacing-100,8px)]">
           <p
-            className="font-medium leading-[24px] text-[16px] tracking-[-0.08px] whitespace-nowrap"
+            className="font-medium leading-[var(--headline-xs-medium-line-height,24px)] text-[length:var(--headline-xs-medium-size,16px)] tracking-[-0.08px] whitespace-nowrap"
             style={{ fontFamily: '"DM Sans", Helvetica', color: titleColor }}
           >
             Card Title
@@ -213,7 +221,7 @@ function CardHeader({
         </div>
         <IconButton src={starSrc} />
       </div>
-      <div className="w-full h-0 border-t border-solid border-[#e1e1e8]" />
+      <div className="w-full h-0 border-t border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)]" />
     </div>
   );
 }
@@ -222,7 +230,7 @@ function CardHeader({
 function PlaceholderBox({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`bg-[rgba(209,148,255,0.2)] border border-dashed border-[#d194ff] w-full ${className}`}
+      className={`bg-[rgba(209,148,255,0.2)] border border-dashed border-[var(--colours-blue-300,#d194ff)] w-full ${className}`}
     />
   );
 }
@@ -247,16 +255,16 @@ function SmartCard({
   const isHover = state === "hover";
 
   const shadow = isHover
-    ? "0px 1px 4px 0px rgba(113,113,128,0.08), 0px 12px 20px 0px rgba(113,113,128,0.1)"
+    ? "0px 1px 4px 0px var(--shadow-lvl8,rgba(113,113,128,0.08)), 0px 12px 20px 0px var(--shadow-lvl10,rgba(113,113,128,0.1))"
     : isSelected
-      ? "0px 1px 4px 0px rgba(113,113,128,0.08), 0px 16px 24px 0px rgba(113,113,128,0.12)"
-      : "0px 1px 4px 0px rgba(113,113,128,0.08), 0px 8px 16px 0px rgba(113,113,128,0.04)";
+      ? "0px 1px 4px 0px var(--shadow-lvl8,rgba(113,113,128,0.08)), 0px 16px 24px 0px var(--shadow-lvl12,rgba(113,113,128,0.12))"
+      : "0px 1px 4px 0px var(--shadow-lvl8,rgba(113,113,128,0.08)), 0px 8px 16px 0px var(--shadow-lvl4,rgba(113,113,128,0.04))";
 
   return (
     <div
-      className={`flex items-start min-w-[180px] overflow-hidden rounded-[2px] ${
-        isDisabled ? "bg-[rgba(113,113,128,0.1)]" : "bg-white"
-      } ${isSelected ? "border border-solid border-[#7c33b5]" : ""}`}
+      className={`flex items-start min-w-[180px] overflow-hidden rounded-[var(--radius-25,2px)] ${
+        isDisabled ? "bg-[rgba(113,113,128,0.1)]" : "bg-[var(--surface-background-lvl1,#ffffff)]"
+      } ${isSelected ? "border border-solid border-[var(--border-dynamic-brand-selected,#7c33b5)]" : ""}`}
       style={{ boxShadow: shadow }}
     >
       {showDragSection && (
@@ -264,7 +272,7 @@ function SmartCard({
       )}
       <div className="flex flex-col items-start w-[400px]">
         {showHeader && <CardHeader disabled={isDisabled} />}
-        <div className="flex flex-col gap-[8px] items-start p-[16px] w-full">
+        <div className="flex flex-col gap-[var(--spacing-100,8px)] items-start p-[var(--spacing-200,16px)] w-full">
           <PlaceholderBox className="h-[193px]" />
         </div>
         {showFooter && <CardFooter disabled={isDisabled} />}
@@ -286,15 +294,15 @@ type WideStyle =
 
 function WideTitleRow({ multipleIcons = false }: { multipleIcons?: boolean }) {
   return (
-    <div className="flex items-center gap-[8px] w-full">
+    <div className="flex items-center gap-[var(--spacing-100,8px)] w-full">
       <p
-        className="flex-1 min-w-0 font-medium leading-[24px] text-[16px] tracking-[-0.08px]"
-        style={{ fontFamily: '"DM Sans", Helvetica', color: "#13131a" }}
+        className="flex-1 min-w-0 font-medium leading-[var(--headline-xs-medium-line-height,24px)] text-[length:var(--headline-xs-medium-size,16px)] tracking-[-0.08px]"
+        style={{ fontFamily: '"DM Sans", Helvetica', color: "var(--surface-foreground-static-neutral-lvl1,#13131a)" }}
       >
         Card Title
       </p>
       {multipleIcons ? (
-        <div className="flex items-center gap-[8px] shrink-0">
+        <div className="flex items-center gap-[var(--spacing-100,8px)] shrink-0">
           <StarIcon size={24} src={STAR_24} />
           <StarIcon size={24} src={STAR_24} />
           <StarIcon size={24} src={STAR_24} />
@@ -309,8 +317,8 @@ function WideTitleRow({ multipleIcons = false }: { multipleIcons?: boolean }) {
 function WideDescription() {
   return (
     <p
-      className="flex-1 min-w-0 leading-[20px] text-[14px] w-full"
-      style={{ fontFamily: '"DM Sans", Helvetica', color: "#13131a" }}
+      className="flex-1 min-w-0 leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] w-full"
+      style={{ fontFamily: '"DM Sans", Helvetica', color: "var(--surface-foreground-static-neutral-lvl1,#13131a)" }}
     >
       Example Text
     </p>
@@ -325,13 +333,13 @@ function SmartWideCard({
   footer?: boolean;
 }) {
   const cardShadow =
-    "drop-shadow(0px 1px 2px rgba(113,113,128,0.08)) drop-shadow(0px 8px 8px rgba(113,113,128,0.04))";
+    "drop-shadow(0px 1px 2px var(--shadow-lvl8,rgba(113,113,128,0.08))) drop-shadow(0px 8px 8px var(--shadow-lvl4,rgba(113,113,128,0.04)))";
 
   /* Simple / Simple Filled / Draggable: placeholder only */
   if (style === "Simple" || style === "Simple Filled" || style === "Draggable") {
     return (
       <div
-        className="flex items-start bg-white rounded-[2px] w-full p-[16px] gap-[16px]"
+        className="flex items-start bg-[var(--surface-background-lvl1,#ffffff)] rounded-[var(--radius-25,2px)] w-full p-[var(--spacing-200,16px)] gap-[var(--spacing-200,16px)]"
         style={{ filter: cardShadow }}
       >
         {style === "Draggable" && (
@@ -339,10 +347,10 @@ function SmartWideCard({
             <img alt="" className="block max-w-none w-full h-full" src={DRAG} />
           </span>
         )}
-        <div className="flex flex-col gap-[16px] flex-1 min-w-0">
+        <div className="flex flex-col gap-[var(--spacing-200,16px)] flex-1 min-w-0">
           <PlaceholderBox className="h-[80px]" />
           {footer && (
-            <div className="flex items-center justify-end gap-[8px]">
+            <div className="flex items-center justify-end gap-[var(--spacing-100,8px)]">
               <LinkButton />
               <BtnCompactOutline />
               <BtnCompactSolid />
@@ -357,18 +365,18 @@ function SmartWideCard({
   if (style === "Line") {
     return (
       <div
-        className="flex flex-col gap-[16px] bg-white rounded-[2px] w-full py-[16px]"
+        className="flex flex-col gap-[var(--spacing-200,16px)] bg-[var(--surface-background-lvl1,#ffffff)] rounded-[var(--radius-25,2px)] w-full py-[var(--spacing-200,16px)]"
         style={{ filter: cardShadow }}
       >
-        <div className="px-[16px]">
+        <div className="px-[var(--spacing-200,16px)]">
           <WideTitleRow />
         </div>
-        <div className="w-full h-0 border-t border-solid border-[#e1e1e8]" />
-        <div className="px-[16px]">
+        <div className="w-full h-0 border-t border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)]" />
+        <div className="px-[var(--spacing-200,16px)]">
           <PlaceholderBox className="h-[60px]" />
         </div>
         {footer && (
-          <div className="flex items-center justify-end gap-[8px] px-[16px]">
+          <div className="flex items-center justify-end gap-[var(--spacing-100,8px)] px-[var(--spacing-200,16px)]">
             <LinkButton />
             <BtnCompactOutline />
             <BtnCompactSolid />
@@ -382,32 +390,32 @@ function SmartWideCard({
   if (style === "Line Filled") {
     return (
       <div
-        className="flex flex-col gap-[16px] bg-white rounded-[2px] w-full py-[16px]"
+        className="flex flex-col gap-[var(--spacing-200,16px)] bg-[var(--surface-background-lvl1,#ffffff)] rounded-[var(--radius-25,2px)] w-full py-[var(--spacing-200,16px)]"
         style={{ filter: cardShadow }}
       >
-        <div className="flex items-start justify-between px-[16px]">
-          <div className="flex items-center gap-[8px]">
+        <div className="flex items-start justify-between px-[var(--spacing-200,16px)]">
+          <div className="flex items-center gap-[var(--spacing-100,8px)]">
             <StarIcon size={24} src={STAR_24} />
             <p
-              className="font-medium leading-[19px] text-[16px] tracking-[-0.32px]"
-              style={{ fontFamily: '"DM Sans", Helvetica', color: "#13131a" }}
+              className="font-medium leading-[19px] text-[length:var(--headline-xs-medium-size,16px)] tracking-[-0.32px]"
+              style={{ fontFamily: '"DM Sans", Helvetica', color: "var(--surface-foreground-static-neutral-lvl1,#13131a)" }}
             >
               Card Title
             </p>
           </div>
-          <div className="flex items-center gap-[8px] shrink-0">
+          <div className="flex items-center gap-[var(--spacing-100,8px)] shrink-0">
             <StarIcon size={24} src={STAR_24} />
             <StarIcon size={24} src={STAR_24} />
             <StarIcon size={24} src={STAR_24} />
           </div>
         </div>
-        <div className="w-full h-0 border-t border-solid border-[#e1e1e8]" />
+        <div className="w-full h-0 border-t border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)]" />
         {footer && (
           <>
-            <div className="px-[16px]">
+            <div className="px-[var(--spacing-200,16px)]">
               <WideDescription />
             </div>
-            <div className="px-[16px]">
+            <div className="px-[var(--spacing-200,16px)]">
               <CardFooter />
             </div>
           </>
@@ -420,28 +428,28 @@ function SmartWideCard({
   if (style === "Box Filled") {
     return (
       <div
-        className="flex flex-col gap-[16px] bg-white rounded-[2px] w-full p-[16px]"
+        className="flex flex-col gap-[var(--spacing-200,16px)] bg-[var(--surface-background-lvl1,#ffffff)] rounded-[var(--radius-25,2px)] w-full p-[var(--spacing-200,16px)]"
         style={{ filter: cardShadow }}
       >
         <div className="flex items-start justify-between">
           {footer && (
             <StarIcon size={24} src={STAR_24} />
           )}
-          <div className="flex flex-1 min-w-0 items-start justify-end gap-[8px]">
+          <div className="flex flex-1 min-w-0 items-start justify-end gap-[var(--spacing-100,8px)]">
             <p
-              className="flex-1 min-w-0 font-medium leading-[19px] text-[16px] tracking-[-0.32px] pl-[8px] pr-[10px] pt-[3px] pb-[2px]"
-              style={{ fontFamily: '"DM Sans", Helvetica', color: "#13131a" }}
+              className="flex-1 min-w-0 font-medium leading-[19px] text-[length:var(--headline-xs-medium-size,16px)] tracking-[-0.32px] pl-[var(--spacing-100,8px)] pr-[10px] pt-[3px] pb-[2px]"
+              style={{ fontFamily: '"DM Sans", Helvetica', color: "var(--surface-foreground-static-neutral-lvl1,#13131a)" }}
             >
               Card Title
             </p>
-            <div className="flex items-center gap-[8px] shrink-0">
+            <div className="flex items-center gap-[var(--spacing-100,8px)] shrink-0">
               <StarIcon size={24} src={STAR_24} />
               <StarIcon size={24} src={STAR_24} />
               <StarIcon size={24} src={STAR_24} />
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-[8px] items-start p-[16px] border border-solid border-[#e1e1e8] w-full">
+        <div className="flex flex-col gap-[var(--spacing-100,8px)] items-start p-[var(--spacing-200,16px)] border border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] w-full">
           <WideDescription />
         </div>
         {footer && <CardFooter />}
@@ -452,13 +460,13 @@ function SmartWideCard({
   /* Box: title row, bordered box, optional footer */
   return (
     <div
-      className="flex flex-col items-start bg-white rounded-[2px] w-full p-[16px] gap-[16px]"
+      className="flex flex-col items-start bg-[var(--surface-background-lvl1,#ffffff)] rounded-[var(--radius-25,2px)] w-full p-[var(--spacing-200,16px)] gap-[var(--spacing-200,16px)]"
       style={{ filter: cardShadow }}
     >
       <WideTitleRow />
-      <PlaceholderBox className="flex-1 min-h-[80px] border-solid border-[#e1e1e8]" />
+      <PlaceholderBox className="flex-1 min-h-[80px] border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)]" />
       {footer && (
-        <div className="flex items-center justify-end gap-[8px] w-full">
+        <div className="flex items-center justify-end gap-[var(--spacing-100,8px)] w-full">
           <LinkButton />
           <BtnCompactOutline />
           <BtnCompactSolid />
@@ -480,14 +488,14 @@ function StandaloneFooter({
   return (
     <div className="flex flex-wrap content-end items-end justify-between gap-2 w-full max-w-[368px]">
       {leftFooter && (
-        <div className="flex gap-[8px] items-center shrink-0">
+        <div className="flex gap-[var(--spacing-100,8px)] items-center shrink-0">
           <IconButton src={STAR} />
           <BtnCompactSolid />
           <LinkButton />
         </div>
       )}
       {rightFooter && (
-        <div className="flex gap-[8px] items-center justify-end shrink-0">
+        <div className="flex gap-[var(--spacing-100,8px)] items-center justify-end shrink-0">
           <LinkButton />
           <BtnCompactOutline />
           <BtnCompactSolid />
@@ -506,15 +514,15 @@ function CardContent({
 }) {
   if (type === "box with line") {
     return (
-      <div className="flex flex-col gap-[8px] items-start bg-white p-[16px] w-[368px] h-[225px]">
+      <div className="flex flex-col gap-[var(--spacing-100,8px)] items-start bg-[var(--surface-background-lvl1,#ffffff)] p-[var(--spacing-200,16px)] w-[368px] h-[225px]">
         <PlaceholderBox className="flex-1 min-h-0" />
       </div>
     );
   }
   if (type === "outlined box") {
     return (
-      <div className="flex flex-col items-center pb-[16px] px-[16px] bg-white w-[368px]">
-        <div className="flex flex-col items-start p-[16px] h-[209px] border border-solid border-[#e1e1e8] w-full">
+      <div className="flex flex-col items-center pb-[var(--spacing-200,16px)] px-[var(--spacing-200,16px)] bg-[var(--surface-background-lvl1,#ffffff)] w-[368px]">
+        <div className="flex flex-col items-start p-[var(--spacing-200,16px)] h-[209px] border border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] w-full">
           <PlaceholderBox className="flex-1 min-h-0" />
         </div>
       </div>
@@ -522,11 +530,11 @@ function CardContent({
   }
   /* two box */
   return (
-    <div className="flex flex-col items-start p-[16px] bg-white w-[368px] h-[169px]">
-      <div className="flex flex-1 flex-col items-start p-[16px] border border-solid border-[#e1e1e8] w-full min-h-0 -mb-px">
+    <div className="flex flex-col items-start p-[var(--spacing-200,16px)] bg-[var(--surface-background-lvl1,#ffffff)] w-[368px] h-[169px]">
+      <div className="flex flex-1 flex-col items-start p-[var(--spacing-200,16px)] border border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] w-full min-h-0 -mb-px">
         <PlaceholderBox className="flex-1 min-h-0" />
       </div>
-      <div className="flex flex-1 flex-col items-start p-[16px] border border-solid border-[#e1e1e8] w-full min-h-0">
+      <div className="flex flex-1 flex-col items-start p-[var(--spacing-200,16px)] border border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] w-full min-h-0">
         <PlaceholderBox className="flex-1 min-h-0" />
       </div>
     </div>
@@ -540,8 +548,8 @@ function SwapInstance({ type = "container" }: { type?: "container" | "text" }) {
     return (
       <div className="flex items-center w-[200px] h-[168px]">
         <p
-          className="flex-1 min-w-0 leading-[20px] text-[14px]"
-          style={{ fontFamily: '"DM Sans", Helvetica', color: "#13131a" }}
+          className="flex-1 min-w-0 leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)]"
+          style={{ fontFamily: '"DM Sans", Helvetica', color: "var(--surface-foreground-static-neutral-lvl1,#13131a)" }}
         >
           Text
         </p>
@@ -549,7 +557,7 @@ function SwapInstance({ type = "container" }: { type?: "container" | "text" }) {
     );
   }
   return (
-    <div className="bg-[rgba(209,148,255,0.2)] border border-dashed border-[#d194ff] w-[200px] h-[168px]" />
+    <div className="bg-[rgba(209,148,255,0.2)] border border-dashed border-[var(--colours-blue-300,#d194ff)] w-[200px] h-[168px]" />
   );
 }
 
@@ -557,32 +565,32 @@ function SwapInstance({ type = "container" }: { type?: "container" | "text" }) {
 
 function TermsPolicyCard() {
   return (
-    <div className="relative flex flex-col items-start rounded-[2px] w-full max-w-[588px] min-h-[248px]">
-      <div className="flex gap-[10px] items-start pb-[16px] pt-[72px] px-[16px] w-full">
+    <div className="relative flex flex-col items-start rounded-[var(--radius-25,2px)] w-full max-w-[588px] min-h-[248px]">
+      <div className="flex gap-[10px] items-start pb-[var(--spacing-200,16px)] pt-[72px] px-[var(--spacing-200,16px)] w-full">
         <div className="absolute left-0 top-0 flex flex-col items-start w-full">
           <div
-            className="flex flex-col gap-[16px] items-start px-0 py-[16px] bg-white rounded-[2px] w-full"
+            className="flex flex-col gap-[var(--spacing-200,16px)] items-start px-0 py-[var(--spacing-200,16px)] bg-[var(--surface-background-lvl1,#ffffff)] rounded-[var(--radius-25,2px)] w-full"
             style={{
               filter:
-                "drop-shadow(0px 1px 2px rgba(113,113,128,0.08)) drop-shadow(0px 8px 8px rgba(113,113,128,0.04))",
+                "drop-shadow(0px 1px 2px var(--shadow-lvl8,rgba(113,113,128,0.08))) drop-shadow(0px 8px 8px var(--shadow-lvl4,rgba(113,113,128,0.04)))",
             }}
           >
-            <div className="flex flex-wrap content-start gap-[8px] items-start px-[16px] w-full">
+            <div className="flex flex-wrap content-start gap-[var(--spacing-100,8px)] items-start px-[var(--spacing-200,16px)] w-full">
               <div className="flex flex-1 min-w-0 items-center pr-[10px]">
                 <p
-                  className="flex-1 min-w-0 font-medium leading-[24px] text-[16px] tracking-[-0.08px]"
-                  style={{ fontFamily: '"DM Sans", Helvetica', color: "#13131a" }}
+                  className="flex-1 min-w-0 font-medium leading-[var(--headline-xs-medium-line-height,24px)] text-[length:var(--headline-xs-medium-size,16px)] tracking-[-0.08px]"
+                  style={{ fontFamily: '"DM Sans", Helvetica', color: "var(--surface-foreground-static-neutral-lvl1,#13131a)" }}
                 >
                   Privacy Statement
                 </p>
               </div>
             </div>
-            <div className="w-full h-0 border-t border-solid border-[#e1e1e8]" />
+            <div className="w-full h-0 border-t border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)]" />
           </div>
         </div>
         <p
-          className="flex-1 min-w-0 leading-[20px] text-[14px]"
-          style={{ fontFamily: '"DM Sans", Helvetica', color: "#13131a" }}
+          className="flex-1 min-w-0 leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)]"
+          style={{ fontFamily: '"DM Sans", Helvetica', color: "var(--surface-foreground-static-neutral-lvl1,#13131a)" }}
         >
           {`MiQ Digital Limited (“MiQ” or “we” or “us” or “our”) is committed to protecting the personal data of individuals whose personal data we process. This Statement is incorporated by reference into our MiQ Privacy Policy which is located at https://www.wearemiq.com/privacy-and-compliance/privacy-policy/ (“Privacy Policy”) MiQ is committed to working with you to obtain a fair and rapid resolution of any queries, complaints, or disputes about privacy. If you should have any questions about this Policy, our Privacy Policy or our information collection, retention, use and sharing practices, please contact us at privacy@miqdigital.com.`}
         </p>
@@ -635,14 +643,13 @@ const smartCardConfig: PlaygroundConfig = {
     );
   },
   tokens: {
-    "container/background": "#ffffff",
-    "container/disabled/background": "rgba(113,113,128,0.1)",
-    "border/brand/selected": "#7c33b5",
-    "border/neutral/subtle": "#e1e1e8",
-    "radius/card": "2px",
-    "shadow/hover": "0px 12px 20px rgba(113,113,128,0.1)",
-    "shadow/selected": "0px 16px 24px rgba(113,113,128,0.12)",
-    "size/content-width": "400px",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "border/dynamic/brand/selected": "var(--border-dynamic-brand-selected)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "radius/25": "var(--radius-25)",
+    "Elevation Hover": "var(--elevation-hover)",
+    "Elevation Selected": "var(--elevation-selected)",
+    "Elevation Regular": "var(--elevation-regular)",
   },
 };
 
@@ -677,12 +684,13 @@ const smartWideCardConfig: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "container/background": "#ffffff",
-    "border/neutral/subtle": "#e1e1e8",
-    "radius/card": "2px",
-    "spacing/padding": "16px",
-    "spacing/gap": "16px",
-    "shadow/card": "0px 8px 8px rgba(113,113,128,0.04)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "radius/25": "var(--radius-25)",
+    "spacing/200": "var(--spacing-200)",
+    "spacing/100": "var(--spacing-100)",
+    "shadow/lvl8": "var(--shadow-lvl8)",
+    "shadow/lvl4": "var(--shadow-lvl4)",
   },
 };
 
@@ -694,7 +702,7 @@ const headerConfig: PlaygroundConfig = {
     { kind: "boolean", name: "disabled", label: "Disabled", defaultValue: false },
   ],
   render: (props) => (
-    <div className="w-[400px] max-w-full bg-white">
+    <div className="w-[400px] max-w-full bg-[var(--surface-background-lvl1,#ffffff)]">
       <CardHeader
         rightTab={props.rightTab === true}
         disabled={props.disabled === true}
@@ -702,12 +710,13 @@ const headerConfig: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "text/title": "#13131a",
-    "text/title/disabled": "#a8a8b2",
-    "text/brand/tab-active": "#7c33b5",
-    "border/neutral/subtle": "#e1e1e8",
-    "border/brand/tab-active": "#7c33b5",
-    "spacing/padding": "16px",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/dynamic/neutral/disabled": "var(--surface-foreground-dynamic-neutral-disabled)",
+    "surface/foreground/dynamic/brand/default": "var(--surface-foreground-dynamic-brand-default)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "border/dynamic/brand/selected": "var(--border-dynamic-brand-selected)",
+    "spacing/200": "var(--spacing-200)",
+    "spacing/100": "var(--spacing-100)",
   },
 };
 
@@ -725,10 +734,13 @@ const footerConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "container/brand/bold/background": "#7c33b5",
-    "border/neutral/bold": "#4b4b59",
-    "text/brand/link": "#7c33b5",
-    "spacing/gap": "8px",
+    "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
+    "container/dynamic/brand/bold/foreground/default": "var(--container-dynamic-brand-bold-foreground-default)",
+    "border/dynamic/neutral/bold/default": "var(--border-dynamic-neutral-bold-default)",
+    "surface/foreground/dynamic/brand/default": "var(--surface-foreground-dynamic-brand-default)",
+    "surface/foreground/dynamic/neutral/default/regular": "var(--surface-foreground-dynamic-neutral-default-regular)",
+    "surface/foreground/dynamic/neutral/disabled": "var(--surface-foreground-dynamic-neutral-disabled)",
+    "spacing/100": "var(--spacing-100)",
   },
 };
 
@@ -751,11 +763,11 @@ const contentConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "container/background": "#ffffff",
-    "border/neutral/subtle": "#e1e1e8",
-    "placeholder/fill": "rgba(209,148,255,0.2)",
-    "placeholder/border": "#d194ff",
-    "spacing/padding": "16px",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "Colours/Blue/300": "var(--colours-blue-300)",
+    "spacing/200": "var(--spacing-200)",
+    "spacing/100": "var(--spacing-100)",
   },
 };
 
@@ -776,10 +788,9 @@ const swapInstanceConfig: PlaygroundConfig = {
     <SwapInstance type={String(props.type) as "container" | "text"} />
   ),
   tokens: {
-    "placeholder/fill": "rgba(209,148,255,0.2)",
-    "placeholder/border": "#d194ff",
-    "text/body": "#13131a",
-    "size/slot": "200×168",
+    "Colours/Blue/300": "var(--colours-blue-300)",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "Body Md/Medium": "var(--body-md-medium-size)",
   },
 };
 
@@ -793,12 +804,12 @@ const termsPolicyConfig: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "container/background": "#ffffff",
-    "border/neutral/subtle": "#e1e1e8",
-    "text/title": "#13131a",
-    "text/body": "#13131a",
-    "radius/card": "2px",
-    "shadow/card": "0px 8px 8px rgba(113,113,128,0.04)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "radius/25": "var(--radius-25)",
+    "shadow/lvl8": "var(--shadow-lvl8)",
+    "shadow/lvl4": "var(--shadow-lvl4)",
   },
 };
 

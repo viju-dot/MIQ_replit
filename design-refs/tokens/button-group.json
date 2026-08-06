@@ -1,0 +1,62 @@
+{
+  "[old]Radiuses/2": {
+    "cssVar": "--old-radiuses-2",
+    "value": "2"
+  },
+  "[old]Radiuses/None": {
+    "cssVar": "--old-radiuses-none",
+    "value": "0"
+  },
+  "[old]Stroke Thickness/1": {
+    "cssVar": "--old-stroke-thickness-1",
+    "value": "1"
+  },
+  "border/dynamic/neutral/subtle/default": {
+    "cssVar": "--border-dynamic-neutral-subtle-default",
+    "value": "#c6c6cc"
+  },
+  "border/dynamic/neutral/subtle/disabled": {
+    "cssVar": "--border-dynamic-neutral-subtle-disabled",
+    "value": "#e1e1e8"
+  },
+  "container/dynamic/neutral/subtle/background/default/regular": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-default-regular",
+    "value": "#ffffff"
+  },
+  "container/dynamic/neutral/subtle/background/default/variation": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-default-variation",
+    "value": "#ebebf0"
+  },
+  "container/dynamic/neutral/subtle/background/disabled": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-disabled",
+    "value": "#7171801a"
+  },
+  "container/dynamic/neutral/subtle/background/hover": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-hover",
+    "value": "#71718014"
+  },
+  "container/dynamic/neutral/subtle/foreground/default/regular": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-default-regular",
+    "value": "#4b4b59"
+  },
+  "container/dynamic/neutral/subtle/foreground/disabled": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-disabled",
+    "value": "#a8a8b2"
+  },
+  "container/dynamic/neutral/subtle/foreground/hover": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-hover",
+    "value": "#13131a"
+  },
+  "container/dynamic/neutral/subtle/foreground/selected": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-selected",
+    "value": "#13131a"
+  },
+  "odd_numbers/-1": {
+    "cssVar": "--odd-numbers-1",
+    "value": "-1"
+  },
+  "surface/background/lvl1": {
+    "cssVar": "--surface-background-lvl1",
+    "value": "#ffffff"
+  }
+}

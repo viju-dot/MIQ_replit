@@ -1,0 +1,112 @@
+Task: Apply Figma Design Tokens & Variables Across All Components
+Context
+
+The current implementation renders the visual appearance of the components, but it is not using the original Figma Design Tokens and Variables. Most styles appear to be hardcoded or converted into static CSS values.
+
+My Design System in Figma already contains a complete token architecture, including Colors, Typography, Spacing, Radius, Borders, Elevation, Opacity, and Theme Variables.
+
+The Replit application should use these tokens as the single source of truth instead of static values.
+
+Objective
+
+Update the application so every imported component is driven by the original Figma Design Tokens and Variables.
+
+Do not hardcode any visual properties if a corresponding Figma token or variable exists.
+
+Requirements
+
+When importing components from Figma using MCP:
+
+Read all available Design Tokens.
+Read all Variables and Variable Collections.
+Preserve token relationships.
+Preserve semantic token names.
+Preserve variable references instead of converting them into fixed values.
+
+Every component should inherit its styles from these tokens.
+
+Apply Tokens To
+
+Wherever applicable, ensure components use the original Figma tokens and variables for:
+
+Colors
+Typography
+Font Sizes
+Font Weights
+Line Heights
+Letter Spacing
+Spacing
+Padding
+Margin
+Border Radius
+Border Width
+Border Colors
+Shadows
+Elevation
+Opacity
+Stroke
+Icon Colors
+Component Sizes
+Layout Values
+Motion (if available)
+
+Do not replace these values with hardcoded CSS.
+
+Theme Support
+
+Light Mode and Dark Mode should be powered entirely by the Figma Variable Collections.
+
+When switching themes:
+
+All components should update automatically.
+Colors should change through variable references.
+Typography and semantic values should remain consistent.
+No manual theme-specific styling should be required.
+Token Architecture
+
+Maintain the same token hierarchy defined in Figma.
+
+For example:
+
+Primitive Tokens
+Semantic Tokens
+Component Tokens
+Theme Variables
+
+Do not flatten or rename token structures unless absolutely necessary.
+
+Component Behavior
+
+Every imported component should reference the original tokens rather than storing copied values.
+
+For example:
+
+Instead of:
+
+background: #2C2C2C;
+border-radius: 8px;
+padding: 12px;
+
+Use the original token references, such as:
+
+background: var(--background-brand-default);
+border-radius: var(--radius-200);
+padding: var(--space-300);
+
+The implementation should remain linked to the Design System rather than relying on static values.
+
+Live Updates
+
+When a Design Token or Variable changes in the Figma Design System, the application architecture should make it possible for those changes to propagate without manually updating every component.
+
+The design tokens should serve as the foundation for all component styling.
+
+Success Criteria
+
+The implementation will be successful when:
+
+Every component uses Figma Design Tokens instead of hardcoded styles.
+Light and Dark themes are fully driven by Figma Variables.
+Typography, spacing, radius, colors, and other design decisions are inherited from the token system.
+Components remain visually identical to Figma while preserving the underlying token architecture.
+The application behaves as a true extension of the Figma Design System rather than a static recreation

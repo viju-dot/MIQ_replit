@@ -5,8 +5,8 @@ type ButtonSize = "medium" | "small";
 
 function LinkButton({ label = "Link" }: { label?: string }) {
   return (
-    <div className="flex items-center gap-1 rounded-[2px] shrink-0">
-      <p className="font-['DM_Sans:Medium',_Helvetica] font-medium leading-[20px] text-[14px] text-[#7c33b5] text-center whitespace-nowrap">
+    <div className="flex items-center gap-1 rounded-[var(--radiuses-small,2px)] shrink-0">
+      <p className="font-['DM_Sans:Medium',_Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)] text-center whitespace-nowrap">
         {label}
       </p>
     </div>
@@ -20,13 +20,16 @@ function OutlineButton({
   size?: ButtonSize;
   label?: string;
 }) {
-  const pad = size === "small" ? "px-[6px] py-[2px]" : "px-[12px] py-[7px]";
+  const pad =
+    size === "small"
+      ? "px-[var(--spacing-75,6px)] py-[var(--spacing-container-s,2px)]"
+      : "px-[var(--spacing-150,12px)] py-[var(--spacing-container-m,7px)]";
   return (
     <div
-      className={`flex items-center justify-end gap-0 rounded-[2px] border border-solid border-[#4b4b59] shrink-0 ${pad}`}
+      className={`flex items-center justify-end gap-0 rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-neutral-bold-default,#4b4b59)] shrink-0 ${pad}`}
     >
-      <div className="flex items-center justify-center gap-1 rounded-[2px] shrink-0">
-        <p className="font-['DM_Sans:Medium',_Helvetica] font-medium leading-[20px] text-[14px] text-[#4b4b59] text-center whitespace-nowrap">
+      <div className="flex items-center justify-center gap-1 rounded-[var(--radiuses-small,2px)] shrink-0">
+        <p className="font-['DM_Sans:Medium',_Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)] text-center whitespace-nowrap">
           {label}
         </p>
       </div>
@@ -41,13 +44,16 @@ function BrandButton({
   size?: ButtonSize;
   label?: string;
 }) {
-  const pad = size === "small" ? "px-[6px] py-[2px]" : "px-[12px] py-[7px]";
+  const pad =
+    size === "small"
+      ? "px-[var(--spacing-75,6px)] py-[var(--spacing-container-s,2px)]"
+      : "px-[var(--spacing-150,12px)] py-[var(--spacing-container-m,7px)]";
   return (
     <div
-      className={`flex items-center justify-end gap-0 rounded-[2px] bg-[#7c33b5] shrink-0 ${pad}`}
+      className={`flex items-center justify-end gap-0 rounded-[var(--radiuses-small,2px)] bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)] shrink-0 ${pad}`}
     >
-      <div className="flex items-center justify-center gap-1 rounded-[2px] shrink-0">
-        <p className="font-['DM_Sans:Medium',_Helvetica] font-medium leading-[20px] text-[14px] text-white text-center whitespace-nowrap">
+      <div className="flex items-center justify-center gap-1 rounded-[var(--radiuses-small,2px)] shrink-0">
+        <p className="font-['DM_Sans:Medium',_Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--container-dynamic-brand-bold-foreground-default,#ffffff)] text-center whitespace-nowrap">
           {label}
         </p>
       </div>
@@ -67,21 +73,21 @@ function FooterPageBar({
 }) {
   return (
     <div
-      className="flex flex-wrap items-center justify-between content-center relative w-full min-h-[66px] bg-white"
+      className="flex flex-wrap items-center justify-between content-center relative w-full min-h-[66px] bg-[var(--surface-background-lvl1,#ffffff)]"
       style={{
         filter:
-          "drop-shadow(0px -1px 2px rgba(113,113,128,0.12)) drop-shadow(0px -8px 8px rgba(113,113,128,0.08))",
+          "drop-shadow(0px -1px 2px var(--shadow-lvl12, rgba(113,113,128,0.12))) drop-shadow(0px -8px 8px var(--shadow-lvl8, rgba(113,113,128,0.08)))",
       }}
     >
       {actionsLeft && (
-        <div className="flex flex-1 min-w-px items-center gap-4 px-4 py-4 relative">
+        <div className="flex flex-1 min-w-px items-center gap-[var(--spacing-200,16px)] px-[var(--spacing-200,16px)] py-[var(--spacing-200,16px)] relative">
           <LinkButton />
           <OutlineButton />
           <BrandButton label={primaryLabel} />
         </div>
       )}
       {actionsRight && (
-        <div className="flex flex-1 min-w-px items-center justify-end gap-4 px-4 py-4 relative">
+        <div className="flex flex-1 min-w-px items-center justify-end gap-[var(--spacing-200,16px)] px-[var(--spacing-200,16px)] py-[var(--spacing-200,16px)] relative">
           <LinkButton />
           <OutlineButton />
           <BrandButton label={primaryLabel} />
@@ -107,17 +113,17 @@ function FooterModal({
   const minH = compact ? "min-h-[56px]" : "min-h-[66px]";
   return (
     <div
-      className={`flex flex-wrap items-center justify-between p-4 relative w-full ${minH} bg-[#f7f7fa]`}
+      className={`flex flex-wrap items-center justify-between p-[var(--spacing-200,16px)] relative w-full ${minH} bg-[var(--surface-background-lvl2,#f7f7fa)]`}
     >
       {actionsLeft && (
-        <div className="flex flex-1 min-w-px items-center gap-4 relative">
+        <div className="flex flex-1 min-w-px items-center gap-[var(--spacing-200,16px)] relative">
           <LinkButton />
           <OutlineButton size={btnSize} />
           <BrandButton size={btnSize} label={primaryLabel} />
         </div>
       )}
       {actionsRight && (
-        <div className="flex flex-1 min-w-px items-center justify-end gap-4 relative">
+        <div className="flex flex-1 min-w-px items-center justify-end gap-[var(--spacing-200,16px)] relative">
           <LinkButton />
           <BrandButton size={btnSize} label={primaryLabel} />
         </div>
@@ -161,16 +167,23 @@ const pageConfig: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "container/background": "#ffffff",
-    "container/brand/bold/background": "#7c33b5",
-    "text/brand": "#7c33b5",
-    "text/neutral/strong": "#4b4b59",
-    "border/neutral": "#4b4b59",
-    "radius/button": "2px",
-    "spacing/gap": "16px",
-    "spacing/padding": "16px",
-    "size/min-height": "66px",
-    "shadow/top": "0px -1px 2px rgba(113,113,128,0.12), 0px -8px 8px rgba(113,113,128,0.08)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "container/dynamic/brand/bold/background/default":
+      "var(--container-dynamic-brand-bold-background-default)",
+    "container/dynamic/brand/bold/foreground/default":
+      "var(--container-dynamic-brand-bold-foreground-default)",
+    "surface/foreground/dynamic/brand/default":
+      "var(--surface-foreground-dynamic-brand-default)",
+    "container/dynamic/neutral/subtle/foreground/default/regular":
+      "var(--container-dynamic-neutral-subtle-foreground-default-regular)",
+    "border/dynamic/neutral/bold/default":
+      "var(--border-dynamic-neutral-bold-default)",
+    "Radiuses/small": "var(--radiuses-small)",
+    "spacing/200": "var(--spacing-200)",
+    "spacing/150": "var(--spacing-150)",
+    "spacing/container/m": "var(--spacing-container-m)",
+    "shadow/lvl12": "var(--shadow-lvl12)",
+    "shadow/lvl8": "var(--shadow-lvl8)",
   },
 };
 
@@ -218,16 +231,23 @@ const modalConfig: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "container/background": "#f7f7fa",
-    "container/brand/bold/background": "#7c33b5",
-    "text/brand": "#7c33b5",
-    "text/neutral/strong": "#4b4b59",
-    "border/neutral": "#4b4b59",
-    "radius/button": "2px",
-    "spacing/gap": "16px",
-    "spacing/padding": "16px",
-    "size/min-height/default": "66px",
-    "size/min-height/compact": "56px",
+    "surface/background/lvl2": "var(--surface-background-lvl2)",
+    "container/dynamic/brand/bold/background/default":
+      "var(--container-dynamic-brand-bold-background-default)",
+    "container/dynamic/brand/bold/foreground/default":
+      "var(--container-dynamic-brand-bold-foreground-default)",
+    "surface/foreground/dynamic/brand/default":
+      "var(--surface-foreground-dynamic-brand-default)",
+    "container/dynamic/neutral/subtle/foreground/default/regular":
+      "var(--container-dynamic-neutral-subtle-foreground-default-regular)",
+    "border/dynamic/neutral/bold/default":
+      "var(--border-dynamic-neutral-bold-default)",
+    "Radiuses/small": "var(--radiuses-small)",
+    "spacing/200": "var(--spacing-200)",
+    "spacing/150": "var(--spacing-150)",
+    "spacing/container/m": "var(--spacing-container-m)",
+    "spacing/75": "var(--spacing-75)",
+    "spacing/container/s": "var(--spacing-container-s)",
   },
 };
 

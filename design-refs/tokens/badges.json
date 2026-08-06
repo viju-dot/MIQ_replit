@@ -1,0 +1,94 @@
+{
+  "Body Md/Regular": {
+    "cssVar": "--body-md-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 14, weight: 400, lineHeight: 20, letterSpacing: 0)"
+  },
+  "Body Sm/Medium": {
+    "cssVar": "--body-sm-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 12, weight: 500, lineHeight: 18, letterSpacing: 0)"
+  },
+  "[old]Radiuses/4": {
+    "cssVar": "--old-radiuses-4",
+    "value": "4"
+  },
+  "[old]Radiuses/None": {
+    "cssVar": "--old-radiuses-none",
+    "value": "0"
+  },
+  "[old]Stroke Thickness/1": {
+    "cssVar": "--old-stroke-thickness-1",
+    "value": "1"
+  },
+  "border/dynamic/neutral/subtle/default": {
+    "cssVar": "--border-dynamic-neutral-subtle-default",
+    "value": "#c6c6cc"
+  },
+  "border/dynamic/neutral/subtle/disabled": {
+    "cssVar": "--border-dynamic-neutral-subtle-disabled",
+    "value": "#e1e1e8"
+  },
+  "container/dynamic/neutral/subtle/background/default/variation": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-default-variation",
+    "value": "#ebebf0"
+  },
+  "container/dynamic/neutral/subtle/foreground/default/regular": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-default-regular",
+    "value": "#4b4b59"
+  },
+  "container/dynamic/neutral/subtle/foreground/default/variation": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-default-variation",
+    "value": "#13131a"
+  },
+  "container/dynamic/neutral/subtle/foreground/disabled": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-disabled",
+    "value": "#a8a8b2"
+  },
+  "controls/background/disabled": {
+    "cssVar": "--controls-background-disabled",
+    "value": "#7171801a"
+  },
+  "numbers/12": {
+    "cssVar": "--numbers-12",
+    "value": "12"
+  },
+  "numbers/4": {
+    "cssVar": "--numbers-4",
+    "value": "4"
+  },
+  "numbers/6": {
+    "cssVar": "--numbers-6",
+    "value": "6"
+  },
+  "numbers/8": {
+    "cssVar": "--numbers-8",
+    "value": "8"
+  },
+  "numbers/None": {
+    "cssVar": "--numbers-none",
+    "value": "0"
+  },
+  "odd_numbers/5": {
+    "cssVar": "--odd-numbers-5",
+    "value": "5"
+  },
+  "radius/25": {
+    "cssVar": "--radius-25",
+    "value": "2"
+  },
+  "spacing/50": {
+    "cssVar": "--spacing-50",
+    "value": "4"
+  },
+  "spacing/container/s": {
+    "cssVar": "--spacing-container-s",
+    "value": "2"
+  },
+  "surface/background/lvl1": {
+    "cssVar": "--surface-background-lvl1",
+    "value": "#ffffff"
+  },
+  "surface/foreground/static/neutral/lvl1": {
+    "cssVar": "--surface-foreground-static-neutral-lvl1",
+    "value": "#13131a"
+  }
+}

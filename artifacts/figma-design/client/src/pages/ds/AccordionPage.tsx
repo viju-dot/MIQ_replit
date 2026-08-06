@@ -38,24 +38,26 @@ function Accordion({
   //  - otherwise background on => white
   let rootBg = "";
   if (disabled) {
-    rootBg = "bg-[rgba(113,113,128,0.1)]";
+    rootBg = "bg-[var(--container-dynamic-neutral-subtle-background-disabled,rgba(113,113,128,0.1))]";
   } else if (background) {
-    rootBg = "bg-white";
+    rootBg = "bg-[var(--surface-background-lvl1,#ffffff)]";
   }
 
   // Header rounding
   let headerRadius = "";
   if (type === "Collapse" && border === "full") {
-    headerRadius = "rounded-[2px]";
+    headerRadius = "rounded-[var(--radius-25,2px)]";
   } else if (border === "full") {
-    headerRadius = "rounded-tl-[2px] rounded-tr-[2px]";
+    headerRadius = "rounded-tl-[var(--radius-25,2px)] rounded-tr-[var(--radius-25,2px)]";
   }
 
   // Expanded body rounding / side borders (only for full border)
   const bodyFullBorder =
-    border === "full" ? "border-l border-r rounded-bl-[2px] rounded-br-[2px]" : "";
+    border === "full" ? "border-l border-r rounded-bl-[var(--radius-25,2px)] rounded-br-[var(--radius-25,2px)]" : "";
 
-  const textColor = disabled ? "text-[#a8a8b2]" : "text-[#13131a]";
+  const textColor = disabled
+    ? "text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)]"
+    : "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]";
   const dragIcon = disabled ? `${ASSET}/drag-left-disabled.svg` : `${ASSET}/drag-left.svg`;
   const actionIcon = disabled
     ? `${ASSET}/action-dots-disabled.svg`
@@ -75,7 +77,7 @@ function Accordion({
           {/* Header row */}
           <div className="flex w-full flex-col items-start">
             <div
-              className={`flex w-full flex-col items-start overflow-clip border-b border-t border-solid border-[#e1e1e8] px-3 py-2 ${headerRadius}`}
+              className={`flex w-full flex-col items-start overflow-clip border-b border-t border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] px-3 py-2 ${headerRadius}`}
             >
               <div className="flex w-full items-center gap-5">
                 {/* Title-Left */}
@@ -84,24 +86,24 @@ function Accordion({
                     <button
                       type="button"
                       onClick={() => setChecked((c) => !c)}
-                      className="flex shrink-0 items-center justify-center rounded-[2px] p-0.5"
+                      className="flex shrink-0 items-center justify-center rounded-[var(--radius-25,2px)] p-0.5"
                       aria-pressed={checked}
                       aria-label="Toggle"
                     >
-                      <div className="flex size-5 shrink-0 items-center justify-center rounded-[2px] p-[7px]">
+                      <div className="flex size-5 shrink-0 items-center justify-center rounded-[var(--radius-25,2px)] p-[7px]">
                         <div className="flex shrink-0 items-center overflow-clip p-0.5">
                           <div
-                            className={`size-4 shrink-0 overflow-clip rounded-[2px] border-[1.5px] border-solid ${
+                            className={`size-4 shrink-0 overflow-clip rounded-[var(--radius-25,2px)] border-[1.5px] border-solid ${
                               checked
-                                ? "border-[#7c33b5] bg-[#7c33b5]"
-                                : "border-[#c6c6cc]"
+                                ? "border-[var(--border-dynamic-brand-default,#7c33b5)] bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)]"
+                                : "border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]"
                             }`}
                           />
                         </div>
                       </div>
                     </button>
                   ) : leftSlot === "Icon" ? null : (
-                    <div className="flex shrink-0 items-center justify-center rounded-[2px] p-0.5">
+                    <div className="flex shrink-0 items-center justify-center rounded-[var(--radius-25,2px)] p-0.5">
                       <div className="flex size-5 shrink-0 items-center justify-center p-0.5">
                         <img
                           alt=""
@@ -113,7 +115,7 @@ function Accordion({
                   )}
                   <div className="flex h-6 min-w-px flex-1 items-center gap-2">
                     <p
-                      className={`min-w-px flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[14px] leading-[20px] [font-family:'DM_Sans',Helvetica] ${textColor}`}
+                      className={`min-w-px flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)] [font-family:'DM_Sans',Helvetica] ${textColor}`}
                     >
                       {title}
                     </p>
@@ -121,7 +123,7 @@ function Accordion({
                 </div>
                 {/* Right actions */}
                 <div className="flex shrink-0 items-center gap-2">
-                  <div className="flex shrink-0 items-center justify-center rounded-[2px] p-0.5">
+                  <div className="flex shrink-0 items-center justify-center rounded-[var(--radius-25,2px)] p-0.5">
                     <div className="flex size-5 shrink-0 items-center justify-center p-0.5">
                       <div className="relative h-[16.25px] w-[15px] shrink-0">
                         <img
@@ -132,7 +134,7 @@ function Accordion({
                       </div>
                     </div>
                   </div>
-                  <div className="flex w-6 shrink-0 items-center justify-center rounded-[2px] p-0.5">
+                  <div className="flex w-6 shrink-0 items-center justify-center rounded-[var(--radius-25,2px)] p-0.5">
                     <div className="flex size-5 shrink-0 items-center justify-center p-0.5">
                       <img
                         alt=""
@@ -148,12 +150,12 @@ function Accordion({
           {/* Expanded body */}
           {isExpanded && (
             <div
-              className={`flex w-full items-center overflow-clip border-b border-solid border-[#e1e1e8] px-4 pb-3 pt-4 ${bodyFullBorder}`}
+              className={`flex w-full items-center overflow-clip border-b border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] px-4 pb-3 pt-4 ${bodyFullBorder}`}
             >
               <div className="flex min-w-px flex-1 flex-wrap content-start items-start">
                 <div className="flex min-w-px flex-1 items-center">
                   <p
-                    className={`min-w-px flex-1 text-[14px] leading-[20px] [font-family:'DM_Sans',Helvetica] [word-break:break-word] ${textColor}`}
+                    className={`min-w-px flex-1 text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)] [font-family:'DM_Sans',Helvetica] [word-break:break-word] ${textColor}`}
                   >
                     {body}
                   </p>
@@ -224,17 +226,18 @@ const config: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "border/neutral": "#e1e1e8",
-    "text/default": "#13131a",
-    "text/disabled": "#a8a8b2",
-    "container/on/background": "#ffffff",
-    "container/disabled/background": "rgba(113,113,128,0.1)",
-    "checkbox/brand/selected": "#7c33b5",
-    "checkbox/border/inactive": "#c6c6cc",
-    "radius/full-border": "2px",
-    "size/width": "600px (min 180px)",
-    "spacing/header": "px-3 py-2",
-    "spacing/body": "px-4 pt-4 pb-3",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/dynamic/neutral/disabled": "var(--surface-foreground-dynamic-neutral-disabled)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "container/dynamic/neutral/subtle/background/disabled":
+      "var(--container-dynamic-neutral-subtle-background-disabled)",
+    "container/dynamic/brand/bold/background/default":
+      "var(--container-dynamic-brand-bold-background-default)",
+    "border/dynamic/brand/default": "var(--border-dynamic-brand-default)",
+    "border/dynamic/neutral/subtle/default": "var(--border-dynamic-neutral-subtle-default)",
+    "radius/25": "var(--radius-25)",
+    "Body Md/Regular": "var(--body-md-regular-size) / var(--body-md-regular-line-height)",
   },
 };
 

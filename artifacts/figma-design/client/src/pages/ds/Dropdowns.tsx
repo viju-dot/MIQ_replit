@@ -10,12 +10,24 @@ const STATE_STYLES: Record<
   DropdownState,
   { backgroundClass?: string; textClass?: string }
 > = {
-  Default: { textClass: "text-[#13131a]" },
-  Hover: { backgroundClass: "bg-[#71718014]", textClass: "text-[#13131a]" },
-  Selected: { backgroundClass: "bg-[#f6ebff]", textClass: "text-[#7c33b5]" },
-  Disabled: { textClass: "text-[#a8a8b2]" },
-  "Selected Disabled": { backgroundClass: "bg-[#7171801a]", textClass: "text-[#a8a8b2]" },
-  Loading: { backgroundClass: "bg-[#7171801a]", textClass: "text-[#a8a8b2]" },
+  Default: { textClass: "text-[var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)]" },
+  Hover: {
+    backgroundClass: "bg-[var(--container-dynamic-neutral-subtle-background-hover,#71718014)]",
+    textClass: "text-[var(--container-dynamic-neutral-subtle-foreground-hover,#13131a)]",
+  },
+  Selected: {
+    backgroundClass: "bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)]",
+    textClass: "text-[var(--container-dynamic-brand-subtle-foreground-delected,#7c33b5)]",
+  },
+  Disabled: { textClass: "text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]" },
+  "Selected Disabled": {
+    backgroundClass: "bg-[var(--container-dynamic-neutral-subtle-background-disabled,#7171801a)]",
+    textClass: "text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]",
+  },
+  Loading: {
+    backgroundClass: "bg-[var(--container-dynamic-neutral-subtle-background-disabled,#7171801a)]",
+    textClass: "text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]",
+  },
 };
 
 function FiberDropdownRow({
@@ -38,8 +50,8 @@ function FiberDropdownRow({
   // Loading state renders the dedicated loading row (exact Figma).
   if (state === "Loading") {
     return (
-      <article className="flex w-full max-w-[276px] items-center gap-2 border-b border-[#e1e1e8] bg-[#7171801a] px-3 py-2">
-        <span className="flex h-6 items-center font-body-md-regular text-[length:var(--body-md-regular-font-size)] font-[number:var(--body-md-regular-font-weight)] leading-[var(--body-md-regular-line-height)] tracking-[var(--body-md-regular-letter-spacing)] text-[#a8a8b2]">
+      <article className="flex w-full max-w-[276px] items-center gap-2 border-b border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--container-dynamic-neutral-subtle-background-disabled,#7171801a)] px-3 py-2">
+        <span className="flex h-6 items-center font-body-md-regular text-[length:var(--body-md-regular-size,14px)] font-[number:var(--body-md-regular-weight,400)] leading-[var(--body-md-regular-line-height,20px)] tracking-[var(--body-md-regular-letter-spacing,0px)] text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]">
           Loading...
         </span>
       </article>
@@ -48,7 +60,7 @@ function FiberDropdownRow({
 
   return (
     <article
-      className={`flex w-full max-w-[276px] items-center gap-2 border-b border-[#e1e1e8] px-3 py-2 ${
+      className={`flex w-full max-w-[276px] items-center gap-2 border-b border-[var(--border-static-subtle-neutral,#e1e1e8)] px-3 py-2 ${
         hasCheckbox ? "pl-2" : ""
       } ${style.backgroundClass ?? ""}`}
     >
@@ -61,13 +73,14 @@ function FiberDropdownRow({
               disabled={isDisabled}
               onCheckedChange={(value) => setLocalChecked(value === true)}
               aria-label="Field 1"
-              className="h-4 w-4 shrink-0 rounded-sm border-[1.5px] border-[#c6c6cc] data-[state=checked]:border-[#7c33b5] data-[state=checked]:bg-[#7c33b5] disabled:border-[#c6c6cc] disabled:opacity-100 data-[state=checked]:disabled:border-transparent data-[state=checked]:disabled:bg-[#7171801a]"
+              className="h-4 w-4 shrink-0 rounded-sm border-[1.5px] border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] data-[state=checked]:border-[var(--controls-background-selected,#7c33b5)] data-[state=checked]:bg-[var(--controls-background-selected,#7c33b5)] disabled:border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] disabled:opacity-100 data-[state=checked]:disabled:border-transparent data-[state=checked]:disabled:bg-[var(--container-dynamic-neutral-subtle-background-disabled,#7171801a)]"
             />
           )}
           <label
             htmlFor={hasCheckbox ? "dropdown-field" : undefined}
-            className={`flex items-center whitespace-nowrap font-body-md-regular text-[length:var(--body-md-regular-font-size)] font-[number:var(--body-md-regular-font-weight)] leading-[var(--body-md-regular-line-height)] tracking-[var(--body-md-regular-letter-spacing)] ${
-              style.textClass ?? "text-[#13131a]"
+            className={`flex items-center whitespace-nowrap font-body-md-regular text-[length:var(--body-md-regular-size,14px)] font-[number:var(--body-md-regular-weight,400)] leading-[var(--body-md-regular-line-height,20px)] tracking-[var(--body-md-regular-letter-spacing,0px)] ${
+              style.textClass ??
+              "text-[var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)]"
             }`}
           >
             {label || "Field 1"}
@@ -121,17 +134,24 @@ const config: PlaygroundConfig = {
     );
   },
   tokens: {
-    "container/hover/background": "#71718014",
-    "container/selected/background": "#f6ebff",
-    "container/disabled/background": "#7171801a",
-    "content/selected/text": "#7c33b5",
-    "content/default/text": "#13131a",
-    "content/disabled/text": "#a8a8b2",
-    "border/divider": "#e1e1e8",
-    "checkbox/border": "#c6c6cc",
-    "checkbox/checked": "#7c33b5",
-    "spacing/row-padding": "12px / 8px",
-    "size/max-width": "276px",
+    "container/dynamic/neutral/subtle/background/hover":
+      "var(--container-dynamic-neutral-subtle-background-hover)",
+    "container/dynamic/brand/subtle/background/selected":
+      "var(--container-dynamic-brand-subtle-background-selected)",
+    "container/dynamic/neutral/subtle/background/disabled":
+      "var(--container-dynamic-neutral-subtle-background-disabled)",
+    "container/dynamic/brand/subtle/foreground/delected":
+      "var(--container-dynamic-brand-subtle-foreground-delected)",
+    "container/dynamic/neutral/subtle/foreground/default/variation":
+      "var(--container-dynamic-neutral-subtle-foreground-default-variation)",
+    "container/dynamic/neutral/subtle/foreground/hover":
+      "var(--container-dynamic-neutral-subtle-foreground-hover)",
+    "container/dynamic/neutral/subtle/foreground/disabled":
+      "var(--container-dynamic-neutral-subtle-foreground-disabled)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "border/dynamic/neutral/subtle/default": "var(--border-dynamic-neutral-subtle-default)",
+    "controls/background/selected": "var(--controls-background-selected)",
+    "Body Md/Regular": "var(--body-md-regular-size)",
   },
 };
 

@@ -14,10 +14,10 @@ function FiberToggle({
   disabled: boolean;
   onToggle?: () => void;
 }): JSX.Element {
-  // Track background (exact Figma values)
-  let bgClass = "bg-[#ebebf0]";
-  if (disabled) bgClass = "bg-[rgba(113,113,128,0.1)]";
-  else if (on) bgClass = "bg-[#7c33b5]";
+  // Track background (Figma control tokens)
+  let bgClass = "bg-[var(--controls-background-inactive,#ebebf0)]";
+  if (disabled) bgClass = "bg-[var(--controls-background-disabled,rgba(113,113,128,0.1))]";
+  else if (on) bgClass = "bg-[var(--controls-background-active,#7c33b5)]";
 
   const trackClass = compact
     ? "h-[24px] w-[46px] p-[2px] max-h-[24px] max-w-[46px] min-w-[46px]"
@@ -75,9 +75,9 @@ const config: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "container/brand/bold/background": "#7c33b5",
-    "container/neutral/background/inactive": "#ebebf0",
-    "container/disabled/background": "rgba(113,113,128,0.1)",
+    "controls/background/active": "var(--controls-background-active)",
+    "controls/background/inactive": "var(--controls-background-inactive)",
+    "controls/background/disabled": "var(--controls-background-disabled)",
     "radius/track": "20px",
     "size/compact": "46×24 (knob 20px)",
     "size/large": "63×32 (knob 28px)",

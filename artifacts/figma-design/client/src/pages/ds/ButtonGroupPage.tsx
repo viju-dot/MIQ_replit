@@ -10,26 +10,37 @@ type State = "Selected" | "Unselected" | "Hover" | "Disabled";
 // Design tokens (converted from Figma CSS variables to plain fallback values)
 // ---------------------------------------------------------------------------
 const BG: Record<State, string> = {
-  Selected: "#ebebf0",
-  Unselected: "#ffffff",
-  Hover: "rgba(113,113,128,0.08)",
-  Disabled: "rgba(113,113,128,0.1)",
+  Selected:
+    "var(--container-dynamic-neutral-subtle-background-default-variation,#ebebf0)",
+  Unselected:
+    "var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)",
+  Hover:
+    "var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))",
+  Disabled:
+    "var(--container-dynamic-neutral-subtle-background-disabled,rgba(113,113,128,0.1))",
 };
 const TEXT: Record<State, string> = {
-  Selected: "#13131a",
-  Unselected: "#4b4b59",
-  Hover: "#13131a",
-  Disabled: "#a8a8b2",
+  Selected:
+    "var(--container-dynamic-neutral-subtle-foreground-selected,#13131a)",
+  Unselected:
+    "var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)",
+  Hover: "var(--container-dynamic-neutral-subtle-foreground-hover,#13131a)",
+  Disabled:
+    "var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)",
 };
-const BORDER = (state: State) => (state === "Disabled" ? "#e1e1e8" : "#c6c6cc");
+const BORDER = (state: State) =>
+  state === "Disabled"
+    ? "var(--border-dynamic-neutral-subtle-disabled,#e1e1e8)"
+    : "var(--border-dynamic-neutral-subtle-default,#c6c6cc)";
 
 // End-corner radius depending on side (adjacent sides overlap by -1px)
 function radiusStyle(side: Side): React.CSSProperties {
+  const r = "var(--old-radiuses-2,2px)";
   if (side === "Left") {
-    return { borderTopLeftRadius: 2, borderBottomLeftRadius: 2 };
+    return { borderTopLeftRadius: r, borderBottomLeftRadius: r };
   }
   if (side === "Right") {
-    return { borderTopRightRadius: 2, borderBottomRightRadius: 2 };
+    return { borderTopRightRadius: r, borderBottomRightRadius: r };
   }
   return {};
 }
@@ -58,11 +69,15 @@ type IconSegmentProps = {
 };
 
 function IconSegment({ side, state, compact, overlap = false }: IconSegmentProps) {
-  const boxClass = compact ? "h-[24px] w-[34px]" : "size-[34px]";
-  const iconBoxSize = compact ? 16 : 24;
+  const boxClass = compact
+    ? "h-[var(--old-sizing-24,24px)] w-[var(--old-sizing-34,34px)]"
+    : "size-[var(--old-sizing-34,34px)]";
+  const iconBoxSize = compact
+    ? "var(--old-sizing-16,16px)"
+    : "var(--old-sizing-24,24px)";
   return (
     <div
-      className={`relative shrink-0 overflow-hidden ${boxClass} ${overlap ? "mr-[-1px]" : ""}`}
+      className={`relative shrink-0 overflow-hidden ${boxClass} ${overlap ? "mr-[var(--odd-numbers-1,-1px)]" : ""}`}
       style={radiusStyle(side)}
     >
       {/* base fill + border */}
@@ -103,9 +118,11 @@ type TextSegmentProps = {
 function TextSegment({ side, state, compact, overlap = false, label = "Button" }: TextSegmentProps) {
   return (
     <div
-      className={`relative flex shrink-0 items-center justify-center px-[24px] border border-solid ${
-        compact ? "h-[24px] py-[2.5px]" : "h-[34px] py-[7px]"
-      } ${overlap ? "mr-[-1px]" : ""}`}
+      className={`relative flex shrink-0 items-center justify-center px-[var(--spacing-300,24px)] border border-solid ${
+        compact
+          ? "h-[var(--old-sizing-24,24px)] py-[var(--odd-numbers-2-5,2.5px)]"
+          : "h-[var(--old-sizing-34,34px)] py-[var(--odd-numbers-7,7px)]"
+      } ${overlap ? "mr-[var(--odd-numbers-1,-1px)]" : ""}`}
       style={{
         backgroundColor: BG[state],
         borderColor: BORDER(state),
@@ -114,7 +131,9 @@ function TextSegment({ side, state, compact, overlap = false, label = "Button" }
     >
       <p
         className={`whitespace-nowrap text-center font-['DM_Sans'] ${
-          compact ? "text-[12px] leading-[18px]" : "text-[14px] leading-[20px]"
+          compact
+            ? "text-[length:var(--body-sm-medium-size,12px)] leading-[var(--body-sm-medium-line-height,18px)]"
+            : "text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)]"
         }`}
         style={{ color: TEXT[state] }}
       >
@@ -176,18 +195,29 @@ function IconButtonGroup({ amount, compact }: IconGroupProps) {
 // Shared token maps for Developer Mode
 // ---------------------------------------------------------------------------
 const SHARED_TOKENS: Record<string, string> = {
-  "container/selected/background": "#ebebf0",
-  "container/unselected/background": "#ffffff",
-  "container/hover/background": "rgba(113,113,128,0.08)",
-  "container/disabled/background": "rgba(113,113,128,0.1)",
-  "text/selected": "#13131a",
-  "text/unselected": "#4b4b59",
-  "text/disabled": "#a8a8b2",
-  "border/default": "#c6c6cc",
-  "border/disabled": "#e1e1e8",
-  "radius/end": "2px",
-  "size/large": "h 34px",
-  "size/compact": "h 24px",
+  "container/dynamic/neutral/subtle/background/default/variation":
+    "var(--container-dynamic-neutral-subtle-background-default-variation)",
+  "container/dynamic/neutral/subtle/background/default/regular":
+    "var(--container-dynamic-neutral-subtle-background-default-regular)",
+  "container/dynamic/neutral/subtle/background/hover":
+    "var(--container-dynamic-neutral-subtle-background-hover)",
+  "container/dynamic/neutral/subtle/background/disabled":
+    "var(--container-dynamic-neutral-subtle-background-disabled)",
+  "container/dynamic/neutral/subtle/foreground/selected":
+    "var(--container-dynamic-neutral-subtle-foreground-selected)",
+  "container/dynamic/neutral/subtle/foreground/default/regular":
+    "var(--container-dynamic-neutral-subtle-foreground-default-regular)",
+  "container/dynamic/neutral/subtle/foreground/hover":
+    "var(--container-dynamic-neutral-subtle-foreground-hover)",
+  "container/dynamic/neutral/subtle/foreground/disabled":
+    "var(--container-dynamic-neutral-subtle-foreground-disabled)",
+  "border/dynamic/neutral/subtle/default":
+    "var(--border-dynamic-neutral-subtle-default)",
+  "border/dynamic/neutral/subtle/disabled":
+    "var(--border-dynamic-neutral-subtle-disabled)",
+  "[old]Radiuses/2": "var(--old-radiuses-2)",
+  "[old]Stroke Thickness/1": "var(--old-stroke-thickness-1)",
+  "odd_numbers/-1": "var(--odd-numbers-1)",
 };
 
 // ---------------------------------------------------------------------------

@@ -1,0 +1,138 @@
+{
+  "Body Md/Medium": {
+    "cssVar": "--body-md-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 14, weight: 500, lineHeight: 20, letterSpacing: 0)"
+  },
+  "Body Sm/Medium": {
+    "cssVar": "--body-sm-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 12, weight: 500, lineHeight: 18, letterSpacing: 0)"
+  },
+  "[old]Radiuses/round": {
+    "cssVar": "--old-radiuses-round",
+    "value": "100"
+  },
+  "[old]Sizing/18": {
+    "cssVar": "--old-sizing-18",
+    "value": "18"
+  },
+  "[old]Sizing/24": {
+    "cssVar": "--old-sizing-24",
+    "value": "24"
+  },
+  "[old]Stroke Thickness/1": {
+    "cssVar": "--old-stroke-thickness-1",
+    "value": "1"
+  },
+  "border/dynamic/brand/default": {
+    "cssVar": "--border-dynamic-brand-default",
+    "value": "#7c33b5"
+  },
+  "border/dynamic/brand/hover": {
+    "cssVar": "--border-dynamic-brand-hover",
+    "value": "#662994"
+  },
+  "border/dynamic/warning/default": {
+    "cssVar": "--border-dynamic-warning-default",
+    "value": "#f8c500"
+  },
+  "border/dynamic/warning/hover": {
+    "cssVar": "--border-dynamic-warning-hover",
+    "value": "#d1a600"
+  },
+  "container/dynamic/Brand/Subtle/foreground/default": {
+    "cssVar": "--container-dynamic-brand-subtle-foreground-default",
+    "value": "#7c33b5"
+  },
+  "container/dynamic/brand/bold/background/default": {
+    "cssVar": "--container-dynamic-brand-bold-background-default",
+    "value": "#7c33b5"
+  },
+  "container/dynamic/brand/bold/background/hover": {
+    "cssVar": "--container-dynamic-brand-bold-background-hover",
+    "value": "#662994"
+  },
+  "container/dynamic/brand/bold/foreground/default": {
+    "cssVar": "--container-dynamic-brand-bold-foreground-default",
+    "value": "#ffffff"
+  },
+  "container/dynamic/brand/bold/foreground/hover": {
+    "cssVar": "--container-dynamic-brand-bold-foreground-hover",
+    "value": "#ffffff"
+  },
+  "container/dynamic/brand/subtle/background/default": {
+    "cssVar": "--container-dynamic-brand-subtle-background-default",
+    "value": "#f6ebff"
+  },
+  "container/dynamic/brand/subtle/background/hover": {
+    "cssVar": "--container-dynamic-brand-subtle-background-hover",
+    "value": "#e7c7ff"
+  },
+  "container/dynamic/brand/subtle/foreground/hover": {
+    "cssVar": "--container-dynamic-brand-subtle-foreground-hover",
+    "value": "#662994"
+  },
+  "container/dynamic/neutral/subtle/background/default/regular": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-default-regular",
+    "value": "#ffffff"
+  },
+  "container/dynamic/neutral/subtle/background/disabled": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-disabled",
+    "value": "#7171801a"
+  },
+  "container/dynamic/neutral/subtle/background/hover": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-hover",
+    "value": "#71718014"
+  },
+  "container/dynamic/neutral/subtle/foreground/disabled": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-disabled",
+    "value": "#a8a8b2"
+  },
+  "container/dynamic/warning/bold/background/default": {
+    "cssVar": "--container-dynamic-warning-bold-background-default",
+    "value": "#f8c500"
+  },
+  "container/dynamic/warning/bold/background/hover": {
+    "cssVar": "--container-dynamic-warning-bold-background-hover",
+    "value": "#d1a600"
+  },
+  "container/dynamic/warning/bold/foreground/default": {
+    "cssVar": "--container-dynamic-warning-bold-foreground-default",
+    "value": "#241c00"
+  },
+  "container/dynamic/warning/bold/foreground/hover": {
+    "cssVar": "--container-dynamic-warning-bold-foreground-hover",
+    "value": "#241c00"
+  },
+  "container/dynamic/warning/subtle/foreground/default": {
+    "cssVar": "--container-dynamic-warning-subtle-foreground-default",
+    "value": "#483800"
+  },
+  "container/dynamic/warning/subtle/foreground/hover": {
+    "cssVar": "--container-dynamic-warning-subtle-foreground-hover",
+    "value": "#241c00"
+  },
+  "numbers/2": {
+    "cssVar": "--numbers-2",
+    "value": "2"
+  },
+  "numbers/4": {
+    "cssVar": "--numbers-4",
+    "value": "4"
+  },
+  "numbers/6": {
+    "cssVar": "--numbers-6",
+    "value": "6"
+  },
+  "numbers/8": {
+    "cssVar": "--numbers-8",
+    "value": "8"
+  },
+  "odd_numbers/10": {
+    "cssVar": "--odd-numbers-10",
+    "value": "10"
+  },
+  "surface/background/lvl1": {
+    "cssVar": "--surface-background-lvl1",
+    "value": "#ffffff"
+  }
+}

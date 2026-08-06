@@ -1,0 +1,158 @@
+{
+  "Body Md/Medium": {
+    "cssVar": "--body-md-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 14, weight: 500, lineHeight: 20, letterSpacing: 0)"
+  },
+  "Colours/Blue/300": {
+    "cssVar": "--colours-blue-300",
+    "value": "#d194ff"
+  },
+  "Elevation Hover": {
+    "cssVar": "--elevation-hover",
+    "value": "Effect(type: DROP_SHADOW, color: shadow/lvl10, offset: (0, 12), radius: 20, spread: 0); Effect(type: DROP_SHADOW, color: shadow/lvl8, offset: (0, 1), radius: 4, spread: 0)"
+  },
+  "Elevation Regular": {
+    "cssVar": "--elevation-regular",
+    "value": "Effect(type: DROP_SHADOW, color: shadow/lvl4, offset: (0, 8), radius: 16, spread: 0); Effect(type: DROP_SHADOW, color: shadow/lvl8, offset: (0, 1), radius: 4, spread: 0)"
+  },
+  "Elevation Selected": {
+    "cssVar": "--elevation-selected",
+    "value": "Effect(type: DROP_SHADOW, color: shadow/lvl12, offset: (0, 16), radius: 24, spread: 0); Effect(type: DROP_SHADOW, color: shadow/lvl8, offset: (0, 1), radius: 4, spread: 0)"
+  },
+  "Headline Xs/Medium": {
+    "cssVar": "--headline-xs-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 16, weight: 500, lineHeight: 24, letterSpacing: -0.5)"
+  },
+  "Radiuses/small": {
+    "cssVar": "--radiuses-small",
+    "value": "2"
+  },
+  "Spacing/24": {
+    "cssVar": "--spacing-24",
+    "value": "24"
+  },
+  "[old]Sizing/24": {
+    "cssVar": "--old-sizing-24",
+    "value": "24"
+  },
+  "[old]Stroke Thickness/1": {
+    "cssVar": "--old-stroke-thickness-1",
+    "value": "1"
+  },
+  "border/dynamic/brand/selected": {
+    "cssVar": "--border-dynamic-brand-selected",
+    "value": "#7c33b5"
+  },
+  "border/dynamic/neutral/bold/default": {
+    "cssVar": "--border-dynamic-neutral-bold-default",
+    "value": "#4b4b59"
+  },
+  "border/static/subtle/neutral": {
+    "cssVar": "--border-static-subtle-neutral",
+    "value": "#e1e1e8"
+  },
+  "container/dynamic/brand/bold/background/default": {
+    "cssVar": "--container-dynamic-brand-bold-background-default",
+    "value": "#7c33b5"
+  },
+  "container/dynamic/brand/bold/foreground/default": {
+    "cssVar": "--container-dynamic-brand-bold-foreground-default",
+    "value": "#ffffff"
+  },
+  "container/dynamic/neutral/subtle/foreground/default/regular": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-default-regular",
+    "value": "#4b4b59"
+  },
+  "numbers/2": {
+    "cssVar": "--numbers-2",
+    "value": "2"
+  },
+  "numbers/6": {
+    "cssVar": "--numbers-6",
+    "value": "6"
+  },
+  "numbers/8": {
+    "cssVar": "--numbers-8",
+    "value": "8"
+  },
+  "numbers/None": {
+    "cssVar": "--numbers-none",
+    "value": "0"
+  },
+  "radius/0": {
+    "cssVar": "--radius-0",
+    "value": "0"
+  },
+  "radius/25": {
+    "cssVar": "--radius-25",
+    "value": "2"
+  },
+  "shadow/lvl10": {
+    "cssVar": "--shadow-lvl10",
+    "value": "#7171801a"
+  },
+  "shadow/lvl12": {
+    "cssVar": "--shadow-lvl12",
+    "value": "#7171801f"
+  },
+  "shadow/lvl4": {
+    "cssVar": "--shadow-lvl4",
+    "value": "#7171800a"
+  },
+  "shadow/lvl8": {
+    "cssVar": "--shadow-lvl8",
+    "value": "#71718014"
+  },
+  "spacing/0": {
+    "cssVar": "--spacing-0",
+    "value": "0"
+  },
+  "spacing/100": {
+    "cssVar": "--spacing-100",
+    "value": "8"
+  },
+  "spacing/200": {
+    "cssVar": "--spacing-200",
+    "value": "16"
+  },
+  "spacing/container/s": {
+    "cssVar": "--spacing-container-s",
+    "value": "2"
+  },
+  "spacing/margin/0": {
+    "cssVar": "--spacing-margin-0",
+    "value": "0"
+  },
+  "stroke_weight/15": {
+    "cssVar": "--stroke-weight-15",
+    "value": "1"
+  },
+  "surface/background/hover": {
+    "cssVar": "--surface-background-hover",
+    "value": "#7171801a"
+  },
+  "surface/background/lvl1": {
+    "cssVar": "--surface-background-lvl1",
+    "value": "#ffffff"
+  },
+  "surface/background/lvl2": {
+    "cssVar": "--surface-background-lvl2",
+    "value": "#f7f7fa"
+  },
+  "surface/foreground/dynamic/brand/default": {
+    "cssVar": "--surface-foreground-dynamic-brand-default",
+    "value": "#7c33b5"
+  },
+  "surface/foreground/dynamic/neutral/default/regular": {
+    "cssVar": "--surface-foreground-dynamic-neutral-default-regular",
+    "value": "#4b4b59"
+  },
+  "surface/foreground/dynamic/neutral/disabled": {
+    "cssVar": "--surface-foreground-dynamic-neutral-disabled",
+    "value": "#a8a8b2"
+  },
+  "surface/foreground/static/neutral/lvl1": {
+    "cssVar": "--surface-foreground-static-neutral-lvl1",
+    "value": "#13131a"
+  }
+}

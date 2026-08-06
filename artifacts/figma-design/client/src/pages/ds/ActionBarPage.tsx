@@ -66,18 +66,22 @@ function ActionBar({
   const selectIcon = isWhite
     ? `${ASSET}/white-select-icon.svg`
     : `${ASSET}/brand-select-icon.svg`;
-  const actionTextClass = isWhite ? "text-[#7c33b5]" : "text-[#f7f7fa]";
+  const actionTextClass = isWhite
+    ? "text-[var(--container-dynamic-brand-subtle-foreground-default,#7c33b5)]"
+    : "text-[var(--container-dynamic-neutral-inverse-foreground-default,#f7f7fa)]";
 
   return (
     <div
-      className={`flex w-full items-center justify-between gap-4 rounded-[2px] px-4 py-[3px] ${
-        isWhite ? "bg-white" : "bg-[#7c33b5]"
+      className={`flex w-full items-center justify-between gap-4 rounded-[var(--radiuses-small,2px)] px-4 py-[var(--spacing-container-l,3px)] ${
+        isWhite
+          ? "bg-[var(--surface-background-lvl1,#ffffff)]"
+          : "bg-[var(--surface-background-brand,#7c33b5)]"
       }`}
     >
       {/* Left */}
-      <div className="flex shrink-0 items-center gap-[11px]">
-        <div className="flex shrink-0 items-center gap-[8px]">
-          <div className="flex shrink-0 items-center justify-center rounded-[2px] p-[7px]">
+      <div className="flex shrink-0 items-center gap-[var(--odd-numbers-11,11px)]">
+        <div className="flex shrink-0 items-center gap-[var(--numbers-8,8px)]">
+          <div className="flex shrink-0 items-center justify-center rounded-[var(--radiuses-small,2px)] p-[var(--spacing-container-m,7px)]">
             <div className="flex size-[20px] shrink-0 items-center justify-center p-[2px]">
               <div className="relative size-[12.5px] shrink-0">
                 <img
@@ -89,8 +93,10 @@ function ActionBar({
             </div>
           </div>
           <p
-            className={`whitespace-nowrap font-['DM_Sans',Helvetica] text-[14px] font-medium leading-[20px] [word-break:break-word] ${
-              isWhite ? "text-[#13131a]" : "text-white"
+            className={`whitespace-nowrap font-['DM_Sans',Helvetica] text-[length:var(--body-md-medium-size,14px)] font-medium leading-[var(--body-md-medium-line-height,20px)] [word-break:break-word] ${
+              isWhite
+                ? "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]"
+                : "text-[var(--container-dynamic-neutral-inverse-foreground-hover,#ffffff)]"
             }`}
           >
             {selectionLabel}
@@ -103,9 +109,9 @@ function ActionBar({
         {actions.map((action) => (
           <div
             key={action.label}
-            className="flex shrink-0 items-center justify-center rounded-[2px] px-[12px] py-[7px]"
+            className="flex shrink-0 items-center justify-center rounded-[var(--radiuses-small,2px)] px-[var(--spacing-150,12px)] py-[var(--spacing-container-m,7px)]"
           >
-            <div className="flex shrink-0 items-center justify-center gap-[4px] rounded-[2px]">
+            <div className="flex shrink-0 items-center justify-center gap-[var(--spacing-50,4px)] rounded-[var(--radiuses-small,2px)]">
               <div
                 className={`flex size-[20px] shrink-0 items-center justify-center ${action.wrapClass}`}
               >
@@ -118,7 +124,7 @@ function ActionBar({
                 </div>
               </div>
               <p
-                className={`whitespace-nowrap text-center font-['DM_Sans',Helvetica] text-[14px] font-medium leading-[20px] [word-break:break-word] ${actionTextClass}`}
+                className={`whitespace-nowrap text-center font-['DM_Sans',Helvetica] text-[length:var(--body-md-medium-size,14px)] font-medium leading-[var(--body-md-medium-line-height,20px)] [word-break:break-word] ${actionTextClass}`}
               >
                 {action.label}
               </p>
@@ -160,16 +166,25 @@ const config: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "container/brand/bold/background": "#7c33b5",
-    "container/white/background": "#ffffff",
-    "text/brand": "#7c33b5",
-    "text/on-brand": "#f7f7fa",
-    "text/default": "#13131a",
-    "text/on-brand/strong": "#ffffff",
-    "radius/bar": "2px",
-    "spacing/bar-x": "16px",
-    "spacing/bar-y": "3px",
-    "spacing/actions-gap": "16px",
+    "surface/background/brand": "var(--surface-background-brand)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "container/dynamic/Brand/Subtle/foreground/default":
+      "var(--container-dynamic-brand-subtle-foreground-default)",
+    "container/dynamic/neutral/inverse/foreground/default":
+      "var(--container-dynamic-neutral-inverse-foreground-default)",
+    "container/dynamic/neutral/inverse/foreground/hover":
+      "var(--container-dynamic-neutral-inverse-foreground-hover)",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "Body Md/Medium": "var(--body-md-medium-size)",
+    "Radiuses/small": "var(--radiuses-small)",
+    "spacing/200": "var(--spacing-200)",
+    "spacing/150": "var(--spacing-150)",
+    "spacing/container/l": "var(--spacing-container-l)",
+    "spacing/container/m": "var(--spacing-container-m)",
+    "spacing/50": "var(--spacing-50)",
+    "numbers/8": "var(--numbers-8)",
+    "odd_numbers/11": "var(--odd-numbers-11)",
   },
 };
 

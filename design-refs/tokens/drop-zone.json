@@ -1,0 +1,102 @@
+{
+  "Body Md/Medium": {
+    "cssVar": "--body-md-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 14, weight: 500, lineHeight: 20, letterSpacing: 0)"
+  },
+  "Body Md/Regular": {
+    "cssVar": "--body-md-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 14, weight: 400, lineHeight: 20, letterSpacing: 0)"
+  },
+  "[old]Stroke Thickness/1": {
+    "cssVar": "--old-stroke-thickness-1",
+    "value": "1"
+  },
+  "border/dynamic/brand/hover": {
+    "cssVar": "--border-dynamic-brand-hover",
+    "value": "#662994"
+  },
+  "border/dynamic/neutral/subtle/default": {
+    "cssVar": "--border-dynamic-neutral-subtle-default",
+    "value": "#c6c6cc"
+  },
+  "border/static/subtle/neutral": {
+    "cssVar": "--border-static-subtle-neutral",
+    "value": "#e1e1e8"
+  },
+  "radius/0": {
+    "cssVar": "--radius-0",
+    "value": "0"
+  },
+  "radius/25": {
+    "cssVar": "--radius-25",
+    "value": "2"
+  },
+  "radius/50": {
+    "cssVar": "--radius-50",
+    "value": "4"
+  },
+  "spacing/0": {
+    "cssVar": "--spacing-0",
+    "value": "0"
+  },
+  "spacing/100": {
+    "cssVar": "--spacing-100",
+    "value": "8"
+  },
+  "spacing/150": {
+    "cssVar": "--spacing-150",
+    "value": "12"
+  },
+  "spacing/200": {
+    "cssVar": "--spacing-200",
+    "value": "16"
+  },
+  "spacing/25": {
+    "cssVar": "--spacing-25",
+    "value": "2"
+  },
+  "spacing/300": {
+    "cssVar": "--spacing-300",
+    "value": "24"
+  },
+  "spacing/container/s": {
+    "cssVar": "--spacing-container-s",
+    "value": "2"
+  },
+  "surface/background/lvl1": {
+    "cssVar": "--surface-background-lvl1",
+    "value": "#ffffff"
+  },
+  "surface/foreground/dynamic/brand/default": {
+    "cssVar": "--surface-foreground-dynamic-brand-default",
+    "value": "#7c33b5"
+  },
+  "surface/foreground/dynamic/brand/hover": {
+    "cssVar": "--surface-foreground-dynamic-brand-hover",
+    "value": "#662994"
+  },
+  "surface/foreground/dynamic/neutral/default/regular": {
+    "cssVar": "--surface-foreground-dynamic-neutral-default-regular",
+    "value": "#4b4b59"
+  },
+  "surface/foreground/dynamic/neutral/disabled": {
+    "cssVar": "--surface-foreground-dynamic-neutral-disabled",
+    "value": "#a8a8b2"
+  },
+  "surface/foreground/dynamic/neutral/inversed/default/regular": {
+    "cssVar": "--surface-foreground-dynamic-neutral-inversed-default-regular",
+    "value": "#ffffff"
+  },
+  "surface/foreground/static/neutral/inversed": {
+    "cssVar": "--surface-foreground-static-neutral-inversed",
+    "value": "#ffffff"
+  },
+  "surface/foreground/static/neutral/lvl1": {
+    "cssVar": "--surface-foreground-static-neutral-lvl1",
+    "value": "#13131a"
+  },
+  "surface/foreground/static/neutral/lvl3": {
+    "cssVar": "--surface-foreground-static-neutral-lvl3",
+    "value": "#717180"
+  }
+}

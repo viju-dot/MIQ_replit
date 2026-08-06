@@ -26,7 +26,7 @@ function Radio({
   label,
   labelText,
   disabled,
-  dark,
+  dark: _dark,
 }: {
   selected: boolean;
   label: boolean;
@@ -38,8 +38,8 @@ function Radio({
 
   if (!label) {
     return (
-      <div className="relative size-[24px]">
-        <div className="absolute left-0 size-[24px] top-0">
+      <div className="relative size-[var(--sizing-lg,24px)]">
+        <div className="absolute left-0 size-[var(--sizing-lg,24px)] top-0">
           <img
             alt=""
             className="absolute block inset-0 max-w-none size-full"
@@ -50,12 +50,13 @@ function Radio({
     );
   }
 
-  const enabledText = dark ? "text-[#f7f7fa]" : "text-[#13131a]";
+  const enabledText =
+    "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]";
 
   return (
-    <div className="flex gap-[4px] items-center">
-      <div className="relative shrink-0 size-[24px]">
-        <div className="absolute left-0 size-[24px] top-0">
+    <div className="flex gap-[var(--numbers-4,4px)] items-center">
+      <div className="relative shrink-0 size-[var(--sizing-lg,24px)]">
+        <div className="absolute left-0 size-[var(--sizing-lg,24px)] top-0">
           <img
             alt=""
             className="absolute block inset-0 max-w-none size-full"
@@ -64,12 +65,19 @@ function Radio({
         </div>
       </div>
       <div
-        className={`flex flex-col justify-center leading-[0] not-italic relative shrink-0 text-[14px] whitespace-nowrap ${
-          disabled ? "text-[#a8a8b2]" : enabledText
+        className={`flex flex-col justify-center leading-[0] not-italic relative shrink-0 text-[length:var(--body-md-regular-size,14px)] whitespace-nowrap ${
+          disabled
+            ? "text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)]"
+            : enabledText
         }`}
-        style={{ fontFamily: '"DM Sans", Helvetica', fontWeight: 400 }}
+        style={{
+          fontFamily: 'var(--body-md-regular-family, "DM Sans", Helvetica)',
+          fontWeight: "var(--body-md-regular-weight, 400)",
+        }}
       >
-        <p className="leading-[20px]">{labelText || "Option"}</p>
+        <p className="leading-[var(--body-md-regular-line-height,20px)]">
+          {labelText || "Option"}
+        </p>
       </div>
     </div>
   );
@@ -108,12 +116,13 @@ const radioConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "label/default": "#13131a",
-    "label/disabled": "#a8a8b2",
-    "size/control": "24px",
-    "gap/label": "4px",
-    "type/label": "14px / 20px",
-    "font/family": "DM Sans",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/dynamic/neutral/disabled":
+      "var(--surface-foreground-dynamic-neutral-disabled)",
+    "sizing/lg": "var(--sizing-lg)",
+    "numbers/4": "var(--numbers-4)",
+    "Body Md/Regular": "var(--body-md-regular-size)",
   },
 };
 
@@ -128,13 +137,17 @@ function RadioGroup({
   onSelect: (i: number) => void;
   dark: boolean;
 }): JSX.Element {
-  const titleColor = dark ? "text-[#f7f7fa]" : "text-[#13131a]";
+  const titleColor =
+    "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]";
   const options = [0, 1, 2];
   return (
-    <div className="flex flex-col gap-[6px] items-start">
+    <div className="flex flex-col gap-[var(--numbers-6,6px)] items-start">
       <p
-        className={`leading-[20px] not-italic relative shrink-0 text-[14px] ${titleColor} whitespace-nowrap`}
-        style={{ fontFamily: '"DM Sans", Helvetica', fontWeight: 400 }}
+        className={`leading-[var(--body-md-regular-line-height,20px)] not-italic relative shrink-0 text-[length:var(--body-md-regular-size,14px)] ${titleColor} whitespace-nowrap`}
+        style={{
+          fontFamily: 'var(--body-md-regular-family, "DM Sans", Helvetica)',
+          fontWeight: "var(--body-md-regular-weight, 400)",
+        }}
       >
         {labelText || "Radio group title:"}
       </p>
@@ -181,10 +194,10 @@ const groupConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "title/color": "#13131a",
-    "gap/options": "6px",
-    "type/title": "14px / 20px",
-    "font/family": "DM Sans",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "numbers/6": "var(--numbers-6)",
+    "Body Md/Regular": "var(--body-md-regular-size)",
   },
 };
 
@@ -210,7 +223,7 @@ export default function RadioPage(): JSX.Element {
     <section
       aria-label="Radio component playground"
       className="flex flex-col gap-6"
-      style={{ fontFamily: '"DM Sans", Helvetica' }}
+      style={{ fontFamily: 'var(--body-md-regular-family, "DM Sans", Helvetica)' }}
     >
       <Playground config={radioConfig} />
       <Playground config={groupConfig} />

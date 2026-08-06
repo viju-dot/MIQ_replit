@@ -1,0 +1,50 @@
+{
+  "Elevation Regular": {
+    "cssVar": "--elevation-regular",
+    "value": "Effect(type: DROP_SHADOW, color: shadow/lvl4, offset: (0, 8), radius: 16, spread: 0); Effect(type: DROP_SHADOW, color: shadow/lvl8, offset: (0, 1), radius: 4, spread: 0)"
+  },
+  "Elevation Selected": {
+    "cssVar": "--elevation-selected",
+    "value": "Effect(type: DROP_SHADOW, color: shadow/lvl12, offset: (0, 16), radius: 24, spread: 0); Effect(type: DROP_SHADOW, color: shadow/lvl8, offset: (0, 1), radius: 4, spread: 0)"
+  },
+  "[old]Sizing/18": {
+    "cssVar": "--old-sizing-18",
+    "value": "18"
+  },
+  "[old]Sizing/24": {
+    "cssVar": "--old-sizing-24",
+    "value": "24"
+  },
+  "[old]Sizing/32": {
+    "cssVar": "--old-sizing-32",
+    "value": "32"
+  },
+  "controls/background/active": {
+    "cssVar": "--controls-background-active",
+    "value": "#7c33b5"
+  },
+  "controls/foreground/default": {
+    "cssVar": "--controls-foreground-default",
+    "value": "#ffffff"
+  },
+  "controls/foreground/disabled": {
+    "cssVar": "--controls-foreground-disabled",
+    "value": "#c6c6cc"
+  },
+  "numbers/4": {
+    "cssVar": "--numbers-4",
+    "value": "4"
+  },
+  "shadow/lvl12": {
+    "cssVar": "--shadow-lvl12",
+    "value": "#7171801f"
+  },
+  "shadow/lvl4": {
+    "cssVar": "--shadow-lvl4",
+    "value": "#7171800a"
+  },
+  "shadow/lvl8": {
+    "cssVar": "--shadow-lvl8",
+    "value": "#71718014"
+  }
+}

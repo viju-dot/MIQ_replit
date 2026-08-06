@@ -1,0 +1,50 @@
+{
+  "Body Md/Regular": {
+    "cssVar": "--body-md-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 14, weight: 400, lineHeight: 20, letterSpacing: 0)"
+  },
+  "border/dynamic/neutral/subtle/default": {
+    "cssVar": "--border-dynamic-neutral-subtle-default",
+    "value": "#c6c6cc"
+  },
+  "border/dynamic/neutral/subtle/disabled": {
+    "cssVar": "--border-dynamic-neutral-subtle-disabled",
+    "value": "#e1e1e8"
+  },
+  "controls/background/disabled": {
+    "cssVar": "--controls-background-disabled",
+    "value": "#7171801a"
+  },
+  "controls/background/selected": {
+    "cssVar": "--controls-background-selected",
+    "value": "#7c33b5"
+  },
+  "controls/foreground/default": {
+    "cssVar": "--controls-foreground-default",
+    "value": "#ffffff"
+  },
+  "controls/foreground/disabled": {
+    "cssVar": "--controls-foreground-disabled",
+    "value": "#c6c6cc"
+  },
+  "numbers/4": {
+    "cssVar": "--numbers-4",
+    "value": "4"
+  },
+  "numbers/6": {
+    "cssVar": "--numbers-6",
+    "value": "6"
+  },
+  "surface/background/lvl1": {
+    "cssVar": "--surface-background-lvl1",
+    "value": "#ffffff"
+  },
+  "surface/foreground/dynamic/neutral/disabled": {
+    "cssVar": "--surface-foreground-dynamic-neutral-disabled",
+    "value": "#a8a8b2"
+  },
+  "surface/foreground/static/neutral/lvl1": {
+    "cssVar": "--surface-foreground-static-neutral-lvl1",
+    "value": "#13131a"
+  }
+}

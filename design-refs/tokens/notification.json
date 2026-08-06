@@ -1,0 +1,94 @@
+{
+  "Body Md/Medium": {
+    "cssVar": "--body-md-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 14, weight: 500, lineHeight: 20, letterSpacing: 0)"
+  },
+  "Body Sm/Regular": {
+    "cssVar": "--body-sm-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 12, weight: 400, lineHeight: 18, letterSpacing: 0)"
+  },
+  "Surface/MIQ/MIQ/Foreground": {
+    "cssVar": "--surface-miq-miq-foreground",
+    "value": "#ffffff"
+  },
+  "[old]Sizing/68": {
+    "cssVar": "--old-sizing-68",
+    "value": "68"
+  },
+  "container/dynamic/brand/bold/foreground/default": {
+    "cssVar": "--container-dynamic-brand-bold-foreground-default",
+    "value": "#ffffff"
+  },
+  "container/static/error/bold/background": {
+    "cssVar": "--container-static-error-bold-background",
+    "value": "#da294b"
+  },
+  "container/static/error/bold/foreground": {
+    "cssVar": "--container-static-error-bold-foreground",
+    "value": "#ffffff"
+  },
+  "container/static/info/bold/background": {
+    "cssVar": "--container-static-info-bold-background",
+    "value": "#2360db"
+  },
+  "container/static/info/bold/foreground": {
+    "cssVar": "--container-static-info-bold-foreground",
+    "value": "#ffffff"
+  },
+  "container/static/neutral/bold/foreground": {
+    "cssVar": "--container-static-neutral-bold-foreground",
+    "value": "#f7f7fa"
+  },
+  "container/static/success/bold/background": {
+    "cssVar": "--container-static-success-bold-background",
+    "value": "#1e8158"
+  },
+  "container/static/success/bold/foreground": {
+    "cssVar": "--container-static-success-bold-foreground",
+    "value": "#ffffff"
+  },
+  "numbers/20": {
+    "cssVar": "--numbers-20",
+    "value": "20"
+  },
+  "numbers/52": {
+    "cssVar": "--numbers-52",
+    "value": "52"
+  },
+  "numbers/8": {
+    "cssVar": "--numbers-8",
+    "value": "8"
+  },
+  "odd_numbers/-1": {
+    "cssVar": "--odd-numbers-1",
+    "value": "-1"
+  },
+  "odd_numbers/10": {
+    "cssVar": "--odd-numbers-10",
+    "value": "10"
+  },
+  "odd_numbers/11-5": {
+    "cssVar": "--odd-numbers-11-5",
+    "value": "11.5"
+  },
+  "odd_numbers/13": {
+    "cssVar": "--odd-numbers-13",
+    "value": "13"
+  },
+  "odd_numbers/15-5": {
+    "cssVar": "--odd-numbers-15-5",
+    "value": "15.5"
+  },
+  "odd_numbers/19": {
+    "cssVar": "--odd-numbers-19",
+    "value": "19"
+  },
+  "surface/background/lvl2": {
+    "cssVar": "--surface-background-lvl2",
+    "value": "#f7f7fa"
+  },
+  "surface/background/miq": {
+    "cssVar": "--surface-background-miq",
+    "value": "#2b0030"
+  }
+}

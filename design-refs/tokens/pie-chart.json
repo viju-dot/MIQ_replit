@@ -1,0 +1,218 @@
+{
+  "Body Lg/Regular": {
+    "cssVar": "--body-lg-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 16, weight: 400, lineHeight: 24, letterSpacing: 0)"
+  },
+  "Body Md/Regular": {
+    "cssVar": "--body-md-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 14, weight: 400, lineHeight: 20, letterSpacing: 0)"
+  },
+  "Color/Secondary/Red": {
+    "cssVar": "--color-secondary-red",
+    "value": "#FF2000"
+  },
+  "Elevation Regular": {
+    "cssVar": "--elevation-regular",
+    "value": "Effect(type: DROP_SHADOW, color: shadow/lvl4, offset: (0, 8), radius: 16, spread: 0); Effect(type: DROP_SHADOW, color: shadow/lvl8, offset: (0, 1), radius: 4, spread: 0)"
+  },
+  "Green / 50": {
+    "cssVar": "--green-50",
+    "value": "#F0FDF4"
+  },
+  "Headline Md/Regular": {
+    "cssVar": "--headline-md-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 24, weight: 400, lineHeight: 32, letterSpacing: -1.5)"
+  },
+  "Headline Sm/Medium": {
+    "cssVar": "--headline-sm-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 20, weight: 500, lineHeight: 28, letterSpacing: -1)"
+  },
+  "Headline Xl/Bold": {
+    "cssVar": "--headline-xl-bold",
+    "value": "Font(family: \"DM Sans\", style: Bold, size: 32, weight: 700, lineHeight: 40, letterSpacing: -2)"
+  },
+  "Headline Xl/Medium": {
+    "cssVar": "--headline-xl-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 32, weight: 500, lineHeight: 40, letterSpacing: -2)"
+  },
+  "Headline Xs/Medium": {
+    "cssVar": "--headline-xs-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 16, weight: 500, lineHeight: 24, letterSpacing: -0.5)"
+  },
+  "Red / 50": {
+    "cssVar": "--red-50",
+    "value": "#FEF2F2"
+  },
+  "Status (DELETE)/DELETE/success": {
+    "cssVar": "--status-delete-delete-success",
+    "value": "#1e8158"
+  },
+  "Surface DELETE/neutral-disabled-200": {
+    "cssVar": "--surface-delete-neutral-disabled-200",
+    "value": "#ebebf0"
+  },
+  "Surface DELETE/neutral-disabled-300": {
+    "cssVar": "--surface-delete-neutral-disabled-300",
+    "value": "#e1e1e8"
+  },
+  "[old]Stroke Thickness/1": {
+    "cssVar": "--old-stroke-thickness-1",
+    "value": "1"
+  },
+  "border/static/subtle/neutral": {
+    "cssVar": "--border-static-subtle-neutral",
+    "value": "#e1e1e8"
+  },
+  "container/dynamic/Brand/Subtle/foreground/default": {
+    "cssVar": "--container-dynamic-brand-subtle-foreground-default",
+    "value": "#7c33b5"
+  },
+  "container/dynamic/brand/bold/foreground/default": {
+    "cssVar": "--container-dynamic-brand-bold-foreground-default",
+    "value": "#ffffff"
+  },
+  "container/dynamic/neutral/bold/background/default": {
+    "cssVar": "--container-dynamic-neutral-bold-background-default",
+    "value": "#4b4b59"
+  },
+  "container/dynamic/neutral/subtle/background/default/regular": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-default-regular",
+    "value": "#ffffff"
+  },
+  "container/dynamic/neutral/subtle/background/default/variation": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-default-variation",
+    "value": "#ebebf0"
+  },
+  "container/dynamic/neutral/subtle/foreground/default/regular": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-default-regular",
+    "value": "#4b4b59"
+  },
+  "container/static/neutral/bold/foreground": {
+    "cssVar": "--container-static-neutral-bold-foreground",
+    "value": "#f7f7fa"
+  },
+  "datavis/border": {
+    "cssVar": "--datavis-border",
+    "value": "#ffffff"
+  },
+  "datavis/labels/adaptive": {
+    "cssVar": "--datavis-labels-adaptive",
+    "value": "#ffffff"
+  },
+  "datavis/labels/dark": {
+    "cssVar": "--datavis-labels-dark",
+    "value": "#13131a"
+  },
+  "datavis/labels/inverse": {
+    "cssVar": "--datavis-labels-inverse",
+    "value": "#13131a"
+  },
+  "datavis/qualitative/1": {
+    "cssVar": "--datavis-qualitative-1",
+    "value": "#fbbb3b"
+  },
+  "datavis/qualitative/2": {
+    "cssVar": "--datavis-qualitative-2",
+    "value": "#ef8736"
+  },
+  "datavis/qualitative/3": {
+    "cssVar": "--datavis-qualitative-3",
+    "value": "#a857e5"
+  },
+  "datavis/qualitative/4": {
+    "cssVar": "--datavis-qualitative-4",
+    "value": "#7c33b5"
+  },
+  "datavis/qualitative/5": {
+    "cssVar": "--datavis-qualitative-5",
+    "value": "#ee4980"
+  },
+  "datavis/qualitative/6": {
+    "cssVar": "--datavis-qualitative-6",
+    "value": "#d32f61"
+  },
+  "datavis/qualitative/7": {
+    "cssVar": "--datavis-qualitative-7",
+    "value": "#e1e1e8"
+  },
+  "numbers/None": {
+    "cssVar": "--numbers-none",
+    "value": "0"
+  },
+  "odd_numbers/10": {
+    "cssVar": "--odd-numbers-10",
+    "value": "10"
+  },
+  "radius/0": {
+    "cssVar": "--radius-0",
+    "value": "0"
+  },
+  "radius/25": {
+    "cssVar": "--radius-25",
+    "value": "2"
+  },
+  "shadow/lvl4": {
+    "cssVar": "--shadow-lvl4",
+    "value": "#7171800a"
+  },
+  "shadow/lvl8": {
+    "cssVar": "--shadow-lvl8",
+    "value": "#71718014"
+  },
+  "sizing/sm": {
+    "cssVar": "--sizing-sm",
+    "value": "16"
+  },
+  "spacing/0": {
+    "cssVar": "--spacing-0",
+    "value": "0"
+  },
+  "spacing/100": {
+    "cssVar": "--spacing-100",
+    "value": "8"
+  },
+  "spacing/150": {
+    "cssVar": "--spacing-150",
+    "value": "12"
+  },
+  "spacing/200": {
+    "cssVar": "--spacing-200",
+    "value": "16"
+  },
+  "spacing/300": {
+    "cssVar": "--spacing-300",
+    "value": "24"
+  },
+  "spacing/margin/0": {
+    "cssVar": "--spacing-margin-0",
+    "value": "0"
+  },
+  "stroke_weight/15": {
+    "cssVar": "--stroke-weight-15",
+    "value": "1"
+  },
+  "surface/background/lvl1": {
+    "cssVar": "--surface-background-lvl1",
+    "value": "#ffffff"
+  },
+  "surface/background/lvl2": {
+    "cssVar": "--surface-background-lvl2",
+    "value": "#f7f7fa"
+  },
+  "surface/background/miq": {
+    "cssVar": "--surface-background-miq",
+    "value": "#2b0030"
+  },
+  "surface/foreground/dynamic/brand/default": {
+    "cssVar": "--surface-foreground-dynamic-brand-default",
+    "value": "#7c33b5"
+  },
+  "surface/foreground/static/error": {
+    "cssVar": "--surface-foreground-static-error",
+    "value": "#7c33b5"
+  },
+  "surface/foreground/static/neutral/lvl1": {
+    "cssVar": "--surface-foreground-static-neutral-lvl1",
+    "value": "#13131a"
+  }
+}

@@ -15,19 +15,23 @@ function PaginationLabel({
   isInverted = false,
   labelValue = "x of y",
 }: PaginationLabelProps) {
-  let textColor = "#13131a";
+  let textColor =
+    "var(--surface-foreground-static-neutral-lvl1, #13131a)";
   if (isDisabled && isInverted) {
-    textColor = "rgba(255,255,255,0.24)";
+    textColor =
+      "var(--surface-foreground-dynamic-neutral-inversed-disabled, rgba(255,255,255,0.24))";
   } else if (isDisabled) {
-    textColor = "#a8a8b2";
+    textColor =
+      "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)";
   } else if (isInverted) {
-    textColor = "#ffffff";
+    textColor =
+      "var(--surface-foreground-static-neutral-inversed, #ffffff)";
   }
 
   return (
     <div className="flex items-center justify-end pr-2">
       <p
-        className="whitespace-nowrap text-right text-[14px] font-normal leading-[20px] [font-family:'DM_Sans',Helvetica]"
+        className="whitespace-nowrap text-right text-[length:var(--body-md-regular-size,14px)] font-normal leading-[var(--body-md-regular-line-height,20px)] [font-family:'DM_Sans',Helvetica]"
         style={{ color: textColor }}
       >
         {labelValue}
@@ -49,7 +53,7 @@ function PaginationButton({ direction, disabled, onClick }: PaginationButtonProp
       disabled={disabled}
       onClick={onClick}
       aria-label={direction === "left" ? "Previous page" : "Next page"}
-      className="flex items-center justify-center rounded-[2px] p-[7px] transition-colors hover:bg-[#71718014] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+      className="flex items-center justify-center rounded-[var(--radius-25,2px)] p-[var(--spacing-container-m,7px)] transition-colors hover:bg-[var(--container-dynamic-neutral-subtle-background-hover,#71718014)] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
     >
       <span className="flex size-5 items-center justify-center p-[2px]">
         <img
@@ -104,12 +108,15 @@ const paginationConfig: PlaygroundConfig = {
     return <Pagination key={total} total={total} />;
   },
   tokens: {
-    "text/label/default": "#13131a",
-    "text/label/disabled": "#a8a8b2",
-    "container/button/hover": "#71718014",
-    "size/button": "20px (icon), 7px padding",
-    "radius/button": "2px",
-    "typography/label": "DM Sans 14/20",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/dynamic/neutral/disabled":
+      "var(--surface-foreground-dynamic-neutral-disabled)",
+    "container/dynamic/neutral/subtle/background/hover":
+      "var(--container-dynamic-neutral-subtle-background-hover)",
+    "spacing/container/m": "var(--spacing-container-m)",
+    "radius/25": "var(--radius-25)",
+    "Body Md/Regular": "var(--body-md-regular-size) / var(--body-md-regular-line-height)",
   },
 };
 
@@ -143,7 +150,11 @@ const labelConfig: PlaygroundConfig = {
     return (
       <div
         className="flex items-center justify-end rounded-[5px] px-4 py-3"
-        style={{ backgroundColor: isInverted ? "#13131a" : "#f7f7fa" }}
+        style={{
+          backgroundColor: isInverted
+            ? "var(--surface-foreground-static-neutral-lvl1, #13131a)"
+            : "var(--surface-background-lvl2, #f7f7fa)",
+        }}
       >
         <PaginationLabel
           isDisabled={props.isDisabled === true}
@@ -154,13 +165,15 @@ const labelConfig: PlaygroundConfig = {
     );
   },
   tokens: {
-    "text/default": "#13131a",
-    "text/disabled": "#a8a8b2",
-    "text/inverted": "#ffffff",
-    "text/inverted-disabled": "rgba(255,255,255,0.24)",
-    "container/inverted/background": "#13131a",
-    "container/default/background": "#f7f7fa",
-    "radius/container": "5px",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/dynamic/neutral/disabled":
+      "var(--surface-foreground-dynamic-neutral-disabled)",
+    "surface/foreground/static/neutral/inversed":
+      "var(--surface-foreground-static-neutral-inversed)",
+    "surface/foreground/dynamic/neutral/inversed/disabled":
+      "var(--surface-foreground-dynamic-neutral-inversed-disabled)",
+    "surface/background/lvl2": "var(--surface-background-lvl2)",
   },
 };
 

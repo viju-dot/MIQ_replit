@@ -45,14 +45,14 @@ function SingleDiamond({ className }: { className?: string }) {
 function Navigation({ className }: { className?: string }) {
   return (
     <div className={className || "content-stretch flex flex-col items-start relative w-full"} data-name="Navigation">
-      <div className="bg-[#2b0030] content-stretch flex h-[64px] items-center justify-between p-[24px] relative shrink-0 w-full" data-name="Primary Navigation">
+      <div className="bg-[var(--surface-background-miq,#2b0030)] content-stretch flex h-[64px] items-center justify-between p-[24px] relative shrink-0 w-full" data-name="Primary Navigation">
         <div className="content-stretch flex gap-[0px] items-center relative shrink-0" data-name="Menu item">
           <div className="content-stretch flex gap-[32px] h-[64px] items-center justify-center relative shrink-0" data-name="Menu">
             <div className="h-full relative shrink-0 w-[100px]" data-name="Intelligence">
-              <p className="[word-break:break-word] absolute font-['DM_Sans'] font-medium leading-[24px] left-[calc(50%-43.23px)] not-italic text-[16px] text-white top-[calc(50%-10px)] whitespace-nowrap">
+              <p className="[word-break:break-word] absolute font-['DM_Sans'] font-medium leading-[var(--body-lg-medium-line-height,24px)] left-[calc(50%-43.23px)] not-italic text-[length:var(--body-lg-medium-size,16px)] text-[var(--surface-foreground-static-neutral-inversed,#ffffff)] top-[calc(50%-10px)] whitespace-nowrap">
                 Intelligence
               </p>
-              <div className="-translate-x-1/2 absolute bg-gradient-to-r bottom-0 from-[#d71982] from-[25.521%] h-[4px] left-[calc(50%-1px)] rounded-tl-[2px] rounded-tr-[2px] to-[#dad310] via-[#ff540c] via-[59.375%] w-[100px]" data-name="On" />
+              <div className="-translate-x-1/2 absolute bg-gradient-to-r bottom-0 from-[var(--gradients-sigma-1,#d71982)] from-[25.521%] h-[4px] left-[calc(50%-1px)] rounded-tl-[2px] rounded-tr-[2px] to-[#dad310] via-[var(--gradients-sigma-2,#ff540c)] via-[59.375%] w-[100px]" data-name="On" />
             </div>
           </div>
           <div className="flex flex-row items-center self-stretch">
@@ -100,14 +100,14 @@ function Navigation({ className }: { className?: string }) {
           </div>
         </div>
         <div className="content-stretch flex gap-[20px] items-center justify-end relative shrink-0" data-name="right">
-          <div className="bg-[rgba(255,255,255,0.2)] content-stretch flex gap-[8px] h-[34px] items-center justify-center px-[12px] py-[4px] relative rounded-[2px] shrink-0" data-name="language">
+          <div className="bg-[rgba(255,255,255,0.2)] content-stretch flex gap-[8px] h-[34px] items-center justify-center px-[12px] py-[4px] relative rounded-[var(--radiuses-small,2px)] shrink-0" data-name="language">
             <div className="content-stretch flex gap-[4px] items-center relative shrink-0">
               <div className="content-stretch flex items-center justify-center overflow-clip p-[2px] relative shrink-0 size-[20px]" data-name="Icon/translate">
                 <div className="h-[15.625px] relative shrink-0 w-[17.5px]" data-name="Vector">
                   <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgTranslate} />
                 </div>
               </div>
-              <p className="[word-break:break-word] font-['DM_Sans'] leading-[20px] not-italic relative shrink-0 text-[14px] text-white whitespace-nowrap">
+              <p className="[word-break:break-word] font-['DM_Sans'] leading-[var(--body-md-regular-line-height,20px)] not-italic relative shrink-0 text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-inversed,#ffffff)] whitespace-nowrap">
                 English
               </p>
             </div>
@@ -124,14 +124,14 @@ function Navigation({ className }: { className?: string }) {
                 <div className="absolute left-0 size-[32px] top-0">
                   <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgAvatarEllipse} />
                 </div>
-                <p className="-translate-x-full [word-break:break-word] absolute font-['DM_Sans'] font-medium leading-[normal] left-[calc(50%+8px)] not-italic text-[14px] text-[#13131a] text-right top-[7px] whitespace-nowrap">
+                <p className="-translate-x-full [word-break:break-word] absolute font-['DM_Sans'] font-medium leading-[normal] left-[calc(50%+8px)] not-italic text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] text-right top-[7px] whitespace-nowrap">
                   JS
                 </p>
               </div>
               <div className="-translate-x-1/2 absolute bottom-0 content-stretch flex items-start left-1/2" data-name="Badge/rounded">
                 <div className="content-stretch flex gap-[10px] h-[18px] items-start relative shrink-0" data-name="Badge/rounded">
-                  <div className="bg-gradient-to-r content-stretch flex from-[25.521%] from-[#d71982] gap-[4px] h-[18px] items-center justify-center px-[8px] py-[2px] relative rounded-[100px] shrink-0 to-[#f0e812] via-[59.375%] via-[#ff540c]">
-                    <p className="[word-break:break-word] font-['DM_Sans'] font-medium leading-[18px] not-italic relative shrink-0 text-[12px] text-white text-center whitespace-nowrap">
+                  <div className="bg-gradient-to-r content-stretch flex from-[25.521%] from-[var(--gradients-sigma-1,#d71982)] gap-[4px] h-[18px] items-center justify-center px-[8px] py-[2px] relative rounded-[var(--old-radiuses-round,100px)] shrink-0 to-[var(--gradients-sigma-3,#f0e812)] via-[59.375%] via-[var(--gradients-sigma-2,#ff540c)]">
+                    <p className="[word-break:break-word] font-['DM_Sans'] font-medium leading-[var(--body-sm-medium-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-medium-size,12px)] text-[var(--surface-foreground-static-neutral-inversed,#ffffff)] text-center whitespace-nowrap">
                       Pro+
                     </p>
                   </div>
@@ -142,14 +142,14 @@ function Navigation({ className }: { className?: string }) {
         </div>
       </div>
       <div
-        className="bg-white h-[56px] relative shrink-0 w-full"
-        style={{ filter: "drop-shadow(0px 1px 2px rgba(113,113,128,0.08)) drop-shadow(0px 8px 8px rgba(113,113,128,0.04))" }}
+        className="bg-[var(--surface-background-lvl1,#ffffff)] h-[56px] relative shrink-0 w-full"
+        style={{ filter: "drop-shadow(0px 1px 2px var(--shadow-lvl8, rgba(113,113,128,0.08))) drop-shadow(0px 8px 8px var(--shadow-lvl4, rgba(113,113,128,0.04)))" }}
         data-name="Secondary Navigation"
       >
-        <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute content-stretch flex gap-[24px] items-start leading-[20px] left-1/2 not-italic text-[14px] top-[calc(50%+0.5px)] whitespace-nowrap" data-name="Menu Items">
-          <p className="font-['DM_Sans'] font-semibold relative shrink-0 text-[#13131a]">My audience</p>
-          <p className="font-['DM_Sans'] relative shrink-0 text-[#4b4b59]">Saved audiences</p>
-          <p className="font-['DM_Sans'] relative shrink-0 text-[#4b4b59]">Monitor</p>
+        <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute content-stretch flex gap-[24px] items-start leading-[var(--body-md-regular-line-height,20px)] left-1/2 not-italic text-[length:var(--body-md-regular-size,14px)] top-[calc(50%+0.5px)] whitespace-nowrap" data-name="Menu Items">
+          <p className="font-['DM_Sans'] font-semibold relative shrink-0 text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">My audience</p>
+          <p className="font-['DM_Sans'] relative shrink-0 text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]">Saved audiences</p>
+          <p className="font-['DM_Sans'] relative shrink-0 text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]">Monitor</p>
         </div>
       </div>
     </div>
@@ -167,39 +167,39 @@ function Page({ className, pageFooter = false, swap = null }: PageProps) {
     <div
       className={
         className ||
-        "bg-[#f7f7fa] content-stretch flex flex-col gap-[32px] h-[916px] items-start max-w-[767px] overflow-clip pb-0 relative w-full"
+        "bg-[var(--surface-background-lvl2,#f7f7fa)] content-stretch flex flex-col gap-[var(--spacing-400,32px)] h-[916px] items-start max-w-[767px] overflow-clip pb-0 relative w-full"
       }
       data-name="Page"
     >
       <Navigation className="content-stretch flex flex-col items-start relative shrink-0 w-full" />
-      <div className="content-stretch flex flex-[1_0_0] items-start min-h-px overflow-clip pb-[32px] px-[16px] relative w-full" data-name="body">
+      <div className="content-stretch flex flex-[1_0_0] items-start min-h-px overflow-clip pb-[var(--spacing-400,32px)] px-[var(--screen-margin,16px)] relative w-full" data-name="body">
         {swap || (
-          <div className="bg-[rgba(209,148,255,0.2)] border border-[#d194ff] border-dashed flex-[1_0_0] h-[700px] min-w-px relative" data-name="Swap Instance" />
+          <div className="bg-[rgba(209,148,255,0.2)] border border-[var(--colours-blue-300,#d194ff)] border-dashed flex-[1_0_0] h-[700px] min-w-px relative" data-name="Swap Instance" />
         )}
       </div>
       <div className="absolute bottom-0 content-stretch flex flex-col h-[66px] items-start justify-end left-0 right-0">
         {pageFooter && (
           <div
-            className="bg-white content-center flex flex-wrap gap-[0px_16px] h-[66px] items-center justify-center relative shrink-0 w-full"
-            style={{ filter: "drop-shadow(0px -1px 2px rgba(113,113,128,0.12)) drop-shadow(0px -8px 8px rgba(113,113,128,0.08))" }}
+            className="bg-[var(--surface-background-lvl1,#ffffff)] content-center flex flex-wrap gap-[0px_16px] h-[66px] items-center justify-center relative shrink-0 w-full"
+            style={{ filter: "drop-shadow(0px -1px 2px var(--shadow-lvl12, rgba(113,113,128,0.12))) drop-shadow(0px -8px 8px var(--shadow-lvl8, rgba(113,113,128,0.08)))" }}
             data-name="Footer - Page"
           >
-            <div className="content-stretch flex flex-[1_0_0] gap-[16px] items-center justify-end min-w-px px-[16px] py-[16px] relative" data-name="ActionsRight">
-              <div className="content-stretch flex gap-[4px] items-center relative rounded-[2px] shrink-0" data-name="Button">
-                <p className="[word-break:break-word] font-['DM_Sans'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[#7c33b5] text-center whitespace-nowrap">
+            <div className="content-stretch flex flex-[1_0_0] gap-[var(--spacing-200,16px)] items-center justify-end min-w-px px-[var(--spacing-200,16px)] py-[var(--spacing-200,16px)] relative" data-name="ActionsRight">
+              <div className="content-stretch flex gap-[4px] items-center relative rounded-[var(--radiuses-small,2px)] shrink-0" data-name="Button">
+                <p className="[word-break:break-word] font-['DM_Sans'] font-medium leading-[var(--body-md-medium-line-height,20px)] not-italic relative shrink-0 text-[length:var(--body-md-medium-size,14px)] text-[var(--container-dynamic-brand-subtle-foreground-default,#7c33b5)] text-center whitespace-nowrap">
                   Link
                 </p>
               </div>
-              <div className="border border-[#4b4b59] border-solid content-stretch flex gap-0 items-center justify-end px-[12px] py-[7px] relative rounded-[2px] shrink-0" data-name="Button">
-                <div className="content-stretch flex gap-[4px] items-center justify-center relative rounded-[2px] shrink-0">
-                  <p className="[word-break:break-word] font-['DM_Sans'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[#4b4b59] text-center whitespace-nowrap">
+              <div className="border border-[var(--border-dynamic-neutral-bold-default,#4b4b59)] border-solid content-stretch flex gap-0 items-center justify-end px-[12px] py-[7px] relative rounded-[var(--radiuses-small,2px)] shrink-0" data-name="Button">
+                <div className="content-stretch flex gap-[4px] items-center justify-center relative rounded-[var(--radiuses-small,2px)] shrink-0">
+                  <p className="[word-break:break-word] font-['DM_Sans'] font-medium leading-[var(--body-md-medium-line-height,20px)] not-italic relative shrink-0 text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)] text-center whitespace-nowrap">
                     Default
                   </p>
                 </div>
               </div>
-              <div className="bg-[#7c33b5] content-stretch flex gap-0 items-center justify-end px-[12px] py-[7px] relative rounded-[2px] shrink-0" data-name="Button">
-                <div className="content-stretch flex gap-[4px] items-center justify-center relative rounded-[2px] shrink-0">
-                  <p className="[word-break:break-word] font-['DM_Sans'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-white text-center whitespace-nowrap">
+              <div className="bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)] content-stretch flex gap-0 items-center justify-end px-[12px] py-[7px] relative rounded-[var(--radiuses-small,2px)] shrink-0" data-name="Button">
+                <div className="content-stretch flex gap-[4px] items-center justify-center relative rounded-[var(--radiuses-small,2px)] shrink-0">
+                  <p className="[word-break:break-word] font-['DM_Sans'] font-medium leading-[var(--body-md-medium-line-height,20px)] not-italic relative shrink-0 text-[length:var(--body-md-medium-size,14px)] text-[var(--container-static-brand-bold-foreground,#ffffff)] text-center whitespace-nowrap">
                     Default
                   </p>
                 </div>
@@ -224,19 +224,19 @@ const categories: Cat[] = [
 
 function AtomicCategoryGroup({ active }: { active: string }) {
   return (
-    <div className="content-stretch flex flex-wrap gap-[48px] items-center justify-center relative shrink-0" data-name="Atomic design component category group">
+    <div className="content-stretch flex flex-wrap gap-[var(--spacing-600,48px)] items-center justify-center relative shrink-0" data-name="Atomic design component category group">
       {categories.map((cat) => {
         const isActive = cat.label === active;
         return (
           <div key={cat.label} className={`content-stretch flex flex-col gap-[5px] items-center relative shrink-0 ${cat.w}`}>
-            <div className={`content-stretch flex relative shrink-0 size-[52px] ${cat.boxClass}`}>
+            <div className={`content-stretch flex relative shrink-0 size-[var(--numbers-52,52px)] ${cat.boxClass}`}>
               <div className="flex-[1_0_0] h-full min-w-px relative" data-name="Vector wrap">
                 <img alt="" className="absolute block inset-0 max-w-none size-full" src={cat.src} />
               </div>
             </div>
             <p
-              className={`[word-break:break-word] font-['DM_Sans'] font-semibold leading-[32px] not-italic relative shrink-0 text-[24px] tracking-[-0.36px] whitespace-nowrap ${
-                isActive ? "text-[#4b4b59]" : "text-[#c6c6cc]"
+              className={`[word-break:break-word] font-['DM_Sans'] font-semibold leading-[var(--headline-md-semibold-line-height,32px)] not-italic relative shrink-0 text-[length:var(--headline-md-semibold-size,24px)] tracking-[-0.36px] whitespace-nowrap ${
+                isActive ? "text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]" : "text-[var(--colours-neutral-400,#c6c6cc)]"
               }`}
             >
               {cat.label}
@@ -265,15 +265,16 @@ const pageConfig: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "surface/page/background": "#f7f7fa",
-    "surface/footer/background": "#ffffff",
-    "spacing/400 (nav↔content)": "32px",
-    "margin/horizontal": "16px",
-    "swap/placeholder/background": "rgba(209,148,255,0.2)",
-    "swap/placeholder/border": "#d194ff",
-    "action/brand/bold": "#7c33b5",
-    "action/neutral/border": "#4b4b59",
-    "radius/button": "2px",
+    "surface/background/lvl2": "var(--surface-background-lvl2)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "spacing/400": "var(--spacing-400)",
+    "screen/margin": "var(--screen-margin)",
+    "colours/blue/300": "var(--colours-blue-300)",
+    "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
+    "border/dynamic/neutral/bold/default": "var(--border-dynamic-neutral-bold-default)",
+    "container/dynamic/brand/subtle/foreground/default": "var(--container-dynamic-brand-subtle-foreground-default)",
+    "container/static/brand/bold/foreground": "var(--container-static-brand-bold-foreground)",
+    "radiuses/small": "var(--radiuses-small)",
   },
 };
 
@@ -288,17 +289,16 @@ const navigationConfig: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "surface/primary-nav/background": "#2b0030",
-    "surface/secondary-nav/background": "#ffffff",
-    "text/on-brand": "#ffffff",
-    "text/secondary-nav/active": "#13131a",
-    "text/secondary-nav/inactive": "#4b4b59",
-    "badge/gradient/from": "#d71982",
-    "badge/gradient/via": "#ff540c",
-    "badge/gradient/to": "#f0e812",
-    "language/pill/background": "rgba(255,255,255,0.2)",
-    "height/primary-nav": "64px",
-    "height/secondary-nav": "56px",
+    "surface/background/miq": "var(--surface-background-miq)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "surface/foreground/static/neutral/inversed": "var(--surface-foreground-static-neutral-inversed)",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/dynamic/neutral/default/regular": "var(--surface-foreground-dynamic-neutral-default-regular)",
+    "gradients/sigma/1": "var(--gradients-sigma-1)",
+    "gradients/sigma/2": "var(--gradients-sigma-2)",
+    "gradients/sigma/3": "var(--gradients-sigma-3)",
+    "radiuses/small": "var(--radiuses-small)",
+    "old/radiuses/round": "var(--old-radiuses-round)",
   },
 };
 
@@ -322,11 +322,11 @@ const categoryConfig: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "text/category/active": "#4b4b59",
-    "text/category/inactive": "#c6c6cc",
-    "icon/size": "52px",
-    "type/category": "24px / 32px (DM Sans, -0.36px)",
-    "gap/group": "48px",
+    "surface/foreground/dynamic/neutral/default/regular": "var(--surface-foreground-dynamic-neutral-default-regular)",
+    "colours/neutral/400": "var(--colours-neutral-400)",
+    "numbers/52": "var(--numbers-52)",
+    "Headline Md/Semibold": "var(--headline-md-semibold-size) / var(--headline-md-semibold-line-height)",
+    "spacing/600": "var(--spacing-600)",
   },
 };
 
@@ -336,11 +336,11 @@ const categoryConfig: PlaygroundConfig = {
 
 function StepScreenshot({ title, aspect, src }: { title: string; aspect: string; src: string }) {
   return (
-    <div className="bg-white content-stretch flex flex-col gap-[24px] items-start p-[24px] sm:p-[40px] relative rounded-[28px] shrink-0 w-full">
-      <p className="font-['DM_Sans'] font-bold leading-[36px] not-italic text-[28px] text-[#13131a] tracking-[-0.56px]">
+    <div className="bg-[var(--surface-background-lvl1,#ffffff)] content-stretch flex flex-col gap-[var(--spacing-300,24px)] items-start p-[24px] sm:p-[40px] relative rounded-[28px] shrink-0 w-full">
+      <p className="font-['DM_Sans'] font-bold leading-[var(--headline-lg-bold-line-height,36px)] not-italic text-[length:var(--headline-lg-bold-size,28px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] tracking-[-0.56px]">
         {title}
       </p>
-      <div className={`${aspect} border border-[#e1e1e8] border-solid overflow-hidden relative rounded-[26px] shrink-0 w-full`}>
+      <div className={`${aspect} border border-[var(--border-static-subtle-neutral,#e1e1e8)] border-solid overflow-hidden relative rounded-[26px] shrink-0 w-full`}>
         <img alt={title} className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[26px] size-full" src={src} />
       </div>
     </div>
@@ -355,19 +355,19 @@ export default function PagePage(): JSX.Element {
       <Playground config={categoryConfig} />
 
       {/* Anatomy & usage documentation (reference imagery, unchanged) */}
-      <details className="rounded-xl border border-[#e1e1e8] bg-white">
-        <summary className="cursor-pointer select-none px-4 py-3 text-[13px] font-semibold text-[#4b4b59]">
+      <details className="rounded-xl border border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--surface-background-lvl1,#ffffff)]">
+        <summary className="cursor-pointer select-none px-4 py-3 text-[13px] font-semibold text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]">
           Anatomy &amp; usage guidelines
         </summary>
         <div className="flex flex-col gap-8 px-4 pb-6">
           {/* Introduction */}
-          <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[#4b4b59] tracking-[-0.36px]">
+          <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)] tracking-[-0.36px]">
             The page component is used to create responsive layouts and will replace manually created pages using frames.
           </p>
 
           {/* Anatomy */}
           <div className="flex flex-col gap-4">
-            <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[#282833]">
+            <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[var(--surface-foreground-static-neutral-lvl2,#282833)]">
               The page component contains the navigation component and a swap instance component that designers replace with
               their content. It has a responsive grid, a <span className="font-semibold">margin variable</span> for horizontal
               padding and <span className="font-semibold">spacing 400 (32px)</span> between the page content and navigation. The
@@ -403,7 +403,7 @@ export default function PagePage(): JSX.Element {
           {/* Usage */}
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-3">
-              <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[#282833] tracking-[-0.36px]">
+              <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[var(--surface-foreground-static-neutral-lvl2,#282833)] tracking-[-0.36px]">
                 <span className="font-semibold">Step 1.</span> To insert content into the page component, wrap the content in a{" "}
                 <span className="font-semibold">component</span> with <span className="font-semibold">auto-layout</span> applied.
                 Elements that transform from vertical to horizontal layout should use the{" "}
@@ -412,14 +412,14 @@ export default function PagePage(): JSX.Element {
               <StepScreenshot title="Step 1" aspect="aspect-[1985/1347]" src={imgScreenshotStep1} />
             </div>
             <div className="flex flex-col gap-3">
-              <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[#282833] tracking-[-0.36px]">
+              <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[var(--surface-foreground-static-neutral-lvl2,#282833)] tracking-[-0.36px]">
                 <span className="font-semibold">Step 2.</span> Once the content is a component, it can be replaced with a{" "}
                 <span className="font-semibold">Swap Instance frame</span>.
               </p>
               <StepScreenshot title="Step 2" aspect="aspect-[2382/896]" src={imgScreenshotStep2} />
             </div>
             <div className="flex flex-col gap-3">
-              <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[#282833] tracking-[-0.36px]">
+              <p className="font-['DM_Sans'] leading-[32px] text-[20px] text-[var(--surface-foreground-static-neutral-lvl2,#282833)] tracking-[-0.36px]">
                 <span className="font-semibold">Step 3.</span> Now the page can be{" "}
                 <span className="font-semibold">duplicated</span> to illustrate designs for larger screens by simply having a{" "}
                 <span className="font-semibold">different mode applied to it in the appearance settings</span>. The designs adapt
@@ -434,7 +434,7 @@ export default function PagePage(): JSX.Element {
             <div className="h-[2px] w-[33.677px] relative">
               <img alt="" className="absolute inset-0 max-w-none object-cover size-full" src={imgImage1} />
             </div>
-            <p className="font-['DM_Sans'] leading-[20px] text-[14px] text-[#717180]">FIBER DESIGN SYSTEM</p>
+            <p className="font-['DM_Sans'] leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl3,#717180)]">FIBER DESIGN SYSTEM</p>
             <img alt="" className="mt-1 block w-[300px] max-w-full" src={imgFiberLine} />
           </div>
         </div>

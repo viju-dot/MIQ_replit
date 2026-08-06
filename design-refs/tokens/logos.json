@@ -1,0 +1,10 @@
+{
+  "UP Gradient": {
+    "cssVar": "--up-gradient",
+    "value": ""
+  },
+  "surface/foreground/static/neutral/lvl3": {
+    "cssVar": "--surface-foreground-static-neutral-lvl3",
+    "value": "#717180"
+  }
+}

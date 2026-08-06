@@ -31,8 +31,18 @@ const caretSrc = "/figmaAssets/button/caret.svg";
 type Size = "default" | "compact";
 
 const sizeBox: Record<Size, { h: string; text: string; px: string; icon: string }> = {
-  default: { h: "h-[34px]", text: "text-[14px] leading-[20px]", px: "px-[12px] py-[7px]", icon: "size-[20px]" },
-  compact: { h: "h-[24px]", text: "text-[12px] leading-[18px]", px: "px-[8px] py-[3px]", icon: "size-[16px]" },
+  default: {
+    h: "h-[var(--height-34,34px)]",
+    text: "text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)]",
+    px: "px-[var(--spacing-150,12px)] py-[var(--odd-numbers-7,7px)]",
+    icon: "size-[20px]",
+  },
+  compact: {
+    h: "h-[24px]",
+    text: "text-[length:var(--body-sm-medium-size,12px)] leading-[var(--body-sm-medium-line-height,18px)]",
+    px: "px-[var(--spacing-100,8px)] py-[3px]",
+    icon: "size-[16px]",
+  },
 };
 
 // A simple caret icon used by dropdown buttons.
@@ -58,18 +68,44 @@ type Appearance = "fill" | "outline" | "none";
 type State = "default" | "hover" | "disabled";
 
 const fillColors: Record<Variant, { bg: string; hoverBg: string }> = {
-  primary: { bg: "#7c33b5", hoverBg: "#702ea3" },
-  secondary: { bg: "#71718014", hoverBg: "#71718029" },
+  primary: {
+    bg: "var(--container-dynamic-brand-bold-background-default,#7c33b5)",
+    hoverBg: "var(--container-dynamic-brand-bold-background-hover,#702ea3)",
+  },
+  secondary: {
+    bg: "var(--container-dynamic-neutral-subtle-background-hover,#71718014)",
+    hoverBg: "#71718029",
+  },
   destructive: { bg: "#d92d20", hoverBg: "#b42318" },
 };
 
 const outlineColors: Record<Variant, { border: string; fg: string }> = {
-  primary: { border: "#7c33b5", fg: "#7c33b5" },
-  secondary: { border: "#c6c6cc", fg: "#13131a" },
+  primary: {
+    border: "var(--border-dynamic-brand-default,#7c33b5)",
+    fg: "var(--surface-foreground-dynamic-brand-default,#7c33b5)",
+  },
+  secondary: {
+    border: "var(--border-dynamic-neutral-subtle-default,#c6c6cc)",
+    fg: "var(--surface-foreground-static-neutral-lvl1,#13131a)",
+  },
   destructive: { border: "#d92d20", fg: "#d92d20" },
 };
 
 const noneColors: Record<Variant, string> = {
+  primary: "var(--surface-foreground-dynamic-brand-default,#7c33b5)",
+  secondary: "var(--surface-foreground-static-neutral-lvl1,#13131a)",
+  destructive: "#d92d20",
+};
+
+// Raw hex values used only to build the low-opacity hover tints (color + "14")
+// where the "14" alpha suffix cannot be appended to a var() reference.
+const outlineHoverTint: Record<Variant, string> = {
+  primary: "#7c33b5",
+  secondary: "#c6c6cc",
+  destructive: "#d92d20",
+};
+
+const noneHoverTint: Record<Variant, string> = {
   primary: "#7c33b5",
   secondary: "#13131a",
   destructive: "#d92d20",
@@ -105,43 +141,43 @@ function DemoButton({
   if (appearance === "fill") {
     if (inverse) {
       // Inverse primary fill: white surface, brand foreground.
-      style.backgroundColor = "#ffffff";
-      style.color = "#7c33b5";
+      style.backgroundColor = "var(--surface-background-lvl1,#ffffff)";
+      style.color = "var(--surface-foreground-dynamic-brand-default,#7c33b5)";
     } else if (variant === "secondary") {
       style.backgroundColor = hover ? fillColors.secondary.hoverBg : fillColors.secondary.bg;
-      style.color = "#13131a";
+      style.color = "var(--surface-foreground-static-neutral-lvl1,#13131a)";
     } else {
       style.backgroundColor = hover ? fillColors[variant].hoverBg : fillColors[variant].bg;
-      style.color = "#ffffff";
+      style.color = "var(--container-dynamic-brand-bold-foreground-default,#ffffff)";
     }
   } else if (appearance === "outline") {
     const c = outlineColors[variant];
-    style.border = `1px solid ${inverse ? "#ffffff" : c.border}`;
-    style.color = inverse ? "#ffffff" : c.fg;
-    style.backgroundColor = hover ? `${c.border}14` : "transparent";
+    style.border = `1px solid ${inverse ? "var(--surface-background-lvl1,#ffffff)" : c.border}`;
+    style.color = inverse ? "var(--surface-background-lvl1,#ffffff)" : c.fg;
+    style.backgroundColor = hover ? `${outlineHoverTint[variant]}14` : "transparent";
     if (inverse) style.backgroundColor = "transparent";
   } else {
     // appearance === "none"
-    style.color = inverse ? "#ffffff" : noneColors[variant];
-    style.backgroundColor = hover ? `${noneColors[variant]}14` : "transparent";
+    style.color = inverse ? "var(--surface-background-lvl1,#ffffff)" : noneColors[variant];
+    style.backgroundColor = hover ? `${noneHoverTint[variant]}14` : "transparent";
   }
 
   if (disabled) {
     if (appearance === "fill" && !inverse && variant !== "secondary") {
-      style.backgroundColor = "#7171801a";
-      style.color = "#a8a8b2";
+      style.backgroundColor = "var(--container-dynamic-neutral-subtle-background-disabled,#7171801a)";
+      style.color = "var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)";
     } else if (appearance === "fill" && variant === "secondary") {
       style.backgroundColor = "#7171800a";
-      style.color = "#a8a8b2";
+      style.color = "var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)";
     } else if (appearance === "fill" && inverse) {
       style.backgroundColor = "#ffffff29";
       style.color = "#ffffff8a";
     } else if (appearance === "outline") {
-      style.border = `1px solid ${inverse ? "#ffffff52" : "#c6c6cc"}`;
-      style.color = inverse ? "#ffffff8a" : "#a8a8b2";
+      style.border = `1px solid ${inverse ? "#ffffff52" : "var(--border-dynamic-neutral-subtle-default,#c6c6cc)"}`;
+      style.color = inverse ? "#ffffff8a" : "var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)";
       style.backgroundColor = "transparent";
     } else {
-      style.color = inverse ? "#ffffff8a" : "#a8a8b2";
+      style.color = inverse ? "#ffffff8a" : "var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)";
       style.backgroundColor = "transparent";
     }
   }
@@ -151,15 +187,15 @@ function DemoButton({
       type="button"
       disabled={disabled}
       style={style}
-      className={`inline-flex items-center justify-center gap-[6px] rounded-[2px] font-medium ${box.h} ${
+      className={`inline-flex items-center justify-center gap-[var(--numbers-6,6px)] rounded-[var(--radiuses-small,2px)] font-medium [font-weight:var(--body-md-medium-weight,500)] ${box.h} ${
         fullWidth ? "w-full" : ""
       } ${
-        iconOnly ? (size === "compact" ? "w-[24px] px-0" : "w-[34px] px-0") : box.px
+        iconOnly ? (size === "compact" ? "w-[24px] px-0" : "w-[var(--height-34,34px)] px-0") : box.px
       } ${box.text} ${disabled ? "cursor-not-allowed" : ""}`}
     >
       {iconOnly ? (
         <span
-          className={`inline-block ${size === "compact" ? "size-[16px]" : "size-[20px]"} rounded-[2px]`}
+          className={`inline-block ${size === "compact" ? "size-[16px]" : "size-[20px]"} rounded-[var(--radiuses-small,2px)]`}
           style={{ backgroundColor: "currentColor", WebkitMaskImage: "none" }}
           aria-hidden
         />
@@ -177,11 +213,13 @@ function DemoButton({
 const slidePalette = ["#7c33b5", "#702ea3", "#7c2ea3", "#882ea3", "#902d9f", "#9b2d9f", "#9f2d98"];
 
 function AnimatedHoverButton({ dark = false }: { dark?: boolean }) {
-  const base = dark ? "#a857e5" : "#7c33b5";
+  const base = dark
+    ? "var(--illustration-brand-2,#a857e5)"
+    : "var(--container-dynamic-brand-bold-background-default,#7c33b5)";
   return (
     <button
       type="button"
-      className="group relative inline-flex h-[34px] items-center justify-center overflow-hidden rounded-[2px] px-[12px] py-[7px] text-[14px] font-medium leading-[20px] text-white"
+      className="group relative inline-flex h-[var(--height-34,34px)] items-center justify-center overflow-hidden rounded-[var(--radiuses-small,2px)] px-[var(--spacing-150,12px)] py-[var(--odd-numbers-7,7px)] text-[length:var(--body-md-medium-size,14px)] font-medium leading-[var(--body-md-medium-line-height,20px)] text-white"
       style={{ backgroundColor: base }}
     >
       {/* Sliding multi-colour background that reveals on hover (-45deg). */}
@@ -207,16 +245,16 @@ function AnimationFrames() {
     <div className="flex flex-wrap items-center justify-center gap-3">
       <div className="flex flex-col items-center gap-1">
         <div
-          className="inline-flex h-[34px] items-center justify-center rounded-[2px] px-[12px] py-[7px] text-[14px] font-medium leading-[20px] text-white"
-          style={{ backgroundColor: "#7c33b5" }}
+          className="inline-flex h-[var(--height-34,34px)] items-center justify-center rounded-[var(--radiuses-small,2px)] px-[var(--spacing-150,12px)] py-[var(--odd-numbers-7,7px)] text-[length:var(--body-md-medium-size,14px)] font-medium leading-[var(--body-md-medium-line-height,20px)] text-white"
+          style={{ backgroundColor: "var(--container-dynamic-brand-bold-background-default,#7c33b5)" }}
         >
           Default
         </div>
-        <span className="text-[12px] text-[#a8a8b2]">Default</span>
+        <span className="text-[length:var(--body-sm-medium-size,12px)] text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)]">Default</span>
       </div>
       {positions.map((left, i) => (
         <div key={i} className="flex flex-col items-center gap-1">
-          <div className="relative inline-flex h-[34px] items-center justify-center overflow-hidden rounded-[2px] px-[12px] py-[7px] text-[14px] font-medium leading-[20px] text-white">
+          <div className="relative inline-flex h-[var(--height-34,34px)] items-center justify-center overflow-hidden rounded-[var(--radiuses-small,2px)] px-[var(--spacing-150,12px)] py-[var(--odd-numbers-7,7px)] text-[length:var(--body-md-medium-size,14px)] font-medium leading-[var(--body-md-medium-line-height,20px)] text-white">
             <span
               className="pointer-events-none absolute top-1/2 flex size-[150px] -translate-y-1/2 -rotate-[135deg] items-center"
               style={{ left }}
@@ -230,7 +268,7 @@ function AnimationFrames() {
             </span>
             <span className="relative z-10 whitespace-nowrap">Default</span>
           </div>
-          <span className="text-[12px] text-[#a8a8b2]">{`hover${i + 1}`}</span>
+          <span className="text-[length:var(--body-sm-medium-size,12px)] text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)]">{`hover${i + 1}`}</span>
         </div>
       ))}
     </div>
@@ -244,10 +282,10 @@ function AnimationFrames() {
 function ButtonDropdown({ rounded = false }: { rounded?: boolean }) {
   return (
     <div
-      className={`inline-flex h-[34px] items-center gap-[2px] py-[7px] pl-[12px] pr-[8px] text-[14px] font-medium leading-[20px] text-white ${
-        rounded ? "rounded-[100px]" : "rounded-[2px] pr-[4px]"
+      className={`inline-flex h-[var(--height-34,34px)] items-center gap-[var(--numbers-2,2px)] py-[var(--odd-numbers-7,7px)] pl-[var(--spacing-150,12px)] pr-[var(--spacing-100,8px)] text-[length:var(--body-md-medium-size,14px)] font-medium leading-[var(--body-md-medium-line-height,20px)] text-white ${
+        rounded ? "rounded-[var(--old-radiuses-round,100px)]" : "rounded-[var(--radiuses-small,2px)] pr-[var(--spacing-50,4px)]"
       }`}
-      style={{ backgroundColor: "#7c33b5" }}
+      style={{ backgroundColor: "var(--container-dynamic-brand-bold-background-default,#7c33b5)" }}
     >
       <span className="whitespace-nowrap">Default</span>
       <Caret invert />
@@ -262,10 +300,10 @@ function BackToTop() {
       type="button"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      className={`inline-flex h-[34px] items-center gap-[4px] overflow-hidden py-[7px] text-[14px] font-medium leading-[20px] text-white ${
-        hover ? "rounded-l-[2px] pl-[4px] pr-[12px]" : "w-[34px] justify-center rounded-[2px]"
+      className={`inline-flex h-[var(--height-34,34px)] items-center gap-[var(--spacing-50,4px)] overflow-hidden py-[var(--odd-numbers-7,7px)] text-[length:var(--body-md-medium-size,14px)] font-medium leading-[var(--body-md-medium-line-height,20px)] text-white ${
+        hover ? "rounded-l-[var(--radiuses-small,2px)] pl-[var(--spacing-50,4px)] pr-[var(--spacing-150,12px)]" : "w-[var(--height-34,34px)] justify-center rounded-[var(--radiuses-small,2px)]"
       }`}
-      style={{ backgroundColor: hover ? "#9f2d98" : "#7c33b5" }}
+      style={{ backgroundColor: hover ? "#9f2d98" : "var(--container-dynamic-brand-bold-background-default,#7c33b5)" }}
     >
       <Caret invert size="size-[24px]" />
       {hover && <span className="whitespace-nowrap">Back to top</span>}
@@ -336,19 +374,19 @@ const buttonConfig: PlaygroundConfig = {
     );
   },
   tokens: {
-    "container/brand/bold/background": "#7c33b5",
-    "container/brand/bold/background-hover": "#702ea3",
-    "container/secondary/background": "#71718014",
-    "container/destructive/bold/background": "#d92d20",
-    "container/destructive/bold/background-hover": "#b42318",
-    "container/disabled/background": "#7171801a",
-    "foreground/on-bold": "#ffffff",
-    "foreground/brand": "#7c33b5",
-    "foreground/disabled": "#a8a8b2",
-    "border/neutral": "#c6c6cc",
-    "radius/button": "2px",
-    "size/default": "h 34px · text 14px",
-    "size/compact": "h 24px · text 12px",
+    "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
+    "container/dynamic/brand/bold/background/hover": "var(--container-dynamic-brand-bold-background-hover)",
+    "container/dynamic/brand/bold/foreground/default": "var(--container-dynamic-brand-bold-foreground-default)",
+    "container/dynamic/neutral/subtle/background/hover": "var(--container-dynamic-neutral-subtle-background-hover)",
+    "container/dynamic/neutral/subtle/background/disabled": "var(--container-dynamic-neutral-subtle-background-disabled)",
+    "surface/foreground/dynamic/brand/default": "var(--surface-foreground-dynamic-brand-default)",
+    "surface/foreground/dynamic/neutral/disabled": "var(--surface-foreground-dynamic-neutral-disabled)",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "border/dynamic/brand/default": "var(--border-dynamic-brand-default)",
+    "border/dynamic/neutral/subtle/default": "var(--border-dynamic-neutral-subtle-default)",
+    "radiuses/small": "var(--radiuses-small)",
+    "height/34": "var(--height-34)",
+    "Body Md/Medium": "var(--body-md-medium-size)",
   },
 };
 
@@ -395,9 +433,9 @@ const inverseConfig: PlaygroundConfig = {
     );
   },
   tokens: {
-    "container/inverse/background": "#ffffff",
-    "foreground/inverse": "#7c33b5",
-    "surface/dark": "#1b181f",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "surface/foreground/dynamic/brand/default": "var(--surface-foreground-dynamic-brand-default)",
+    "surface/background/lvl2": "#1b181f",
     "container/inverse/disabled": "#ffffff29",
     "foreground/inverse/disabled": "#ffffff8a",
   },
@@ -409,10 +447,10 @@ const dropdownConfig: PlaygroundConfig = {
   controls: [{ kind: "boolean", name: "rounded", label: "Rounded (pill)", defaultValue: false }],
   render: (props) => <ButtonDropdown rounded={props.rounded === true} />,
   tokens: {
-    "container/brand/bold/background": "#7c33b5",
-    "foreground/on-bold": "#ffffff",
-    "radius/standard": "2px",
-    "radius/rounded": "100px",
+    "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
+    "container/dynamic/brand/bold/foreground/default": "var(--container-dynamic-brand-bold-foreground-default)",
+    "radiuses/small": "var(--radiuses-small)",
+    "[old]Radiuses/round": "var(--old-radiuses-round)",
   },
 };
 
@@ -422,10 +460,10 @@ const backToTopConfig: PlaygroundConfig = {
   controls: [],
   render: () => <BackToTop />,
   tokens: {
-    "container/brand/bold/background": "#7c33b5",
+    "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
     "container/brand/bold/background-hover": "#9f2d98",
-    "foreground/on-bold": "#ffffff",
-    "radius/button": "2px",
+    "container/dynamic/brand/bold/foreground/default": "var(--container-dynamic-brand-bold-foreground-default)",
+    "radiuses/small": "var(--radiuses-small)",
   },
 };
 
@@ -441,15 +479,15 @@ const hoverAnimationConfig: PlaygroundConfig = {
       <div className="flex flex-col items-center gap-6">
         <AnimatedHoverButton dark={dark} />
         <div className="flex flex-col items-center gap-2">
-          <span className="text-[12px] text-[#a8a8b2]">Animation frames (Default → hover4)</span>
+          <span className="text-[length:var(--body-sm-medium-size,12px)] text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)]">Animation frames (Default → hover4)</span>
           <AnimationFrames />
         </div>
       </div>
     );
   },
   tokens: {
-    "container/brand/bold/background": "#7c33b5",
-    "container/brand/bold/background-dark": "#a857e5",
+    "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
+    "illustration/brand/2": "var(--illustration-brand-2)",
     "slide/1": "#7c33b5",
     "slide/2": "#702ea3",
     "slide/3": "#7c2ea3",

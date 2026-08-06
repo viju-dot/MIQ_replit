@@ -21,8 +21,8 @@ function Avatar() {
         </div>
         {/* Pro badge */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-start">
-          <div className="flex h-[18px] items-center justify-center gap-[4px] rounded-[100px] bg-gradient-to-r from-[#d71a82] to-[#f456ca] px-[8px] py-[2px]">
-            <p className="leading-[18px] text-[12px] font-medium text-white text-center whitespace-nowrap">
+          <div className="flex h-[18px] items-center justify-center gap-[var(--spacing-50,4px)] rounded-[100px] bg-gradient-to-r from-[#d71a82] to-[#f456ca] px-[var(--spacing-100,8px)] py-[var(--spacing-25,2px)]">
+            <p className="leading-[var(--body-sm-medium-line-height,18px)] text-[length:var(--body-sm-medium-size,12px)] font-medium text-white text-center whitespace-nowrap">
               Pro
             </p>
           </div>
@@ -51,23 +51,23 @@ function LeftCheckbox({
       onClick={onChange}
       aria-checked={checked}
       role="checkbox"
-      className="flex items-center justify-center overflow-hidden p-[2px] rounded-[2px] shrink-0 all-unset cursor-pointer disabled:cursor-not-allowed"
+      className="flex items-center justify-center overflow-hidden p-[2px] rounded-[var(--radius-25,2px)] shrink-0 all-unset cursor-pointer disabled:cursor-not-allowed"
     >
       <div className="flex items-center overflow-hidden p-[2px] shrink-0">
         <div
-          className={`flex h-[16px] w-[16px] items-center justify-center rounded-[2px] border-[1.5px] border-solid ${
+          className={`flex h-[16px] w-[16px] items-center justify-center rounded-[var(--radius-25,2px)] border-[1.5px] border-solid ${
             checked
               ? disabled
-                ? "border-transparent bg-[#7171801a]"
-                : "border-[#7c33b5] bg-[#7c33b5]"
-              : "border-[#c6c6cc] bg-transparent"
+                ? "border-transparent bg-[var(--container-dynamic-neutral-subtle-background-disabled,#7171801a)]"
+                : "border-[var(--border-dynamic-brand-default,#7c33b5)] bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)]"
+              : "border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] bg-transparent"
           }`}
         >
           {checked && (
             <svg width="10" height="8" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
                 d="M1 4L3.5 6.5L9 1"
-                stroke={disabled ? "#a8a8b2" : "#ffffff"}
+                stroke={disabled ? "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)" : "var(--container-dynamic-brand-bold-foreground-default, #ffffff)"}
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -85,7 +85,7 @@ function LeftCheckbox({
  * ------------------------------------------------------------------------- */
 function TrailingButton() {
   return (
-    <div className="flex items-center justify-center rounded-[2px] bg-[#7c33b5] p-[2px] shrink-0">
+    <div className="flex items-center justify-center rounded-[var(--radius-25,2px)] bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)] p-[2px] shrink-0">
       <div className="flex items-center justify-center p-[2px] h-[20px] w-[20px]">
         <img alt="" className="h-[16.25px] w-[16.25px]" src={imgButtonIcon} />
       </div>
@@ -130,17 +130,17 @@ function ListItem({
   disabled = false,
   onCheckChange,
   backgroundClass = "",
-  headingClass = "text-[#13131a]",
+  headingClass = "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]",
 }: ListItemProps) {
   return (
     <div className="flex flex-col items-start relative w-full min-w-[200px]">
       <div
-        className={`flex flex-col gap-[8px] items-start justify-center p-[8px] relative w-full ${backgroundClass}`}
+        className={`flex flex-col gap-[var(--spacing-100,8px)] items-start justify-center p-[var(--spacing-100,8px)] relative w-full ${backgroundClass}`}
       >
-        <div className="flex gap-[8px] items-start relative w-full">
+        <div className="flex gap-[var(--spacing-100,8px)] items-start relative w-full">
           {/* leftSlot */}
           {leftSlot && (
-            <div className="flex gap-[8px] items-center relative shrink-0">
+            <div className="flex gap-[var(--spacing-100,8px)] items-center relative shrink-0">
               <div className="flex flex-col items-start overflow-hidden relative shrink-0">
                 {leftItem ?? (
                   <LeftCheckbox
@@ -153,15 +153,15 @@ function ListItem({
             </div>
           )}
           {/* centreSlot */}
-          <div className="flex flex-1 flex-col gap-[8px] items-start min-w-0 pt-[2px] relative self-stretch">
-            <div className="flex flex-col gap-[4px] items-start relative w-full">
+          <div className="flex flex-1 flex-col gap-[var(--spacing-100,8px)] items-start min-w-0 pt-[2px] relative self-stretch">
+            <div className="flex flex-col gap-[var(--spacing-50,4px)] items-start relative w-full">
               <p
-                className={`leading-[20px] overflow-hidden text-ellipsis whitespace-nowrap text-[14px] w-full ${headingClass}`}
+                className={`leading-[var(--body-md-medium-line-height,20px)] overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--body-md-medium-size,14px)] w-full ${headingClass}`}
               >
                 {headingValue}
               </p>
               {description && (
-                <p className="h-[18px] leading-[18px] overflow-hidden text-ellipsis whitespace-nowrap text-[12px] text-[#4b4b59] w-full">
+                <p className="h-[18px] leading-[var(--body-sm-regular-line-height,18px)] overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)] w-full">
                   {descriptionValue}
                 </p>
               )}
@@ -172,15 +172,15 @@ function ListItem({
           </div>
           {/* trailingSlot */}
           {rightSlot && (
-            <div className="flex gap-[8px] items-center justify-end relative shrink-0">
-              <div className="flex gap-[8px] h-[24px] items-center justify-end overflow-hidden shrink-0">
+            <div className="flex gap-[var(--spacing-100,8px)] items-center justify-end relative shrink-0">
+              <div className="flex gap-[var(--spacing-100,8px)] h-[24px] items-center justify-end overflow-hidden shrink-0">
                 {rightItem ?? <TrailingButton />}
               </div>
             </div>
           )}
         </div>
       </div>
-      {hasSeparator && <div className="h-0 w-full border-t border-[#e1e1e8]" />}
+      {hasSeparator && <div className="h-0 w-full border-t border-[var(--border-static-subtle-neutral,#e1e1e8)]" />}
     </div>
   );
 }
@@ -204,7 +204,7 @@ function List({
       </div>
       {hasScroll && (
         <div className="flex items-center justify-center self-stretch shrink-0 w-[12px] py-[2px]">
-          <div className="w-[8px] flex-1 rounded-[100px] bg-[#e1e1e8]" />
+          <div className="w-[8px] flex-1 rounded-[100px] bg-[var(--border-static-subtle-neutral,#e1e1e8)]" />
         </div>
       )}
     </div>
@@ -227,29 +227,29 @@ function stateStyles(state: StateName): {
   switch (state) {
     case "Hover":
       return {
-        backgroundClass: "bg-[#71718014]",
-        headingClass: "text-[#13131a]",
+        backgroundClass: "bg-[var(--container-dynamic-neutral-subtle-background-hover,#71718014)]",
+        headingClass: "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]",
         disabled: false,
         checked: false,
       };
     case "Selected":
       return {
-        backgroundClass: "bg-[#f6ebff]",
-        headingClass: "text-[#7c33b5]",
+        backgroundClass: "bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)]",
+        headingClass: "text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]",
         disabled: false,
         checked: true,
       };
     case "Disabled":
       return {
         backgroundClass: "",
-        headingClass: "text-[#a8a8b2]",
+        headingClass: "text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)]",
         disabled: true,
         checked: false,
       };
     default:
       return {
         backgroundClass: "",
-        headingClass: "text-[#13131a]",
+        headingClass: "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]",
         disabled: false,
         checked: false,
       };
@@ -316,7 +316,7 @@ const listItemConfig: PlaygroundConfig = {
           rightSlot={props.rightSlot === true}
           contentSlot={props.contentSlot === true}
           contentItem={
-            <div className="h-[27px] w-full rounded-[6px] bg-[#f7f7fa]" />
+            <div className="h-[27px] w-full rounded-[var(--numbers-6,6px)] bg-[var(--surface-background-lvl2,#f7f7fa)]" />
           }
           hasSeparator={props.hasSeparator === true}
           checked={s.checked}
@@ -328,19 +328,20 @@ const listItemConfig: PlaygroundConfig = {
     );
   },
   tokens: {
-    "text/heading": "#13131a",
-    "text/description": "#4b4b59",
-    "text/disabled": "#a8a8b2",
-    "text/selected": "#7c33b5",
-    "container/hover/background": "#71718014",
-    "container/selected/background": "#f6ebff",
-    "container/checkbox/checked": "#7c33b5",
-    "container/checkbox/disabled": "#7171801a",
-    "border/checkbox": "#c6c6cc",
-    "border/separator": "#e1e1e8",
-    "container/content/background": "#f7f7fa",
-    "spacing/padding": "8px",
-    "radius/checkbox": "2px",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/dynamic/neutral/default/regular": "var(--surface-foreground-dynamic-neutral-default-regular)",
+    "surface/foreground/dynamic/neutral/disabled": "var(--surface-foreground-dynamic-neutral-disabled)",
+    "surface/foreground/dynamic/brand/default": "var(--surface-foreground-dynamic-brand-default)",
+    "container/dynamic/neutral/subtle/background/hover": "var(--container-dynamic-neutral-subtle-background-hover)",
+    "container/dynamic/brand/subtle/background/selected": "var(--container-dynamic-brand-subtle-background-selected)",
+    "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
+    "container/dynamic/neutral/subtle/background/disabled": "var(--container-dynamic-neutral-subtle-background-disabled)",
+    "border/dynamic/brand/default": "var(--border-dynamic-brand-default)",
+    "border/dynamic/neutral/subtle/default": "var(--border-dynamic-neutral-subtle-default)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "surface/background/lvl2": "var(--surface-background-lvl2)",
+    "spacing/100": "var(--spacing-100)",
+    "radius/25": "var(--radius-25)",
   },
 };
 
@@ -395,9 +396,8 @@ const listConfig: PlaygroundConfig = {
   tokens: {
     "container/width": "281px",
     "container/min-width": "200px",
-    "scrollbar/track": "#e1e1e8",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
     "scrollbar/width": "8px",
-    "border/separator": "#e1e1e8",
   },
 };
 

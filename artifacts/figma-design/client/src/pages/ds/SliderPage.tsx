@@ -87,11 +87,11 @@ function Indicator({
           className="flex flex-col items-center relative shrink-0"
           style={{
             filter:
-              "drop-shadow(0px 1px 2px rgba(113,113,128,0.08)) drop-shadow(0px 12px 10px rgba(113,113,128,0.1))",
+              "drop-shadow(0px 1px 2px var(--shadow-lvl8, rgba(113,113,128,0.08))) drop-shadow(0px 12px 10px var(--shadow-lvl10, rgba(113,113,128,0.1)))",
           }}
         >
-          <div className="bg-[#717180] flex flex-col items-center justify-center px-[4px] relative rounded-[2px] shrink-0">
-            <p className="font-medium leading-[18px] not-italic relative shrink-0 text-[12px] text-white whitespace-nowrap">
+          <div className="bg-[var(--surface-background-lvl5,#717180)] flex flex-col items-center justify-center px-[4px] relative rounded-[var(--radius-25,2px)] shrink-0">
+            <p className="font-medium leading-[var(--body-sm-medium-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-medium-size,12px)] text-[var(--controls-foreground-default,#ffffff)] whitespace-nowrap">
               100
             </p>
           </div>
@@ -124,11 +124,11 @@ function Indicator({
           className="flex flex-col items-center relative shrink-0"
           style={{
             filter:
-              "drop-shadow(0px 1px 2px rgba(113,113,128,0.08)) drop-shadow(0px 12px 10px rgba(113,113,128,0.1))",
+              "drop-shadow(0px 1px 2px var(--shadow-lvl8, rgba(113,113,128,0.08))) drop-shadow(0px 12px 10px var(--shadow-lvl10, rgba(113,113,128,0.1)))",
           }}
         >
-          <div className="bg-[rgba(113,113,128,0.1)] flex flex-col items-center justify-center px-[4px] relative rounded-[2px] shrink-0">
-            <p className="font-medium leading-[18px] not-italic relative shrink-0 text-[12px] text-[#a8a8b2] whitespace-nowrap">
+          <div className="bg-[var(--controls-background-disabled,rgba(113,113,128,0.1))] flex flex-col items-center justify-center px-[4px] relative rounded-[var(--radius-25,2px)] shrink-0">
+            <p className="font-medium leading-[var(--body-sm-medium-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-medium-size,12px)] text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)] whitespace-nowrap">
               100
             </p>
           </div>
@@ -193,30 +193,30 @@ function SliderTrack({
 
   // Background bar (behind the fill), full width, centered.
   const bgCls = isContinuousAndDisabled
-    ? "bg-[rgba(113,113,128,0.1)] h-[4px]"
+    ? "bg-[var(--controls-background-disabled,rgba(113,113,128,0.1))] h-[4px]"
     : isDiscreteAndDisabled
-      ? "bg-[rgba(113,113,128,0.1)] h-[8px]"
+      ? "bg-[var(--controls-background-disabled,rgba(113,113,128,0.1))] h-[8px]"
       : isContinuousAndActiveAnd1
-        ? "bg-[#7c33b5] h-[4px]"
+        ? "bg-[var(--controls-background-active,#7c33b5)] h-[4px]"
         : isContinuousAndActiveAnd2
-          ? "bg-[#e1e1e8] h-[4px]"
+          ? "bg-[var(--border-static-subtle-neutral,#e1e1e8)] h-[4px]"
           : isDiscreteAndActiveAnd1
-            ? "bg-[#7c33b5] h-[8px]"
-            : "bg-[#e1e1e8] h-[8px]";
+            ? "bg-[var(--controls-background-active,#7c33b5)] h-[8px]"
+            : "bg-[var(--border-static-subtle-neutral,#e1e1e8)] h-[8px]";
 
   // Fill bar (the coloured portion). For count=1 fill starts from left; here we
   // render it full width matching the reference geometry (300px frame).
   const fillCls = isContinuousAndDisabled
-    ? "bg-[rgba(113,113,128,0.1)] h-[4px] rounded-[4px]"
+    ? "bg-[var(--controls-background-disabled,rgba(113,113,128,0.1))] h-[4px] rounded-[var(--radius-50,4px)]"
     : isDiscreteAndDisabled
-      ? "bg-[rgba(113,113,128,0.1)] h-[8px] rounded-[4px]"
+      ? "bg-[var(--controls-background-disabled,rgba(113,113,128,0.1))] h-[8px] rounded-[var(--radius-50,4px)]"
       : isContinuousAndActiveAnd1
-        ? "bg-[#ebebf0] h-[4px] rounded-[4px]"
+        ? "bg-[var(--controls-background-inactive,#ebebf0)] h-[4px] rounded-[var(--radius-50,4px)]"
         : isContinuousAndActiveAnd2
-          ? "bg-[#7c33b5] h-[4px] rounded-[4px]"
+          ? "bg-[var(--controls-background-active,#7c33b5)] h-[4px] rounded-[var(--radius-50,4px)]"
           : isDiscreteAndActiveAnd1
-            ? "bg-[#ebebf0] h-[8px] rounded-[4px]"
-            : "bg-[#7c33b5] h-[8px] rounded-[4px]";
+            ? "bg-[var(--controls-background-inactive,#ebebf0)] h-[8px] rounded-[var(--radius-50,4px)]"
+            : "bg-[var(--controls-background-active,#7c33b5)] h-[8px] rounded-[var(--radius-50,4px)]";
 
   const indicatorState: IndicatorState =
     state === "Disabled" ? "Disabled" : "Active";
@@ -230,7 +230,7 @@ function SliderTrack({
       >
         {/* Background bar */}
         <div
-          className={`-translate-y-1/2 absolute left-0 right-0 rounded-[4px] top-1/2 ${bgCls}`}
+          className={`-translate-y-1/2 absolute left-0 right-0 rounded-[var(--radius-50,4px)] top-1/2 ${bgCls}`}
         />
 
         {/* Fill bar */}
@@ -267,18 +267,18 @@ function SliderTrack({
         {/* Steps (discrete only) */}
         {type === "Discrete" && (
           <div className="-translate-y-1/2 absolute flex h-[8px] items-center justify-between left-0 right-0 top-1/2">
-            <div className="relative rounded-[100px] shrink-0 size-[4px]" />
+            <div className="relative rounded-[var(--old-radiuses-round,100px)] shrink-0 size-[4px]" />
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
                 className={`relative shrink-0 size-[4px] ${
                   isDiscreteAndDisabled
-                    ? "bg-[#c6c6cc] rounded-[2px]"
-                    : "bg-white rounded-[100px]"
+                    ? "bg-[var(--controls-foreground-disabled,#c6c6cc)] rounded-[var(--radius-25,2px)]"
+                    : "bg-[var(--controls-foreground-default,#ffffff)] rounded-[var(--old-radiuses-round,100px)]"
                 }`}
               />
             ))}
-            <div className="relative rounded-[100px] shrink-0 size-[4px]" />
+            <div className="relative rounded-[var(--old-radiuses-round,100px)] shrink-0 size-[4px]" />
           </div>
         )}
       </div>
@@ -326,16 +326,14 @@ const sliderConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "container/brand/bold/background": "#7c33b5",
-    "container/neutral/background/inactive": "#e1e1e8",
-    "container/fill/track": "#ebebf0",
-    "container/disabled/background": "rgba(113,113,128,0.1)",
-    "container/step/on": "#ffffff",
-    "container/step/disabled": "#c6c6cc",
-    "radius/fill": "4px",
-    "size/discrete/track": "8px",
-    "size/continuous/track": "4px",
-    "size/frame": "300px wide",
+    "controls/background/active": "var(--controls-background-active)",
+    "controls/background/inactive": "var(--controls-background-inactive)",
+    "controls/background/disabled": "var(--controls-background-disabled)",
+    "controls/foreground/default": "var(--controls-foreground-default)",
+    "controls/foreground/disabled": "var(--controls-foreground-disabled)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "radius/50": "var(--radius-50)",
+    "[old]radiuses/round": "var(--old-radiuses-round)",
   },
 };
 
@@ -374,14 +372,15 @@ const indicatorConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "container/tooltip/background": "#717180",
-    "container/tooltip/disabled": "rgba(113,113,128,0.1)",
-    "text/tooltip/on": "#ffffff",
-    "text/tooltip/disabled": "#a8a8b2",
-    "radius/tooltip": "2px",
-    "size/discrete": "24px",
-    "size/continuous": "18px",
-    "size/continuous/active-marker": "32×11",
+    "surface/background/lvl5": "var(--surface-background-lvl5)",
+    "controls/background/disabled": "var(--controls-background-disabled)",
+    "controls/foreground/default": "var(--controls-foreground-default)",
+    "surface/foreground/dynamic/neutral/disabled":
+      "var(--surface-foreground-dynamic-neutral-disabled)",
+    "radius/25": "var(--radius-25)",
+    "body/sm/medium": "var(--body-sm-medium-size)",
+    "shadow/lvl8": "var(--shadow-lvl8)",
+    "shadow/lvl10": "var(--shadow-lvl10)",
   },
 };
 

@@ -1,0 +1,58 @@
+{
+  "Body Md/Regular": {
+    "cssVar": "--body-md-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 14, weight: 400, lineHeight: 20, letterSpacing: 0)"
+  },
+  "[old]Sizing/28": {
+    "cssVar": "--old-sizing-28",
+    "value": "28"
+  },
+  "border/dynamic/brand/hover": {
+    "cssVar": "--border-dynamic-brand-hover",
+    "value": "#662994"
+  },
+  "border/dynamic/brand/selected": {
+    "cssVar": "--border-dynamic-brand-selected",
+    "value": "#7c33b5"
+  },
+  "border/static/subtle/neutral": {
+    "cssVar": "--border-static-subtle-neutral",
+    "value": "#e1e1e8"
+  },
+  "container/dynamic/neutral/subtle/background/hover": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-hover",
+    "value": "#71718014"
+  },
+  "numbers/16": {
+    "cssVar": "--numbers-16",
+    "value": "16"
+  },
+  "numbers/8": {
+    "cssVar": "--numbers-8",
+    "value": "8"
+  },
+  "odd_numbers/10": {
+    "cssVar": "--odd-numbers-10",
+    "value": "10"
+  },
+  "spacing/100": {
+    "cssVar": "--spacing-100",
+    "value": "8"
+  },
+  "surface/foreground/dynamic/brand/default": {
+    "cssVar": "--surface-foreground-dynamic-brand-default",
+    "value": "#7c33b5"
+  },
+  "surface/foreground/dynamic/brand/hover": {
+    "cssVar": "--surface-foreground-dynamic-brand-hover",
+    "value": "#662994"
+  },
+  "surface/foreground/dynamic/neutral/default/variation": {
+    "cssVar": "--surface-foreground-dynamic-neutral-default-variation",
+    "value": "#13131a"
+  },
+  "surface/foreground/dynamic/neutral/disabled": {
+    "cssVar": "--surface-foreground-dynamic-neutral-disabled",
+    "value": "#a8a8b2"
+  }
+}

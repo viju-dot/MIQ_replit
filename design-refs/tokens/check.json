@@ -1,0 +1,78 @@
+{
+  "Body Md/Regular": {
+    "cssVar": "--body-md-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 14, weight: 400, lineHeight: 20, letterSpacing: 0)"
+  },
+  "[old]Radiuses/None": {
+    "cssVar": "--old-radiuses-none",
+    "value": "0"
+  },
+  "border/dynamic/error/default": {
+    "cssVar": "--border-dynamic-error-default",
+    "value": "#da294b"
+  },
+  "border/dynamic/neutral/subtle/default": {
+    "cssVar": "--border-dynamic-neutral-subtle-default",
+    "value": "#c6c6cc"
+  },
+  "border/dynamic/neutral/subtle/disabled": {
+    "cssVar": "--border-dynamic-neutral-subtle-disabled",
+    "value": "#e1e1e8"
+  },
+  "border/dynamic/neutral/subtle/hover": {
+    "cssVar": "--border-dynamic-neutral-subtle-hover",
+    "value": "#a8a8b2"
+  },
+  "container/dynamic/neutral/subtle/background/hover": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-hover",
+    "value": "#71718014"
+  },
+  "controls/background/disabled": {
+    "cssVar": "--controls-background-disabled",
+    "value": "#7171801a"
+  },
+  "controls/background/selected": {
+    "cssVar": "--controls-background-selected",
+    "value": "#7c33b5"
+  },
+  "controls/foreground/default": {
+    "cssVar": "--controls-foreground-default",
+    "value": "#ffffff"
+  },
+  "controls/foreground/disabled": {
+    "cssVar": "--controls-foreground-disabled",
+    "value": "#c6c6cc"
+  },
+  "numbers/None": {
+    "cssVar": "--numbers-none",
+    "value": "0"
+  },
+  "radius/25": {
+    "cssVar": "--radius-25",
+    "value": "2"
+  },
+  "spacing/25": {
+    "cssVar": "--spacing-25",
+    "value": "2"
+  },
+  "spacing/50": {
+    "cssVar": "--spacing-50",
+    "value": "4"
+  },
+  "spacing/container/m": {
+    "cssVar": "--spacing-container-m",
+    "value": "7"
+  },
+  "spacing/container/s": {
+    "cssVar": "--spacing-container-s",
+    "value": "2"
+  },
+  "surface/foreground/dynamic/neutral/disabled": {
+    "cssVar": "--surface-foreground-dynamic-neutral-disabled",
+    "value": "#a8a8b2"
+  },
+  "surface/foreground/static/neutral/lvl1": {
+    "cssVar": "--surface-foreground-static-neutral-lvl1",
+    "value": "#13131a"
+  }
+}

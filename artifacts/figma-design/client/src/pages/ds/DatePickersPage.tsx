@@ -40,28 +40,28 @@ function RangeInput({
 }): JSX.Element {
   if (showTime) {
     return (
-      <div className="bg-white border border-solid border-[#7c33b5] flex flex-col items-start relative rounded-[2px] w-[316px] max-w-full">
-        <div className="flex gap-[8px] h-[34px] items-center pl-[12px] pr-[8px] py-0 relative rounded-[2px] shrink-0 w-full">
+      <div className="bg-[var(--surface-background-lvl1,#ffffff)] border border-solid border-[var(--border-dynamic-brand-default,#7c33b5)] flex flex-col items-start relative rounded-[var(--radiuses-small,2px)] w-[316px] max-w-full">
+        <div className="flex gap-[var(--numbers-8,8px)] h-[var(--sizing-34,34px)] items-center pl-[12px] pr-[8px] py-0 relative rounded-[var(--radiuses-small,2px)] shrink-0 w-full">
           <div className="flex items-start relative shrink-0">
-            <div className="bg-[#f6ebff] flex h-[18px] items-center justify-center px-[3px] relative rounded-[2px] shrink-0">
-              <p className="font-['DM_Sans'] not-italic relative shrink-0 text-[14px] text-[#7c33b5] text-center whitespace-nowrap">
-                <span className="leading-[20px]">{startDate}</span>
-                <span className="leading-[20px]">{` 12:00 AM`}</span>
+            <div className="bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)] flex h-[18px] items-center justify-center px-[3px] relative rounded-[var(--radiuses-small,2px)] shrink-0">
+              <p className="font-['DM_Sans'] not-italic relative shrink-0 text-[length:var(--body-md-medium-size,14px)] text-[var(--container-dynamic-brand-subtle-foreground-delected,#7c33b5)] text-center whitespace-nowrap">
+                <span className="leading-[var(--body-md-medium-line-height,20px)]">{startDate}</span>
+                <span className="leading-[var(--body-md-medium-line-height,20px)]">{` 12:00 AM`}</span>
               </p>
             </div>
           </div>
-          <div className="flex flex-col font-['DM_Sans'] justify-center not-italic relative shrink-0 text-[14px] text-[#4b4b59] whitespace-nowrap">
-            <p className="leading-[20px]">-</p>
+          <div className="flex flex-col font-['DM_Sans'] justify-center not-italic relative shrink-0 text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)] whitespace-nowrap">
+            <p className="leading-[var(--body-md-regular-line-height,20px)]">-</p>
           </div>
           <div className="flex items-start relative shrink-0">
-            <div className="bg-[#f6ebff] flex h-[18px] items-center justify-center px-[3px] relative rounded-[2px] shrink-0">
-              <p className="font-['DM_Sans'] not-italic relative shrink-0 text-[14px] text-[#7c33b5] text-center whitespace-nowrap">
-                <span className="leading-[20px]">{endDate}</span>
-                <span className="leading-[20px]">{` 12:00 AM`}</span>
+            <div className="bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)] flex h-[18px] items-center justify-center px-[3px] relative rounded-[var(--radiuses-small,2px)] shrink-0">
+              <p className="font-['DM_Sans'] not-italic relative shrink-0 text-[length:var(--body-md-medium-size,14px)] text-[var(--container-dynamic-brand-subtle-foreground-delected,#7c33b5)] text-center whitespace-nowrap">
+                <span className="leading-[var(--body-md-medium-line-height,20px)]">{endDate}</span>
+                <span className="leading-[var(--body-md-medium-line-height,20px)]">{` 12:00 AM`}</span>
               </p>
             </div>
           </div>
-          <div className="flex-1 h-[34px] min-w-px relative" />
+          <div className="flex-1 h-[var(--sizing-34,34px)] min-w-px relative" />
           <div className="flex h-[24px] items-start relative shrink-0">
             <div className="flex items-center justify-center px-[3px] py-[2px] relative shrink-0 size-[24px]">
               <div className="h-[19.5px] relative shrink-0 w-[18px]">
@@ -79,21 +79,21 @@ function RangeInput({
   }
 
   return (
-    <div className="bg-white border border-solid border-[#7c33b5] flex flex-col items-start relative rounded-[2px] w-[316px] max-w-full">
-      <div className="flex gap-[8px] h-[34px] items-center pl-[12px] pr-[8px] py-0 relative rounded-[2px] shrink-0 w-full">
+    <div className="bg-[var(--surface-background-lvl1,#ffffff)] border border-solid border-[var(--border-dynamic-brand-default,#7c33b5)] flex flex-col items-start relative rounded-[var(--radiuses-small,2px)] w-[316px] max-w-full">
+      <div className="flex gap-[var(--numbers-8,8px)] h-[var(--sizing-34,34px)] items-center pl-[12px] pr-[8px] py-0 relative rounded-[var(--radiuses-small,2px)] shrink-0 w-full">
         <div className="flex items-start relative shrink-0">
-          <div className="bg-[#f6ebff] flex h-[18px] items-center justify-center px-[3px] relative rounded-[2px] shrink-0">
-            <p className="font-['DM_Sans'] leading-[20px] not-italic relative shrink-0 text-[14px] text-[#7c33b5] text-center whitespace-nowrap">
+          <div className="bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)] flex h-[18px] items-center justify-center px-[3px] relative rounded-[var(--radiuses-small,2px)] shrink-0">
+            <p className="font-['DM_Sans'] leading-[var(--body-md-medium-line-height,20px)] not-italic relative shrink-0 text-[length:var(--body-md-medium-size,14px)] text-[var(--container-dynamic-brand-subtle-foreground-delected,#7c33b5)] text-center whitespace-nowrap">
               {startDate}
             </p>
           </div>
         </div>
-        <div className="flex flex-col font-['DM_Sans'] justify-center not-italic relative shrink-0 text-[14px] text-[#4b4b59] whitespace-nowrap">
-          <p className="leading-[20px]">-</p>
+        <div className="flex flex-col font-['DM_Sans'] justify-center not-italic relative shrink-0 text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)] whitespace-nowrap">
+          <p className="leading-[var(--body-md-regular-line-height,20px)]">-</p>
         </div>
-        <div className="flex flex-1 gap-[8px] h-[34px] items-start min-w-px py-[8px] relative">
-          <div className="flex flex-1 flex-col font-['DM_Sans'] justify-center min-w-px not-italic overflow-hidden relative text-[14px] text-[#13131a] text-ellipsis whitespace-nowrap">
-            <p className="leading-[20px] overflow-hidden text-ellipsis">{endDate}</p>
+        <div className="flex flex-1 gap-[var(--numbers-8,8px)] h-[var(--sizing-34,34px)] items-start min-w-px py-[8px] relative">
+          <div className="flex flex-1 flex-col font-['DM_Sans'] justify-center min-w-px not-italic overflow-hidden relative text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] text-ellipsis whitespace-nowrap">
+            <p className="leading-[var(--body-md-regular-line-height,20px)] overflow-hidden text-ellipsis">{endDate}</p>
           </div>
         </div>
         <div className="flex h-[24px] items-start relative shrink-0">
@@ -135,13 +135,14 @@ const rangeConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "border/brand": "#7c33b5",
-    "badge/background": "#f6ebff",
-    "badge/foreground": "#7c33b5",
-    "text/neutral": "#4b4b59",
-    "text/strong": "#13131a",
-    "radius/field": "2px",
-    "size/field": "316px wide · 34px tall",
+    "border/dynamic/brand/default": "var(--border-dynamic-brand-default)",
+    "container/dynamic/brand/subtle/background/selected": "var(--container-dynamic-brand-subtle-background-selected)",
+    "container/dynamic/brand/subtle/foreground/delected": "var(--container-dynamic-brand-subtle-foreground-delected)",
+    "surface/foreground/dynamic/neutral/default/regular": "var(--surface-foreground-dynamic-neutral-default-regular)",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "Radiuses/small": "var(--radiuses-small)",
+    "Sizing/34": "var(--sizing-34)",
   },
 };
 
@@ -161,7 +162,7 @@ function TimeOnlyPicker(): JSX.Element {
 
       {/* AM column */}
       <div className="absolute left-[203px] top-[50px]">
-        <p className="absolute font-['DM_Sans'] leading-[24px] left-[78.08%] not-italic right-[12.31%] text-[16px] text-[#13131a] text-center top-[calc(50%+8px)] tracking-[-0.08px] whitespace-nowrap">
+        <p className="absolute font-['DM_Sans'] leading-[var(--headline-xs-medium-line-height,24px)] left-[78.08%] not-italic right-[12.31%] text-[length:var(--headline-xs-medium-size,16px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] text-center top-[calc(50%+8px)] tracking-[-0.08px] whitespace-nowrap">
           AM
         </p>
         <div className="absolute flex items-center justify-center left-[203px] size-[24px] top-[119px]">
@@ -178,7 +179,7 @@ function TimeOnlyPicker(): JSX.Element {
 
       {/* minutes column */}
       <div className="absolute left-[117px] top-[50px]">
-        <p className="absolute font-['DM_Sans'] leading-[24px] left-[45%] not-italic right-[46.15%] text-[16px] text-[#13131a] text-center top-[calc(50%+8px)] tracking-[-0.08px] whitespace-nowrap">
+        <p className="absolute font-['DM_Sans'] leading-[var(--headline-xs-medium-line-height,24px)] left-[45%] not-italic right-[46.15%] text-[length:var(--headline-xs-medium-size,16px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] text-center top-[calc(50%+8px)] tracking-[-0.08px] whitespace-nowrap">
           00
         </p>
         <div className="absolute flex items-center justify-center left-[117px] size-[24px] top-[119px]">
@@ -195,7 +196,7 @@ function TimeOnlyPicker(): JSX.Element {
 
       {/* hours column */}
       <div className="absolute left-[32px] top-[50px]">
-        <p className="absolute font-['DM_Sans'] leading-[24px] left-[14.23%] not-italic right-[80%] text-[16px] text-[#13131a] text-center top-[calc(50%+8px)] tracking-[-0.08px] whitespace-nowrap">
+        <p className="absolute font-['DM_Sans'] leading-[var(--headline-xs-medium-line-height,24px)] left-[14.23%] not-italic right-[80%] text-[length:var(--headline-xs-medium-size,16px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] text-center top-[calc(50%+8px)] tracking-[-0.08px] whitespace-nowrap">
           12
         </p>
         <div className="absolute flex items-center justify-center left-[32px] size-[24px] top-[119px]">
@@ -210,15 +211,15 @@ function TimeOnlyPicker(): JSX.Element {
         </div>
       </div>
 
-      <p className="absolute font-['DM_Sans'] leading-[24px] left-[32.31%] not-italic right-[66.15%] text-[16px] text-[#13131a] text-center top-[calc(50%+6px)] tracking-[-0.08px] whitespace-nowrap">
+      <p className="absolute font-['DM_Sans'] leading-[var(--headline-xs-medium-line-height,24px)] left-[32.31%] not-italic right-[66.15%] text-[length:var(--headline-xs-medium-size,16px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] text-center top-[calc(50%+6px)] tracking-[-0.08px] whitespace-nowrap">
         :
       </p>
 
       {/* Header */}
       <div className="absolute left-0 top-0">
-        <div className="absolute bg-[#717180] inset-[0_0_73.42%_0] rounded-tl-[2px] rounded-tr-[2px]" />
+        <div className="absolute bg-[var(--surface-background-lvl5,#717180)] inset-[0_0_73.42%_0] rounded-tl-[var(--radiuses-small,2px)] rounded-tr-[var(--radiuses-small,2px)]" />
         <div className="absolute flex items-start left-[16px] py-0 top-[12px]">
-          <p className="font-['DM_Sans'] leading-[18px] not-italic relative shrink-0 text-[12px] text-white whitespace-nowrap">
+          <p className="font-['DM_Sans'] leading-[var(--body-sm-medium-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-medium-size,12px)] text-[var(--surface-foreground-static-neutral-inversed,#ffffff)] whitespace-nowrap">
             TIME
           </p>
         </div>
@@ -233,12 +234,10 @@ const timeConfig: PlaygroundConfig = {
   controls: [],
   render: () => <TimeOnlyPicker />,
   tokens: {
-    "surface/base": "#ffffff",
-    "header/background": "#717180",
-    "header/foreground": "#ffffff",
-    "text/strong": "#13131a",
-    "radius/picker": "2px",
-    "size/picker": "260×158",
+    "surface/background/lvl5": "var(--surface-background-lvl5)",
+    "surface/foreground/static/neutral/inversed": "var(--surface-foreground-static-neutral-inversed)",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "Radiuses/small": "var(--radiuses-small)",
   },
 };
 
@@ -331,13 +330,13 @@ const columns: { name: string; head: string; days: Day[] }[] = [
 function dayColor(tone: Day["tone"]): string {
   switch (tone) {
     case "brand":
-      return "text-[#7c33b5]";
+      return "text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]";
     case "brandFg":
-      return "text-white";
+      return "text-[var(--surface-foreground-static-neutral-inversed,#ffffff)]";
     case "disabled":
-      return "text-[#a8a8b2]";
+      return "text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)]";
     default:
-      return "text-[#13131a]";
+      return "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]";
   }
 }
 
@@ -346,11 +345,11 @@ const colLeft = [16, 50, 87, 121, 159, 193, 227];
 function DateTimePicker({ month }: { month: string }): JSX.Element {
   return (
     <div
-      className="bg-white relative h-[305px] w-[260px] rounded-[2px]"
+      className="bg-[var(--surface-background-lvl1,#ffffff)] relative h-[305px] w-[260px] rounded-[var(--radiuses-small,2px)]"
       style={pickerShadow}
     >
       {/* footer bkg */}
-      <div className="absolute bg-white border-[#e1e1e8] border-solid border-t h-[52px] left-0 rounded-bl-[2px] rounded-br-[2px] top-[253px] w-[260px]" />
+      <div className="absolute bg-[var(--surface-background-lvl1,#ffffff)] border-[var(--border-static-subtle-neutral,#e1e1e8)] border-solid border-t h-[52px] left-0 rounded-bl-[var(--radiuses-small,2px)] rounded-br-[var(--radiuses-small,2px)] top-[253px] w-[260px]" />
 
       {/* selected-week highlights */}
       <div className="absolute inset-[28.85%_4.23%_30.82%_4.62%]">
@@ -367,14 +366,14 @@ function DateTimePicker({ month }: { month: string }): JSX.Element {
       </div>
 
       {/* Columns */}
-      <div className="absolute left-[16px] top-[58px] text-[14px] text-center leading-[20px]">
+      <div className="absolute left-[16px] top-[58px] text-[length:var(--body-md-medium-size,14px)] text-center leading-[var(--body-md-medium-line-height,20px)]">
         {columns.map((col, i) => (
           <div
             key={col.name}
-            className="absolute flex flex-col gap-[13px] items-center top-[58px]"
+            className="absolute flex flex-col gap-[var(--odd-numbers-13,13px)] items-center top-[58px]"
             style={{ left: `${colLeft[i]}px` }}
           >
-            <p className="font-['DM_Sans'] font-medium relative shrink-0 text-[#13131a]">
+            <p className="font-['DM_Sans'] font-medium relative shrink-0 text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
               {col.head}
             </p>
             {col.days.map((d, j) => (
@@ -391,14 +390,14 @@ function DateTimePicker({ month }: { month: string }): JSX.Element {
 
       {/* Header */}
       <div className="absolute left-0 top-0">
-        <div className="absolute bg-[#717180] inset-[0_0_86.23%_0] rounded-tl-[2px] rounded-tr-[2px]" />
+        <div className="absolute bg-[var(--surface-background-lvl5,#717180)] inset-[0_0_86.23%_0] rounded-tl-[var(--radiuses-small,2px)] rounded-tr-[var(--radiuses-small,2px)]" />
         <div className="absolute flex items-start left-[16px] py-0 top-[12px]">
-          <p className="font-['DM_Sans'] leading-[18px] not-italic relative shrink-0 text-[12px] text-white whitespace-nowrap">
+          <p className="font-['DM_Sans'] leading-[var(--body-sm-medium-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-medium-size,12px)] text-[var(--surface-foreground-static-neutral-inversed,#ffffff)] whitespace-nowrap">
             {month}
           </p>
         </div>
         <div className="absolute flex items-center justify-end left-[192px] top-[8px]">
-          <div className="flex items-center justify-center p-[7px] relative rounded-[2px] shrink-0">
+          <div className="flex items-center justify-center p-[7px] relative rounded-[var(--radiuses-small,2px)] shrink-0">
             <div className="flex items-center justify-center p-[2px] relative shrink-0 size-[20px]">
               <div className="relative shrink-0 size-[20px]">
                 <img
@@ -409,7 +408,7 @@ function DateTimePicker({ month }: { month: string }): JSX.Element {
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-center p-[7px] relative rounded-[2px] shrink-0">
+          <div className="flex items-center justify-center p-[7px] relative rounded-[var(--radiuses-small,2px)] shrink-0">
             <div className="flex items-center justify-center p-[2px] relative shrink-0 size-[20px]">
               <div className="relative shrink-0 size-[20px]">
                 <img
@@ -430,7 +429,7 @@ function DateTimePicker({ month }: { month: string }): JSX.Element {
             <img alt="" className="absolute block inset-0 max-w-none size-full" src={dateTime.clock} />
           </div>
         </div>
-        <p className="absolute font-['DM_Sans'] inset-[88.2%_26.15%_5.25%_35.38%] leading-[20px] not-italic text-[14px] text-[#13131a] whitespace-nowrap">
+        <p className="absolute font-['DM_Sans'] inset-[88.2%_26.15%_5.25%_35.38%] leading-[var(--body-md-regular-line-height,20px)] not-italic text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] whitespace-nowrap">
           12:00 AM (UTC)
         </p>
       </div>
@@ -446,15 +445,14 @@ const dateTimeConfig: PlaygroundConfig = {
   ],
   render: (props: PropValues) => <DateTimePicker month={String(props.month)} />,
   tokens: {
-    "surface/base": "#ffffff",
-    "header/background": "#717180",
-    "border/footer": "#e1e1e8",
-    "day/brand": "#7c33b5",
-    "day/selected-foreground": "#ffffff",
-    "day/disabled": "#a8a8b2",
-    "day/default": "#13131a",
-    "radius/picker": "2px",
-    "size/picker": "260×305",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "surface/background/lvl5": "var(--surface-background-lvl5)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "surface/foreground/dynamic/brand/default": "var(--surface-foreground-dynamic-brand-default)",
+    "surface/foreground/static/neutral/inversed": "var(--surface-foreground-static-neutral-inversed)",
+    "surface/foreground/dynamic/neutral/disabled": "var(--surface-foreground-dynamic-neutral-disabled)",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "Radiuses/small": "var(--radiuses-small)",
   },
 };
 

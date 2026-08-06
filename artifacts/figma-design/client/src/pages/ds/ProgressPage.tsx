@@ -4,15 +4,15 @@ import type { PlaygroundConfig } from "@/components/playground/types";
 type ProgressState = "Alert" | "Info" | "Success" | "Warning" | "Pause";
 
 const STATE_COLORS: Record<ProgressState, string> = {
-  Alert: "#da294b",
-  Info: "#2360db",
-  Success: "#1e8158",
-  Warning: "#f8c500",
-  Pause: "#c76217",
+  Alert: "var(--progress-error, #da294b)",
+  Info: "var(--progress-info, #2360db)",
+  Success: "var(--progress-success, #1e8158)",
+  Warning: "var(--progress-warning, #f8c500)",
+  Pause: "var(--progress-orange, #c76217)",
 };
 
-const BASE_COLOR = "#e1e1e8";
-const LABEL_COLOR = "#13131a";
+const BASE_COLOR = "var(--progress-neutral, #e1e1e8)";
+const LABEL_COLOR = "var(--surface-foreground-static-neutral-lvl1, #13131a)";
 
 /**
  * Fiber progress bar — parametric across the real Figma variant axes:
@@ -39,13 +39,13 @@ function FiberProgress({
   // Bar-only variant (no labels): height 6px, width 288px, fill 63.89%.
   if (!hasLabels) {
     return (
-      <div className="relative h-[6px] w-[288px] rounded-[4px]">
+      <div className="relative h-[6px] w-[288px] rounded-[var(--old-radiuses-4,4px)]">
         <div
-          className="absolute inset-0 rounded-[4px]"
+          className="absolute inset-0 rounded-[var(--old-radiuses-4,4px)]"
           style={{ backgroundColor: BASE_COLOR }}
         />
         <div
-          className="absolute rounded-[4px]"
+          className="absolute rounded-[var(--old-radiuses-4,4px)]"
           style={{ top: 0, bottom: 0, left: 0, right: "36.11%", backgroundColor: fill }}
         />
       </div>
@@ -60,7 +60,7 @@ function FiberProgress({
     <div className={`relative h-[32px] ${width}`}>
       {leftLabel && (
         <p
-          className="absolute left-0 top-0 whitespace-nowrap font-['DM_Sans'] text-[12px] not-italic leading-[18px]"
+          className="absolute left-0 top-0 whitespace-nowrap font-['DM_Sans'] text-[length:var(--body-sm-regular-size,12px)] not-italic leading-[var(--body-sm-regular-line-height,18px)]"
           style={{ color: LABEL_COLOR, right: "64.6%", bottom: "43.75%" }}
         >
           {leftText}
@@ -68,18 +68,18 @@ function FiberProgress({
       )}
       {rightLabel && (
         <p
-          className="absolute whitespace-nowrap text-right font-['DM_Sans'] text-[12px] not-italic leading-[18px]"
+          className="absolute whitespace-nowrap text-right font-['DM_Sans'] text-[length:var(--body-sm-regular-size,12px)] not-italic leading-[var(--body-sm-regular-line-height,18px)]"
           style={{ color: LABEL_COLOR, left: "92.24%", top: 0, right: 0, bottom: "43.75%" }}
         >
           {rightText}
         </p>
       )}
       <div
-        className="absolute rounded-[4px]"
+        className="absolute rounded-[var(--old-radiuses-4,4px)]"
         style={{ top: "81.25%", bottom: 0, left: 0, right: 0, backgroundColor: BASE_COLOR }}
       />
       <div
-        className="absolute rounded-[4px]"
+        className="absolute rounded-[var(--old-radiuses-4,4px)]"
         style={{ top: "81.25%", bottom: 0, left: 0, right: "46.27%", backgroundColor: fill }}
       />
     </div>
@@ -126,16 +126,17 @@ const config: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "state/alert": "#da294b",
-    "state/info": "#2360db",
-    "state/success": "#1e8158",
-    "state/warning": "#f8c500",
-    "state/pause": "#c76217",
-    "track/background": "#e1e1e8",
-    "label/text": "#13131a",
-    "radius/bar": "4px",
-    "size/bar-only": "288×6",
-    "size/labelled": "322×32 (bar 6px)",
+    "progress/error": "var(--progress-error)",
+    "progress/info": "var(--progress-info)",
+    "progress/success": "var(--progress-success)",
+    "progress/warning": "var(--progress-warning)",
+    "progress/orange": "var(--progress-orange)",
+    "progress/neutral": "var(--progress-neutral)",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "Body Sm/Regular": "var(--body-sm-regular-size)",
+    "[old]Radiuses/4": "var(--old-radiuses-4)",
+    "[old]Sizing/6": "var(--old-sizing-6)",
+    "[old]Sizing/32": "var(--old-sizing-32)",
   },
 };
 

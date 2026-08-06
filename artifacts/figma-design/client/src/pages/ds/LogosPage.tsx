@@ -711,6 +711,7 @@ const sigmaConfig: PlaygroundConfig = {
   ],
   render: (props) => <SigmaFrame type={props.type as SigmaType} />,
   tokens: {
+    "UP Gradient": "var(--up-gradient)",
     "size/linear": "249×28",
     "size/iconLight": "77×120",
     "size/full": "180 × aspect 1975.2/1233.98",
@@ -794,6 +795,7 @@ const loadingConfig: PlaygroundConfig = {
   ],
   render: (props) => <Loading2 variant={props.variant as "1" | "2" | "3" | "4"} />,
   tokens: {
+    "UP Gradient": "var(--up-gradient)",
     "size": "48×48",
     "gradient/up": upGradient,
   },
@@ -812,12 +814,12 @@ export default function LogosPage(): JSX.Element {
       <Playground config={loadingConfig} />
 
       {/* Text and tokens note (from the "Logos" content frame) */}
-      <div className="rounded-xl border border-[#e1e1e8] bg-white p-6 dark:border-[#33333d] dark:bg-[#26262e]">
+      <div className="rounded-xl border border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--surface-background-lvl1,#ffffff)] shadow-[var(--elevation-regular)] p-6">
         <div className="flex flex-col gap-[10px]">
-          <p className="font-['DM_Sans:Medium',_Helvetica] text-[24px] font-medium leading-[32px] tracking-[-0.36px] text-[#717180]">
+          <p className="font-['DM_Sans:Medium',_Helvetica] text-[length:var(--headline-md-semibold-size,24px)] font-medium leading-[var(--headline-md-semibold-line-height,32px)] tracking-[-0.36px] text-[var(--surface-foreground-static-neutral-lvl3,#717180)]">
             Token for text
           </p>
-          <p className="font-['DM_Sans:Medium',_Helvetica] text-[28px] font-medium leading-[36px] tracking-[-0.56px] text-black dark:text-[#f7f7fa]">
+          <p className="font-['DM_Sans:Medium',_Helvetica] text-[length:var(--headline-lg-semibold-size,28px)] font-medium leading-[var(--headline-lg-semibold-line-height,36px)] tracking-[-0.56px] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
             The text in the logos is using lvl2 foreground. Even if the original
             assets had white text, they could not be used in all contexts of the
             application. The change guarantees that the logo can be used in both

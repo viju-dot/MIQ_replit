@@ -1,0 +1,154 @@
+{
+  "Body Md/Medium": {
+    "cssVar": "--body-md-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 14, weight: 500, lineHeight: 20, letterSpacing: 0)"
+  },
+  "Body Md/Regular": {
+    "cssVar": "--body-md-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 14, weight: 400, lineHeight: 20, letterSpacing: 0)"
+  },
+  "Body Sm/Regular": {
+    "cssVar": "--body-sm-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 12, weight: 400, lineHeight: 18, letterSpacing: 0)"
+  },
+  "Color/Secondary/Red": {
+    "cssVar": "--color-secondary-red",
+    "value": "#FF2000"
+  },
+  "Display Lg/Medium": {
+    "cssVar": "--display-lg-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 56, weight: 500, lineHeight: 68, letterSpacing: -2.5)"
+  },
+  "Elevation Regular": {
+    "cssVar": "--elevation-regular",
+    "value": "Effect(type: DROP_SHADOW, color: shadow/lvl4, offset: (0, 8), radius: 16, spread: 0); Effect(type: DROP_SHADOW, color: shadow/lvl8, offset: (0, 1), radius: 4, spread: 0)"
+  },
+  "Green / 50": {
+    "cssVar": "--green-50",
+    "value": "#F0FDF4"
+  },
+  "Headline Lg/Regular": {
+    "cssVar": "--headline-lg-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 28, weight: 400, lineHeight: 36, letterSpacing: -2)"
+  },
+  "Headline Md/Regular": {
+    "cssVar": "--headline-md-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 24, weight: 400, lineHeight: 32, letterSpacing: -1.5)"
+  },
+  "Headline Sm/Medium": {
+    "cssVar": "--headline-sm-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 20, weight: 500, lineHeight: 28, letterSpacing: -1)"
+  },
+  "Headline Xl/Bold": {
+    "cssVar": "--headline-xl-bold",
+    "value": "Font(family: \"DM Sans\", style: Bold, size: 32, weight: 700, lineHeight: 40, letterSpacing: -2)"
+  },
+  "Headline Xl/Semibold": {
+    "cssVar": "--headline-xl-semibold",
+    "value": "Font(family: \"DM Sans\", style: SemiBold, size: 32, weight: 600, lineHeight: 40, letterSpacing: -2)"
+  },
+  "Radiuses/small": {
+    "cssVar": "--radiuses-small",
+    "value": "2"
+  },
+  "Red / 50": {
+    "cssVar": "--red-50",
+    "value": "#FEF2F2"
+  },
+  "Status (DELETE)/DELETE/success": {
+    "cssVar": "--status-delete-delete-success",
+    "value": "#1e8158"
+  },
+  "Surface DELETE/neutral-disabled-300": {
+    "cssVar": "--surface-delete-neutral-disabled-300",
+    "value": "#e1e1e8"
+  },
+  "border/dynamic/neutral/subtle/disabled": {
+    "cssVar": "--border-dynamic-neutral-subtle-disabled",
+    "value": "#e1e1e8"
+  },
+  "container/dynamic/neutral/subtle/background/default/regular": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-default-regular",
+    "value": "#ffffff"
+  },
+  "container/static/neutral/bold/background": {
+    "cssVar": "--container-static-neutral-bold-background",
+    "value": "#4b4b59"
+  },
+  "container/static/neutral/bold/foreground": {
+    "cssVar": "--container-static-neutral-bold-foreground",
+    "value": "#f7f7fa"
+  },
+  "container/static/success/bold/background": {
+    "cssVar": "--container-static-success-bold-background",
+    "value": "#1e8158"
+  },
+  "container/static/warning/bold/background": {
+    "cssVar": "--container-static-warning-bold-background",
+    "value": "#f8c500"
+  },
+  "numbers/8": {
+    "cssVar": "--numbers-8",
+    "value": "8"
+  },
+  "numbers/None": {
+    "cssVar": "--numbers-none",
+    "value": "0"
+  },
+  "odd_numbers/10": {
+    "cssVar": "--odd-numbers-10",
+    "value": "10"
+  },
+  "progress/brand": {
+    "cssVar": "--progress-brand",
+    "value": "#7c33b5"
+  },
+  "progress/neutral": {
+    "cssVar": "--progress-neutral",
+    "value": "#e1e1e8"
+  },
+  "shadow/lvl4": {
+    "cssVar": "--shadow-lvl4",
+    "value": "#7171800a"
+  },
+  "shadow/lvl8": {
+    "cssVar": "--shadow-lvl8",
+    "value": "#71718014"
+  },
+  "sizing/lg": {
+    "cssVar": "--sizing-lg",
+    "value": "24"
+  },
+  "spacing/150": {
+    "cssVar": "--spacing-150",
+    "value": "12"
+  },
+  "spacing/25": {
+    "cssVar": "--spacing-25",
+    "value": "2"
+  },
+  "spacing/300": {
+    "cssVar": "--spacing-300",
+    "value": "24"
+  },
+  "spacing/50": {
+    "cssVar": "--spacing-50",
+    "value": "4"
+  },
+  "surface/background/lvl1": {
+    "cssVar": "--surface-background-lvl1",
+    "value": "#ffffff"
+  },
+  "surface/background/lvl2": {
+    "cssVar": "--surface-background-lvl2",
+    "value": "#f7f7fa"
+  },
+  "surface/foreground/static/neutral/lvl1": {
+    "cssVar": "--surface-foreground-static-neutral-lvl1",
+    "value": "#13131a"
+  },
+  "surface/foreground/static/neutral/lvl3": {
+    "cssVar": "--surface-foreground-static-neutral-lvl3",
+    "value": "#717180"
+  }
+}

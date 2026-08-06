@@ -1,0 +1,122 @@
+{
+  "Body Md/Medium": {
+    "cssVar": "--body-md-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 14, weight: 500, lineHeight: 20, letterSpacing: 0)"
+  },
+  "Body Md/Regular": {
+    "cssVar": "--body-md-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 14, weight: 400, lineHeight: 20, letterSpacing: 0)"
+  },
+  "[old]Radiuses/None": {
+    "cssVar": "--old-radiuses-none",
+    "value": "0"
+  },
+  "[old]Stroke Thickness/1": {
+    "cssVar": "--old-stroke-thickness-1",
+    "value": "1"
+  },
+  "border/dynamic/neutral/subtle/default": {
+    "cssVar": "--border-dynamic-neutral-subtle-default",
+    "value": "#c6c6cc"
+  },
+  "border/static/subtle/neutral": {
+    "cssVar": "--border-static-subtle-neutral",
+    "value": "#e1e1e8"
+  },
+  "container/dynamic/brand/subtle/background/selected": {
+    "cssVar": "--container-dynamic-brand-subtle-background-selected",
+    "value": "#f6ebff"
+  },
+  "container/dynamic/brand/subtle/foreground/delected": {
+    "cssVar": "--container-dynamic-brand-subtle-foreground-delected",
+    "value": "#7c33b5"
+  },
+  "container/dynamic/neutral/subtle/background/disabled": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-disabled",
+    "value": "#7171801a"
+  },
+  "container/dynamic/neutral/subtle/background/hover": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-hover",
+    "value": "#71718014"
+  },
+  "container/dynamic/neutral/subtle/foreground/default/regular": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-default-regular",
+    "value": "#4b4b59"
+  },
+  "container/dynamic/neutral/subtle/foreground/default/variation": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-default-variation",
+    "value": "#13131a"
+  },
+  "container/dynamic/neutral/subtle/foreground/disabled": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-disabled",
+    "value": "#a8a8b2"
+  },
+  "container/dynamic/neutral/subtle/foreground/hover": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-hover",
+    "value": "#13131a"
+  },
+  "controls/background/disabled": {
+    "cssVar": "--controls-background-disabled",
+    "value": "#7171801a"
+  },
+  "controls/background/selected": {
+    "cssVar": "--controls-background-selected",
+    "value": "#7c33b5"
+  },
+  "controls/foreground/default": {
+    "cssVar": "--controls-foreground-default",
+    "value": "#ffffff"
+  },
+  "controls/foreground/disabled": {
+    "cssVar": "--controls-foreground-disabled",
+    "value": "#c6c6cc"
+  },
+  "numbers/12": {
+    "cssVar": "--numbers-12",
+    "value": "12"
+  },
+  "numbers/6": {
+    "cssVar": "--numbers-6",
+    "value": "6"
+  },
+  "numbers/8": {
+    "cssVar": "--numbers-8",
+    "value": "8"
+  },
+  "numbers/None": {
+    "cssVar": "--numbers-none",
+    "value": "0"
+  },
+  "odd_numbers/10": {
+    "cssVar": "--odd-numbers-10",
+    "value": "10"
+  },
+  "radius/25": {
+    "cssVar": "--radius-25",
+    "value": "2"
+  },
+  "spacing/100": {
+    "cssVar": "--spacing-100",
+    "value": "8"
+  },
+  "spacing/150": {
+    "cssVar": "--spacing-150",
+    "value": "12"
+  },
+  "spacing/50": {
+    "cssVar": "--spacing-50",
+    "value": "4"
+  },
+  "spacing/container/s": {
+    "cssVar": "--spacing-container-s",
+    "value": "2"
+  },
+  "surface/foreground/dynamic/brand/default": {
+    "cssVar": "--surface-foreground-dynamic-brand-default",
+    "value": "#7c33b5"
+  },
+  "surface/foreground/dynamic/neutral/disabled": {
+    "cssVar": "--surface-foreground-dynamic-neutral-disabled",
+    "value": "#a8a8b2"
+  }
+}

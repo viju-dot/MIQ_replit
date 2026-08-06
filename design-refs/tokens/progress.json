@@ -1,0 +1,50 @@
+{
+  "Body Sm/Regular": {
+    "cssVar": "--body-sm-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 12, weight: 400, lineHeight: 18, letterSpacing: 0)"
+  },
+  "[old]Radiuses/4": {
+    "cssVar": "--old-radiuses-4",
+    "value": "4"
+  },
+  "[old]Sizing/32": {
+    "cssVar": "--old-sizing-32",
+    "value": "32"
+  },
+  "[old]Sizing/6": {
+    "cssVar": "--old-sizing-6",
+    "value": "6"
+  },
+  "progress/error": {
+    "cssVar": "--progress-error",
+    "value": "#da294b"
+  },
+  "progress/info": {
+    "cssVar": "--progress-info",
+    "value": "#2360db"
+  },
+  "progress/neutral": {
+    "cssVar": "--progress-neutral",
+    "value": "#e1e1e8"
+  },
+  "progress/orange": {
+    "cssVar": "--progress-orange",
+    "value": "#c76217"
+  },
+  "progress/success": {
+    "cssVar": "--progress-success",
+    "value": "#1e8158"
+  },
+  "progress/warning": {
+    "cssVar": "--progress-warning",
+    "value": "#f8c500"
+  },
+  "surface/background/lvl1": {
+    "cssVar": "--surface-background-lvl1",
+    "value": "#ffffff"
+  },
+  "surface/foreground/static/neutral/lvl1": {
+    "cssVar": "--surface-foreground-static-neutral-lvl1",
+    "value": "#13131a"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "Headline Xl/Medium": {
+    "cssVar": "--headline-xl-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 32, weight: 500, lineHeight: 40, letterSpacing: -2)"
+  },
+  "Headline Xs/Medium": {
+    "cssVar": "--headline-xs-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 16, weight: 500, lineHeight: 24, letterSpacing: -0.5)"
+  },
+  "border/dynamic/neutral/subtle/default": {
+    "cssVar": "--border-dynamic-neutral-subtle-default",
+    "value": "#c6c6cc"
+  },
+  "border/static/subtle/neutral": {
+    "cssVar": "--border-static-subtle-neutral",
+    "value": "#e1e1e8"
+  },
+  "container/dynamic/neutral/subtle/background/default/regular": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-default-regular",
+    "value": "#ffffff"
+  },
+  "container/dynamic/neutral/subtle/background/default/variation": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-default-variation",
+    "value": "#ebebf0"
+  },
+  "container/dynamic/neutral/subtle/foreground/disabled": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-disabled",
+    "value": "#a8a8b2"
+  },
+  "surface/foreground/static/neutral/lvl1": {
+    "cssVar": "--surface-foreground-static-neutral-lvl1",
+    "value": "#13131a"
+  }
+}

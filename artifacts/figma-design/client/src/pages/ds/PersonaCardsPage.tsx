@@ -17,8 +17,8 @@ function Badge({ label }: { label: string }) {
   return (
     <div className="flex items-center shrink-0">
       <div className="flex gap-[10px] items-start shrink-0">
-        <div className="bg-[#ebebf0] flex gap-[2px] h-[18px] items-center justify-center px-[3px] py-0 relative rounded-[2px] shrink-0">
-          <p className="[word-break:break-word] font-medium leading-[18px] not-italic text-[12px] text-[#4b4b59] text-center whitespace-nowrap">
+        <div className="bg-[var(--container-static-neutral-subtle-background,#ebebf0)] flex gap-[var(--numbers-2,2px)] h-[18px] items-center justify-center px-[var(--odd-numbers-3,3px)] py-0 relative rounded-[var(--radiuses-small,2px)] shrink-0">
+          <p className="[word-break:break-word] font-medium leading-[var(--body-sm-medium-line-height,18px)] not-italic text-[length:var(--body-sm-medium-size,12px)] text-[var(--container-static-neutral-subtle-foreground,#4b4b59)] text-center whitespace-nowrap">
             {label}
           </p>
         </div>
@@ -30,9 +30,9 @@ function Badge({ label }: { label: string }) {
 function DataRow({ label, badges }: { label: string; badges: string[] }) {
   if (badges.length === 0) return null;
   return (
-    <div className="content-center flex flex-wrap gap-[8px] items-center relative shrink-0 w-full">
+    <div className="content-center flex flex-wrap gap-[var(--spacing-100,8px)] items-center relative shrink-0 w-full">
       <div className="flex items-center shrink-0">
-        <p className="[word-break:break-word] font-medium leading-[18px] not-italic text-[12px] text-[#13131a] whitespace-nowrap">
+        <p className="[word-break:break-word] font-medium leading-[var(--body-sm-medium-line-height,18px)] not-italic text-[length:var(--body-sm-medium-size,12px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] whitespace-nowrap">
           {label}
         </p>
       </div>
@@ -64,32 +64,32 @@ function PersonaCard({
 }) {
   return (
     <div
-      className="bg-white flex items-start min-w-[180px] overflow-clip relative rounded-[2px] shrink-0 w-full"
+      className="bg-[var(--surface-background-lvl1,#ffffff)] flex items-start min-w-[180px] overflow-clip relative rounded-[var(--radiuses-small,2px)] shrink-0 w-full"
       style={{
         boxShadow:
-          "0px 1px 4px 0px rgba(113,113,128,0.08), 0px 8px 16px 0px rgba(113,113,128,0.04)",
+          "0px 1px 4px 0px var(--shadow-lvl8, rgba(113,113,128,0.08)), 0px 8px 16px 0px var(--shadow-lvl4, rgba(113,113,128,0.04))",
       }}
       data-name="Smart Card"
     >
       <div className="flex flex-[1_0_0] flex-col items-start min-w-px relative" data-name="Master Card">
-        <div className="flex flex-col gap-[8px] items-start p-[16px] relative shrink-0 w-full" data-name="Content">
-          <div className="flex gap-[16px] items-start relative shrink-0 w-full" data-name="Persona Card - Content Container">
-            <div className="flex flex-[1_0_0] gap-[16px] items-start min-w-px relative" data-name="Content Container">
+        <div className="flex flex-col gap-[var(--spacing-100,8px)] items-start p-[var(--spacing-200,16px)] relative shrink-0 w-full" data-name="Content">
+          <div className="flex gap-[var(--spacing-200,16px)] items-start relative shrink-0 w-full" data-name="Persona Card - Content Container">
+            <div className="flex flex-[1_0_0] gap-[var(--spacing-200,16px)] items-start min-w-px relative" data-name="Content Container">
               {/* Persona picture */}
               <div className="h-[140px] relative shrink-0 w-[115px]" data-name="Persona picture">
                 <img
                   alt={`${name} persona`}
-                  className="absolute inset-0 max-w-none object-cover pointer-events-none size-full rounded-[2px]"
+                  className="absolute inset-0 max-w-none object-cover pointer-events-none size-full rounded-[var(--radiuses-small,2px)]"
                   src={imgPersonaPicture}
                 />
               </div>
               {/* Persona info */}
-              <div className="flex flex-[1_0_0] gap-[16px] items-start min-w-px relative" data-name="Persona Info Container">
-                <div className="flex flex-[1_0_0] flex-col gap-[12px] items-start min-w-px relative self-stretch" data-name="Left Text Container">
+              <div className="flex flex-[1_0_0] gap-[var(--spacing-200,16px)] items-start min-w-px relative" data-name="Persona Info Container">
+                <div className="flex flex-[1_0_0] flex-col gap-[var(--spacing-150,12px)] items-start min-w-px relative self-stretch" data-name="Left Text Container">
                   {/* Name */}
-                  <div className="flex gap-[8px] items-start justify-center relative shrink-0 w-full">
-                    <div className="flex flex-[1_0_0] gap-[8px] items-start min-w-px relative">
-                      <p className="[word-break:break-word] font-medium leading-[20px] not-italic text-[14px] text-[#13131a] whitespace-nowrap">
+                  <div className="flex gap-[var(--spacing-100,8px)] items-start justify-center relative shrink-0 w-full">
+                    <div className="flex flex-[1_0_0] gap-[var(--spacing-100,8px)] items-start min-w-px relative">
+                      <p className="[word-break:break-word] font-medium leading-[var(--body-md-medium-line-height,20px)] not-italic text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] whitespace-nowrap">
                         {name}
                       </p>
                     </div>
@@ -97,44 +97,44 @@ function PersonaCard({
 
                   {/* Demographics row: gender / income / age */}
                   {showDemographics && (
-                    <div className="content-start flex flex-wrap gap-[8px] items-start relative shrink-0 w-full">
+                    <div className="content-start flex flex-wrap gap-[var(--spacing-100,8px)] items-start relative shrink-0 w-full">
                       {/* Gender */}
-                      <div className="flex gap-[4px] items-center relative shrink-0">
+                      <div className="flex gap-[var(--spacing-50,4px)] items-center relative shrink-0">
                         <div className="flex items-center justify-center relative shrink-0 size-[16px]">
                           <img alt="" className="block size-[16px]" src={imgGenderMale} />
                         </div>
-                        <p className="[word-break:break-word] font-medium leading-[18px] not-italic text-[12px] text-[#13131a] whitespace-nowrap">
+                        <p className="[word-break:break-word] font-medium leading-[var(--body-sm-medium-line-height,18px)] not-italic text-[length:var(--body-sm-medium-size,12px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] whitespace-nowrap">
                           Gender:
                         </p>
-                        <p className="[word-break:break-word] font-normal leading-[18px] not-italic text-[12px] text-[#13131a] whitespace-nowrap">
+                        <p className="[word-break:break-word] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] whitespace-nowrap">
                           {gender}
                         </p>
                       </div>
                       {/* Income */}
-                      <div className="flex gap-[4px] items-center relative shrink-0">
-                        <div className="flex flex-col items-center justify-center overflow-clip px-px py-[4px] relative shrink-0 size-[16px]">
+                      <div className="flex gap-[var(--spacing-50,4px)] items-center relative shrink-0">
+                        <div className="flex flex-col items-center justify-center overflow-clip px-px py-[var(--spacing-50,4px)] relative shrink-0 size-[16px]">
                           <div className="h-[9px] relative shrink-0 w-[15px]">
                             <img alt="" className="block size-full" src={imgMoney} />
                           </div>
                         </div>
-                        <p className="[word-break:break-word] font-medium leading-[18px] not-italic text-[12px] text-[#13131a] whitespace-nowrap">
+                        <p className="[word-break:break-word] font-medium leading-[var(--body-sm-medium-line-height,18px)] not-italic text-[length:var(--body-sm-medium-size,12px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] whitespace-nowrap">
                           Income:
                         </p>
-                        <p className="[word-break:break-word] font-normal leading-[18px] not-italic text-[12px] text-[#13131a] whitespace-nowrap">
+                        <p className="[word-break:break-word] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] whitespace-nowrap">
                           {income}
                         </p>
                       </div>
                       {/* Age */}
-                      <div className="flex gap-[4px] items-center relative shrink-0">
-                        <div className="flex flex-col items-center justify-center px-[2px] py-[3px] relative shrink-0 size-[16px]">
+                      <div className="flex gap-[var(--spacing-50,4px)] items-center relative shrink-0">
+                        <div className="flex flex-col items-center justify-center px-[var(--spacing-25,2px)] py-[var(--odd-numbers-3,3px)] relative shrink-0 size-[16px]">
                           <div className="h-[11px] relative shrink-0 w-[13px]">
                             <img alt="" className="block size-full" src={imgIdCard} />
                           </div>
                         </div>
-                        <p className="[word-break:break-word] font-medium leading-[18px] not-italic text-[12px] text-[#13131a] whitespace-nowrap">
+                        <p className="[word-break:break-word] font-medium leading-[var(--body-sm-medium-line-height,18px)] not-italic text-[length:var(--body-sm-medium-size,12px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] whitespace-nowrap">
                           Age:
                         </p>
-                        <p className="[word-break:break-word] font-normal leading-[18px] not-italic text-[12px] text-[#13131a] whitespace-nowrap">
+                        <p className="[word-break:break-word] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] whitespace-nowrap">
                           {age}
                         </p>
                       </div>
@@ -198,17 +198,20 @@ const config: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "container/surface/background": "#ffffff",
-    "container/neutral/badge/background": "#ebebf0",
-    "text/heading/primary": "#13131a",
-    "text/body/secondary": "#4b4b59",
-    "radius/card": "2px",
-    "radius/badge": "2px",
-    "spacing/content/padding": "16px",
-    "spacing/section/gap": "12px",
-    "size/persona-picture": "115×140",
-    "shadow/card":
-      "0px 1px 4px rgba(113,113,128,0.08), 0px 8px 16px rgba(113,113,128,0.04)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "container/static/neutral/subtle/background": "var(--container-static-neutral-subtle-background)",
+    "container/static/neutral/subtle/foreground": "var(--container-static-neutral-subtle-foreground)",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "Radiuses/small": "var(--radiuses-small)",
+    "spacing/200": "var(--spacing-200)",
+    "spacing/150": "var(--spacing-150)",
+    "spacing/100": "var(--spacing-100)",
+    "spacing/50": "var(--spacing-50)",
+    "spacing/25": "var(--spacing-25)",
+    "Body Md/Medium": "var(--body-md-medium-size)",
+    "Body Sm/Medium": "var(--body-sm-medium-size)",
+    "Body Sm/Regular": "var(--body-sm-regular-size)",
+    "Elevation Regular": "var(--shadow-lvl4), var(--shadow-lvl8)",
   },
 };
 

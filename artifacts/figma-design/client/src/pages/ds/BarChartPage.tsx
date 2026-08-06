@@ -21,14 +21,21 @@ import type { PlaygroundConfig, PropValues } from "@/components/playground/types
 
 const FONT = '"DM Sans", Helvetica';
 
-/* Fiber data-vis qualitative palette (datavis/qualitative/1..4) */
-const DATAVIS = ["#7c33b5", "#d194ff", "#3b82c4", "#5ac8b0"];
+/* Fiber data-vis qualitative palette. Values keep their original hex as the
+ * var() fallback; #7c33b5 maps to datavis/qualitative/4 and #d194ff to
+ * colours/blue-300. #3b82c4 and #5ac8b0 have no matching Figma token. */
+const DATAVIS = [
+  "var(--datavis-qualitative-4, #7c33b5)",
+  "var(--colours-blue-300, #d194ff)",
+  "#3b82c4",
+  "#5ac8b0",
+];
 
-const GRID = "#e1e1e8"; // border/static/subtle/neutral
-const GRID_DARK = "#3a3a45";
-const AXIS_LABEL = "#4b4b59"; // surface/foreground/static/neutral/lvl1
-const AXIS_LABEL_DARK = "#c6c6cc";
-const TITLE = "#13131a";
+/* Token-backed chart colors. Each var() auto-flips under [data-theme="dark"],
+ * so no per-mode conditional is needed for these. */
+const GRID = "var(--border-static-subtle-neutral, #e1e1e8)"; // border/static/subtle/neutral
+const AXIS_LABEL = "var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59)";
+const TITLE = "var(--surface-foreground-static-neutral-lvl1, #13131a)";
 
 /* ---------- shared chart primitives ---------- */
 
@@ -41,19 +48,18 @@ const Y_TICKS = [100, 75, 50, 25, 0];
 
 type ChartKind = "grouped" | "stacked" | "combo";
 
-function Legend({ series, dark }: { series: Series[]; dark: boolean }) {
-  const labelColor = dark ? AXIS_LABEL_DARK : AXIS_LABEL;
+function Legend({ series }: { series: Series[] }) {
   return (
-    <div className="flex flex-wrap items-center gap-x-[16px] gap-y-[6px]">
+    <div className="flex flex-wrap items-center gap-x-[var(--spacing-200,16px)] gap-y-[var(--spacing-75,6px)]">
       {series.map((s) => (
-        <div key={s.name} className="flex items-center gap-[6px]">
+        <div key={s.name} className="flex items-center gap-[var(--spacing-75,6px)]">
           <span
-            className="block h-[12px] w-[12px] shrink-0 rounded-[2px]"
+            className="block h-[12px] w-[12px] shrink-0 rounded-[var(--radius-25,2px)]"
             style={{ backgroundColor: s.color }}
           />
           <span
-            className="whitespace-nowrap text-[14px] leading-[20px]"
-            style={{ fontFamily: FONT, color: labelColor }}
+            className="whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)]"
+            style={{ fontFamily: FONT, color: AXIS_LABEL }}
           >
             {s.name}
           </span>
@@ -88,8 +94,8 @@ function ColumnChart({
 
   const scaleY = (v: number) => (v / max) * plotH;
 
-  const gridColor = dark ? GRID_DARK : GRID;
-  const labelColor = dark ? AXIS_LABEL_DARK : AXIS_LABEL;
+  const gridColor = GRID;
+  const labelColor = AXIS_LABEL;
 
   const linePoints =
     line &&
@@ -100,24 +106,23 @@ function ColumnChart({
     });
 
   return (
-    <div className="flex w-full flex-col gap-[12px]">
+    <div className="flex w-full flex-col gap-[var(--spacing-150,12px)]">
       {/* Legend */}
       <Legend
         series={line ? [...series, { name: line.name, color: line.color, values: [] }] : series}
-        dark={dark}
       />
 
       {/* Plot container: Y axis + plot area, X axis below */}
       <div className="flex w-full">
         {/* Y axis labels */}
         <div
-          className="flex flex-col justify-between pr-[8px] text-right"
+          className="flex flex-col justify-between pr-[var(--spacing-100,8px)] text-right"
           style={{ height: plotH }}
         >
           {Y_TICKS.map((t) => (
             <span
               key={t}
-              className="text-[14px] leading-[20px]"
+              className="text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)]"
               style={{ fontFamily: FONT, color: labelColor }}
             >
               {t}
@@ -228,11 +233,11 @@ function ColumnChart({
           </div>
 
           {/* X axis labels */}
-          <div className="mt-[6px] flex w-full justify-between">
+          <div className="mt-[var(--spacing-75,6px)] flex w-full justify-between">
             {CATEGORIES.map((c) => (
               <span
                 key={c}
-                className="text-[14px] leading-[20px]"
+                className="text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)]"
                 style={{ fontFamily: FONT, color: labelColor }}
               >
                 {c}
@@ -249,42 +254,34 @@ function ColumnChart({
 
 function SmartCard({
   title,
-  dark,
   children,
 }: {
   title: string;
-  dark: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div
-      className={`flex w-full min-w-[300px] max-w-[560px] flex-col overflow-hidden rounded-[2px] ${
-        dark ? "bg-[#1c1c24]" : "bg-white"
-      }`}
-      style={
-        dark
-          ? undefined
-          : {
-              boxShadow:
-                "0px 1px 4px 0px rgba(113,113,128,0.08), 0px 8px 16px 0px rgba(113,113,128,0.04)",
-            }
-      }
+      className="flex w-full min-w-[300px] max-w-[560px] flex-col overflow-hidden rounded-[var(--radius-25,2px)] bg-[var(--surface-background-lvl1,#ffffff)]"
+      style={{
+        boxShadow:
+          "0px 1px 4px 0px var(--shadow-lvl8, rgba(113,113,128,0.08)), 0px 8px 16px 0px var(--shadow-lvl4, rgba(113,113,128,0.04))",
+      }}
     >
       {/* header */}
-      <div className="flex items-center gap-[8px] p-[16px]">
+      <div className="flex items-center gap-[var(--spacing-100,8px)] p-[var(--spacing-200,16px)]">
         <p
-          className="text-[16px] font-medium leading-[24px] tracking-[-0.08px]"
-          style={{ fontFamily: FONT, color: dark ? "#ffffff" : TITLE }}
+          className="text-[length:var(--headline-xs-medium-size,16px)] font-medium leading-[var(--headline-xs-medium-line-height,24px)] tracking-[-0.08px]"
+          style={{ fontFamily: FONT, color: TITLE }}
         >
           {title}
         </p>
       </div>
       <div
         className="h-0 w-full border-t border-solid"
-        style={{ borderColor: dark ? GRID_DARK : GRID }}
+        style={{ borderColor: GRID }}
       />
       {/* content / plot */}
-      <div className="p-[16px]">{children}</div>
+      <div className="p-[var(--spacing-200,16px)]">{children}</div>
     </div>
   );
 }
@@ -335,11 +332,7 @@ function renderChart(props: PropValues, theme: "light" | "dark") {
     return <div className="w-full max-w-[520px]">{chart}</div>;
   }
 
-  return (
-    <SmartCard title={title} dark={dark}>
-      {chart}
-    </SmartCard>
-  );
+  return <SmartCard title={title}>{chart}</SmartCard>;
 }
 
 const config: PlaygroundConfig = {
@@ -360,17 +353,22 @@ const config: PlaygroundConfig = {
   ],
   render: renderChart,
   tokens: {
-    "border/static/subtle/neutral": GRID,
-    "surface/foreground/static/neutral/lvl1": AXIS_LABEL,
-    "datavis/qualitative/1": DATAVIS[0],
-    "datavis/qualitative/2": DATAVIS[1],
-    "datavis/qualitative/3": DATAVIS[2],
-    "datavis/qualitative/4": DATAVIS[3],
-    "surface/background/dark": "#1c1c24",
-    "radius/card": "2px",
-    "size/column-min": "16px",
-    "size/column-max": "24px",
-    "typography/body-lg": "14 / 20",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/dynamic/neutral/default/regular":
+      "var(--surface-foreground-dynamic-neutral-default-regular)",
+    "datavis/qualitative/4": "var(--datavis-qualitative-4)",
+    "shadow/lvl4": "var(--shadow-lvl4)",
+    "shadow/lvl8": "var(--shadow-lvl8)",
+    "radius/25": "var(--radius-25)",
+    "spacing/75": "var(--spacing-75)",
+    "spacing/100": "var(--spacing-100)",
+    "spacing/150": "var(--spacing-150)",
+    "spacing/200": "var(--spacing-200)",
+    "spacing/300": "var(--spacing-300)",
+    "Headline Xs/Medium": "var(--headline-xs-medium-size)",
+    "Body Md/Regular": "var(--body-md-regular-size)",
   },
 };
 
@@ -378,7 +376,7 @@ const config: PlaygroundConfig = {
 
 export default function BarChartPage() {
   return (
-    <section className="flex flex-col gap-[24px]" aria-label="Bar chart component playground">
+    <section className="flex flex-col gap-[var(--spacing-300,24px)]" aria-label="Bar chart component playground">
       <Playground config={config} />
     </section>
   );

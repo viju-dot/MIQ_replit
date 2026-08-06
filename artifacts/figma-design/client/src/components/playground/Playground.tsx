@@ -3,6 +3,23 @@ import { ChevronDown, ChevronLeft, Code2, SlidersHorizontal } from "lucide-react
 import { useTheme } from "@/lib/theme";
 import type { Control, PlaygroundConfig, PropValues } from "./types";
 
+/*
+ * Playground chrome is token-driven: colors reference Figma variables from
+ * tokens.css, so [data-theme="dark"] flips everything automatically.
+ */
+const surfaceCard = "bg-[var(--surface-background-lvl1,#ffffff)]";
+const surfaceSubtle = "bg-[var(--surface-background-lvl2,#f7f7fa)]";
+const borderToken = "border-[var(--border-static-subtle-neutral,#e1e1e8)]";
+const borderControl = "border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]";
+const textPrimary = "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]";
+const textBody = "text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]";
+const textMuted = "text-[var(--surface-foreground-static-neutral-lvl3,#717180)]";
+const brandText = "text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]";
+const brandBorder = "border-[var(--border-dynamic-brand-selected,#7c33b5)]";
+const focusBrand = "focus:border-[var(--border-dynamic-brand-selected,#7c33b5)]";
+const hoverSubtle =
+  "hover:bg-[var(--container-dynamic-neutral-subtle-background-hover,#71718014)]";
+
 function defaultsOf(controls: Control[]): PropValues {
   const v: PropValues = {};
   for (const c of controls) v[c.name] = c.defaultValue;
@@ -13,14 +30,12 @@ function ControlField({
   control,
   value,
   onChange,
-  dark,
 }: {
   control: Control;
   value: string | boolean;
   onChange: (v: string | boolean) => void;
-  dark: boolean;
 }) {
-  const labelCls = `block text-[12px] font-medium ${dark ? "text-[#c6c6cc]" : "text-[#4b4b59]"}`;
+  const labelCls = `block text-[12px] font-medium ${textBody}`;
   if (control.kind === "boolean") {
     return (
       <label className="flex cursor-pointer items-center justify-between gap-3 py-1">
@@ -31,11 +46,13 @@ function ControlField({
           aria-checked={value === true}
           onClick={() => onChange(!(value === true))}
           className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
-            value === true ? "bg-[#7c33b5]" : dark ? "bg-[#4b4b59]" : "bg-[#c6c6cc]"
+            value === true
+              ? "bg-[var(--controls-background-active,#7c33b5)]"
+              : "bg-[var(--controls-background-inactive,#c6c6cc)]"
           }`}
         >
           <span
-            className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all ${
+            className={`absolute top-0.5 h-4 w-4 rounded-full bg-[var(--controls-foreground-default,#ffffff)] transition-all ${
               value === true ? "left-[18px]" : "left-0.5"
             }`}
           />
@@ -52,11 +69,7 @@ function ControlField({
           value={String(value)}
           placeholder={control.placeholder}
           onChange={(e) => onChange(e.target.value)}
-          className={`w-full rounded-md border px-2.5 py-1.5 text-[13px] outline-none focus:border-[#7c33b5] ${
-            dark
-              ? "border-[#4b4b59] bg-[#26262e] text-[#f7f7fa]"
-              : "border-[#e1e1e8] bg-white text-[#13131a]"
-          }`}
+          className={`w-full rounded-md border px-2.5 py-1.5 text-[13px] outline-none ${focusBrand} ${borderControl} ${surfaceCard} ${textPrimary}`}
         />
       </div>
     );
@@ -68,11 +81,7 @@ function ControlField({
         <select
           value={String(value)}
           onChange={(e) => onChange(e.target.value)}
-          className={`w-full appearance-none rounded-md border px-2.5 py-1.5 pr-8 text-[13px] outline-none focus:border-[#7c33b5] ${
-            dark
-              ? "border-[#4b4b59] bg-[#26262e] text-[#f7f7fa]"
-              : "border-[#e1e1e8] bg-white text-[#13131a]"
-          }`}
+          className={`w-full appearance-none rounded-md border px-2.5 py-1.5 pr-8 text-[13px] outline-none ${focusBrand} ${borderControl} ${surfaceCard} ${textPrimary}`}
         >
           {control.options.map((o) => (
             <option key={o} value={o}>
@@ -81,9 +90,7 @@ function ControlField({
           ))}
         </select>
         <ChevronDown
-          className={`pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 ${
-            dark ? "text-[#a8a8b2]" : "text-[#71717a]"
-          }`}
+          className={`pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 ${textMuted}`}
         />
       </div>
     </div>
@@ -106,30 +113,23 @@ export function Playground({ config }: { config: PlaygroundConfig }) {
   const set = (name: string) => (v: string | boolean) =>
     setValues((cur) => ({ ...cur, [name]: v }));
 
+  // Token-driven: --surface-background-lvl1 flips automatically with [data-theme]
   const previewBg = dark
-    ? config.previewBackground?.dark ?? (config.darkReady ? "#1c1c21" : "#ffffff")
-    : config.previewBackground?.light ?? "#ffffff";
+    ? config.previewBackground?.dark ?? "var(--surface-background-lvl1, #ffffff)"
+    : config.previewBackground?.light ?? "var(--surface-background-lvl1, #ffffff)";
 
   const json = useMemo(() => JSON.stringify(values, null, 2), [values]);
 
-  const cardCls = dark ? "border-[#33333d] bg-[#26262e]" : "border-[#e1e1e8] bg-white";
-
   return (
-    <div className={`overflow-hidden rounded-xl border ${cardCls}`}>
+    <div className={`overflow-hidden rounded-xl border ${borderToken} ${surfaceCard}`}>
       {/* Header */}
       <div
-        className={`flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3 ${
-          dark ? "border-[#33333d]" : "border-[#e1e1e8]"
-        }`}
+        className={`flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3 ${borderToken}`}
       >
         <div>
-          <h2 className={`text-[15px] font-semibold ${dark ? "text-[#f7f7fa]" : "text-[#13131a]"}`}>
-            {config.name}
-          </h2>
+          <h2 className={`text-[15px] font-semibold ${textPrimary}`}>{config.name}</h2>
           {config.description && (
-            <p className={`text-[12px] ${dark ? "text-[#a8a8b2]" : "text-[#71717a]"}`}>
-              {config.description}
-            </p>
+            <p className={`text-[12px] ${textMuted}`}>{config.description}</p>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -138,10 +138,8 @@ export function Playground({ config }: { config: PlaygroundConfig }) {
             onClick={() => setDevMode((d) => !d)}
             className={`flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[12px] font-medium transition-colors ${
               devMode
-                ? "border-[#7c33b5] bg-[#f6ebff] text-[#7c33b5]"
-                : dark
-                  ? "border-[#4b4b59] text-[#c6c6cc] hover:bg-[#33333d]"
-                  : "border-[#e1e1e8] text-[#4b4b59] hover:bg-[#f7f7fa]"
+                ? `${brandBorder} bg-[var(--container-dynamic-brand-subtle-background-default,#f6ebff)] ${brandText}`
+                : `${borderControl} ${textBody} ${hoverSubtle}`
             }`}
           >
             <Code2 className="h-3.5 w-3.5" />
@@ -152,9 +150,7 @@ export function Playground({ config }: { config: PlaygroundConfig }) {
               type="button"
               onClick={() => setPropsOpen((o) => !o)}
               aria-label={propsOpen ? "Collapse properties" : "Expand properties"}
-              className={`flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[12px] font-medium md:hidden ${
-                dark ? "border-[#4b4b59] text-[#c6c6cc]" : "border-[#e1e1e8] text-[#4b4b59]"
-              }`}
+              className={`flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[12px] font-medium md:hidden ${borderControl} ${textBody}`}
             >
               <SlidersHorizontal className="h-3.5 w-3.5" />
               Properties
@@ -167,9 +163,7 @@ export function Playground({ config }: { config: PlaygroundConfig }) {
       {tabControls.map((tc) => (
         <div
           key={tc.name}
-          className={`flex flex-wrap items-center gap-1 border-b px-4 pt-2 ${
-            dark ? "border-[#33333d]" : "border-[#e1e1e8]"
-          }`}
+          className={`flex flex-wrap items-center gap-1 border-b px-4 pt-2 ${borderToken}`}
         >
           {tc.options.map((o) => {
             const active = values[tc.name] === o;
@@ -180,12 +174,8 @@ export function Playground({ config }: { config: PlaygroundConfig }) {
                 onClick={() => set(tc.name)(o)}
                 className={`-mb-px border-b-2 px-3 py-2 text-[13px] font-medium transition-colors ${
                   active
-                    ? "border-[#7c33b5] text-[#7c33b5]"
-                    : `border-transparent ${
-                        dark
-                          ? "text-[#a8a8b2] hover:text-[#f7f7fa]"
-                          : "text-[#71717a] hover:text-[#13131a]"
-                      }`
+                    ? `${brandBorder} ${brandText}`
+                    : `border-transparent ${textMuted} hover:text-[var(--surface-foreground-dynamic-neutral-hover,#282833)]`
                 }`}
               >
                 {o}
@@ -201,7 +191,7 @@ export function Playground({ config }: { config: PlaygroundConfig }) {
           <aside
             className={`shrink-0 border-b md:border-b-0 md:border-r ${
               propsOpen ? "md:w-60" : "hidden md:block md:w-9"
-            } ${dark ? "border-[#33333d]" : "border-[#e1e1e8]"}`}
+            } ${borderToken}`}
           >
             <button
               type="button"
@@ -209,7 +199,7 @@ export function Playground({ config }: { config: PlaygroundConfig }) {
               aria-label={propsOpen ? "Collapse properties" : "Expand properties"}
               className={`hidden w-full items-center py-2.5 text-[11px] font-semibold uppercase tracking-wide md:flex ${
                 propsOpen ? "justify-between px-4" : "justify-center px-0"
-              } ${dark ? "text-[#a8a8b2]" : "text-[#71717a]"}`}
+              } ${textMuted}`}
             >
               {propsOpen && "Properties"}
               <ChevronLeft
@@ -224,7 +214,6 @@ export function Playground({ config }: { config: PlaygroundConfig }) {
                     control={c}
                     value={values[c.name]}
                     onChange={set(c.name)}
-                    dark={dark}
                   />
                 ))}
               </div>
@@ -243,13 +232,7 @@ export function Playground({ config }: { config: PlaygroundConfig }) {
 
           {/* Developer panel */}
           {devMode && (
-            <div
-              className={`border-t px-4 py-4 text-[12px] ${
-                dark
-                  ? "border-[#33333d] bg-[#1c1c21] text-[#c6c6cc]"
-                  : "border-[#e1e1e8] bg-[#f7f7fa] text-[#4b4b59]"
-              }`}
-            >
+            <div className={`border-t px-4 py-4 text-[12px] ${borderToken} ${surfaceSubtle} ${textBody}`}>
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide">
@@ -264,17 +247,15 @@ export function Playground({ config }: { config: PlaygroundConfig }) {
                     <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide">
                       Design Tokens
                     </p>
-                    <div className="overflow-hidden rounded-md border border-black/10">
+                    <div className={`overflow-hidden rounded-md border ${borderToken}`}>
                       {Object.entries(config.tokens).map(([k, v]) => (
                         <div
                           key={k}
-                          className={`flex items-center justify-between gap-3 px-3 py-1.5 font-mono text-[11px] ${
-                            dark ? "odd:bg-[#26262e]" : "odd:bg-white"
-                          }`}
+                          className={`flex items-center justify-between gap-3 px-3 py-1.5 font-mono text-[11px] odd:bg-[var(--surface-background-lvl1,#ffffff)]`}
                         >
                           <span className="truncate">{k}</span>
                           <span className="flex shrink-0 items-center gap-1.5">
-                            {/^#|^rgb/.test(v) && (
+                            {/^#|^rgb|^var\(/.test(v) && (
                               <span
                                 className="inline-block h-3 w-3 rounded-sm border border-black/20"
                                 style={{ backgroundColor: v }}

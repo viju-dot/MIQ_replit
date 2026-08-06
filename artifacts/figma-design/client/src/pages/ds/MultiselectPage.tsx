@@ -14,8 +14,8 @@ const CHECK = "/figmaAssets/icon-check.svg";
 
 function BadgePill({ label }: { label: string }): JSX.Element {
   return (
-    <div className="flex h-[18px] items-center justify-center gap-1 rounded-full bg-[#7c33b5] py-0.5 pl-2 pr-1.5">
-      <p className="whitespace-pre-line font-['DM_Sans'] text-[12px] font-medium leading-[18px] text-white">
+    <div className="flex h-[18px] items-center justify-center gap-1 rounded-full bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)] py-0.5 pl-2 pr-1.5">
+      <p className="whitespace-pre-line font-['DM_Sans'] text-[length:var(--body-sm-medium-size,12px)] font-medium leading-[var(--body-sm-medium-line-height,18px)] text-[var(--container-dynamic-brand-bold-foreground-default,#ffffff)]">
         {label}
       </p>
       <div className="relative size-4 shrink-0 overflow-hidden">
@@ -31,8 +31,8 @@ function BadgePill({ label }: { label: string }): JSX.Element {
 
 function CountPill({ label }: { label: string }): JSX.Element {
   return (
-    <div className="flex h-[18px] items-center justify-center rounded-full bg-[#f6ebff] px-2">
-      <p className="whitespace-nowrap text-center font-['DM_Sans'] text-[12px] font-medium leading-[18px] text-[#662994]">
+    <div className="flex h-[18px] items-center justify-center rounded-full bg-[var(--container-static-brand-subtle-background,#f6ebff)] px-2">
+      <p className="whitespace-nowrap text-center font-['DM_Sans'] text-[length:var(--body-sm-medium-size,12px)] font-medium leading-[var(--body-sm-medium-line-height,18px)] text-[var(--container-static-brand-subtle-foreground-variation,#662994)]">
         {label}
       </p>
     </div>
@@ -53,8 +53,8 @@ function DropdownField({
 }): JSX.Element {
   return (
     <div
-      className={`flex w-full flex-col items-start justify-center rounded-[2px] border border-solid border-[#7c33b5] ${
-        disabled ? "bg-[#7171800a]" : "bg-white"
+      className={`flex w-full flex-col items-start justify-center rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-brand-default,#7c33b5)] ${
+        disabled ? "bg-[#7171800a]" : "bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)]"
       }`}
     >
       <div className="flex w-full items-center gap-2 pl-3 pr-1.5">
@@ -95,24 +95,24 @@ function OptionRow({
       type="button"
       onClick={onToggle}
       disabled={disabled}
-      className={`flex w-full items-center gap-2 border-b border-[#e1e1e8] py-2 pl-2 pr-3 text-left ${
-        checked ? "bg-[#f6ebff]" : "bg-white hover:bg-[#71718014]"
+      className={`flex w-full items-center gap-2 border-b border-[var(--border-static-subtle-neutral,#e1e1e8)] py-2 pl-2 pr-3 text-left ${
+        checked ? "bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)]" : "bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] hover:bg-[var(--container-dynamic-neutral-subtle-background-hover,#71718014)]"
       } disabled:cursor-not-allowed`}
     >
       <span
-        className={`flex size-4 shrink-0 items-center justify-center rounded-[2px] border-[1.5px] ${
+        className={`flex size-4 shrink-0 items-center justify-center rounded-[var(--radiuses-small,2px)] border-[1.5px] ${
           checked
             ? disabled
-              ? "border-transparent bg-[#7171801a]"
-              : "border-[#7c33b5] bg-[#7c33b5]"
-            : "border-[#c6c6cc] bg-transparent"
+              ? "border-transparent bg-[var(--container-dynamic-neutral-subtle-background-disabled,#7171801a)]"
+              : "border-[var(--border-dynamic-brand-default,#7c33b5)] bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)]"
+            : "border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] bg-transparent"
         }`}
       >
         {checked ? <img alt="" className="size-4" src={CHECK} /> : null}
       </span>
       <span
-        className={`flex h-6 items-center whitespace-nowrap font-['DM_Sans'] text-[14px] font-normal leading-[20px] ${
-          disabled ? "text-[#a8a8b2]" : checked ? "text-[#7c33b5]" : "text-[#13131a]"
+        className={`flex h-6 items-center whitespace-nowrap font-['DM_Sans'] text-[length:var(--body-md-regular-size,14px)] font-normal leading-[var(--body-md-regular-line-height,20px)] ${
+          disabled ? "text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]" : checked ? "text-[var(--container-dynamic-brand-subtle-foreground-delected,#7c33b5)]" : "text-[var(--container-dynamic-neutral-subtle-foreground-selected,#13131a)]"
         }`}
       >
         {label}
@@ -124,9 +124,9 @@ function OptionRow({
 /* Search input row shown at top of the open menu. */
 function SearchRow({ value }: { value: string }): JSX.Element {
   return (
-    <div className="flex w-full items-center gap-2 border-b border-[#e1e1e8] px-3 py-2">
+    <div className="flex w-full items-center gap-2 border-b border-[var(--border-static-subtle-neutral,#e1e1e8)] px-3 py-2">
       <img alt="" className="size-5 shrink-0" src={SEARCH} />
-      <span className="font-['DM_Sans'] text-[14px] font-normal leading-[20px] text-[#71718099]">
+      <span className="font-['DM_Sans'] text-[length:var(--body-md-regular-size,14px)] font-normal leading-[var(--body-md-regular-line-height,20px)] text-[#71718099]">
         {value}
       </span>
     </div>
@@ -137,10 +137,10 @@ function SearchRow({ value }: { value: string }): JSX.Element {
 function Menu({ children }: { children: React.ReactNode }): JSX.Element {
   return (
     <div
-      className="flex w-full flex-col overflow-hidden rounded-[2px] border border-solid border-[#7c33b5] bg-white"
+      className="flex w-full flex-col overflow-hidden rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-brand-default,#7c33b5)] bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)]"
       style={{
         boxShadow:
-          "0px 12px 20px 0px rgba(113, 113, 128, 0.1), 0px 1px 4px 0px rgba(113, 113, 128, 0.08)",
+          "0px 12px 20px 0px var(--shadow-lvl10, rgba(113, 113, 128, 0.1)), 0px 1px 4px 0px var(--shadow-lvl8, rgba(113, 113, 128, 0.08))",
       }}
     >
       {children}
@@ -200,14 +200,19 @@ const closedConfig: PlaygroundConfig = {
   ],
   render: (props) => renderClosedField(props),
   tokens: {
-    "field/border": "#7c33b5",
-    "field/background": "#ffffff",
-    "field/background/disabled": "rgba(113,113,128,0.04)",
-    "pill/brand/background": "#7c33b5",
-    "pill/count/background": "#f6ebff",
-    "pill/count/text": "#662994",
-    "radius/field": "2px",
-    "pill/height": "18px",
+    "border/dynamic/brand/default": "var(--border-dynamic-brand-default)",
+    "container/dynamic/neutral/subtle/background/default/regular":
+      "var(--container-dynamic-neutral-subtle-background-default-regular)",
+    "container/dynamic/brand/bold/background/default":
+      "var(--container-dynamic-brand-bold-background-default)",
+    "container/dynamic/brand/bold/foreground/default":
+      "var(--container-dynamic-brand-bold-foreground-default)",
+    "container/static/brand/subtle/background":
+      "var(--container-static-brand-subtle-background)",
+    "container/static/brand/subtle/foreground/variation":
+      "var(--container-static-brand-subtle-foreground-variation)",
+    "radiuses/small": "var(--radiuses-small)",
+    "Body Sm/Medium": "var(--body-sm-medium-size)",
   },
 };
 
@@ -259,7 +264,7 @@ function OpenDropdown({ props }: { props: PropValues }): JSX.Element {
           <>
             <SearchRow value={searchValue} />
             <div className="flex w-full items-center justify-center px-3 py-4">
-              <span className="font-['DM_Sans'] text-[14px] font-normal leading-[20px] text-[#a8a8b2]">
+              <span className="font-['DM_Sans'] text-[length:var(--body-md-regular-size,14px)] font-normal leading-[var(--body-md-regular-line-height,20px)] text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]">
                 No results found
               </span>
             </div>
@@ -326,18 +331,28 @@ const openConfig: PlaygroundConfig = {
   ],
   render: (props) => <OpenDropdown props={props} />,
   tokens: {
-    "menu/border": "#7c33b5",
-    "menu/background": "#ffffff",
-    "option/row/border": "#e1e1e8",
-    "option/selected/background": "#f6ebff",
-    "option/hover/background": "rgba(113,113,128,0.08)",
-    "checkbox/checked": "#7c33b5",
-    "checkbox/unchecked/border": "#c6c6cc",
-    "checkbox/disabled/background": "rgba(113,113,128,0.1)",
-    "option/text": "#13131a",
-    "option/text/selected": "#7c33b5",
-    "option/text/disabled": "#a8a8b2",
-    "search/placeholder": "rgba(113,113,128,0.6)",
+    "border/dynamic/brand/default": "var(--border-dynamic-brand-default)",
+    "container/dynamic/neutral/subtle/background/default/regular":
+      "var(--container-dynamic-neutral-subtle-background-default-regular)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "container/dynamic/brand/subtle/background/selected":
+      "var(--container-dynamic-brand-subtle-background-selected)",
+    "container/dynamic/neutral/subtle/background/hover":
+      "var(--container-dynamic-neutral-subtle-background-hover)",
+    "container/dynamic/brand/bold/background/default":
+      "var(--container-dynamic-brand-bold-background-default)",
+    "border/dynamic/neutral/subtle/default":
+      "var(--border-dynamic-neutral-subtle-default)",
+    "container/dynamic/neutral/subtle/background/disabled":
+      "var(--container-dynamic-neutral-subtle-background-disabled)",
+    "container/dynamic/neutral/subtle/foreground/selected":
+      "var(--container-dynamic-neutral-subtle-foreground-selected)",
+    "container/dynamic/brand/subtle/foreground/delected":
+      "var(--container-dynamic-brand-subtle-foreground-delected)",
+    "container/dynamic/neutral/subtle/foreground/disabled":
+      "var(--container-dynamic-neutral-subtle-foreground-disabled)",
+    "elevation/hover": "var(--elevation-hover)",
+    "radiuses/small": "var(--radiuses-small)",
   },
 };
 

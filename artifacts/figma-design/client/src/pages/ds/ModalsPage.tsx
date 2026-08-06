@@ -23,7 +23,7 @@ function SwapInstance({
   if (type === "text") {
     return (
       <div className="flex flex-1 items-start relative">
-        <p className="[word-break:break-word] flex-1 font-['DM_Sans',Helvetica] font-normal leading-[20px] min-w-px text-[14px] text-[#13131a]">
+        <p className="[word-break:break-word] flex-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] min-w-px text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
           {text}
         </p>
       </div>
@@ -32,7 +32,7 @@ function SwapInstance({
 
   if (type === "notification") {
     return (
-      <div className="relative flex flex-1 items-start gap-2 min-w-px rounded-[2px] border border-solid border-[#da294b] bg-white p-5">
+      <div className="relative flex flex-1 items-start gap-2 min-w-px rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-error-default,#da294b)] bg-[var(--surface-background-lvl1,#ffffff)] p-5">
         <div className="relative z-[2] flex flex-1 flex-col items-start gap-[3px] min-w-px">
           <div className="flex w-full items-center gap-2 shrink-0">
             <div className="flex flex-col items-center justify-center px-px py-[2px] shrink-0 size-5">
@@ -43,22 +43,22 @@ function SwapInstance({
               />
             </div>
             <div className="flex flex-1 flex-col items-start gap-1 min-w-px overflow-hidden">
-              <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[20px] text-[14px] text-[#13131a] w-full shrink-0">
+              <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] w-full shrink-0">
                 {title}
               </p>
             </div>
           </div>
           <div className="flex items-start pl-8 pt-[5px] w-full shrink-0">
-            <p className="[word-break:break-word] flex-1 font-['DM_Sans',Helvetica] font-normal leading-[20px] min-w-px text-[14px] text-[#13131a]">
+            <p className="[word-break:break-word] flex-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] min-w-px text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
               {description}
             </p>
           </div>
         </div>
         <div
-          className="absolute inset-[-1px] z-[1] rounded-[2px] border border-solid border-[#da294b] bg-white"
+          className="absolute inset-[-1px] z-[1] rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-error-default,#da294b)] bg-[var(--surface-background-lvl1,#ffffff)]"
           style={{
             boxShadow:
-              "0px 1px 4px 0px rgba(113,113,128,0.08), 0px 16px 24px 0px rgba(113,113,128,0.12)",
+              "0px 1px 4px 0px var(--shadow-lvl8,rgba(113,113,128,0.08)), 0px 16px 24px 0px var(--shadow-lvl12,rgba(113,113,128,0.12))",
           }}
         />
       </div>
@@ -66,7 +66,9 @@ function SwapInstance({
   }
 
   // custom (empty placeholder container)
-  return <div className="h-[76px] w-full bg-white shrink-0" />;
+  return (
+    <div className="h-[76px] w-full bg-[var(--surface-background-lvl1,#ffffff)] shrink-0" />
+  );
 }
 
 type ModalSize = "400px" | "600px" | "800px" | "1000px" | "768px" | "640px";
@@ -98,18 +100,18 @@ function Modal({
 
   return (
     <div
-      className="flex flex-col items-start min-w-[180px] rounded-[2px]"
+      className="flex flex-col items-start min-w-[180px] rounded-[var(--radiuses-small,2px)]"
       style={{
         width: fluid ? "100%" : numericWidth,
         maxWidth: numericWidth,
-        filter: `drop-shadow(0px 1px 2px rgba(113,113,128,0.08)) drop-shadow(0px 8px 8px rgba(113,113,128,0.04))`,
+        filter: `drop-shadow(0px 1px 2px var(--shadow-lvl8,rgba(113,113,128,0.08))) drop-shadow(0px 8px 8px var(--shadow-lvl4,rgba(113,113,128,0.04)))`,
       }}
     >
       {/* Header */}
-      <div className="flex h-[50px] w-full items-start shrink-0 rounded-t-[2px] border-b border-solid border-[#e1e1e8] bg-white pl-4 pr-[11px] py-[13px]">
+      <div className="flex h-[50px] w-full items-start shrink-0 rounded-t-[var(--radiuses-small,2px)] border-b border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--surface-background-lvl1,#ffffff)] pl-4 pr-[11px] py-[13px]">
         <div className="flex flex-1 items-start gap-2 min-w-px">
           <div className="flex flex-1 flex-col items-start min-w-px overflow-hidden self-stretch">
-            <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[24px] text-[16px] text-[#13131a] tracking-[-0.08px] w-full">
+            <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--headline-xs-medium-line-height,24px)] text-[length:var(--headline-xs-medium-size,16px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] tracking-[-0.08px] w-full">
               {title ?? defaultTitle}
             </p>
           </div>
@@ -124,29 +126,29 @@ function Modal({
       </div>
 
       {/* Swap Container */}
-      <div className="flex w-full flex-col items-start bg-white p-4 shrink-0">
+      <div className="flex w-full flex-col items-start bg-[var(--surface-background-lvl1,#ffffff)] p-4 shrink-0">
         <SwapInstance type={swap} />
       </div>
 
       {/* Footer */}
       <div
-        className={`flex w-full flex-wrap items-center justify-center gap-x-4 bg-[#f7f7fa] p-4 shrink-0 ${
+        className={`flex w-full flex-wrap items-center justify-center gap-x-4 bg-[var(--surface-background-lvl2,#f7f7fa)] p-4 shrink-0 ${
           isLarge ? "h-[66px]" : "h-[56px]"
         }`}
       >
         <div className="flex flex-1 items-center justify-end gap-4 min-w-px">
-          <div className="flex items-center gap-1 rounded-[2px] shrink-0">
-            <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[20px] text-[14px] text-[#7c33b5] text-center whitespace-nowrap">
+          <div className="flex items-center gap-1 rounded-[var(--radiuses-small,2px)] shrink-0">
+            <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)] text-center whitespace-nowrap">
               Cancel
             </p>
           </div>
           <div
-            className={`flex items-center justify-end gap-0 rounded-[2px] bg-[#7c33b5] shrink-0 ${
+            className={`flex items-center justify-end gap-0 rounded-[var(--radiuses-small,2px)] bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)] shrink-0 ${
               isLarge ? "px-3 py-[7px]" : "px-[6px] py-[2px]"
             }`}
           >
-            <div className="flex items-center justify-center gap-1 rounded-[2px] shrink-0">
-              <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[20px] text-[14px] text-white text-center whitespace-nowrap">
+            <div className="flex items-center justify-center gap-1 rounded-[var(--radiuses-small,2px)] shrink-0">
+              <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--container-dynamic-brand-bold-foreground-default,#ffffff)] text-center whitespace-nowrap">
                 Confirm
               </p>
             </div>
@@ -194,17 +196,21 @@ const modalConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "container/surface/background": "#ffffff",
-    "container/footer/background": "#f7f7fa",
-    "border/neutral": "#e1e1e8",
-    "text/primary": "#13131a",
-    "text/brand": "#7c33b5",
-    "container/brand/bold/background": "#7c33b5",
-    "radius/modal": "2px",
-    "size/header-height": "50px",
-    "size/footer-height": "56px (large 66px)",
-    "shadow/modal":
-      "0px 1px 2px rgba(113,113,128,0.08), 0px 8px 8px rgba(113,113,128,0.04)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "surface/background/lvl2": "var(--surface-background-lvl2)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/dynamic/brand/default":
+      "var(--surface-foreground-dynamic-brand-default)",
+    "container/dynamic/brand/bold/background/default":
+      "var(--container-dynamic-brand-bold-background-default)",
+    "container/dynamic/brand/bold/foreground/default":
+      "var(--container-dynamic-brand-bold-foreground-default)",
+    "Radiuses/small": "var(--radiuses-small)",
+    "Headline Xs/Medium": "var(--headline-xs-medium-size)",
+    "Body Md/Medium": "var(--body-md-medium-size)",
+    "Elevation Regular": "var(--shadow-lvl4) / var(--shadow-lvl8)",
   },
 };
 
@@ -247,15 +253,15 @@ const swapConfig: PlaygroundConfig = {
     const type = props.type as SwapType;
     if (type === "custom") {
       return (
-        <div className="w-full max-w-[400px] rounded-[2px] border border-solid border-[#e1e1e8] bg-white p-4">
-          <div className="flex h-[76px] w-full items-center justify-center bg-[#f7f7fa] text-[12px] text-[#a8a8b2]">
+        <div className="w-full max-w-[400px] rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--surface-background-lvl1,#ffffff)] p-4">
+          <div className="flex h-[76px] w-full items-center justify-center bg-[var(--surface-background-lvl2,#f7f7fa)] text-[12px] text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)]">
             Custom content slot
           </div>
         </div>
       );
     }
     return (
-      <div className="flex w-full max-w-[400px] rounded-[2px] border border-solid border-[#e1e1e8] bg-white p-4">
+      <div className="flex w-full max-w-[400px] rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--surface-background-lvl1,#ffffff)] p-4">
         <SwapInstance
           type={type}
           text={String(props.text)}
@@ -266,15 +272,16 @@ const swapConfig: PlaygroundConfig = {
     );
   },
   tokens: {
-    "container/surface/background": "#ffffff",
-    "border/neutral": "#e1e1e8",
-    "border/danger": "#da294b",
-    "text/primary": "#13131a",
-    "text/muted": "#a8a8b2",
-    "container/custom/background": "#f7f7fa",
-    "radius/swap": "2px",
-    "shadow/notification":
-      "0px 1px 4px rgba(113,113,128,0.08), 0px 16px 24px rgba(113,113,128,0.12)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "surface/background/lvl2": "var(--surface-background-lvl2)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "border/dynamic/error/default": "var(--border-dynamic-error-default)",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/dynamic/neutral/disabled":
+      "var(--surface-foreground-dynamic-neutral-disabled)",
+    "Radiuses/small": "var(--radiuses-small)",
+    "Elevation Regular": "var(--shadow-lvl8) / var(--shadow-lvl12)",
   },
 };
 

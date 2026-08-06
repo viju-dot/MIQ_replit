@@ -1,0 +1,90 @@
+{
+  "Body Sm/Medium": {
+    "cssVar": "--body-sm-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 12, weight: 500, lineHeight: 18, letterSpacing: 0)"
+  },
+  "Body Sm/Regular": {
+    "cssVar": "--body-sm-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 12, weight: 400, lineHeight: 18, letterSpacing: 0)"
+  },
+  "Headline Lg/Semibold": {
+    "cssVar": "--headline-lg-semibold",
+    "value": "Font(family: \"DM Sans\", style: SemiBold, size: 28, weight: 600, lineHeight: 36, letterSpacing: -2)"
+  },
+  "Headline Md/Semibold": {
+    "cssVar": "--headline-md-semibold",
+    "value": "Font(family: \"DM Sans\", style: SemiBold, size: 24, weight: 600, lineHeight: 32, letterSpacing: -1.5)"
+  },
+  "Headline Sm/Semibold": {
+    "cssVar": "--headline-sm-semibold",
+    "value": "Font(family: \"DM Sans\", style: SemiBold, size: 20, weight: 600, lineHeight: 28, letterSpacing: -1)"
+  },
+  "Radiuses/small": {
+    "cssVar": "--radiuses-small",
+    "value": "2"
+  },
+  "[old]Sizing/18": {
+    "cssVar": "--old-sizing-18",
+    "value": "18"
+  },
+  "[old]Stroke Thickness/1": {
+    "cssVar": "--old-stroke-thickness-1",
+    "value": "1"
+  },
+  "container/static/success/subtle/background": {
+    "cssVar": "--container-static-success-subtle-background",
+    "value": "#e7faef"
+  },
+  "container/static/success/subtle/foreground/variation": {
+    "cssVar": "--container-static-success-subtle-foreground-variation",
+    "value": "#115639"
+  },
+  "numbers/2": {
+    "cssVar": "--numbers-2",
+    "value": "2"
+  },
+  "numbers/None": {
+    "cssVar": "--numbers-none",
+    "value": "0"
+  },
+  "odd_numbers/10": {
+    "cssVar": "--odd-numbers-10",
+    "value": "10"
+  },
+  "odd_numbers/3": {
+    "cssVar": "--odd-numbers-3",
+    "value": "3"
+  },
+  "radius/25": {
+    "cssVar": "--radius-25",
+    "value": "2"
+  },
+  "spacing/0": {
+    "cssVar": "--spacing-0",
+    "value": "0"
+  },
+  "spacing/100": {
+    "cssVar": "--spacing-100",
+    "value": "8"
+  },
+  "spacing/25": {
+    "cssVar": "--spacing-25",
+    "value": "2"
+  },
+  "spacing/75": {
+    "cssVar": "--spacing-75",
+    "value": "6"
+  },
+  "surface/foreground/static/neutral/lvl1": {
+    "cssVar": "--surface-foreground-static-neutral-lvl1",
+    "value": "#13131a"
+  },
+  "surface/foreground/static/neutral/lvl2": {
+    "cssVar": "--surface-foreground-static-neutral-lvl2",
+    "value": "#282833"
+  },
+  "surface/foreground/static/neutral/lvl3": {
+    "cssVar": "--surface-foreground-static-neutral-lvl3",
+    "value": "#717180"
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "Body Md/Regular": {
+    "cssVar": "--body-md-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 14, weight: 400, lineHeight: 20, letterSpacing: 0)"
+  },
+  "Colours/Neutral/200": {
+    "cssVar": "--colours-neutral-200",
+    "value": "#ebebf0"
+  },
+  "Display Sm/Regular": {
+    "cssVar": "--display-sm-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 40, weight: 400, lineHeight: 48, letterSpacing: -2.5)"
+  },
+  "Headline Xs/Medium": {
+    "cssVar": "--headline-xs-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 16, weight: 500, lineHeight: 24, letterSpacing: -0.5)"
+  },
+  "border/static/bold/neutral": {
+    "cssVar": "--border-static-bold-neutral",
+    "value": "#4b4b59"
+  },
+  "colours/miq/900": {
+    "cssVar": "--colours-miq-900",
+    "value": "#440140"
+  },
+  "numbers/8": {
+    "cssVar": "--numbers-8",
+    "value": "8"
+  },
+  "radius/25": {
+    "cssVar": "--radius-25",
+    "value": "2"
+  },
+  "spacing/300": {
+    "cssVar": "--spacing-300",
+    "value": "24"
+  },
+  "spacing/400": {
+    "cssVar": "--spacing-400",
+    "value": "32"
+  },
+  "spacing/500": {
+    "cssVar": "--spacing-500",
+    "value": "40"
+  },
+  "spacing/800": {
+    "cssVar": "--spacing-800",
+    "value": "64"
+  },
+  "spacing/container/m": {
+    "cssVar": "--spacing-container-m",
+    "value": "7"
+  },
+  "surface/background/lvl2": {
+    "cssVar": "--surface-background-lvl2",
+    "value": "#f7f7fa"
+  },
+  "surface/foreground/dynamic/neutral/default/regular": {
+    "cssVar": "--surface-foreground-dynamic-neutral-default-regular",
+    "value": "#4b4b59"
+  },
+  "surface/foreground/dynamic/neutral/disabled": {
+    "cssVar": "--surface-foreground-dynamic-neutral-disabled",
+    "value": "#a8a8b2"
+  },
+  "surface/foreground/dynamic/neutral/inversed/disabled": {
+    "cssVar": "--surface-foreground-dynamic-neutral-inversed-disabled",
+    "value": "#ffffff3d"
+  },
+  "surface/foreground/static/neutral/inversed": {
+    "cssVar": "--surface-foreground-static-neutral-inversed",
+    "value": "#ffffff"
+  },
+  "surface/foreground/static/neutral/lvl1": {
+    "cssVar": "--surface-foreground-static-neutral-lvl1",
+    "value": "#13131a"
+  },
+  "surface/foreground/static/neutral/lvl3": {
+    "cssVar": "--surface-foreground-static-neutral-lvl3",
+    "value": "#717180"
+  }
+}

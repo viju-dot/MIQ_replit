@@ -43,9 +43,9 @@ function TtdLogo() {
 
 function CheckboxUnchecked() {
   return (
-    <div className="flex items-center justify-center overflow-clip p-[2px] relative rounded-[2px] shrink-0">
+    <div className="flex items-center justify-center overflow-clip p-[2px] relative rounded-[var(--radius-25,2px)] shrink-0">
       <div className="flex items-center overflow-clip p-[2px] relative shrink-0">
-        <div className="border-[1.5px] border-[#c6c6cc] border-solid overflow-clip relative rounded-[2px] shrink-0 size-[16px]" />
+        <div className="border-[1.5px] border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] border-solid overflow-clip relative rounded-[var(--radius-25,2px)] shrink-0 size-[16px]" />
       </div>
     </div>
   );
@@ -53,9 +53,9 @@ function CheckboxUnchecked() {
 
 function CheckboxChecked() {
   return (
-    <div className="flex items-center justify-center overflow-clip p-[2px] relative rounded-[2px] shrink-0">
+    <div className="flex items-center justify-center overflow-clip p-[2px] relative rounded-[var(--radius-25,2px)] shrink-0">
       <div className="flex items-center overflow-clip p-[2px] relative shrink-0">
-        <div className="bg-[#7c33b5] overflow-clip relative rounded-[2px] shrink-0 size-[16px]">
+        <div className="bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)] overflow-clip relative rounded-[var(--radius-25,2px)] shrink-0 size-[16px]">
           <div className="absolute flex flex-col items-center justify-center left-0 overflow-clip px-px py-[3px] size-[16px] top-0">
             <div className="h-[9.001px] relative shrink-0 w-[12.501px]">
               <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgCheck} />
@@ -69,7 +69,7 @@ function CheckboxChecked() {
 
 function CaretIcon({ src }: { src: string }) {
   return (
-    <div className="flex items-center p-[2px] relative rounded-[2px] shrink-0">
+    <div className="flex items-center p-[2px] relative rounded-[var(--radius-25,2px)] shrink-0">
       <div className="flex items-center justify-center relative shrink-0 size-[20px]">
         <div className="relative shrink-0 size-[20px]">
           <img alt="" className="absolute block inset-0 max-w-none size-full" src={src} />
@@ -110,7 +110,7 @@ function CellBodyContent({
   return (
     <div className="flex items-start relative w-[160px]">
       <p
-        className={`[word-break:break-word] leading-[18px] not-italic relative text-[12px] text-[#13131a] ${
+        className={`[word-break:break-word] leading-[var(--body-sm-regular-line-height,18px)] not-italic relative text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] ${
           number
             ? `flex-1 min-w-px text-right ${strong ? "font-medium" : "font-normal"}`
             : `shrink-0 whitespace-nowrap ${strong ? "font-medium" : "font-normal"}`
@@ -152,15 +152,15 @@ function CellText({
 }) {
   const bg =
     state === "Selected"
-      ? "bg-[#f6ebff]"
+      ? "bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)]"
       : state === "Hover"
-        ? "bg-[rgba(113,113,128,0.08)]"
-        : "bg-white";
-  const pl = indent === 2 ? "pl-[72px]" : indent === 1 ? "pl-[40px]" : "pl-[12px]";
+        ? "bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))]"
+        : "bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)]";
+  const pl = indent === 2 ? "pl-[72px]" : indent === 1 ? "pl-[40px]" : "pl-[var(--spacing-150,12px)]";
   const textCls =
     state === "Selected"
-      ? "font-medium text-[#7c33b5]"
-      : "font-normal text-[#13131a]";
+      ? "font-medium text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]"
+      : "font-normal text-[var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)]";
 
   const caretSrc =
     state === "Selected"
@@ -173,11 +173,11 @@ function CellText({
 
   return (
     <div
-      className={`${bg} ${pl} border-[#e1e1e8] border-b border-solid flex gap-[4px] h-[40px] items-center pr-[16px] relative w-[192px]`}
+      className={`${bg} ${pl} border-[var(--border-static-subtle-neutral,#e1e1e8)] border-b border-solid flex gap-[var(--spacing-50,4px)] h-[40px] items-center pr-[var(--spacing-200,16px)] relative w-[192px]`}
     >
       {hasLogo && <TtdLogo />}
       {hasChildren && (
-        <div className="flex gap-[4px] items-center relative shrink-0">
+        <div className="flex gap-[var(--spacing-50,4px)] items-center relative shrink-0">
           {hasCheck &&
             (checked || state === "Selected" ? <CheckboxChecked /> : <CheckboxUnchecked />)}
           <div className="flex items-center relative shrink-0">
@@ -192,7 +192,7 @@ function CellText({
       )}
       <div className="flex flex-1 items-start min-w-px relative">
         <p
-          className={`[word-break:break-word] flex-1 leading-[18px] min-w-px not-italic overflow-hidden relative text-[12px] text-ellipsis whitespace-nowrap ${textCls}`}
+          className={`[word-break:break-word] flex-1 leading-[var(--body-sm-regular-line-height,18px)] min-w-px not-italic overflow-hidden relative text-[length:var(--body-sm-regular-size,12px)] text-ellipsis whitespace-nowrap ${textCls}`}
         >
           {text}
         </p>
@@ -214,21 +214,21 @@ function ColumnHeader({
   text?: string;
 }) {
   return (
-    <div className="bg-[#f7f7fa] border-[#e1e1e8] border-b border-solid flex h-[40px] items-center py-[10px] relative w-[192px]">
+    <div className="bg-[var(--surface-background-lvl2,#f7f7fa)] border-[var(--border-static-subtle-neutral,#e1e1e8)] border-b border-solid flex h-[40px] items-center py-[10px] relative w-[192px]">
       <div className="flex h-[20px] items-center relative shrink-0 w-[12px]" />
       {hasCheckbox && (
-        <div className="flex items-center overflow-clip pr-[4px] relative shrink-0">
+        <div className="flex items-center overflow-clip pr-[var(--spacing-50,4px)] relative shrink-0">
           <CheckboxUnchecked />
         </div>
       )}
       <div className="flex flex-1 items-start min-w-px relative">
-        <p className="[word-break:break-word] flex-1 font-medium leading-[20px] min-w-px not-italic overflow-hidden relative text-[14px] text-[#282833] text-ellipsis whitespace-nowrap">
+        <p className="[word-break:break-word] flex-1 font-medium leading-[var(--body-md-medium-line-height,20px)] min-w-px not-italic overflow-hidden relative text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-lvl2,#282833)] text-ellipsis whitespace-nowrap">
           {text}
         </p>
       </div>
       <div className="flex h-[20px] items-center justify-end relative shrink-0 w-[16px]">
         <div className="h-[20px] relative shrink-0 w-px">
-          <div className="absolute border border-[#e1e1e8] border-solid inset-0" />
+          <div className="absolute border border-[var(--border-static-subtle-neutral,#e1e1e8)] border-solid inset-0" />
         </div>
       </div>
     </div>
@@ -243,7 +243,7 @@ type ActionState = "Default" | "Hover" | "Selected";
 
 function ActionButton({ src }: { src: string }) {
   return (
-    <div className="flex items-center justify-center p-[7px] relative rounded-[2px] shrink-0">
+    <div className="flex items-center justify-center p-[7px] relative rounded-[var(--radius-25,2px)] shrink-0">
       <div className="flex items-center justify-center p-[2px] relative shrink-0 size-[20px]">
         <div className="relative shrink-0 size-[15.625px]">
           <img alt="" className="absolute block inset-0 max-w-none size-full" src={src} />
@@ -262,10 +262,10 @@ function CellAction({
 }) {
   const bg =
     state === "Selected"
-      ? "bg-[#f6ebff]"
+      ? "bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)]"
       : state === "Hover"
-        ? "bg-[rgba(113,113,128,0.08)]"
-        : "bg-white";
+        ? "bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))]"
+        : "bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)]";
 
   // Icon set per amount (dots menu shown for 3-icon, extra icons revealed on hover/selected)
   const icons: string[] =
@@ -277,10 +277,10 @@ function CellAction({
 
   return (
     <div
-      className={`${bg} border-[#e1e1e8] border-b border-solid flex h-[44px] items-center justify-end px-[8px] py-[5px] relative w-[118px]`}
+      className={`${bg} border-[var(--border-static-subtle-neutral,#e1e1e8)] border-b border-solid flex h-[44px] items-center justify-end px-[8px] py-[5px] relative w-[118px]`}
     >
       {iconAmount === 1 ? (
-        <div className="flex items-center justify-center p-[7px] relative rounded-[2px] shrink-0">
+        <div className="flex items-center justify-center p-[7px] relative rounded-[var(--radius-25,2px)] shrink-0">
           <div className="flex items-center justify-center p-[2px] relative shrink-0 size-[20px]">
             <div className="h-[16.25px] relative shrink-0 w-[15px]">
               <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgActionEdit} />
@@ -324,11 +324,9 @@ const cellBodyConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "text/body/color": "#13131a",
-    "text/size/body": "12px",
-    "text/line-height/body": "18px",
-    "font/number-features": '"lnum" 1, "tnum" 1',
-    "size/width": "160px",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "Body Sm/Regular": "var(--body-sm-regular-size)",
+    "Body Sm/Medium": "var(--body-sm-medium-size)",
   },
 };
 
@@ -379,18 +377,19 @@ const cellTextConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "container/background/default": "#ffffff",
-    "container/background/hover": "rgba(113,113,128,0.08)",
-    "container/background/selected": "#f6ebff",
-    "text/color/default": "#13131a",
-    "text/color/selected": "#7c33b5",
-    "border/divider": "#e1e1e8",
-    "checkbox/border": "#c6c6cc",
-    "checkbox/fill/checked": "#7c33b5",
-    "size/height": "40px",
-    "size/width": "192px",
-    "indent/level-1": "40px",
-    "indent/level-2": "72px",
+    "container/dynamic/neutral/subtle/background/default/regular": "var(--container-dynamic-neutral-subtle-background-default-regular)",
+    "container/dynamic/neutral/subtle/background/hover": "var(--container-dynamic-neutral-subtle-background-hover)",
+    "container/dynamic/brand/subtle/background/selected": "var(--container-dynamic-brand-subtle-background-selected)",
+    "container/dynamic/neutral/subtle/foreground/default/variation": "var(--container-dynamic-neutral-subtle-foreground-default-variation)",
+    "surface/foreground/dynamic/brand/default": "var(--surface-foreground-dynamic-brand-default)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "border/dynamic/neutral/subtle/default": "var(--border-dynamic-neutral-subtle-default)",
+    "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
+    "radius/25": "var(--radius-25)",
+    "spacing/50": "var(--spacing-50)",
+    "spacing/150": "var(--spacing-150)",
+    "spacing/200": "var(--spacing-200)",
+    "Body Sm/Regular": "var(--body-sm-regular-size)",
   },
 };
 
@@ -411,13 +410,12 @@ const columnHeaderConfig: PlaygroundConfig = {
     <ColumnHeader hasCheckbox={p.hasCheckbox === true} text={String(p.text)} />
   ),
   tokens: {
-    "container/background": "#f7f7fa",
-    "text/color": "#282833",
-    "text/size": "14px",
-    "text/line-height": "20px",
-    "border/divider": "#e1e1e8",
-    "size/height": "40px",
-    "size/width": "192px",
+    "surface/background/lvl2": "var(--surface-background-lvl2)",
+    "surface/foreground/static/neutral/lvl2": "var(--surface-foreground-static-neutral-lvl2)",
+    "Body Md/Medium": "var(--body-md-medium-size)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "border/dynamic/neutral/subtle/default": "var(--border-dynamic-neutral-subtle-default)",
+    "spacing/50": "var(--spacing-50)",
   },
 };
 
@@ -448,12 +446,11 @@ const cellActionConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "container/background/default": "#ffffff",
-    "container/background/hover": "rgba(113,113,128,0.08)",
-    "container/background/selected": "#f6ebff",
-    "border/divider": "#e1e1e8",
-    "size/height": "44px",
-    "size/width": "118px",
+    "container/dynamic/neutral/subtle/background/default/regular": "var(--container-dynamic-neutral-subtle-background-default-regular)",
+    "container/dynamic/neutral/subtle/background/hover": "var(--container-dynamic-neutral-subtle-background-hover)",
+    "container/dynamic/brand/subtle/background/selected": "var(--container-dynamic-brand-subtle-background-selected)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "radius/25": "var(--radius-25)",
   },
 };
 

@@ -46,31 +46,40 @@ function Checkbox({
   // 16px container box styling
   let boxClass: string;
   if (!disabled && (variant === "Checked Error" || variant === "Partial Error")) {
-    boxClass = "bg-[#7c33b5] border-[1.5px] border-[#da294b] border-solid";
+    boxClass =
+      "bg-[var(--controls-background-selected,#7c33b5)] border-[1.5px] border-[var(--border-dynamic-error-default,#da294b)] border-solid";
   } else if (state === "Default" && disabled && isFilled) {
-    boxClass = "bg-[rgba(113,113,128,0.1)]";
+    boxClass = "bg-[var(--controls-background-disabled,rgba(113,113,128,0.1))]";
   } else if (!disabled && (variant === "Checked" || variant === "Partial")) {
-    boxClass = "bg-[#7c33b5]";
+    boxClass = "bg-[var(--controls-background-selected,#7c33b5)]";
   } else if (state === "Default" && disabled && isUnchecked) {
-    boxClass = "border-[1.5px] border-[#e1e1e8] border-solid";
+    boxClass =
+      "border-[1.5px] border-[var(--border-dynamic-neutral-subtle-disabled,#e1e1e8)] border-solid";
   } else if (variant === "Unchecked" && state === "Hover" && !disabled) {
-    boxClass = "border-[1.5px] border-[#a8a8b2] border-solid";
+    boxClass =
+      "border-[1.5px] border-[var(--border-dynamic-neutral-subtle-hover,#a8a8b2)] border-solid";
   } else if (variant === "Unchecked Error" && !disabled) {
-    boxClass = "border-[1.5px] border-[#da294b] border-solid";
+    boxClass =
+      "border-[1.5px] border-[var(--border-dynamic-error-default,#da294b)] border-solid";
   } else {
-    boxClass = "border-[1.5px] border-[#c6c6cc] border-solid";
+    boxClass =
+      "border-[1.5px] border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] border-solid";
   }
 
   // Wrapper padding + hover background
   const hoverBg = state === "Hover" && !disabled;
-  const wrapperPad = isCompact ? "p-[2px]" : "p-[7px]";
-  const wrapperBg = hoverBg ? "bg-[rgba(113,113,128,0.08)]" : "";
+  const wrapperPad = isCompact
+    ? "p-[var(--spacing-container-s,2px)]"
+    : "p-[var(--spacing-container-m,7px)]";
+  const wrapperBg = hoverBg
+    ? "bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))]"
+    : "";
 
   // Gap between control and label
   const gap =
     !isCompact && (!disabled || (state === "Default" && disabled))
-      ? "gap-[2px]"
-      : "gap-[4px]";
+      ? "gap-[var(--spacing-25,2px)]"
+      : "gap-[var(--spacing-50,4px)]";
 
   // Label visibility mirrors the reference logic
   const showLabelEnabled =
@@ -102,10 +111,10 @@ function Checkbox({
     (variant === "Unchecked" ||
       variant === "Checked" ||
       variant === "Partial")
-      ? "#a8a8b2"
+      ? "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)"
       : disabled
-        ? "#a8a8b2"
-        : "#13131a";
+        ? "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)"
+        : "var(--surface-foreground-static-neutral-lvl1, #13131a)";
 
   const checkSrc =
     state === "Default" && disabled ? CHECK_ICON_DISABLED : CHECK_ICON;
@@ -115,11 +124,11 @@ function Checkbox({
   return (
     <div className={`flex items-center relative ${gap}`}>
       <div
-        className={`flex items-center justify-center overflow-hidden rounded-[2px] shrink-0 ${wrapperPad} ${wrapperBg}`}
+        className={`flex items-center justify-center overflow-hidden rounded-[var(--radius-25,2px)] shrink-0 ${wrapperPad} ${wrapperBg}`}
       >
-        <div className="flex items-center overflow-hidden p-[2px] shrink-0">
+        <div className="flex items-center overflow-hidden p-[var(--spacing-container-s,2px)] shrink-0">
           <div
-            className={`overflow-hidden relative rounded-[2px] shrink-0 h-[16px] w-[16px] ${boxClass}`}
+            className={`overflow-hidden relative rounded-[var(--radius-25,2px)] shrink-0 h-[16px] w-[16px] ${boxClass}`}
           >
             {isChecked && (
               <div className="absolute left-0 top-0 h-[16px] w-[16px] flex flex-col items-center justify-center overflow-hidden px-px py-[3px]">
@@ -148,7 +157,7 @@ function Checkbox({
       </div>
       {showLabel && (
         <p
-          className="[word-break:break-word] font-['DM_Sans'] leading-[20px] not-italic relative shrink-0 text-[14px] whitespace-nowrap"
+          className="[word-break:break-word] font-['DM_Sans'] [font-family:var(--body-md-regular-family,'DM_Sans')] [font-weight:var(--body-md-regular-weight,400)] leading-[var(--body-md-regular-line-height,20px)] not-italic relative shrink-0 text-[length:var(--body-md-regular-size,14px)] whitespace-nowrap"
           style={{ color: labelColor }}
         >
           {labelValue}
@@ -206,19 +215,27 @@ const checkboxConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "container/brand/bold/background": "#7c33b5",
-    "border/error": "#da294b",
-    "border/default": "#c6c6cc",
-    "border/hover": "#a8a8b2",
-    "border/disabled": "#e1e1e8",
-    "container/disabled/background": "rgba(113,113,128,0.1)",
-    "container/hover/background": "rgba(113,113,128,0.08)",
-    "text/label": "#13131a",
-    "text/label/disabled": "#a8a8b2",
-    "radius/box": "2px",
-    "size/box": "16×16",
-    "padding/compact": "2px",
-    "padding/standard": "7px",
+    "controls/background/selected": "var(--controls-background-selected)",
+    "controls/background/disabled": "var(--controls-background-disabled)",
+    "border/dynamic/error/default": "var(--border-dynamic-error-default)",
+    "border/dynamic/neutral/subtle/default":
+      "var(--border-dynamic-neutral-subtle-default)",
+    "border/dynamic/neutral/subtle/hover":
+      "var(--border-dynamic-neutral-subtle-hover)",
+    "border/dynamic/neutral/subtle/disabled":
+      "var(--border-dynamic-neutral-subtle-disabled)",
+    "container/dynamic/neutral/subtle/background/hover":
+      "var(--container-dynamic-neutral-subtle-background-hover)",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/dynamic/neutral/disabled":
+      "var(--surface-foreground-dynamic-neutral-disabled)",
+    "radius/25": "var(--radius-25)",
+    "spacing/container/s": "var(--spacing-container-s)",
+    "spacing/container/m": "var(--spacing-container-m)",
+    "spacing/25": "var(--spacing-25)",
+    "spacing/50": "var(--spacing-50)",
+    "Body Md/Regular": "var(--body-md-regular-size)",
   },
 };
 

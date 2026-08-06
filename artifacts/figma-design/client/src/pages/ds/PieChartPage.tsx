@@ -34,16 +34,15 @@ const DATAVIS = [
   "#a8a8b2", // 7 (Others)
 ];
 
-const GRID = "#e1e1e8"; // border/static/subtle/neutral
-const AXIS_LABEL = "#4b4b59"; // surface/foreground/static/neutral/lvl1
-const TITLE = "#13131a";
-const SLICE_BORDER = "#ffffff"; // datavis/border (slice separators)
-
-/* dark-mode tokens (auto light & dark mode) */
-const DARK_CARD_BG = "#1c1c24";
-const DARK_BORDER = "#3a3a45";
-const DARK_TITLE = "#ffffff";
-const DARK_LABEL = "#c6c6cc";
+/* Token references — light values kept as var() fallbacks (rule 1); the
+ * [data-theme="dark"] block in tokens.css auto-flips these for dark mode,
+ * so the previous hardcoded dark constants are no longer needed. */
+const GRID = "var(--border-static-subtle-neutral,#e1e1e8)"; // border/static/subtle/neutral
+const AXIS_LABEL = "var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)"; // legend label (dark -> #c6c6cc)
+const TITLE = "var(--surface-foreground-static-neutral-lvl1,#13131a)"; // card title (dark -> #f7f7fa)
+const SLICE_BORDER = "var(--datavis-border,#ffffff)"; // datavis/border (slice separators)
+const LABEL_FG = "var(--datavis-labels-adaptive,#ffffff)"; // datavis/labels/adaptive (data-label text)
+const CARD_BG = "var(--surface-background-lvl1,#ffffff)"; // surface/background/lvl1 (card surface)
 
 /* ---------- types & data ---------- */
 
@@ -162,7 +161,7 @@ function Pie({
               textAnchor="middle"
               dominantBaseline="central"
               style={{ fontFamily: FONT, fontSize: 12, fontWeight: 500 }}
-              fill="#ffffff"
+              fill={LABEL_FG}
             >
               {seg.pct.toFixed(1)}
             </text>
@@ -175,17 +174,18 @@ function Pie({
 /* ---------- legend ---------- */
 
 function Legend({ slices, dark }: { slices: Slice[]; dark: boolean }) {
+  void dark; // colours now flow through auto light/dark tokens
   return (
-    <ul className="flex flex-col gap-[10px]">
+    <ul className="flex flex-col gap-[var(--odd-numbers-10,10px)]">
       {slices.map((s, i) => (
-        <li key={s.name} className="flex items-center gap-[8px]">
+        <li key={s.name} className="flex items-center gap-[var(--spacing-100,8px)]">
           <span
-            className="block h-[12px] w-[12px] shrink-0 rounded-[2px]"
+            className="block h-[var(--numbers-12,12px)] w-[var(--numbers-12,12px)] shrink-0 rounded-[var(--radius-25,2px)]"
             style={{ backgroundColor: DATAVIS[i % DATAVIS.length] }}
           />
           <span
-            className="whitespace-nowrap text-[14px] leading-[20px]"
-            style={{ fontFamily: FONT, color: dark ? DARK_LABEL : AXIS_LABEL }}
+            className="whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)]"
+            style={{ fontFamily: FONT, color: AXIS_LABEL }}
           >
             {s.name}
           </span>
@@ -209,7 +209,7 @@ function PieChart({
   dark: boolean;
 }) {
   return (
-    <div className="flex w-full flex-wrap items-center justify-center gap-[32px]">
+    <div className="flex w-full flex-wrap items-center justify-center gap-[var(--spacing-400,32px)]">
       <Pie slices={slices} size={200} showLabels={showLabels} />
       {showLegend && <Legend slices={slices} dark={dark} />}
     </div>
@@ -228,33 +228,29 @@ function SmartCard({
   dark: boolean;
   children: React.ReactNode;
 }) {
+  void dark; // surface/border/title colours now flow through auto light/dark tokens
   return (
     <div
-      className={`flex w-full min-w-[300px] max-w-[608px] flex-col overflow-hidden rounded-[2px] ${
-        dark ? "bg-[#1c1c24]" : "bg-white"
-      }`}
-      style={
-        dark
-          ? undefined
-          : {
-              boxShadow:
-                "0px 1px 4px 0px rgba(113,113,128,0.08), 0px 8px 16px 0px rgba(113,113,128,0.04)",
-            }
-      }
+      className="flex w-full min-w-[300px] max-w-[608px] flex-col overflow-hidden rounded-[var(--radius-25,2px)]"
+      style={{
+        backgroundColor: CARD_BG,
+        boxShadow:
+          "0px 1px 4px 0px rgba(113,113,128,0.08), 0px 8px 16px 0px rgba(113,113,128,0.04)",
+      }}
     >
-      <div className="flex items-center gap-[8px] p-[16px]">
+      <div className="flex items-center gap-[var(--spacing-100,8px)] p-[var(--spacing-200,16px)]">
         <p
-          className="text-[16px] font-medium leading-[24px] tracking-[-0.08px]"
-          style={{ fontFamily: FONT, color: dark ? DARK_TITLE : TITLE }}
+          className="text-[length:var(--headline-xs-medium-size,16px)] leading-[var(--headline-xs-medium-line-height,24px)] tracking-[-0.08px] [font-weight:var(--headline-xs-medium-weight,500)]"
+          style={{ fontFamily: FONT, color: TITLE }}
         >
           {title}
         </p>
       </div>
       <div
         className="h-0 w-full border-t border-solid"
-        style={{ borderColor: dark ? DARK_BORDER : GRID }}
+        style={{ borderColor: GRID }}
       />
-      <div className="p-[16px]">{children}</div>
+      <div className="p-[var(--spacing-200,16px)]">{children}</div>
     </div>
   );
 }
@@ -300,21 +296,21 @@ const config: PlaygroundConfig = {
     );
   },
   tokens: {
-    "surface/foreground/static/neutral/lvl1": AXIS_LABEL,
-    "datavis/border": SLICE_BORDER,
-    "datavis/qualitative/1": DATAVIS[0],
-    "datavis/qualitative/2": DATAVIS[1],
-    "datavis/qualitative/3": DATAVIS[2],
-    "datavis/qualitative/4": DATAVIS[3],
-    "datavis/qualitative/5": DATAVIS[4],
-    "datavis/qualitative/6": DATAVIS[5],
-    "datavis/qualitative/7 (Others)": DATAVIS[6],
-    "border/static/subtle/neutral": GRID,
-    "surface/dark/lvl1": DARK_CARD_BG,
-    "gap/pie-to-legend": "32px",
-    "frame/min-width": "608px",
-    "frame/min-height": "300px · max 400px",
-    "font/body-md-regular": "14 / 20",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/dynamic/neutral/default/regular":
+      "var(--surface-foreground-dynamic-neutral-default-regular)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "datavis/border": "var(--datavis-border)",
+    "datavis/labels/adaptive": "var(--datavis-labels-adaptive)",
+    "radius/25": "var(--radius-25)",
+    "spacing/100": "var(--spacing-100)",
+    "spacing/200": "var(--spacing-200)",
+    "spacing/400": "var(--spacing-400)",
+    "odd_numbers/10": "var(--odd-numbers-10)",
+    "numbers/12": "var(--numbers-12)",
+    "Headline Xs/Medium": "var(--headline-xs-medium-size)",
+    "Body Md/Regular": "var(--body-md-regular-size)",
   },
 };
 

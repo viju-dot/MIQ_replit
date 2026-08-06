@@ -17,9 +17,9 @@ function NavButton({ direction, onClick, disabled }: NavButtonProps): JSX.Elemen
       onClick={onClick}
       disabled={disabled}
       aria-label={direction === "left" ? "Previous" : "Next"}
-      className="flex items-center justify-center rounded-[2px] p-[7px] transition-colors hover:bg-[#7171801a] disabled:opacity-40 disabled:hover:bg-transparent"
+      className="flex items-center justify-center rounded-[var(--radius-25,2px)] p-[var(--spacing-container-m,7px)] transition-colors hover:bg-[var(--surface-background-hover,#7171801a)] disabled:opacity-40 disabled:hover:bg-transparent"
     >
-      <span className="flex items-center justify-center p-[2px]">
+      <span className="flex items-center justify-center p-[var(--spacing-25,2px)]">
         <img
           alt=""
           className="block h-5 w-5"
@@ -38,7 +38,7 @@ type PaginationProps = {
 
 function CarouselPagination({ count, active, onSelect }: PaginationProps): JSX.Element {
   return (
-    <div className="flex h-full items-center gap-[12px] overflow-hidden">
+    <div className="flex h-full items-center gap-[var(--spacing-150,12px)] overflow-hidden">
       {Array.from({ length: count }).map((_, index) => (
         <button
           type="button"
@@ -50,7 +50,12 @@ function CarouselPagination({ count, active, onSelect }: PaginationProps): JSX.E
         >
           <span
             className="h-2 w-2 rounded-full"
-            style={{ backgroundColor: index === active ? "#7c33b5" : "#ebebf0" }}
+            style={{
+              backgroundColor:
+                index === active
+                  ? "var(--controls-background-active, #7c33b5)"
+                  : "var(--controls-background-inactive, #ebebf0)",
+            }}
           />
         </button>
       ))}
@@ -98,7 +103,7 @@ function Carousel({ count, slotLabel }: { count: number; slotLabel: string }): J
     <div className="flex w-full flex-col items-center justify-center gap-4">
       {/* slot */}
       <div className="relative h-[192px] w-full bg-[rgba(234,0,173,0.1)]">
-        <span className="absolute inset-0 flex items-center justify-center text-[14px] text-[#717180]">
+        <span className="absolute inset-0 flex items-center justify-center text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl3,#717180)]">
           {slotLabel}
         </span>
       </div>
@@ -165,14 +170,11 @@ const carouselConfig: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "pagination/active": "#7c33b5",
-    "pagination/inactive": "#ebebf0",
-    "nav/hover": "rgba(113,113,128,0.1)",
-    "slot/background": "rgba(234,0,173,0.1)",
-    "slot/label": "#717180",
-    "pagination/dot-size": "8px",
-    "pagination/gap": "12px",
-    "slot/height": "192px",
+    "controls/background/active": "var(--controls-background-active)",
+    "controls/background/inactive": "var(--controls-background-inactive)",
+    "surface/background/hover": "var(--surface-background-hover)",
+    "surface/foreground/static/neutral/lvl3": "var(--surface-foreground-static-neutral-lvl3)",
+    "spacing/150": "var(--spacing-150)",
   },
 };
 
@@ -191,13 +193,12 @@ const navigationConfig: PlaygroundConfig = {
   ],
   render: (props) => <InteractiveNavigation count={clampCount(props.count)} />,
   tokens: {
-    "pagination/active": "#7c33b5",
-    "pagination/inactive": "#ebebf0",
-    "nav/hover": "rgba(113,113,128,0.1)",
-    "nav/button-radius": "2px",
-    "nav/caret-size": "20px",
-    "pagination/dot-size": "8px",
-    "pagination/gap": "12px",
+    "controls/background/active": "var(--controls-background-active)",
+    "controls/background/inactive": "var(--controls-background-inactive)",
+    "surface/background/hover": "var(--surface-background-hover)",
+    "radius/25": "var(--radius-25)",
+    "spacing/150": "var(--spacing-150)",
+    "spacing/container/m": "var(--spacing-container-m)",
   },
 };
 

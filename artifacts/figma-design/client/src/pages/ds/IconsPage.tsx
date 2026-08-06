@@ -13,8 +13,8 @@ import type { PlaygroundConfig, PropValues } from "@/components/playground/types
 type IconStyle = "Regular" | "Fill" | "Duotone";
 type Pointing = "Up" | "Down" | "Left" | "Right";
 
-const ICON_COLOR = "#13131a";
-const DUOTONE_FILL = "#71718033"; // subtle neutral accent for duotone bodies
+const ICON_COLOR = "var(--surface-foreground-static-neutral-lvl1, #13131a)";
+const DUOTONE_FILL = "#71718033"; // subtle neutral accent for duotone bodies (no matching token)
 
 const rotationForPointing: Record<Pointing, number> = {
   Up: 0,
@@ -246,7 +246,7 @@ function GearGlyph({ size, style }: SvgProps) {
     return (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
         {teeth && <g fill={ICON_COLOR}>{teeth}</g>}
-        <circle cx="12" cy="12" r="3" fill="#fff" />
+        <circle cx="12" cy="12" r="3" fill="var(--surface-background-lvl1, #fff)" />
       </svg>
     );
   }
@@ -366,15 +366,14 @@ const STYLE_OPTIONS: IconStyle[] = ["Regular", "Fill", "Duotone"];
 const SIZE_OPTIONS = ["16", "20", "24", "32"] as const;
 const POINTING_OPTIONS: Pointing[] = ["Up", "Down", "Left", "Right"];
 
-function IconsGallery({ props, dark }: { props: PropValues; dark: boolean }): JSX.Element {
+function IconsGallery({ props }: { props: PropValues; dark: boolean }): JSX.Element {
   const style = props.style as IconStyle;
   const size = Number(props.size);
   const pointing = props.pointing as Pointing;
 
-  const cardCls = dark
-    ? "border-[#33333d] bg-[#26262e] text-[#f7f7fa]"
-    : "border-[#e1e1e8] bg-white text-[#13131a]";
-  const captionCls = dark ? "text-[#a8a8b2]" : "text-[#a8a8b2]";
+  const cardCls =
+    "border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]";
+  const captionCls = "text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]";
 
   return (
     <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
@@ -390,7 +389,7 @@ function IconsGallery({ props, dark }: { props: PropValues; dark: boolean }): JS
               pointing={family.directional ? pointing : undefined}
             />
           </div>
-          <span className={`text-[12px] leading-[18px] ${captionCls}`}>
+          <span className={`text-[length:var(--body-sm-regular-size,12px)] leading-[var(--body-sm-regular-line-height,18px)] ${captionCls}`}>
             {family.name.replace("Icon/", "")}
           </span>
         </div>
@@ -429,14 +428,13 @@ const config: PlaygroundConfig = {
   ],
   render: (props, theme) => <IconsGallery props={props} dark={theme === "dark"} />,
   tokens: {
-    "color/icon/default": ICON_COLOR,
-    "color/icon/duotone-fill": DUOTONE_FILL,
-    "color/caption": "#a8a8b2",
-    "size/16": "16px",
-    "size/20": "20px",
-    "size/24": "24px",
-    "size/32": "32px",
-    "radius/card": "6px",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "container/dynamic/neutral/subtle/background/default/regular":
+      "var(--container-dynamic-neutral-subtle-background-default-regular)",
+    "container/dynamic/neutral/subtle/foreground/disabled":
+      "var(--container-dynamic-neutral-subtle-foreground-disabled)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
   },
 };
 

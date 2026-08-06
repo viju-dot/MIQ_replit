@@ -10,13 +10,13 @@ const A = "/figmaAssets/side-panel";
 function HeaderActionPagination() {
   return (
     <div className="flex h-[42px] flex-col items-end justify-end shrink-0">
-      <div className="flex items-center justify-end bg-white shrink-0">
-        <div className="flex items-center justify-center p-[7px] rounded-[2px] shrink-0">
+      <div className="flex items-center justify-end bg-[var(--surface-background-lvl1,#ffffff)] shrink-0">
+        <div className="flex items-center justify-center p-[7px] rounded-[var(--radiuses-small,2px)] shrink-0">
           <div className="flex items-center justify-center p-[2px] size-[20px] shrink-0">
             <img alt="" className="block size-full max-w-none" src={`${A}/caret-left.svg`} />
           </div>
         </div>
-        <div className="flex items-center justify-center p-[7px] rounded-[2px] shrink-0">
+        <div className="flex items-center justify-center p-[7px] rounded-[var(--radiuses-small,2px)] shrink-0">
           <div className="flex items-center justify-center p-[2px] size-[20px] shrink-0">
             <img alt="" className="block size-full max-w-none" src={`${A}/caret-right.svg`} />
           </div>
@@ -29,7 +29,7 @@ function HeaderActionPagination() {
 function HeaderActionClose() {
   return (
     <div className="flex flex-col items-end justify-center shrink-0">
-      <div className="flex items-center justify-center p-[7px] rounded-[2px] shrink-0">
+      <div className="flex items-center justify-center p-[7px] rounded-[var(--radiuses-small,2px)] shrink-0">
         <div className="flex items-center justify-center p-[5px] size-[20px] shrink-0">
           <img alt="Close" className="block size-full max-w-none" src={`${A}/x-close.svg`} />
         </div>
@@ -44,11 +44,11 @@ function HeaderActionClose() {
 
 function DateInput() {
   return (
-    <div className="flex w-[156px] flex-col items-start gap-0 rounded-[2px] border border-solid border-[#c6c6cc] bg-white shrink-0">
-      <div className="flex w-full items-center gap-2 rounded-[2px] pl-[12px] pr-[8px] shrink-0">
+    <div className="flex w-[156px] flex-col items-start gap-0 rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] bg-[var(--surface-background-lvl1,#ffffff)] shrink-0">
+      <div className="flex w-full items-center gap-2 rounded-[var(--radiuses-small,2px)] pl-[12px] pr-[8px] shrink-0">
         <div className="flex min-w-0 flex-1 items-start gap-2 py-[2.5px]">
-          <div className="flex min-w-0 flex-1 flex-col justify-center overflow-hidden text-ellipsis whitespace-nowrap font-['DM_Sans:Regular',_Helvetica] text-[12px] leading-[18px] text-[#4b4b59]">
-            <p className="overflow-hidden text-ellipsis leading-[18px]">February, 2022</p>
+          <div className="flex min-w-0 flex-1 flex-col justify-center overflow-hidden text-ellipsis whitespace-nowrap font-['DM_Sans:Regular',_Helvetica] text-[length:var(--body-sm-regular-size,12px)] leading-[var(--body-sm-regular-line-height,18px)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]">
+            <p className="overflow-hidden text-ellipsis leading-[var(--body-sm-regular-line-height,18px)]">February, 2022</p>
           </div>
         </div>
         <div className="flex h-[24px] items-center justify-center shrink-0">
@@ -67,7 +67,7 @@ function CampaignLink() {
       <div className="flex items-center justify-center size-[24px] shrink-0">
         <img alt="" className="block size-[24px] max-w-none" src={`${A}/arrow-square-out.svg`} />
       </div>
-      <p className="whitespace-nowrap text-center font-['DM_Sans:Medium',_Helvetica] font-medium text-[14px] leading-[20px] text-[#7c33b5]">
+      <p className="whitespace-nowrap text-center font-['DM_Sans:Medium',_Helvetica] font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]">
         Full campaign details
       </p>
     </div>
@@ -76,10 +76,10 @@ function CampaignLink() {
 
 function SmallOutlineButton() {
   return (
-    <div className="flex h-[24px] items-start gap-0 rounded-[2px] shrink-0">
-      <div className="flex h-[24px] items-center justify-center gap-[10px] rounded-[2px] border border-solid border-[#4b4b59] pl-[6px] pr-[6px] py-[2px] shrink-0">
-        <div className="flex flex-col justify-center whitespace-nowrap text-center font-['DM_Sans:Medium',_Helvetica] font-medium text-[14px] leading-[20px] text-[#4b4b59]">
-          <p className="leading-[20px]">Button</p>
+    <div className="flex h-[24px] items-start gap-0 rounded-[var(--radiuses-small,2px)] shrink-0">
+      <div className="flex h-[24px] items-center justify-center gap-[10px] rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-neutral-bold-default,#4b4b59)] pl-[6px] pr-[6px] py-[2px] shrink-0">
+        <div className="flex flex-col justify-center whitespace-nowrap text-center font-['DM_Sans:Medium',_Helvetica] font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]">
+          <p className="leading-[var(--body-md-medium-line-height,20px)]">Button</p>
         </div>
       </div>
     </div>
@@ -93,21 +93,21 @@ function SmallOutlineButton() {
 function FooterActions() {
   return (
     <div className="flex flex-1 items-center justify-end gap-4 min-w-px px-4 py-4">
-      <div className="flex items-center gap-1 rounded-[2px] shrink-0">
-        <p className="whitespace-nowrap text-center font-['DM_Sans:Medium',_Helvetica] font-medium text-[14px] leading-[20px] text-[#7c33b5]">
+      <div className="flex items-center gap-1 rounded-[var(--radiuses-small,2px)] shrink-0">
+        <p className="whitespace-nowrap text-center font-['DM_Sans:Medium',_Helvetica] font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]">
           Link
         </p>
       </div>
-      <div className="flex items-center justify-end gap-0 rounded-[2px] border border-solid border-[#4b4b59] px-[12px] py-[7px] shrink-0">
-        <div className="flex items-center justify-center gap-1 rounded-[2px] shrink-0">
-          <p className="whitespace-nowrap text-center font-['DM_Sans:Medium',_Helvetica] font-medium text-[14px] leading-[20px] text-[#4b4b59]">
+      <div className="flex items-center justify-end gap-0 rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-neutral-bold-default,#4b4b59)] px-[12px] py-[7px] shrink-0">
+        <div className="flex items-center justify-center gap-1 rounded-[var(--radiuses-small,2px)] shrink-0">
+          <p className="whitespace-nowrap text-center font-['DM_Sans:Medium',_Helvetica] font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]">
             Default
           </p>
         </div>
       </div>
-      <div className="flex items-center justify-end gap-0 rounded-[2px] bg-[#7c33b5] px-[12px] py-[7px] shrink-0">
-        <div className="flex items-center justify-center gap-1 rounded-[2px] shrink-0">
-          <p className="whitespace-nowrap text-center font-['DM_Sans:Medium',_Helvetica] font-medium text-[14px] leading-[20px] text-white">
+      <div className="flex items-center justify-end gap-0 rounded-[var(--radiuses-small,2px)] bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)] px-[12px] py-[7px] shrink-0">
+        <div className="flex items-center justify-center gap-1 rounded-[var(--radiuses-small,2px)] shrink-0">
+          <p className="whitespace-nowrap text-center font-['DM_Sans:Medium',_Helvetica] font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[var(--container-dynamic-brand-bold-foreground-default,#ffffff)]">
             Default
           </p>
         </div>
@@ -119,10 +119,10 @@ function FooterActions() {
 function SidePanelFooter() {
   return (
     <div
-      className="flex h-[66px] w-full flex-wrap items-center justify-center content-center bg-white shrink-0"
+      className="flex h-[66px] w-full flex-wrap items-center justify-center content-center bg-[var(--surface-background-lvl1,#ffffff)] shrink-0"
       style={{
         filter:
-          "drop-shadow(0px -1px 2px rgba(113,113,128,0.12)) drop-shadow(0px -8px 8px rgba(113,113,128,0.08))",
+          "drop-shadow(0px -1px 2px var(--shadow-lvl12, rgba(113,113,128,0.12))) drop-shadow(0px -8px 8px var(--shadow-lvl8, rgba(113,113,128,0.08)))",
       }}
     >
       <FooterActions />
@@ -162,14 +162,14 @@ function TitleArea({
             />
           </div>
         )}
-        <div className="flex min-w-0 flex-1 flex-col justify-center overflow-hidden text-ellipsis whitespace-nowrap font-['DM_Sans:Medium',_Helvetica] font-medium text-[14px] text-[#13131a]">
-          <p className="overflow-hidden text-ellipsis leading-[20px]">Title</p>
+        <div className="flex min-w-0 flex-1 flex-col justify-center overflow-hidden text-ellipsis whitespace-nowrap font-['DM_Sans:Medium',_Helvetica] font-medium text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
+          <p className="overflow-hidden text-ellipsis leading-[var(--body-md-medium-line-height,20px)]">Title</p>
         </div>
       </div>
       {subtitle && (
         <div className="flex w-full items-start shrink-0">
-          <div className="flex min-w-0 flex-1 flex-col justify-center self-stretch overflow-hidden text-ellipsis whitespace-nowrap font-['DM_Sans:Regular',_Helvetica] text-[12px] text-[#282833]">
-            <p className="overflow-hidden text-ellipsis leading-[18px]">Subtitle</p>
+          <div className="flex min-w-0 flex-1 flex-col justify-center self-stretch overflow-hidden text-ellipsis whitespace-nowrap font-['DM_Sans:Regular',_Helvetica] text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-static-neutral-lvl2,#282833)]">
+            <p className="overflow-hidden text-ellipsis leading-[var(--body-sm-regular-line-height,18px)]">Subtitle</p>
           </div>
         </div>
       )}
@@ -191,21 +191,21 @@ function SidePanel({
 
   return (
     <div
-      className={`flex h-[720px] max-w-full flex-col bg-[#f7f7fa] ${widthClass}`}
+      className={`flex h-[720px] max-w-full flex-col bg-[var(--surface-background-lvl2,#f7f7fa)] ${widthClass}`}
       style={{
         filter:
-          "drop-shadow(0px 1px 2px rgba(113,113,128,0.08)) drop-shadow(0px 8px 8px rgba(113,113,128,0.04))",
+          "drop-shadow(0px 1px 2px var(--shadow-lvl8, rgba(113,113,128,0.08))) drop-shadow(0px 8px 8px var(--shadow-lvl4, rgba(113,113,128,0.04)))",
       }}
     >
       {/* Header (all sizes share a header bar) */}
       {is400 ? (
         <div className="flex w-full flex-col items-start shrink-0">
-          <div className="flex w-full flex-wrap items-center content-center gap-[10px_16px] bg-[#ebebf0] p-[16px] shrink-0">
+          <div className="flex w-full flex-wrap items-center content-center gap-[10px_16px] bg-[var(--surface-background-lvl3,#ebebf0)] p-[16px] shrink-0">
             <TitleArea subtitle={subtitle} titleIcon={titleIcon} fullWidthTitle />
             <HeaderActionPagination />
           </div>
           {subnav && (
-            <div className="flex w-full items-start gap-0 border-b border-solid border-[#e1e1e8] bg-white px-[16px] py-[8px] shrink-0">
+            <div className="flex w-full items-start gap-0 border-b border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--surface-background-lvl1,#ffffff)] px-[16px] py-[8px] shrink-0">
               <div className="flex min-w-px flex-1 flex-wrap items-start justify-between content-start gap-y-4">
                 <DateInput />
                 <CampaignLink />
@@ -215,18 +215,18 @@ function SidePanel({
         </div>
       ) : (
         <>
-          <div className="flex w-full items-center gap-[10px] bg-[#ebebf0] p-[16px] shrink-0">
+          <div className="flex w-full items-center gap-[10px] bg-[var(--surface-background-lvl3,#ebebf0)] p-[16px] shrink-0">
             <div className="flex flex-1 flex-row items-center self-stretch">
               <TitleArea subtitle={subtitle} titleIcon={titleIcon} fullWidthTitle={is800} />
             </div>
             <HeaderActionPagination />
           </div>
           {subnav && (
-            <div className="flex w-full flex-wrap items-start gap-y-4 border-b border-solid border-[#e1e1e8] bg-white px-[16px] py-[8px] shrink-0">
+            <div className="flex w-full flex-wrap items-start gap-y-4 border-b border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--surface-background-lvl1,#ffffff)] px-[16px] py-[8px] shrink-0">
               <div className="flex min-w-[288px] flex-1 flex-wrap items-center justify-between content-center gap-y-4">
                 <div className="flex flex-wrap items-center gap-4 content-center shrink-0">
-                  <div className="flex flex-col justify-center whitespace-nowrap font-['DM_Sans:Medium',_Helvetica] font-medium text-[16px] leading-[24px] tracking-[-0.08px] text-[#13131a]">
-                    <p className="leading-[24px]">Text</p>
+                  <div className="flex flex-col justify-center whitespace-nowrap font-['DM_Sans:Medium',_Helvetica] font-medium text-[length:var(--headline-xs-medium-size,16px)] leading-[var(--headline-xs-medium-line-height,24px)] tracking-[-0.08px] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
+                    <p className="leading-[var(--headline-xs-medium-line-height,24px)]">Text</p>
                   </div>
                   <DateInput />
                 </div>
@@ -249,7 +249,7 @@ function SidePanel({
 
       {/* Swap container (body content placeholder) */}
       <div className="flex min-h-px flex-1 flex-col items-start w-full">
-        <div className="min-h-px w-full flex-1 bg-[#ebebf0]" />
+        <div className="min-h-px w-full flex-1 bg-[var(--surface-background-lvl3,#ebebf0)]" />
       </div>
 
       {/* Footer */}
@@ -288,18 +288,19 @@ const sidePanelConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "container/surface/background": "#f7f7fa",
-    "container/header/background": "#ebebf0",
-    "container/body/background": "#ebebf0",
-    "container/footer/background": "#ffffff",
-    "border/divider": "#e1e1e8",
-    "text/title": "#13131a",
-    "text/subtitle": "#282833",
-    "text/brand": "#7c33b5",
-    "size/400": "400px",
-    "size/600": "600px",
-    "size/800": "800px",
-    "size/height": "720px",
+    "surface/background/lvl2": "var(--surface-background-lvl2)",
+    "surface/background/lvl3": "var(--surface-background-lvl3)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "border/dynamic/neutral/subtle/default": "var(--border-dynamic-neutral-subtle-default)",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/static/neutral/lvl2": "var(--surface-foreground-static-neutral-lvl2)",
+    "surface/foreground/dynamic/brand/default": "var(--surface-foreground-dynamic-brand-default)",
+    "surface/foreground/dynamic/neutral/default/regular": "var(--surface-foreground-dynamic-neutral-default-regular)",
+    "Radiuses/small": "var(--radiuses-small)",
+    "Headline Xs/Medium": "var(--headline-xs-medium-size)",
+    "Body Md/Medium": "var(--body-md-medium-size)",
+    "Body Sm/Regular": "var(--body-sm-regular-size)",
   },
 };
 
@@ -317,14 +318,14 @@ const headerActionConfig: PlaygroundConfig = {
     },
   ],
   render: (props) => (
-    <div className="bg-[#ebebf0] p-2">
+    <div className="bg-[var(--surface-background-lvl3,#ebebf0)] p-2">
       {props.type === "Close" ? <HeaderActionClose /> : <HeaderActionPagination />}
     </div>
   ),
   tokens: {
-    "container/action/background": "#ffffff",
-    "radius/action": "2px",
-    "size/icon": "20px",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "surface/background/lvl3": "var(--surface-background-lvl3)",
+    "Radiuses/small": "var(--radiuses-small)",
   },
 };
 
@@ -338,12 +339,14 @@ const footerConfig: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "container/footer/background": "#ffffff",
-    "button/primary/background": "#7c33b5",
-    "button/secondary/border": "#4b4b59",
-    "text/link": "#7c33b5",
-    "text/default": "#4b4b59",
-    "radius/button": "2px",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
+    "container/dynamic/brand/bold/foreground/default": "var(--container-dynamic-brand-bold-foreground-default)",
+    "border/dynamic/neutral/bold/default": "var(--border-dynamic-neutral-bold-default)",
+    "surface/foreground/dynamic/brand/default": "var(--surface-foreground-dynamic-brand-default)",
+    "surface/foreground/dynamic/neutral/default/regular": "var(--surface-foreground-dynamic-neutral-default-regular)",
+    "Radiuses/small": "var(--radiuses-small)",
+    "Body Md/Medium": "var(--body-md-medium-size)",
   },
 };
 

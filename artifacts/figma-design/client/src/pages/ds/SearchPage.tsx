@@ -57,26 +57,26 @@ function SearchStandard({
   const isNotBackgroundAndHover = !background && state === "Hover";
 
   const containerColors = isBackgroundAndDisabled
-    ? "bg-[rgba(113,113,128,0.1)] border-[#e1e1e8]"
+    ? "bg-[var(--container-dynamic-neutral-subtle-background-disabled,rgba(113,113,128,0.1))] border-[var(--border-dynamic-neutral-subtle-disabled,#e1e1e8)]"
     : isBackgroundAndActiveFocus
-    ? "bg-white border-[#7c33b5]"
+    ? "bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] border-[var(--border-dynamic-brand-default,#7c33b5)]"
     : isBackgroundAndHover
-    ? "bg-[rgba(113,113,128,0.08)] border-[#c6c6cc]"
+    ? "bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))] border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]"
     : background && ["Default", "Filled"].includes(state)
-    ? "bg-white border-[#c6c6cc]"
+    ? "bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]"
     : isNotBackgroundAndDisabled
-    ? "border-[#e1e1e8]"
+    ? "border-[var(--border-dynamic-neutral-subtle-disabled,#e1e1e8)]"
     : isNotBackgroundAndActiveFocus
-    ? "border-[#7c33b5]"
+    ? "border-[var(--border-dynamic-brand-default,#7c33b5)]"
     : isNotBackgroundAndHover
-    ? "border-[#a8a8b2]"
-    : "border-[#c6c6cc]";
+    ? "border-[var(--border-dynamic-neutral-subtle-hover,#a8a8b2)]"
+    : "border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]";
 
   const textColor = isDisabled
-    ? "text-[#a8a8b2]"
+    ? "text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]"
     : ["Active / Focus", "Filled"].includes(state)
-    ? "text-[#13131a]"
-    : "text-[#4b4b59]";
+    ? "text-[var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)]"
+    : "text-[var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)]";
 
   const iconSrc = isDisabled
     ? imgMagnifyingGlassDisabled
@@ -93,10 +93,10 @@ function SearchStandard({
 
   return (
     <div
-      className={`flex w-[300px] min-w-[180px] flex-col items-start gap-[10px] rounded-[2px] border border-solid ${containerColors}`}
+      className={`flex w-[300px] min-w-[180px] flex-col items-start gap-[var(--odd-numbers-10,10px)] rounded-[var(--radiuses-small,2px)] border border-solid ${containerColors}`}
     >
-      <div className="flex h-[34px] w-full items-center gap-[6px] p-[10px]">
-        <div className="flex h-[24px] shrink-0 items-start gap-[10px]">
+      <div className="flex h-[var(--height-34,34px)] w-full items-center gap-[var(--numbers-6,6px)] p-[var(--odd-numbers-10,10px)]">
+        <div className="flex h-[24px] shrink-0 items-start gap-[var(--odd-numbers-10,10px)]">
           <div className="flex size-[24px] shrink-0 items-center justify-center">
             <div className="relative size-[24px] shrink-0">
               <img alt="" className="absolute inset-0 block size-full max-w-none" src={iconSrc} />
@@ -107,12 +107,12 @@ function SearchStandard({
           className={`relative flex min-w-0 flex-1 items-start ${
             ["Hover", "Active / Focus", "Filled", "Disabled"].includes(state) ||
             (background && state === "Default")
-              ? "gap-[10px]"
-              : "gap-[8px]"
+              ? "gap-[var(--odd-numbers-10,10px)]"
+              : "gap-[var(--numbers-8,8px)]"
           }`}
         >
           <p
-            className={`relative min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[14px] leading-[20px] [word-break:break-word] ${textColor}`}
+            className={`relative min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)] [word-break:break-word] ${textColor}`}
             style={{ fontFamily: '"DM Sans", Helvetica' }}
           >
             {resolvedLabel}
@@ -255,14 +255,14 @@ const aiCategories: ResultCategory[] = [
 function ResultTextRow({ title, parts }: { title: string; parts: string[] }): JSX.Element {
   return (
     <div
-      className="relative flex min-w-0 flex-1 items-center gap-[8px] whitespace-nowrap text-[12px] leading-[0] [word-break:break-word]"
+      className="relative flex min-w-0 flex-1 items-center gap-[var(--numbers-8,8px)] whitespace-nowrap text-[length:var(--body-sm-regular-size,12px)] leading-[0] [word-break:break-word]"
       style={{ fontFamily: '"DM Sans", Helvetica' }}
     >
       <div className="flex shrink-0 flex-col justify-center text-[#2b0030]">
-        <p className="leading-[18px]">{title}</p>
+        <p className="leading-[var(--body-sm-regular-line-height,18px)]">{title}</p>
       </div>
       {parts.map((part, i) => (
-        <div key={i} className="flex shrink-0 items-center gap-[8px]">
+        <div key={i} className="flex shrink-0 items-center gap-[var(--numbers-8,8px)]">
           <div
             className="flex shrink-0 flex-col justify-center text-[#806683] tracking-[0.48px]"
             style={{ fontWeight: 300 }}
@@ -273,7 +273,7 @@ function ResultTextRow({ title, parts }: { title: string; parts: string[] }): JS
             className="flex shrink-0 flex-col justify-center text-[#806683]"
             style={{ fontWeight: 300 }}
           >
-            <p className="leading-[18px]">{part}</p>
+            <p className="leading-[var(--body-sm-regular-line-height,18px)]">{part}</p>
           </div>
         </div>
       ))}
@@ -284,18 +284,18 @@ function ResultTextRow({ title, parts }: { title: string; parts: string[] }): JS
 function ResultCategoryBlock({ header, rows }: ResultCategory): JSX.Element {
   return (
     <div className="flex w-full shrink-0 flex-col items-start">
-      <div className="flex shrink-0 items-center gap-[8px]">
+      <div className="flex shrink-0 items-center gap-[var(--numbers-8,8px)]">
         <div
-          className="flex shrink-0 flex-col justify-center whitespace-nowrap text-[14px] leading-[0] text-[#806683]"
+          className="flex shrink-0 flex-col justify-center whitespace-nowrap text-[length:var(--body-md-medium-size,14px)] leading-[0] text-[#806683]"
           style={{ fontFamily: '"DM Sans", Helvetica', fontWeight: 500 }}
         >
-          <p className="leading-[20px]">{header}</p>
+          <p className="leading-[var(--body-md-medium-line-height,20px)]">{header}</p>
         </div>
       </div>
       {rows.map((row, i) => (
         <div
           key={i}
-          className="flex w-full shrink-0 items-center gap-[8px] rounded-[2px] bg-white py-[8px]"
+          className="flex w-full shrink-0 items-center gap-[var(--numbers-8,8px)] rounded-[var(--radiuses-small,2px)] bg-[var(--surface-background-lvl1,#ffffff)] py-[var(--numbers-8,8px)]"
         >
           <div className="relative size-[16px] shrink-0">
             <img
@@ -325,7 +325,7 @@ function UniversalSearch({ state = "Zero" }: UniversalSearchProps): JSX.Element 
 
   return (
     <div
-      className="flex w-[512px] max-w-full flex-col items-start overflow-clip rounded-[2px]"
+      className="flex w-[512px] max-w-full flex-col items-start overflow-clip rounded-[var(--radiuses-small,2px)]"
       style={{
         filter:
           "drop-shadow(0px 1px 2px rgba(113,113,128,0.08)) drop-shadow(0px 16px 12px rgba(113,113,128,0.12))",
@@ -334,8 +334,8 @@ function UniversalSearch({ state = "Zero" }: UniversalSearchProps): JSX.Element 
       }}
     >
       {/* Search input */}
-      <div className="flex w-full shrink-0 flex-col items-start rounded-t-[2px] bg-white py-[4px]">
-        <div className="flex h-[34px] w-full shrink-0 items-center gap-[8px] px-[24px] py-[12px]">
+      <div className="flex w-full shrink-0 flex-col items-start rounded-t-[var(--radiuses-small,2px)] bg-[var(--surface-background-lvl1,#ffffff)] py-[var(--numbers-4,4px)]">
+        <div className="flex h-[var(--height-34,34px)] w-full shrink-0 items-center gap-[var(--numbers-8,8px)] px-[var(--spacing-24,24px)] py-[var(--numbers-12,12px)]">
           <div className="relative size-[24px] shrink-0">
             <img
               alt=""
@@ -345,8 +345,10 @@ function UniversalSearch({ state = "Zero" }: UniversalSearchProps): JSX.Element 
           </div>
           <div className="relative flex min-w-0 flex-1 items-start">
             <p
-              className={`relative min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[14px] leading-[19px] tracking-[-0.15px] [word-break:break-word] ${
-                isFilledOrAi ? "text-[#13131a]" : "text-[#4b4b59]"
+              className={`relative min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] leading-[var(--odd-numbers-19,19px)] tracking-[-0.15px] [word-break:break-word] ${
+                isFilledOrAi
+                  ? "text-[var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)]"
+                  : "text-[var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)]"
               }`}
               style={{ fontFamily: '"DM Sans", Helvetica' }}
             >
@@ -372,8 +374,8 @@ function UniversalSearch({ state = "Zero" }: UniversalSearchProps): JSX.Element 
 
       {/* Dropdown */}
       <div
-        className={`flex w-full shrink-0 flex-col items-start gap-[12px] rounded-b-[2px] bg-white ${
-          isFilledOrAi ? "p-[24px]" : "px-[16px] py-[24px]"
+        className={`flex w-full shrink-0 flex-col items-start gap-[var(--numbers-12,12px)] rounded-b-[var(--radiuses-small,2px)] bg-[var(--surface-background-lvl1,#ffffff)] ${
+          isFilledOrAi ? "p-[var(--spacing-24,24px)]" : "px-[var(--numbers-16,16px)] py-[var(--spacing-24,24px)]"
         }`}
         style={{
           filter:
@@ -382,24 +384,24 @@ function UniversalSearch({ state = "Zero" }: UniversalSearchProps): JSX.Element 
       >
         {/* Categories */}
         <div
-          className={`flex w-full shrink-0 flex-col items-start gap-[4px] ${
-            isFilledOrAi ? "" : "px-[8px]"
+          className={`flex w-full shrink-0 flex-col items-start gap-[var(--numbers-4,4px)] ${
+            isFilledOrAi ? "" : "px-[var(--numbers-8,8px)]"
           }`}
         >
-          <div className="flex shrink-0 items-center gap-[8px]">
+          <div className="flex shrink-0 items-center gap-[var(--numbers-8,8px)]">
             <div
-              className="flex shrink-0 flex-col justify-center whitespace-nowrap text-[12px] leading-[0] tracking-[0.48px] text-[#806683]"
+              className="flex shrink-0 flex-col justify-center whitespace-nowrap text-[length:var(--body-sm-regular-size,12px)] leading-[0] tracking-[0.48px] text-[#806683]"
               style={{ fontFamily: '"DM Sans", Helvetica' }}
             >
               <p className="leading-[normal]">I&rsquo;m looking for</p>
             </div>
           </div>
-          <div className="flex w-full shrink-0 items-center gap-[8px] rounded-[2px] bg-white">
+          <div className="flex w-full shrink-0 items-center gap-[var(--numbers-8,8px)] rounded-[var(--radiuses-small,2px)] bg-[var(--surface-background-lvl1,#ffffff)]">
             {badges.map((badge) => (
-              <div key={badge} className="flex shrink-0 items-start gap-[10px]">
-                <div className="flex h-[18px] shrink-0 items-center justify-center gap-[2px] rounded-[2px] bg-[#ebebf0] px-[3px] py-0">
+              <div key={badge} className="flex shrink-0 items-start gap-[var(--odd-numbers-10,10px)]">
+                <div className="flex h-[18px] shrink-0 items-center justify-center gap-[var(--numbers-2,2px)] rounded-[var(--radiuses-small,2px)] bg-[var(--surface-background-lvl3,#ebebf0)] px-[var(--odd-numbers-3,3px)] py-0">
                   <p
-                    className="relative shrink-0 whitespace-nowrap text-center text-[12px] leading-[19px] tracking-[-0.15px] text-[#4b4b59] [word-break:break-word]"
+                    className="relative shrink-0 whitespace-nowrap text-center text-[length:var(--body-sm-medium-size,12px)] leading-[var(--odd-numbers-19,19px)] tracking-[-0.15px] text-[var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)] [word-break:break-word]"
                     style={{ fontFamily: '"DM Sans", Helvetica', fontWeight: 500 }}
                   >
                     {badge}
@@ -413,8 +415,8 @@ function UniversalSearch({ state = "Zero" }: UniversalSearchProps): JSX.Element 
         {/* Zero state: Recent */}
         {state === "Zero" && (
           <div className="flex w-full shrink-0 flex-col items-start">
-            <div className="flex shrink-0 items-center gap-[8px] px-[8px]">
-              <div className="flex size-[16px] shrink-0 items-center justify-center p-[2px]">
+            <div className="flex shrink-0 items-center gap-[var(--numbers-8,8px)] px-[var(--numbers-8,8px)]">
+              <div className="flex size-[16px] shrink-0 items-center justify-center p-[var(--numbers-2,2px)]">
                 <div className="relative size-[19.5px] shrink-0">
                   <img
                     alt=""
@@ -424,13 +426,13 @@ function UniversalSearch({ state = "Zero" }: UniversalSearchProps): JSX.Element 
                 </div>
               </div>
               <div
-                className="flex shrink-0 flex-col justify-center whitespace-nowrap text-[14px] leading-[0] text-[#806683]"
+                className="flex shrink-0 flex-col justify-center whitespace-nowrap text-[length:var(--body-md-medium-size,14px)] leading-[0] text-[#806683]"
                 style={{ fontFamily: '"DM Sans", Helvetica', fontWeight: 500 }}
               >
-                <p className="leading-[20px]">Recent</p>
+                <p className="leading-[var(--body-md-medium-line-height,20px)]">Recent</p>
               </div>
             </div>
-            <div className="flex w-full shrink-0 items-center gap-[8px] rounded-[2px] bg-white p-[8px]">
+            <div className="flex w-full shrink-0 items-center gap-[var(--numbers-8,8px)] rounded-[var(--radiuses-small,2px)] bg-[var(--surface-background-lvl1,#ffffff)] p-[var(--numbers-8,8px)]">
               <div className="relative size-[16px] shrink-0">
                 <img
                   alt=""
@@ -443,7 +445,7 @@ function UniversalSearch({ state = "Zero" }: UniversalSearchProps): JSX.Element 
                 parts={["Display Campaign"]}
               />
             </div>
-            <div className="flex w-full shrink-0 items-center gap-[8px] rounded-[2px] bg-white p-[8px]">
+            <div className="flex w-full shrink-0 items-center gap-[var(--numbers-8,8px)] rounded-[var(--radiuses-small,2px)] bg-[var(--surface-background-lvl1,#ffffff)] p-[var(--numbers-8,8px)]">
               <div className="relative size-[16px] shrink-0">
                 <img
                   alt=""
@@ -462,15 +464,15 @@ function UniversalSearch({ state = "Zero" }: UniversalSearchProps): JSX.Element 
         {/* Filled state: results */}
         {isFilled && (
           <div className="flex w-full shrink-0 items-start">
-            <div className="flex min-w-0 flex-1 flex-col items-start gap-[4px]">
+            <div className="flex min-w-0 flex-1 flex-col items-start gap-[var(--numbers-4,4px)]">
               {filledCategories.map((cat) => (
                 <ResultCategoryBlock key={cat.header} {...cat} />
               ))}
             </div>
             {/* Scrollbar */}
-            <div className="relative ml-[8px] flex flex-col items-start self-stretch">
-              <div className="relative h-[364px] w-[8px] rounded-[4px] bg-[#ebebf0]" />
-              <div className="absolute left-0 top-0 h-[224px] w-[8px] rounded-[4px] bg-[#e1e1e8]" />
+            <div className="relative ml-[var(--numbers-8,8px)] flex flex-col items-start self-stretch">
+              <div className="relative h-[364px] w-[var(--numbers-8,8px)] rounded-[var(--numbers-4,4px)] bg-[var(--surface-background-lvl3,#ebebf0)]" />
+              <div className="absolute left-0 top-0 h-[224px] w-[var(--numbers-8,8px)] rounded-[var(--numbers-4,4px)] bg-[var(--surface-background-lvl4,#e1e1e8)]" />
             </div>
           </div>
         )}
@@ -479,7 +481,7 @@ function UniversalSearch({ state = "Zero" }: UniversalSearchProps): JSX.Element 
         {isAi && (
           <>
             <div className="flex w-full shrink-0 flex-col items-start">
-              <div className="flex w-full shrink-0 items-center gap-[8px] rounded-[2px] bg-white p-[8px]">
+              <div className="flex w-full shrink-0 items-center gap-[var(--numbers-8,8px)] rounded-[var(--radiuses-small,2px)] bg-[var(--surface-background-lvl1,#ffffff)] p-[var(--numbers-8,8px)]">
                 <div className="relative size-[16px] shrink-0">
                   <img
                     alt=""
@@ -487,19 +489,19 @@ function UniversalSearch({ state = "Zero" }: UniversalSearchProps): JSX.Element 
                     src={imgUsTracedImage}
                   />
                 </div>
-                <div className="flex shrink-0 items-center gap-[8px]">
+                <div className="flex shrink-0 items-center gap-[var(--numbers-8,8px)]">
                   <div
-                    className="flex shrink-0 flex-col justify-center whitespace-nowrap text-[14px] leading-[0] text-[#806683]"
+                    className="flex shrink-0 flex-col justify-center whitespace-nowrap text-[length:var(--body-md-medium-size,14px)] leading-[0] text-[#806683]"
                     style={{ fontFamily: '"DM Sans", Helvetica', fontWeight: 500 }}
                   >
-                    <p className="leading-[20px]">AI Prompts</p>
+                    <p className="leading-[var(--body-md-medium-line-height,20px)]">AI Prompts</p>
                   </div>
                 </div>
               </div>
-              <div className="flex w-full shrink-0 items-center gap-[8px] rounded-[6px] bg-[#f9f8f9] p-[8px]">
-                <div className="relative flex min-w-0 flex-1 items-center gap-[8px]">
+              <div className="flex w-full shrink-0 items-center gap-[var(--numbers-8,8px)] rounded-[var(--numbers-6,6px)] bg-[#f9f8f9] p-[var(--numbers-8,8px)]">
+                <div className="relative flex min-w-0 flex-1 items-center gap-[var(--numbers-8,8px)]">
                   <div
-                    className="flex shrink-0 flex-col justify-center whitespace-nowrap text-[12px] leading-[0] tracking-[0.48px] text-[#2b0030] [word-break:break-word]"
+                    className="flex shrink-0 flex-col justify-center whitespace-nowrap text-[length:var(--body-sm-regular-size,12px)] leading-[0] tracking-[0.48px] text-[#2b0030] [word-break:break-word]"
                     style={{ fontFamily: '"DM Sans", Helvetica' }}
                   >
                     <p className="leading-[normal]">Generate a brief for your campaign</p>
@@ -512,9 +514,9 @@ function UniversalSearch({ state = "Zero" }: UniversalSearchProps): JSX.Element 
                       <img alt="" className="block size-full max-w-none" src={imgUsPointing} />
                     </div>
                   </div>
-                  <div className="absolute inset-0 bg-white opacity-0" />
+                  <div className="absolute inset-0 bg-[var(--surface-background-lvl1,#ffffff)] opacity-0" />
                 </div>
-                <div className="flex shrink-0 items-center rounded-[2px] border border-solid border-[#7c33b5] p-[2px]">
+                <div className="flex shrink-0 items-center rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-brand-default,#7c33b5)] p-[var(--numbers-2,2px)]">
                   <div className="flex size-[20px] shrink-0 items-center justify-center">
                     <div className="relative size-[16px] shrink-0">
                       <img
@@ -528,15 +530,15 @@ function UniversalSearch({ state = "Zero" }: UniversalSearchProps): JSX.Element 
               </div>
             </div>
             <div className="flex w-full shrink-0 items-start">
-              <div className="flex min-w-0 flex-1 flex-col items-start gap-[4px]">
+              <div className="flex min-w-0 flex-1 flex-col items-start gap-[var(--numbers-4,4px)]">
                 {aiCategories.map((cat) => (
                   <ResultCategoryBlock key={cat.header} {...cat} />
                 ))}
               </div>
               {/* Scrollbar */}
-              <div className="relative ml-[8px] flex flex-col items-start self-stretch">
-                <div className="relative h-[146px] w-[8px] rounded-[4px] bg-[#ebebf0]" />
-                <div className="absolute left-0 top-0 h-[90px] w-[8px] rounded-[4px] bg-[#e1e1e8]" />
+              <div className="relative ml-[var(--numbers-8,8px)] flex flex-col items-start self-stretch">
+                <div className="relative h-[146px] w-[var(--numbers-8,8px)] rounded-[var(--numbers-4,4px)] bg-[var(--surface-background-lvl3,#ebebf0)]" />
+                <div className="absolute left-0 top-0 h-[90px] w-[var(--numbers-8,8px)] rounded-[var(--numbers-4,4px)] bg-[var(--surface-background-lvl4,#e1e1e8)]" />
               </div>
             </div>
           </>
@@ -545,21 +547,21 @@ function UniversalSearch({ state = "Zero" }: UniversalSearchProps): JSX.Element 
 
       {/* Footer */}
       <div
-        className={`flex shrink-0 items-center gap-[8px] rounded-[2px] bg-[#ebebf0] p-[8px] ${
+        className={`flex shrink-0 items-center gap-[var(--numbers-8,8px)] rounded-[var(--radiuses-small,2px)] bg-[var(--surface-background-lvl3,#ebebf0)] p-[var(--numbers-8,8px)] ${
           isAi ? "" : "w-full"
         }`}
       >
         <div
-          className={`flex items-center gap-[8px] whitespace-nowrap text-[12px] leading-[0] [word-break:break-word] ${
+          className={`flex items-center gap-[var(--numbers-8,8px)] whitespace-nowrap text-[length:var(--body-sm-regular-size,12px)] leading-[0] [word-break:break-word] ${
             isAi ? "w-[496px] shrink-0" : "min-w-0 flex-1"
           }`}
           style={{ fontFamily: '"DM Sans", Helvetica' }}
         >
           <div className="flex shrink-0 flex-col justify-center text-[#806683]" style={{ fontWeight: 300 }}>
-            <p className="leading-[18px]">Were the results relevant?</p>
+            <p className="leading-[var(--body-sm-regular-line-height,18px)]">Were the results relevant?</p>
           </div>
-          <div className="flex shrink-0 flex-col justify-center text-[#7c33b5]">
-            <p className="leading-[18px]">Let us know</p>
+          <div className="flex shrink-0 flex-col justify-center text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]">
+            <p className="leading-[var(--body-sm-regular-line-height,18px)]">Let us know</p>
           </div>
         </div>
       </div>
@@ -610,17 +612,24 @@ const standardConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "border/default": "#c6c6cc",
-    "border/hover": "#a8a8b2",
-    "border/focus": "#7c33b5",
-    "border/disabled": "#e1e1e8",
-    "surface/background": "#ffffff",
-    "surface/hover": "rgba(113,113,128,0.08)",
-    "surface/disabled": "rgba(113,113,128,0.1)",
-    "text/default": "#4b4b59",
-    "text/filled": "#13131a",
-    "text/disabled": "#a8a8b2",
-    "radius/input": "2px",
+    "border/dynamic/neutral/subtle/default": "var(--border-dynamic-neutral-subtle-default)",
+    "border/dynamic/neutral/subtle/hover": "var(--border-dynamic-neutral-subtle-hover)",
+    "border/dynamic/brand/default": "var(--border-dynamic-brand-default)",
+    "border/dynamic/neutral/subtle/disabled": "var(--border-dynamic-neutral-subtle-disabled)",
+    "container/dynamic/neutral/subtle/background/default/regular":
+      "var(--container-dynamic-neutral-subtle-background-default-regular)",
+    "container/dynamic/neutral/subtle/background/hover":
+      "var(--container-dynamic-neutral-subtle-background-hover)",
+    "container/dynamic/neutral/subtle/background/disabled":
+      "var(--container-dynamic-neutral-subtle-background-disabled)",
+    "container/dynamic/neutral/subtle/foreground/default/regular":
+      "var(--container-dynamic-neutral-subtle-foreground-default-regular)",
+    "container/dynamic/neutral/subtle/foreground/default/variation":
+      "var(--container-dynamic-neutral-subtle-foreground-default-variation)",
+    "container/dynamic/neutral/subtle/foreground/disabled":
+      "var(--container-dynamic-neutral-subtle-foreground-disabled)",
+    "Radiuses/small": "var(--radiuses-small)",
+    "Body Md/Regular": "var(--body-md-regular-size)",
   },
 };
 
@@ -640,18 +649,19 @@ const universalConfig: PlaygroundConfig = {
   ],
   render: (props) => <UniversalSearch state={props.state as UniversalState} />,
   tokens: {
-    "surface/panel": "#ffffff",
-    "surface/footer": "#ebebf0",
-    "surface/ai-prompt": "#f9f8f9",
-    "badge/background": "#ebebf0",
-    "text/heading": "#806683",
-    "text/result": "#2b0030",
-    "text/placeholder": "#4b4b59",
-    "text/link": "#7c33b5",
-    "accent/ai": "#7c33b5",
-    "scrollbar/track": "#ebebf0",
-    "scrollbar/thumb": "#e1e1e8",
-    "radius/panel": "2px",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "surface/background/lvl3": "var(--surface-background-lvl3)",
+    "surface/background/lvl4": "var(--surface-background-lvl4)",
+    "container/dynamic/neutral/subtle/foreground/default/regular":
+      "var(--container-dynamic-neutral-subtle-foreground-default-regular)",
+    "container/dynamic/neutral/subtle/foreground/default/variation":
+      "var(--container-dynamic-neutral-subtle-foreground-default-variation)",
+    "surface/foreground/dynamic/brand/default":
+      "var(--surface-foreground-dynamic-brand-default)",
+    "border/dynamic/brand/default": "var(--border-dynamic-brand-default)",
+    "Radiuses/small": "var(--radiuses-small)",
+    "Body Sm/Regular": "var(--body-sm-regular-size)",
+    "Body Md/Medium": "var(--body-md-medium-size)",
   },
 };
 

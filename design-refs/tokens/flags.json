@@ -1,0 +1,6 @@
+{
+  "surface/background/lvl1": {
+    "cssVar": "--surface-background-lvl1",
+    "value": "#ffffff"
+  }
+}

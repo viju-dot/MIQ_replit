@@ -1,0 +1,62 @@
+{
+  "Body Md/Regular": {
+    "cssVar": "--body-md-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 14, weight: 400, lineHeight: 20, letterSpacing: 0)"
+  },
+  "Elevation Hover": {
+    "cssVar": "--elevation-hover",
+    "value": "Effect(type: DROP_SHADOW, color: shadow/lvl10, offset: (0, 12), radius: 20, spread: 0); Effect(type: DROP_SHADOW, color: shadow/lvl8, offset: (0, 1), radius: 4, spread: 0)"
+  },
+  "Radiuses/small": {
+    "cssVar": "--radiuses-small",
+    "value": "2"
+  },
+  "[old]Stroke Thickness/1": {
+    "cssVar": "--old-stroke-thickness-1",
+    "value": "1"
+  },
+  "numbers/12": {
+    "cssVar": "--numbers-12",
+    "value": "12"
+  },
+  "numbers/16": {
+    "cssVar": "--numbers-16",
+    "value": "16"
+  },
+  "numbers/4": {
+    "cssVar": "--numbers-4",
+    "value": "4"
+  },
+  "odd_numbers/-14": {
+    "cssVar": "--odd-numbers-14",
+    "value": "-14"
+  },
+  "odd_numbers/10": {
+    "cssVar": "--odd-numbers-10",
+    "value": "10"
+  },
+  "shadow/lvl10": {
+    "cssVar": "--shadow-lvl10",
+    "value": "#7171801a"
+  },
+  "shadow/lvl8": {
+    "cssVar": "--shadow-lvl8",
+    "value": "#71718014"
+  },
+  "surface/background/lvl1": {
+    "cssVar": "--surface-background-lvl1",
+    "value": "#ffffff"
+  },
+  "surface/background/lvl6": {
+    "cssVar": "--surface-background-lvl6",
+    "value": "#282833"
+  },
+  "surface/foreground/static/neutral/inversed": {
+    "cssVar": "--surface-foreground-static-neutral-inversed",
+    "value": "#ffffff"
+  },
+  "surface/foreground/static/neutral/lvl1": {
+    "cssVar": "--surface-foreground-static-neutral-lvl1",
+    "value": "#13131a"
+  }
+}

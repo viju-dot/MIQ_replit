@@ -28,34 +28,73 @@ type StdColors = {
 function stdColors(type: StdType, style: StdStyle): StdColors {
   const map: Record<StdType, Record<StdStyle, StdColors>> = {
     neutral: {
-      Filled: { bg: "#4b4b59", fg: "#f7f7fa" },
-      Outline: { border: "#4b4b59", fg: "#4b4b59" },
-      duotone: { bg: "#ebebf0", fg: "#4b4b59" },
+      Filled: {
+        bg: "var(--container-static-neutral-bold-background,#4b4b59)",
+        fg: "var(--container-static-neutral-bold-foreground,#f7f7fa)",
+      },
+      Outline: {
+        border: "var(--border-static-bold-neutral,#4b4b59)",
+        fg: "var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)",
+      },
+      duotone: {
+        bg: "var(--container-static-neutral-subtle-background,#ebebf0)",
+        fg: "var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)",
+      },
     },
     brand: {
-      Filled: { bg: "#7c33b5", fg: "#ffffff" },
-      Outline: { border: "#e7c7ff", fg: "#411661" },
-      duotone: { bg: "#f6ebff", fg: "#411661" },
+      Filled: {
+        bg: "var(--container-dynamic-brand-bold-background-default,#7c33b5)",
+        fg: "var(--container-dynamic-brand-bold-foreground-default,#ffffff)",
+      },
+      Outline: { border: "var(--container-dynamic-brand-subtle-background-hover,#e7c7ff)", fg: "#411661" },
+      duotone: { bg: "var(--container-dynamic-brand-subtle-background-default,#f6ebff)", fg: "#411661" },
     },
     info: {
-      Filled: { bg: "#2360db", fg: "#ffffff" },
-      Outline: { border: "#2360db", fg: "#1344a8" },
-      duotone: { bg: "#ebf1ff", fg: "#1344a8" },
+      Filled: {
+        bg: "var(--container-static-info-bold-background,#2360db)",
+        fg: "var(--container-static-info-bold-foreground,#ffffff)",
+      },
+      Outline: {
+        border: "var(--border-static-bold-info,#2360db)",
+        fg: "var(--container-dynamic-info-subtle-foreground-selected,#1344a8)",
+      },
+      duotone: {
+        bg: "var(--container-dynamic-info-subtle-background-selected,#ebf1ff)",
+        fg: "var(--container-dynamic-info-subtle-foreground-selected,#1344a8)",
+      },
     },
     success: {
-      Filled: { bg: "#1e8158", fg: "#ffffff" },
-      Outline: { border: "#1e8158", fg: "#115639" },
-      duotone: { bg: "#e5f2ec", fg: "#115639" },
+      Filled: {
+        bg: "var(--container-static-success-bold-background,#1e8158)",
+        fg: "var(--container-static-success-bold-foreground,#ffffff)",
+      },
+      Outline: {
+        border: "var(--container-dynamic-success-subtle-foreground-default,#1e8158)",
+        fg: "var(--container-static-success-subtle-foreground-variation,#115639)",
+      },
+      duotone: { bg: "#e5f2ec", fg: "var(--container-static-success-subtle-foreground-variation,#115639)" },
     },
     warning: {
-      Filled: { bg: "#f8c500", fg: "#241c00" },
-      Outline: { border: "#f8c500", fg: "#483800" },
-      duotone: { bg: "#fff8dd", fg: "#483800" },
+      Filled: {
+        bg: "var(--container-static-warning-bold-background,#f8c500)",
+        fg: "var(--container-dynamic-warning-bold-foreground-default,#241c00)",
+      },
+      Outline: {
+        border: "var(--border-static-bold-warning,#f8c500)",
+        fg: "var(--container-dynamic-warning-subtle-foreground-default,#483800)",
+      },
+      duotone: { bg: "#fff8dd", fg: "var(--container-dynamic-warning-subtle-foreground-default,#483800)" },
     },
     danger: {
-      Filled: { bg: "#da294b", fg: "#ffffff" },
-      Outline: { border: "#da294b", fg: "#ad102c" },
-      duotone: { bg: "#ffe9ed", fg: "#ad102c" },
+      Filled: {
+        bg: "var(--container-static-error-bold-background,#da294b)",
+        fg: "var(--container-static-error-bold-foreground,#ffffff)",
+      },
+      Outline: {
+        border: "var(--border-static-bold-error,#da294b)",
+        fg: "var(--container-dynamic-error-subtle-foreground-selected,#ad102c)",
+      },
+      duotone: { bg: "#ffe9ed", fg: "var(--container-dynamic-error-subtle-foreground-selected,#ad102c)" },
     },
   };
   return map[type][style];
@@ -102,7 +141,7 @@ function BadgeStandard({
   if (compact) {
     return (
       <div
-        className="inline-flex h-[18px] items-center justify-center gap-[2px] rounded-[2px]"
+        className="inline-flex h-[18px] items-center justify-center gap-[2px] rounded-[var(--radius-25,2px)]"
         style={{
           ...containerStyle,
           paddingLeft: icon ? 2 : 3,
@@ -115,7 +154,7 @@ function BadgeStandard({
           </span>
         )}
         <p
-          className="whitespace-nowrap text-center text-[12px] leading-[18px]"
+          className="whitespace-nowrap text-center text-[length:var(--body-sm-medium-size,12px)] leading-[var(--body-sm-medium-line-height,18px)]"
           style={{ ...fontMedium, color: c.fg }}
         >
           {label ?? "Badge Small"}
@@ -126,7 +165,7 @@ function BadgeStandard({
 
   return (
     <div
-      className="inline-flex h-[34px] items-center justify-center gap-[4px] rounded-[2px]"
+      className="inline-flex h-[34px] items-center justify-center gap-[4px] rounded-[var(--radius-25,2px)]"
       style={{
         ...containerStyle,
         paddingLeft: icon ? 6 : 8,
@@ -146,7 +185,7 @@ function BadgeStandard({
         </span>
       )}
       <p
-        className="whitespace-nowrap text-center text-[14px] leading-[20px]"
+        className="whitespace-nowrap text-center text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)]"
         style={{ ...fontMedium, color: c.fg }}
       >
         {label ?? "Badge Large"}
@@ -175,22 +214,55 @@ function roundedColors(
   style: RoundedStyle,
 ): StdColors {
   const filled: Record<RoundedType, StdColors> = {
-    "Brand (Bold)": { bg: "#7c33b5", fg: "#ffffff" },
-    "Neutral (Subtle)": { bg: "#ebebf0", fg: "#4b4b59" },
-    "Brand (Subtle)": { bg: "#f6ebff", fg: "#411661" },
-    Info: { bg: "#2360db", fg: "#ffffff" },
-    Success: { bg: "#1e8158", fg: "#ffffff" },
-    Warning: { bg: "#f8c500", fg: "#241c00" },
-    Danger: { bg: "#da294b", fg: "#ffffff" },
+    "Brand (Bold)": {
+      bg: "var(--container-dynamic-brand-bold-background-default,#7c33b5)",
+      fg: "var(--container-dynamic-brand-bold-foreground-default,#ffffff)",
+    },
+    "Neutral (Subtle)": {
+      bg: "var(--container-static-neutral-subtle-background,#ebebf0)",
+      fg: "var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)",
+    },
+    "Brand (Subtle)": { bg: "var(--container-dynamic-brand-subtle-background-default,#f6ebff)", fg: "#411661" },
+    Info: {
+      bg: "var(--container-static-info-bold-background,#2360db)",
+      fg: "var(--container-static-info-bold-foreground,#ffffff)",
+    },
+    Success: {
+      bg: "var(--container-static-success-bold-background,#1e8158)",
+      fg: "var(--container-static-success-bold-foreground,#ffffff)",
+    },
+    Warning: {
+      bg: "var(--container-static-warning-bold-background,#f8c500)",
+      fg: "var(--container-dynamic-warning-bold-foreground-default,#241c00)",
+    },
+    Danger: {
+      bg: "var(--container-static-error-bold-background,#da294b)",
+      fg: "var(--container-static-error-bold-foreground,#ffffff)",
+    },
   };
   const outline: Record<RoundedType, StdColors> = {
-    "Brand (Bold)": { border: "#7c33b5", fg: "#411661" },
-    "Neutral (Subtle)": { border: "#4b4b59", fg: "#4b4b59" },
-    "Brand (Subtle)": { border: "#e7c7ff", fg: "#411661" },
-    Info: { border: "#2360db", fg: "#1344a8" },
-    Success: { border: "#1e8158", fg: "#115639" },
-    Warning: { border: "#f8c500", fg: "#483800" },
-    Danger: { border: "#da294b", fg: "#ad102c" },
+    "Brand (Bold)": { border: "var(--border-dynamic-brand-default,#7c33b5)", fg: "#411661" },
+    "Neutral (Subtle)": {
+      border: "var(--border-static-bold-neutral,#4b4b59)",
+      fg: "var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)",
+    },
+    "Brand (Subtle)": { border: "var(--container-dynamic-brand-subtle-background-hover,#e7c7ff)", fg: "#411661" },
+    Info: {
+      border: "var(--border-static-bold-info,#2360db)",
+      fg: "var(--container-dynamic-info-subtle-foreground-selected,#1344a8)",
+    },
+    Success: {
+      border: "var(--container-dynamic-success-subtle-foreground-default,#1e8158)",
+      fg: "var(--container-static-success-subtle-foreground-variation,#115639)",
+    },
+    Warning: {
+      border: "var(--border-static-bold-warning,#f8c500)",
+      fg: "var(--container-dynamic-warning-subtle-foreground-default,#483800)",
+    },
+    Danger: {
+      border: "var(--border-static-bold-error,#da294b)",
+      fg: "var(--container-dynamic-error-subtle-foreground-selected,#ad102c)",
+    },
   };
   return style === "Filled" ? filled[type] : outline[type];
 }
@@ -207,7 +279,7 @@ function BadgeRounded({ type, size, style, label }: BadgeRoundedProps) {
   const compact = size === "Compact";
   return (
     <div
-      className="inline-flex items-center justify-center gap-[4px] rounded-[100px] px-[8px] py-[2px]"
+      className="inline-flex items-center justify-center gap-[4px] rounded-[var(--old-radiuses-round,100px)] px-[8px] py-[2px]"
       style={{
         backgroundColor: c.bg,
         ...(c.border ? { border: `1px solid ${c.border}` } : {}),
@@ -233,16 +305,16 @@ function BadgeRounded({ type, size, style, label }: BadgeRoundedProps) {
 function BadgePro({ variant }: { variant: "Pro" | "Pro+" }) {
   const gradient =
     variant === "Pro+"
-      ? "linear-gradient(to right, #d71982 25.5%, #ff540c 59.4%, #f0e812 100%)"
+      ? "linear-gradient(to right, var(--gradients-sigma-1,#d71982) 25.5%, var(--gradients-sigma-2,#ff540c) 59.4%, var(--gradients-sigma-3,#f0e812) 100%)"
       : "linear-gradient(to right, #d71a82 50.5%, #f456ca 100%)";
   return (
     <div
-      className="inline-flex h-[18px] items-center justify-center gap-[4px] rounded-[100px] px-[8px] py-[2px]"
+      className="inline-flex h-[18px] items-center justify-center gap-[4px] rounded-[var(--old-radiuses-round,100px)] px-[8px] py-[2px]"
       style={{ backgroundImage: gradient }}
     >
       <p
-        className="whitespace-nowrap text-center text-[12px] leading-[18px]"
-        style={{ ...fontMedium, color: "#ffffff" }}
+        className="whitespace-nowrap text-center text-[length:var(--body-sm-medium-size,12px)] leading-[var(--body-sm-medium-line-height,18px)]"
+        style={{ ...fontMedium, color: "var(--container-static-brand-bold-foreground,#ffffff)" }}
       >
         {variant}
       </p>
@@ -259,22 +331,22 @@ type DigitsVariant = "Single" | "Brand (Subtle)" | "Disabled" | "Double" | "Max"
 function BadgeDigits({ variant }: { variant: DigitsVariant }) {
   const value =
     variant === "Max" ? "99+" : variant === "Double" ? "12" : "4";
-  let bg = "#ebebf0";
-  let fg = "#4b4b59";
+  let bg = "var(--container-static-neutral-subtle-background,#ebebf0)";
+  let fg = "var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)";
   if (variant === "Brand (Subtle)") {
-    bg = "#f6ebff";
-    fg = "#662994";
+    bg = "var(--container-dynamic-brand-subtle-background-default,#f6ebff)";
+    fg = "var(--container-static-brand-subtle-foreground-variation,#662994)";
   } else if (variant === "Disabled") {
-    bg = "rgba(113,113,128,0.1)";
-    fg = "#a8a8b2";
+    bg = "var(--controls-background-disabled,rgba(113,113,128,0.1))";
+    fg = "var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)";
   }
   return (
     <div
-      className="inline-flex h-[18px] items-center justify-center rounded-[100px] px-[8px]"
+      className="inline-flex h-[18px] items-center justify-center rounded-[var(--old-radiuses-round,100px)] px-[8px]"
       style={{ backgroundColor: bg }}
     >
       <p
-        className="whitespace-nowrap text-center text-[12px] leading-[18px]"
+        className="whitespace-nowrap text-center text-[length:var(--body-sm-medium-size,12px)] leading-[var(--body-sm-medium-line-height,18px)]"
         style={{ ...fontMedium, color: fg }}
       >
         {value}
@@ -307,7 +379,7 @@ function BadgeCircular({ size }: { size: 24 | 32 | 40 }) {
         className="absolute left-1/2 -translate-x-1/2 text-center"
         style={{
           ...fontMedium,
-          color: "#4b4b59",
+          color: "var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)",
           fontSize,
           lineHeight,
           top: `calc(50% - ${size === 40 ? 12 : size === 32 ? 10 : 9}px)`,
@@ -338,13 +410,19 @@ function BadgeDescription({
 }: DescriptionProps) {
   const [checked, setChecked] = useState(false);
 
-  const bg = disabled ? "rgba(113,113,128,0.1)" : "#ebebf0";
-  const border = disabled ? "#e1e1e8" : "#c6c6cc";
-  const titleColor = disabled ? "#a8a8b2" : "#13131a";
+  const bg = disabled
+    ? "var(--controls-background-disabled,rgba(113,113,128,0.1))"
+    : "var(--container-static-neutral-subtle-background,#ebebf0)";
+  const border = disabled
+    ? "var(--border-dynamic-neutral-subtle-disabled,#e1e1e8)"
+    : "var(--border-dynamic-neutral-subtle-default,#c6c6cc)";
+  const titleColor = disabled
+    ? "var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)"
+    : "var(--surface-foreground-static-neutral-lvl1,#13131a)";
 
   return (
     <div
-      className="flex w-[200px] items-start gap-[5px] rounded-[4px]"
+      className="flex w-[200px] items-start gap-[5px] rounded-[var(--radius-50,4px)]"
       style={{ backgroundColor: bg, border: `1px solid ${border}` }}
     >
       <div className="flex flex-1 items-start gap-[5px] px-[8px] py-[5px]">
@@ -356,15 +434,17 @@ function BadgeDescription({
                   type="button"
                   disabled={disabled}
                   onClick={() => !disabled && setChecked((v) => !v)}
-                  className="flex size-[16px] items-center justify-center overflow-hidden rounded-[2px]"
+                  className="flex size-[16px] items-center justify-center overflow-hidden rounded-[var(--radius-25,2px)]"
                   style={{
                     border: `1.5px solid ${
-                      checked && !disabled ? "#7c33b5" : border
+                      checked && !disabled
+                        ? "var(--controls-background-active,#7c33b5)"
+                        : border
                     }`,
                     backgroundColor: checked
                       ? disabled
-                        ? "rgba(113,113,128,0.1)"
-                        : "#7c33b5"
+                        ? "var(--controls-background-disabled,rgba(113,113,128,0.1))"
+                        : "var(--controls-background-active,#7c33b5)"
                       : "transparent",
                     cursor: disabled ? "default" : "pointer",
                   }}
@@ -380,7 +460,7 @@ function BadgeDescription({
                     >
                       <path
                         d="M8.5 2.5L3.75 7.25L1.5 5"
-                        stroke="#ffffff"
+                        stroke="var(--controls-foreground-default,#ffffff)"
                         strokeWidth="1.5"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -393,7 +473,7 @@ function BadgeDescription({
           )}
           <div className="flex flex-1 items-center justify-center pt-[3px]">
             <p
-              className="flex-1 text-[12px] leading-[18px]"
+              className="flex-1 text-[length:var(--body-sm-medium-size,12px)] leading-[var(--body-sm-medium-line-height,18px)]"
               style={{ color: titleColor }}
             >
               <span style={fontMedium}>{title}: </span>
@@ -457,15 +537,15 @@ const standardConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "container/neutral/filled": "#4b4b59",
-    "container/brand/filled": "#7c33b5",
-    "container/info/filled": "#2360db",
-    "container/success/filled": "#1e8158",
-    "container/warning/filled": "#f8c500",
-    "container/danger/filled": "#da294b",
-    "radius/badge": "2px",
-    "size/standard": "h 34px · text 14px",
-    "size/compact": "h 18px · text 12px",
+    "container/static/neutral/bold/background": "var(--container-static-neutral-bold-background)",
+    "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
+    "container/static/info/bold/background": "var(--container-static-info-bold-background)",
+    "container/static/success/bold/background": "var(--container-static-success-bold-background)",
+    "container/static/warning/bold/background": "var(--container-static-warning-bold-background)",
+    "container/static/error/bold/background": "var(--container-static-error-bold-background)",
+    "radius/25": "var(--radius-25)",
+    "Body Md/Medium": "var(--body-md-medium-size)",
+    "Body Sm/Medium": "var(--body-sm-medium-size)",
   },
 };
 
@@ -530,14 +610,15 @@ const roundedConfig: PlaygroundConfig = {
     );
   },
   tokens: {
-    "container/brand/bold": "#7c33b5",
-    "container/neutral/subtle": "#ebebf0",
-    "container/brand/subtle": "#f6ebff",
-    "radius/pill": "100px",
-    "gradient/pro": "#d71a82 → #f456ca",
-    "gradient/pro+": "#d71982 → #ff540c → #f0e812",
-    "size/standard": "h 24px · text 14px",
-    "size/compact": "h 18px · text 12px",
+    "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
+    "container/static/neutral/subtle/background": "var(--container-static-neutral-subtle-background)",
+    "container/dynamic/brand/subtle/background/default": "var(--container-dynamic-brand-subtle-background-default)",
+    "old/radiuses/round": "var(--old-radiuses-round)",
+    "gradients/sigma/1": "var(--gradients-sigma-1)",
+    "gradients/sigma/2": "var(--gradients-sigma-2)",
+    "gradients/sigma/3": "var(--gradients-sigma-3)",
+    "Body Md/Medium": "var(--body-md-medium-size)",
+    "Body Sm/Medium": "var(--body-sm-medium-size)",
   },
 };
 
@@ -556,13 +637,13 @@ const digitsConfig: PlaygroundConfig = {
   ],
   render: (props) => <BadgeDigits variant={props.variant as DigitsVariant} />,
   tokens: {
-    "container/neutral": "#ebebf0",
-    "container/brand/subtle": "#f6ebff",
-    "container/disabled": "rgba(113,113,128,0.1)",
-    "text/neutral": "#4b4b59",
-    "text/brand": "#662994",
-    "text/disabled": "#a8a8b2",
-    "radius/pill": "100px",
+    "container/static/neutral/subtle/background": "var(--container-static-neutral-subtle-background)",
+    "container/dynamic/brand/subtle/background/default": "var(--container-dynamic-brand-subtle-background-default)",
+    "controls/background/disabled": "var(--controls-background-disabled)",
+    "container/dynamic/neutral/subtle/foreground/default/regular": "var(--container-dynamic-neutral-subtle-foreground-default-regular)",
+    "container/static/brand/subtle/foreground/variation": "var(--container-static-brand-subtle-foreground-variation)",
+    "container/dynamic/neutral/subtle/foreground/disabled": "var(--container-dynamic-neutral-subtle-foreground-disabled)",
+    "old/radiuses/round": "var(--old-radiuses-round)",
   },
 };
 
@@ -583,7 +664,7 @@ const circularConfig: PlaygroundConfig = {
     <BadgeCircular size={Number(props.size) as 24 | 32 | 40} />
   ),
   tokens: {
-    "text/color": "#4b4b59",
+    "container/dynamic/neutral/subtle/foreground/default/regular": "var(--container-dynamic-neutral-subtle-foreground-default-regular)",
     "size/sm": "24px · text 12px",
     "size/md": "32px · text 14px",
     "size/lg": "40px · text 16px",
@@ -632,14 +713,14 @@ const descriptionConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "container/active": "#ebebf0",
-    "container/disabled": "rgba(113,113,128,0.1)",
-    "border/active": "#c6c6cc",
-    "border/disabled": "#e1e1e8",
-    "checkbox/checked": "#7c33b5",
-    "text/title/active": "#13131a",
-    "text/title/disabled": "#a8a8b2",
-    "radius/badge": "4px",
+    "container/static/neutral/subtle/background": "var(--container-static-neutral-subtle-background)",
+    "controls/background/disabled": "var(--controls-background-disabled)",
+    "border/dynamic/neutral/subtle/default": "var(--border-dynamic-neutral-subtle-default)",
+    "border/dynamic/neutral/subtle/disabled": "var(--border-dynamic-neutral-subtle-disabled)",
+    "controls/background/active": "var(--controls-background-active)",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "container/dynamic/neutral/subtle/foreground/disabled": "var(--container-dynamic-neutral-subtle-foreground-disabled)",
+    "radius/50": "var(--radius-50)",
   },
 };
 

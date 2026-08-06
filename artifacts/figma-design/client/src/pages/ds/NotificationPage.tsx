@@ -28,10 +28,11 @@ type BannerState = "Good News" | "Informative" | "Bad News" | "Celebratory";
 type BannerType = "Standard" | "Paragraph";
 
 const BANNER_BG: Record<BannerState, string> = {
-  "Good News": "#1e8158",
-  Informative: "#2360db",
-  "Bad News": "#da294b",
-  Celebratory: "#2b0030",
+  "Good News":
+    "var(--container-static-success-bold-background,#1e8158)",
+  Informative: "var(--container-static-info-bold-background,#2360db)",
+  "Bad News": "var(--container-static-error-bold-background,#da294b)",
+  Celebratory: "var(--surface-background-miq,#2b0030)",
 };
 
 const BANNER_ICON: Record<BannerState, string> = {
@@ -59,8 +60,14 @@ function GlobalBanner({
       className="relative flex w-full items-start gap-2 pl-[52px] pr-[19px]"
       style={{
         backgroundColor: BANNER_BG[state],
-        paddingTop: type === "Paragraph" ? "15.5px" : "11.5px",
-        paddingBottom: type === "Paragraph" ? "15.5px" : "11.5px",
+        paddingTop:
+          type === "Paragraph"
+            ? "var(--odd-numbers-15-5,15.5px)"
+            : "var(--odd-numbers-11-5,11.5px)",
+        paddingBottom:
+          type === "Paragraph"
+            ? "var(--odd-numbers-15-5,15.5px)"
+            : "var(--odd-numbers-11-5,11.5px)",
       }}
     >
       {/* Left icon */}
@@ -75,11 +82,11 @@ function GlobalBanner({
 
       {/* Text */}
       <div className="flex min-w-0 flex-1 flex-col items-start">
-        <p className="[word-break:break-word] font-medium text-[14px] leading-[20px] text-white">
+        <p className="[word-break:break-word] font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[color:var(--container-static-success-bold-foreground,#ffffff)]">
           {headline}
         </p>
         {type === "Paragraph" && (
-          <p className="[word-break:break-word] text-[12px] leading-[18px] text-white">
+          <p className="[word-break:break-word] text-[length:var(--body-sm-regular-size,12px)] leading-[var(--body-sm-regular-line-height,18px)] text-[color:var(--container-static-success-bold-foreground,#ffffff)]">
             {body}
           </p>
         )}
@@ -148,13 +155,19 @@ const bannerConfig: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "banner/good-news/background": "#1e8158",
-    "banner/informative/background": "#2360db",
-    "banner/bad-news/background": "#da294b",
-    "banner/celebratory/background": "#2b0030",
-    "banner/text": "#ffffff",
-    "banner/padding/standard": "11.5px",
-    "banner/padding/paragraph": "15.5px",
+    "container/static/success/bold/background":
+      "var(--container-static-success-bold-background)",
+    "container/static/info/bold/background":
+      "var(--container-static-info-bold-background)",
+    "container/static/error/bold/background":
+      "var(--container-static-error-bold-background)",
+    "surface/background/miq": "var(--surface-background-miq)",
+    "container/static/success/bold/foreground":
+      "var(--container-static-success-bold-foreground)",
+    "Body Md/Medium": "var(--body-md-medium-size)",
+    "Body Sm/Regular": "var(--body-sm-regular-size)",
+    "odd_numbers/11-5": "var(--odd-numbers-11-5)",
+    "odd_numbers/15-5": "var(--odd-numbers-15-5)",
   },
 };
 
@@ -165,10 +178,10 @@ const bannerConfig: PlaygroundConfig = {
 type AlertState = "Danger" | "Info" | "Success" | "Warning";
 
 const ALERT_BORDER: Record<AlertState, string> = {
-  Danger: "#da294b",
-  Info: "#2360db",
-  Success: "#1e8158",
-  Warning: "#f8c500",
+  Danger: "var(--border-dynamic-error-default,#da294b)",
+  Info: "var(--border-dynamic-info-selected,#2360db)",
+  Success: "var(--border-dynamic-success-selected,#1e8158)",
+  Warning: "var(--border-dynamic-warning-default,#f8c500)",
 };
 
 const ALERT_ICON: Record<AlertState, string> = {
@@ -236,8 +249,8 @@ function Alert({
   const containerStyle: React.CSSProperties = border
     ? {
         border: `1px solid ${ALERT_BORDER[state]}`,
-        borderRadius: 2,
-        backgroundColor: "white",
+        borderRadius: "var(--radius-25,2px)",
+        backgroundColor: "var(--surface-background-lvl1,#ffffff)",
         width,
       }
     : { width: "max-content" };
@@ -261,7 +274,7 @@ function Alert({
       >
         <AlertIcon state={state} />
         <div className="flex min-w-0 flex-1 flex-col gap-1 overflow-hidden">
-          <p className="[word-break:break-word] w-full font-medium text-[14px] leading-[20px] text-[#13131a]">
+          <p className="[word-break:break-word] w-full font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[color:var(--surface-foreground-static-neutral-lvl1,#13131a)]">
             {headline}
           </p>
         </div>
@@ -271,7 +284,7 @@ function Alert({
       {/* Description body */}
       {description && (
         <div className="flex w-full items-start pl-8 pt-[5px]">
-          <p className="[word-break:break-word] min-w-0 flex-1 text-[14px] leading-[20px] text-[#13131a]">
+          <p className="[word-break:break-word] min-w-0 flex-1 text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[color:var(--surface-foreground-static-neutral-lvl1,#13131a)]">
             {body}
           </p>
         </div>
@@ -323,15 +336,16 @@ const alertConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "alert/danger/border": "#da294b",
-    "alert/info/border": "#2360db",
-    "alert/success/border": "#1e8158",
-    "alert/warning/border": "#f8c500",
-    "alert/text": "#13131a",
-    "alert/background": "#ffffff",
-    "alert/radius": "2px",
-    "alert/width/description": "440px",
-    "alert/width/default": "288px",
+    "border/dynamic/error/default": "var(--border-dynamic-error-default)",
+    "border/dynamic/info/selected": "var(--border-dynamic-info-selected)",
+    "border/dynamic/success/selected":
+      "var(--border-dynamic-success-selected)",
+    "border/dynamic/warning/default": "var(--border-dynamic-warning-default)",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "radius/25": "var(--radius-25)",
+    "Body Md/Medium": "var(--body-md-medium-size)",
   },
 };
 
@@ -354,10 +368,12 @@ function NotificationCard({
 
   return (
     <div
-      className="flex w-[400px] max-w-full flex-col items-start gap-4 rounded-[2px] border p-[17px]"
+      className="flex w-[400px] max-w-full flex-col items-start gap-4 rounded-[var(--radius-25,2px)] border p-[17px]"
       style={{
-        borderColor: "#e1e1e8",
-        backgroundColor: isHover ? "rgba(113,113,128,0.08)" : "white",
+        borderColor: "var(--border-static-subtle-neutral,#e1e1e8)",
+        backgroundColor: isHover
+          ? "var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))"
+          : "var(--surface-background-lvl1,#ffffff)",
       }}
     >
       {/* top: icon + title + dots */}
@@ -369,7 +385,7 @@ function NotificationCard({
             src={`${ASSET}/card-info.svg`}
           />
         </div>
-        <p className="[word-break:break-word] w-[310px] overflow-hidden text-ellipsis whitespace-nowrap font-medium text-[14px] leading-[20px] text-[#13131a]">
+        <p className="[word-break:break-word] w-[310px] overflow-hidden text-ellipsis whitespace-nowrap font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[color:var(--surface-foreground-static-neutral-lvl1,#13131a)]">
           {title}
         </p>
         <div className="absolute right-0 top-0 flex size-6 items-center justify-center">
@@ -384,7 +400,7 @@ function NotificationCard({
       {/* body */}
       <div className="flex w-[338px] max-w-full flex-col items-start gap-2">
         <p
-          className={`[word-break:break-word] w-full overflow-hidden text-[14px] leading-[20px] text-[#13131a] ${
+          className={`[word-break:break-word] w-full overflow-hidden text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[color:var(--surface-foreground-static-neutral-lvl1,#13131a)] ${
             isRead ? "font-normal" : "font-medium"
           }`}
         >
@@ -399,12 +415,12 @@ function NotificationCard({
                 src={`${ASSET}/card-new-dot.svg`}
               />
             )}
-            <p className="text-right text-[12px] leading-[18px] text-[#a8a8b2]">
+            <p className="text-right text-[length:var(--body-sm-regular-size,12px)] leading-[var(--body-sm-regular-line-height,18px)] text-[color:var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)]">
               45m
             </p>
           </div>
-          <div className="flex h-[18px] items-center justify-center rounded-[2px] bg-[#ebebf0] px-[3px]">
-            <p className="text-center font-medium text-[12px] leading-[18px] text-[#4b4b59]">
+          <div className="flex h-[18px] items-center justify-center rounded-[var(--radius-25,2px)] bg-[var(--container-static-neutral-subtle-background,#ebebf0)] px-[3px]">
+            <p className="text-center font-medium text-[length:var(--body-sm-regular-size,12px)] leading-[var(--body-sm-regular-line-height,18px)] text-[color:var(--container-static-neutral-subtle-foreground,#4b4b59)]">
               Category
             </p>
           </div>
@@ -413,7 +429,7 @@ function NotificationCard({
 
       {/* button */}
       <div className="flex w-full justify-end">
-        <div className="flex h-6 items-center justify-center gap-1 rounded-[2px] border border-[#7c33b5] pl-1 pr-1.5 py-[3px]">
+        <div className="flex h-6 items-center justify-center gap-1 rounded-[var(--radius-25,2px)] border border-[var(--border-dynamic-brand-default,#7c33b5)] pl-1 pr-1.5 py-[3px]">
           <div className="flex size-5 items-center justify-center p-px">
             <img
               alt=""
@@ -422,7 +438,7 @@ function NotificationCard({
               style={{ width: "17.5px", height: "15.6px" }}
             />
           </div>
-          <p className="font-medium text-[14px] leading-[20px] text-[#7c33b5]">
+          <p className="font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[color:var(--surface-foreground-dynamic-brand-default,#7c33b5)]">
             Download report
           </p>
         </div>
@@ -463,15 +479,22 @@ const cardConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "card/border": "#e1e1e8",
-    "card/background": "#ffffff",
-    "card/hover/background": "rgba(113,113,128,0.08)",
-    "card/title": "#13131a",
-    "card/meta": "#a8a8b2",
-    "card/category/background": "#ebebf0",
-    "card/category/text": "#4b4b59",
-    "card/action/border": "#7c33b5",
-    "card/radius": "2px",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "container/dynamic/neutral/subtle/background/hover":
+      "var(--container-dynamic-neutral-subtle-background-hover)",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/dynamic/neutral/disabled":
+      "var(--surface-foreground-dynamic-neutral-disabled)",
+    "container/static/neutral/subtle/background":
+      "var(--container-static-neutral-subtle-background)",
+    "container/static/neutral/subtle/foreground":
+      "var(--container-static-neutral-subtle-foreground)",
+    "border/dynamic/brand/default": "var(--border-dynamic-brand-default)",
+    "surface/foreground/dynamic/brand/default":
+      "var(--surface-foreground-dynamic-brand-default)",
+    "radius/25": "var(--radius-25)",
   },
 };
 
@@ -520,7 +543,7 @@ function DropdownFilterPill({
 }) {
   return (
     <div className="flex items-center gap-2" style={{ width }}>
-      <p className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[12px] leading-[18px] text-[#4b4b59]">
+      <p className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--body-sm-regular-size,12px)] leading-[var(--body-sm-regular-line-height,18px)] text-[color:var(--container-static-neutral-subtle-foreground,#4b4b59)]">
         {label}
       </p>
       <div className="flex size-5 shrink-0 items-center justify-center">
@@ -536,7 +559,7 @@ function DropdownFilterPill({
 
 function DropdownRowItem({ row }: { row: DropdownRow }) {
   return (
-    <div className="flex w-full flex-col gap-1 border-b border-[#e1e1e8] px-4 py-3">
+    <div className="flex w-full flex-col gap-1 border-b border-[var(--border-static-subtle-neutral,#e1e1e8)] px-4 py-3">
       <div className="flex items-center gap-1">
         <img
           alt=""
@@ -544,12 +567,12 @@ function DropdownRowItem({ row }: { row: DropdownRow }) {
           src={`${ASSET}/card-info.svg`}
           style={{ width: "20px", height: "20px" }}
         />
-        <p className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap font-medium text-[14px] leading-[20px] text-[#13131a]">
+        <p className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[color:var(--surface-foreground-static-neutral-lvl1,#13131a)]">
           {row.title}
         </p>
       </div>
       <p
-        className={`[word-break:break-word] text-[14px] leading-[20px] text-[#13131a] ${
+        className={`[word-break:break-word] text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[color:var(--surface-foreground-static-neutral-lvl1,#13131a)] ${
           row.unread ? "font-medium" : "font-normal"
         }`}
       >
@@ -564,10 +587,10 @@ function DropdownRowItem({ row }: { row: DropdownRow }) {
               src={`${ASSET}/card-new-dot.svg`}
             />
           )}
-          <p className="text-[12px] leading-[18px] text-[#a8a8b2]">{row.time}</p>
+          <p className="text-[length:var(--body-sm-regular-size,12px)] leading-[var(--body-sm-regular-line-height,18px)] text-[color:var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)]">{row.time}</p>
         </div>
-        <div className="flex h-[18px] items-center justify-center rounded-[2px] bg-[#ebebf0] px-[3px]">
-          <p className="text-center font-medium text-[12px] leading-[18px] text-[#4b4b59]">
+        <div className="flex h-[18px] items-center justify-center rounded-[var(--radius-25,2px)] bg-[var(--container-static-neutral-subtle-background,#ebebf0)] px-[3px]">
+          <p className="text-center font-medium text-[length:var(--body-sm-regular-size,12px)] leading-[var(--body-sm-regular-line-height,18px)] text-[color:var(--container-static-neutral-subtle-foreground,#4b4b59)]">
             {row.category}
           </p>
         </div>
@@ -578,22 +601,22 @@ function DropdownRowItem({ row }: { row: DropdownRow }) {
 
 function NotificationDropdown({ empty }: { empty: boolean }) {
   return (
-    <div className="w-[400px] max-w-full overflow-hidden rounded-[4px] bg-white shadow-[0px_1px_2px_rgba(106,76,110,0.08),0px_12px_10px_rgba(106,76,110,0.1)]">
+    <div className="w-[400px] max-w-full overflow-hidden rounded-[var(--radius-50,4px)] bg-[var(--surface-background-lvl1,#ffffff)] shadow-[0px_1px_2px_rgba(106,76,110,0.08),0px_12px_10px_rgba(106,76,110,0.1)]">
       {/* Header */}
       <div className="flex flex-col gap-4 p-4">
-        <p className="font-medium text-[24px] leading-[32px] tracking-[-0.36px] text-[#13131a]">
+        <p className="font-medium text-[length:var(--headline-md-regular-size,24px)] leading-[var(--headline-md-regular-line-height,32px)] tracking-[-0.36px] text-[color:var(--surface-foreground-static-neutral-lvl1,#13131a)]">
           Notifications
         </p>
 
         {/* Tabs */}
-        <div className="flex items-end gap-4 border-b border-[#e1e1e8]">
-          <div className="flex items-center gap-2 border-b-2 border-[#7c33b5] px-4 pb-2">
-            <p className="text-[14px] leading-[20px] text-[#7c33b5]">Tab</p>
+        <div className="flex items-end gap-4 border-b border-[var(--border-static-subtle-neutral,#e1e1e8)]">
+          <div className="flex items-center gap-2 border-b-2 border-[var(--border-dynamic-brand-default,#7c33b5)] px-4 pb-2">
+            <p className="text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[color:var(--surface-foreground-dynamic-brand-default,#7c33b5)]">Tab</p>
           </div>
           <div className="flex items-center gap-2 px-4 pb-2">
-            <p className="text-[14px] leading-[20px] text-[#13131a]">Unread</p>
-            <div className="flex h-[18px] items-center justify-center rounded-full bg-[#ebebf0] px-2">
-              <p className="text-center font-medium text-[12px] leading-[18px] text-[#4b4b59]">
+            <p className="text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[color:var(--surface-foreground-static-neutral-lvl1,#13131a)]">Unread</p>
+            <div className="flex h-[18px] items-center justify-center rounded-full bg-[var(--container-static-neutral-subtle-background,#ebebf0)] px-2">
+              <p className="text-center font-medium text-[length:var(--body-sm-regular-size,12px)] leading-[var(--body-sm-regular-line-height,18px)] text-[color:var(--container-static-neutral-subtle-foreground,#4b4b59)]">
                 4
               </p>
             </div>
@@ -615,7 +638,7 @@ function NotificationDropdown({ empty }: { empty: boolean }) {
             className="block size-6 max-w-none opacity-60"
             src={`${ASSET}/card-info.svg`}
           />
-          <p className="text-center text-[14px] leading-[20px] text-[#a8a8b2]">
+          <p className="text-center text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[color:var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)]">
             No notifications yet
           </p>
         </div>
@@ -644,14 +667,20 @@ const dropdownConfig: PlaygroundConfig = {
   ],
   render: (props) => <NotificationDropdown empty={props.empty === true} />,
   tokens: {
-    "dropdown/background": "#ffffff",
-    "dropdown/divider": "#e1e1e8",
-    "dropdown/title": "#13131a",
-    "dropdown/tab/active": "#7c33b5",
-    "dropdown/meta": "#a8a8b2",
-    "dropdown/radius": "4px",
-    "dropdown/shadow":
-      "0px 1px 2px rgba(106,76,110,0.08), 0px 12px 10px rgba(106,76,110,0.1)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "border/dynamic/brand/default": "var(--border-dynamic-brand-default)",
+    "surface/foreground/dynamic/brand/default":
+      "var(--surface-foreground-dynamic-brand-default)",
+    "surface/foreground/dynamic/neutral/disabled":
+      "var(--surface-foreground-dynamic-neutral-disabled)",
+    "container/static/neutral/subtle/background":
+      "var(--container-static-neutral-subtle-background)",
+    "container/static/neutral/subtle/foreground":
+      "var(--container-static-neutral-subtle-foreground)",
+    "radius/50": "var(--radius-50)",
   },
 };
 

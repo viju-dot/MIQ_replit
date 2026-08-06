@@ -1,0 +1,42 @@
+{
+  "illustration/brand/1": {
+    "cssVar": "--illustration-brand-1",
+    "value": "#e7c7ff"
+  },
+  "illustration/brand/2": {
+    "cssVar": "--illustration-brand-2",
+    "value": "#a857e5"
+  },
+  "illustration/brand/3": {
+    "cssVar": "--illustration-brand-3",
+    "value": "#7c33b5"
+  },
+  "illustration/data3/1": {
+    "cssVar": "--illustration-data3-1",
+    "value": "#ffefd3"
+  },
+  "illustration/data3/2": {
+    "cssVar": "--illustration-data3-2",
+    "value": "#fbbb3b"
+  },
+  "illustration/data3/3": {
+    "cssVar": "--illustration-data3-3",
+    "value": "#d0952e"
+  },
+  "illustration/neutral/1": {
+    "cssVar": "--illustration-neutral-1",
+    "value": "#ebebf0"
+  },
+  "illustration/neutral/2": {
+    "cssVar": "--illustration-neutral-2",
+    "value": "#c6c6cc"
+  },
+  "illustration/neutral/3": {
+    "cssVar": "--illustration-neutral-3",
+    "value": "#a8a8b2"
+  },
+  "surface/background/lvl2": {
+    "cssVar": "--surface-background-lvl2",
+    "value": "#f7f7fa"
+  }
+}

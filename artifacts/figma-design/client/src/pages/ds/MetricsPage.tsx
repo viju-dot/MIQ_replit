@@ -29,13 +29,13 @@ type MetricsValueProps = {
 function MetricsValue({
   metricValue = "8.3% M",
   size = "Small",
-  color = "#13131a",
+  color = "var(--surface-foreground-static-neutral-lvl1, #13131a)",
 }: MetricsValueProps) {
   if (size === "Regular") {
     return (
       <div className="flex items-center justify-center relative">
         <p
-          className="[word-break:break-word] font-['DM_Sans'] font-semibold leading-[32px] not-italic relative shrink-0 text-[24px] text-center tracking-[-0.36px] whitespace-nowrap"
+          className="[word-break:break-word] font-[var(--headline-md-semibold-family,'DM_Sans')] font-semibold leading-[var(--headline-md-semibold-line-height,32px)] not-italic relative shrink-0 text-[length:var(--headline-md-semibold-size,24px)] text-center tracking-[-0.36px] whitespace-nowrap"
           style={{ color }}
         >
           {metricValue}
@@ -47,7 +47,7 @@ function MetricsValue({
     return (
       <div className="flex items-center justify-center relative">
         <p
-          className="[word-break:break-word] font-['DM_Sans'] font-semibold leading-[36px] not-italic relative shrink-0 text-[28px] text-center tracking-[-0.56px] whitespace-nowrap"
+          className="[word-break:break-word] font-[var(--headline-lg-semibold-family,'DM_Sans')] font-semibold leading-[var(--headline-lg-semibold-line-height,36px)] not-italic relative shrink-0 text-[length:var(--headline-lg-semibold-size,28px)] text-center tracking-[-0.56px] whitespace-nowrap"
           style={{ color }}
         >
           {metricValue}
@@ -58,7 +58,7 @@ function MetricsValue({
   return (
     <div className="flex items-center justify-center relative">
       <p
-        className="[word-break:break-word] font-['DM_Sans'] font-semibold leading-[28px] not-italic relative shrink-0 text-[20px] text-center tracking-[-0.2px] w-[68px]"
+        className="[word-break:break-word] font-[var(--headline-sm-semibold-family,'DM_Sans')] font-semibold leading-[var(--headline-sm-semibold-line-height,28px)] not-italic relative shrink-0 text-[length:var(--headline-sm-semibold-size,20px)] text-center tracking-[-0.2px] w-[68px]"
         style={{ color }}
       >
         {metricValue}
@@ -83,39 +83,39 @@ function MetricsCardContent({
   bottomText?: string;
 }) {
   return (
-    <div className="flex gap-[6px] items-center p-0 relative">
-      <div className="flex flex-col gap-[6px] items-start relative shrink-0">
+    <div className="flex gap-[var(--spacing-75,6px)] items-center p-0 relative">
+      <div className="flex flex-col gap-[var(--spacing-75,6px)] items-start relative shrink-0">
         {/* Top icon */}
         <UsersIcon />
         {/* Context Label Top */}
         <div className="flex gap-0 items-center p-0 relative shrink-0 w-full">
-          <div className="flex gap-[8px] items-center p-0 relative shrink-0">
-            <p className="[word-break:break-word] font-['DM_Sans'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-[#717180] text-center whitespace-nowrap">
+          <div className="flex gap-[var(--spacing-100,8px)] items-center p-0 relative shrink-0">
+            <p className="[word-break:break-word] font-[var(--body-sm-regular-family,'DM_Sans')] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-static-neutral-lvl3,#717180)] text-center whitespace-nowrap">
               {descriptionText}
             </p>
           </div>
           <UsersIcon />
         </div>
         {/* Value + name */}
-        <div className="flex gap-[6px] items-end p-0 relative shrink-0">
+        <div className="flex gap-[var(--spacing-75,6px)] items-end p-0 relative shrink-0">
           <MetricsValue metricValue={metricValue} />
-          <div className="flex gap-[8px] items-center pb-[2px] pt-0 px-0 relative shrink-0">
-            <p className="[word-break:break-word] font-['DM_Sans'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-[#282833] text-center whitespace-nowrap">
+          <div className="flex gap-[var(--spacing-100,8px)] items-center pb-[var(--spacing-25,2px)] pt-0 px-0 relative shrink-0">
+            <p className="[word-break:break-word] font-[var(--body-sm-regular-family,'DM_Sans')] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-static-neutral-lvl2,#282833)] text-center whitespace-nowrap">
               {metricsName}
             </p>
           </div>
         </div>
         {/* Context Label Bottom */}
         <div className="flex gap-0 items-center p-0 relative shrink-0 w-full">
-          <div className="flex gap-[8px] items-center relative shrink-0">
-            <div className="flex gap-[10px] items-start p-0 relative rounded-[2px] shrink-0">
-              <div className="bg-[#e7faef] flex gap-[2px] h-[18px] items-center justify-center px-[3px] py-0 relative rounded-[2px] shrink-0">
-                <p className="[word-break:break-word] font-['DM_Sans'] font-medium leading-[18px] not-italic relative shrink-0 text-[12px] text-[#115639] text-center whitespace-nowrap">
+          <div className="flex gap-[var(--spacing-100,8px)] items-center relative shrink-0">
+            <div className="flex gap-[var(--odd-numbers-10,10px)] items-start p-0 relative rounded-[var(--radiuses-small,2px)] shrink-0">
+              <div className="bg-[var(--container-static-success-subtle-background,#e7faef)] flex gap-[var(--spacing-25,2px)] h-[var(--old-sizing-18,18px)] items-center justify-center px-[var(--odd-numbers-3,3px)] py-0 relative rounded-[var(--radiuses-small,2px)] shrink-0">
+                <p className="[word-break:break-word] font-[var(--body-sm-medium-family,'DM_Sans')] font-medium leading-[var(--body-sm-medium-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-medium-size,12px)] text-[var(--container-static-success-subtle-foreground-variation,#115639)] text-center whitespace-nowrap">
                   {badgeText}
                 </p>
               </div>
             </div>
-            <p className="[word-break:break-word] font-['DM_Sans'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-[#282833] text-center whitespace-nowrap">
+            <p className="[word-break:break-word] font-[var(--body-sm-regular-family,'DM_Sans')] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-static-neutral-lvl2,#282833)] text-center whitespace-nowrap">
               {bottomText}
             </p>
           </div>
@@ -151,42 +151,64 @@ function MetricsTile({
 
   let containerStyle: React.CSSProperties;
   if (isSelected) {
-    containerStyle = { backgroundColor: "white", borderColor: "#7c33b5" };
+    containerStyle = {
+      backgroundColor:
+        "var(--container-dynamic-neutral-subtle-background-default-regular, #ffffff)",
+      borderColor: "var(--border-dynamic-brand-selected, #7c33b5)",
+    };
   } else if (isDisabled) {
     containerStyle = {
-      backgroundColor: "rgba(113,113,128,0.1)",
-      borderColor: "#c6c6cc",
+      backgroundColor:
+        "var(--container-dynamic-neutral-subtle-background-disabled, rgba(113,113,128,0.1))",
+      borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)",
     };
   } else if (isHover) {
     containerStyle = {
-      backgroundColor: "rgba(113,113,128,0.08)",
-      borderColor: "#c6c6cc",
+      backgroundColor:
+        "var(--container-dynamic-neutral-subtle-background-hover, rgba(113,113,128,0.08))",
+      borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)",
     };
   } else {
-    containerStyle = { backgroundColor: "white", borderColor: "#c6c6cc" };
+    containerStyle = {
+      backgroundColor:
+        "var(--container-dynamic-neutral-subtle-background-default-regular, #ffffff)",
+      borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)",
+    };
   }
 
   const iconSrc = isDisabled ? imgUsersThreeDisabled : imgUsersThree;
-  const labelTopColor = isDisabled ? "#a8a8b2" : "#717180";
-  const nameColor = isDisabled ? "#a8a8b2" : "#282833";
-  const valueColor = isDisabled ? "#a8a8b2" : "#13131a";
-  const badgeBg = isDisabled ? "rgba(113,113,128,0.1)" : "#e7faef";
-  const badgeTextColor = isDisabled ? "#a8a8b2" : "#115639";
-  const bottomTextColor = isDisabled ? "#a8a8b2" : "#282833";
+  const labelTopColor = isDisabled
+    ? "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)"
+    : "var(--surface-foreground-static-neutral-lvl3, #717180)";
+  const nameColor = isDisabled
+    ? "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)"
+    : "var(--surface-foreground-static-neutral-lvl2, #282833)";
+  const valueColor = isDisabled
+    ? "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)"
+    : "var(--surface-foreground-static-neutral-lvl1, #13131a)";
+  const badgeBg = isDisabled
+    ? "var(--container-dynamic-neutral-subtle-background-disabled, rgba(113,113,128,0.1))"
+    : "var(--container-static-success-subtle-background, #e7faef)";
+  const badgeTextColor = isDisabled
+    ? "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)"
+    : "var(--container-static-success-subtle-foreground-variation, #115639)";
+  const bottomTextColor = isDisabled
+    ? "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)"
+    : "var(--surface-foreground-static-neutral-lvl2, #282833)";
 
   return (
     <div
-      className="border border-solid flex gap-[6px] items-center p-[16px] relative rounded-[2px]"
+      className="border border-solid flex gap-[var(--spacing-75,6px)] items-center p-[var(--spacing-200,16px)] relative rounded-[var(--radiuses-small,2px)]"
       style={containerStyle}
     >
-      <div className="flex flex-col gap-[6px] items-start p-0 relative shrink-0">
+      <div className="flex flex-col gap-[var(--spacing-75,6px)] items-start p-0 relative shrink-0">
         {/* Top icon */}
         <UsersIcon src={iconSrc} />
         {/* Context Label Top */}
         <div className="flex gap-0 items-center p-0 relative shrink-0 w-full">
-          <div className="flex gap-[8px] items-center relative shrink-0">
+          <div className="flex gap-[var(--spacing-100,8px)] items-center relative shrink-0">
             <p
-              className="[word-break:break-word] font-['DM_Sans'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-center whitespace-nowrap"
+              className="[word-break:break-word] font-[var(--body-sm-regular-family,'DM_Sans')] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-regular-size,12px)] text-center whitespace-nowrap"
               style={{ color: labelTopColor }}
             >
               {descriptionText}
@@ -195,11 +217,11 @@ function MetricsTile({
           <UsersIcon src={iconSrc} />
         </div>
         {/* Value + name */}
-        <div className="flex gap-[6px] items-end p-0 relative shrink-0">
+        <div className="flex gap-[var(--spacing-75,6px)] items-end p-0 relative shrink-0">
           <MetricsValue color={valueColor} metricValue={metricValue} />
-          <div className="flex gap-0 items-center pb-[2px] pt-0 px-0 relative shrink-0">
+          <div className="flex gap-0 items-center pb-[var(--spacing-25,2px)] pt-0 px-0 relative shrink-0">
             <p
-              className="[word-break:break-word] font-['DM_Sans'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-center whitespace-nowrap"
+              className="[word-break:break-word] font-[var(--body-sm-regular-family,'DM_Sans')] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-regular-size,12px)] text-center whitespace-nowrap"
               style={{ color: nameColor }}
             >
               {metricsName}
@@ -208,14 +230,14 @@ function MetricsTile({
         </div>
         {/* Context Label Bottom */}
         <div className="flex gap-0 items-center p-0 relative shrink-0 w-full">
-          <div className="flex gap-[8px] items-center p-0 relative shrink-0">
-            <div className="flex gap-[10px] items-start relative rounded-[2px] shrink-0">
+          <div className="flex gap-[var(--spacing-100,8px)] items-center p-0 relative shrink-0">
+            <div className="flex gap-[var(--odd-numbers-10,10px)] items-start relative rounded-[var(--radiuses-small,2px)] shrink-0">
               <div
-                className="flex gap-[2px] h-[18px] items-center justify-center px-[3px] py-0 relative rounded-[2px] shrink-0"
+                className="flex gap-[var(--spacing-25,2px)] h-[var(--old-sizing-18,18px)] items-center justify-center px-[var(--odd-numbers-3,3px)] py-0 relative rounded-[var(--radiuses-small,2px)] shrink-0"
                 style={{ backgroundColor: badgeBg }}
               >
                 <p
-                  className="[word-break:break-word] font-['DM_Sans'] font-medium leading-[18px] not-italic relative shrink-0 text-[12px] text-center whitespace-nowrap"
+                  className="[word-break:break-word] font-[var(--body-sm-medium-family,'DM_Sans')] font-medium leading-[var(--body-sm-medium-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-medium-size,12px)] text-center whitespace-nowrap"
                   style={{ color: badgeTextColor }}
                 >
                   {badgeText}
@@ -223,7 +245,7 @@ function MetricsTile({
               </div>
             </div>
             <p
-              className="[word-break:break-word] font-['DM_Sans'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-center whitespace-nowrap"
+              className="[word-break:break-word] font-[var(--body-sm-regular-family,'DM_Sans')] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-regular-size,12px)] text-center whitespace-nowrap"
               style={{ color: bottomTextColor }}
             >
               {bottomText}
@@ -246,18 +268,18 @@ function MetricsTileCompact({
   descriptionText?: string;
 }) {
   return (
-    <div className="bg-white border border-[#c6c6cc] border-solid flex gap-[6px] items-center p-[16px] relative rounded-[2px]">
-      <div className="flex flex-col gap-[6px] items-start p-0 relative shrink-0">
-        <div className="flex gap-[6px] items-end p-0 relative shrink-0">
+    <div className="bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] border border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] border-solid flex gap-[var(--spacing-75,6px)] items-center p-[var(--spacing-200,16px)] relative rounded-[var(--radiuses-small,2px)]">
+      <div className="flex flex-col gap-[var(--spacing-75,6px)] items-start p-0 relative shrink-0">
+        <div className="flex gap-[var(--spacing-75,6px)] items-end p-0 relative shrink-0">
           <div className="flex items-center justify-center relative shrink-0">
-            <p className="[word-break:break-word] font-['DM_Sans'] font-semibold leading-[28px] not-italic relative shrink-0 text-[20px] text-[#13131a] text-center tracking-[-0.2px] w-[68px]">
+            <p className="[word-break:break-word] font-[var(--headline-sm-semibold-family,'DM_Sans')] font-semibold leading-[var(--headline-sm-semibold-line-height,28px)] not-italic relative shrink-0 text-[length:var(--headline-sm-semibold-size,20px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] text-center tracking-[-0.2px] w-[68px]">
               {metricValue}
             </p>
           </div>
         </div>
         <div className="flex gap-0 items-center p-0 relative shrink-0 w-full">
-          <div className="flex gap-[8px] items-center p-0 relative shrink-0">
-            <p className="[word-break:break-word] font-['DM_Sans'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-[#282833] text-center whitespace-nowrap">
+          <div className="flex gap-[var(--spacing-100,8px)] items-center p-0 relative shrink-0">
+            <p className="[word-break:break-word] font-[var(--body-sm-regular-family,'DM_Sans')] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-static-neutral-lvl2,#282833)] text-center whitespace-nowrap">
               {descriptionText}
             </p>
           </div>
@@ -296,11 +318,11 @@ const metricsValueConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "text/default/bold": "#13131a",
-    "size/small": "20px / lh 28px / tracking -0.2px",
-    "size/regular": "24px / lh 32px / tracking -0.36px",
-    "size/large": "28px / lh 36px / tracking -0.56px",
-    "font/family": "DM Sans",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "Headline Sm/Semibold": "var(--headline-sm-semibold-size)",
+    "Headline Md/Semibold": "var(--headline-md-semibold-size)",
+    "Headline Lg/Semibold": "var(--headline-lg-semibold-size)",
   },
 };
 
@@ -355,12 +377,17 @@ const metricsCardContentConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "text/description": "#717180",
-    "text/name": "#282833",
-    "text/value": "#13131a",
-    "badge/positive/background": "#e7faef",
-    "badge/positive/text": "#115639",
-    "radius/badge": "2px",
+    "surface/foreground/static/neutral/lvl3":
+      "var(--surface-foreground-static-neutral-lvl3)",
+    "surface/foreground/static/neutral/lvl2":
+      "var(--surface-foreground-static-neutral-lvl2)",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "container/static/success/subtle/background":
+      "var(--container-static-success-subtle-background)",
+    "container/static/success/subtle/foreground/variation":
+      "var(--container-static-success-subtle-foreground-variation)",
+    "Radiuses/small": "var(--radiuses-small)",
   },
 };
 
@@ -424,14 +451,19 @@ const metricsTileConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "container/default/background": "#ffffff",
-    "container/default/border": "#c6c6cc",
-    "container/hover/background": "rgba(113,113,128,0.08)",
-    "container/selected/border": "#7c33b5",
-    "container/disabled/background": "rgba(113,113,128,0.1)",
-    "text/disabled": "#a8a8b2",
-    "radius/tile": "2px",
-    "padding/tile": "16px",
+    "container/dynamic/neutral/subtle/background/default/regular":
+      "var(--container-dynamic-neutral-subtle-background-default-regular)",
+    "border/dynamic/neutral/subtle/default":
+      "var(--border-dynamic-neutral-subtle-default)",
+    "container/dynamic/neutral/subtle/background/hover":
+      "var(--container-dynamic-neutral-subtle-background-hover)",
+    "border/dynamic/brand/selected": "var(--border-dynamic-brand-selected)",
+    "container/dynamic/neutral/subtle/background/disabled":
+      "var(--container-dynamic-neutral-subtle-background-disabled)",
+    "surface/foreground/dynamic/neutral/disabled":
+      "var(--surface-foreground-dynamic-neutral-disabled)",
+    "Radiuses/small": "var(--radiuses-small)",
+    "spacing/200": "var(--spacing-200)",
   },
 };
 
@@ -463,11 +495,15 @@ const metricsTileCompactConfig: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "container/background": "#ffffff",
-    "container/border": "#c6c6cc",
-    "text/value": "#13131a",
-    "text/description": "#282833",
-    "radius/tile": "2px",
+    "container/dynamic/neutral/subtle/background/default/regular":
+      "var(--container-dynamic-neutral-subtle-background-default-regular)",
+    "border/dynamic/neutral/subtle/default":
+      "var(--border-dynamic-neutral-subtle-default)",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/static/neutral/lvl2":
+      "var(--surface-foreground-static-neutral-lvl2)",
+    "Radiuses/small": "var(--radiuses-small)",
   },
 };
 

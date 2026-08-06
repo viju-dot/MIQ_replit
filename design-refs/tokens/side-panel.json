@@ -1,0 +1,202 @@
+{
+  "Body Md/Medium": {
+    "cssVar": "--body-md-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 14, weight: 500, lineHeight: 20, letterSpacing: 0)"
+  },
+  "Body Md/Regular": {
+    "cssVar": "--body-md-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 14, weight: 400, lineHeight: 20, letterSpacing: 0)"
+  },
+  "Body Sm/Regular": {
+    "cssVar": "--body-sm-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 12, weight: 400, lineHeight: 18, letterSpacing: 0)"
+  },
+  "Display Lg/Medium": {
+    "cssVar": "--display-lg-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 56, weight: 500, lineHeight: 68, letterSpacing: -2.5)"
+  },
+  "Display Sm/Regular": {
+    "cssVar": "--display-sm-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 40, weight: 400, lineHeight: 48, letterSpacing: -2.5)"
+  },
+  "Elevation Bottom Bar": {
+    "cssVar": "--elevation-bottom-bar",
+    "value": "Effect(type: DROP_SHADOW, color: shadow/lvl8, offset: (0, -8), radius: 16, spread: 0); Effect(type: DROP_SHADOW, color: shadow/lvl12, offset: (0, -1), radius: 4, spread: 0)"
+  },
+  "Elevation Regular": {
+    "cssVar": "--elevation-regular",
+    "value": "Effect(type: DROP_SHADOW, color: shadow/lvl4, offset: (0, 8), radius: 16, spread: 0); Effect(type: DROP_SHADOW, color: shadow/lvl8, offset: (0, 1), radius: 4, spread: 0)"
+  },
+  "Headline Xs/Medium": {
+    "cssVar": "--headline-xs-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 16, weight: 500, lineHeight: 24, letterSpacing: -0.5)"
+  },
+  "Radiuses/small": {
+    "cssVar": "--radiuses-small",
+    "value": "2"
+  },
+  "Spacing/24": {
+    "cssVar": "--spacing-24",
+    "value": "24"
+  },
+  "[old]Radiuses/2": {
+    "cssVar": "--old-radiuses-2",
+    "value": "2"
+  },
+  "[old]Sizing/24": {
+    "cssVar": "--old-sizing-24",
+    "value": "24"
+  },
+  "[old]Stroke Thickness/1": {
+    "cssVar": "--old-stroke-thickness-1",
+    "value": "1"
+  },
+  "border/dynamic/neutral/bold/default": {
+    "cssVar": "--border-dynamic-neutral-bold-default",
+    "value": "#4b4b59"
+  },
+  "border/dynamic/neutral/subtle/default": {
+    "cssVar": "--border-dynamic-neutral-subtle-default",
+    "value": "#c6c6cc"
+  },
+  "border/static/subtle/neutral": {
+    "cssVar": "--border-static-subtle-neutral",
+    "value": "#e1e1e8"
+  },
+  "container/dynamic/brand/bold/background/default": {
+    "cssVar": "--container-dynamic-brand-bold-background-default",
+    "value": "#7c33b5"
+  },
+  "container/dynamic/brand/bold/foreground/default": {
+    "cssVar": "--container-dynamic-brand-bold-foreground-default",
+    "value": "#ffffff"
+  },
+  "container/dynamic/neutral/subtle/background/default/regular": {
+    "cssVar": "--container-dynamic-neutral-subtle-background-default-regular",
+    "value": "#ffffff"
+  },
+  "container/dynamic/neutral/subtle/foreground/default/regular": {
+    "cssVar": "--container-dynamic-neutral-subtle-foreground-default-regular",
+    "value": "#4b4b59"
+  },
+  "numbers/12": {
+    "cssVar": "--numbers-12",
+    "value": "12"
+  },
+  "numbers/16": {
+    "cssVar": "--numbers-16",
+    "value": "16"
+  },
+  "numbers/2": {
+    "cssVar": "--numbers-2",
+    "value": "2"
+  },
+  "numbers/4": {
+    "cssVar": "--numbers-4",
+    "value": "4"
+  },
+  "numbers/6": {
+    "cssVar": "--numbers-6",
+    "value": "6"
+  },
+  "numbers/8": {
+    "cssVar": "--numbers-8",
+    "value": "8"
+  },
+  "numbers/None": {
+    "cssVar": "--numbers-none",
+    "value": "0"
+  },
+  "odd_numbers/10": {
+    "cssVar": "--odd-numbers-10",
+    "value": "10"
+  },
+  "odd_numbers/2-5": {
+    "cssVar": "--odd-numbers-2-5",
+    "value": "2.5"
+  },
+  "odd_numbers/97": {
+    "cssVar": "--odd-numbers-97",
+    "value": "97"
+  },
+  "radius/25": {
+    "cssVar": "--radius-25",
+    "value": "2"
+  },
+  "screen/margin": {
+    "cssVar": "--screen-margin",
+    "value": "16"
+  },
+  "shadow/lvl12": {
+    "cssVar": "--shadow-lvl12",
+    "value": "#7171801f"
+  },
+  "shadow/lvl4": {
+    "cssVar": "--shadow-lvl4",
+    "value": "#7171800a"
+  },
+  "shadow/lvl8": {
+    "cssVar": "--shadow-lvl8",
+    "value": "#71718014"
+  },
+  "spacing/0": {
+    "cssVar": "--spacing-0",
+    "value": "0"
+  },
+  "spacing/150": {
+    "cssVar": "--spacing-150",
+    "value": "12"
+  },
+  "spacing/200": {
+    "cssVar": "--spacing-200",
+    "value": "16"
+  },
+  "spacing/50": {
+    "cssVar": "--spacing-50",
+    "value": "4"
+  },
+  "spacing/container/m": {
+    "cssVar": "--spacing-container-m",
+    "value": "7"
+  },
+  "stroke_weight/15": {
+    "cssVar": "--stroke-weight-15",
+    "value": "1"
+  },
+  "surface/background/lvl1": {
+    "cssVar": "--surface-background-lvl1",
+    "value": "#ffffff"
+  },
+  "surface/background/lvl2": {
+    "cssVar": "--surface-background-lvl2",
+    "value": "#f7f7fa"
+  },
+  "surface/background/lvl3": {
+    "cssVar": "--surface-background-lvl3",
+    "value": "#ebebf0"
+  },
+  "surface/foreground/dynamic/brand/default": {
+    "cssVar": "--surface-foreground-dynamic-brand-default",
+    "value": "#7c33b5"
+  },
+  "surface/foreground/dynamic/neutral/default/regular": {
+    "cssVar": "--surface-foreground-dynamic-neutral-default-regular",
+    "value": "#4b4b59"
+  },
+  "surface/foreground/static/info": {
+    "cssVar": "--surface-foreground-static-info",
+    "value": "#2360db"
+  },
+  "surface/foreground/static/neutral/lvl1": {
+    "cssVar": "--surface-foreground-static-neutral-lvl1",
+    "value": "#13131a"
+  },
+  "surface/foreground/static/neutral/lvl2": {
+    "cssVar": "--surface-foreground-static-neutral-lvl2",
+    "value": "#282833"
+  },
+  "surface/foreground/static/neutral/lvl3": {
+    "cssVar": "--surface-foreground-static-neutral-lvl3",
+    "value": "#717180"
+  }
+}

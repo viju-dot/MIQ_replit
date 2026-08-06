@@ -48,23 +48,31 @@ function Chip({
   const disabled = state === "Disabled";
 
   // Container background / border
-  let bgClass = "bg-white";
-  let borderStyle = "1px solid #c6c6cc";
-  let textColor = "#13131a";
+  let bgClass =
+    "bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)]";
+  let borderStyle =
+    "1px solid var(--border-dynamic-neutral-subtle-default,#c6c6cc)";
+  let textColor =
+    "var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)";
 
   if (disabled) {
-    bgClass = "bg-[rgba(113,113,128,0.1)]";
+    bgClass =
+      "bg-[var(--container-dynamic-neutral-subtle-background-disabled,rgba(113,113,128,0.1))]";
     borderStyle = "1px solid transparent";
-    textColor = "#a8a8b2";
+    textColor =
+      "var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)";
   } else if (selected) {
-    bgClass = "bg-[#f6ebff]";
-    borderStyle = "1px solid #7c33b5";
-    textColor = "#7c33b5";
+    bgClass =
+      "bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)]";
+    borderStyle = "1px solid var(--border-dynamic-brand-selected,#7c33b5)";
+    textColor =
+      "var(--container-dynamic-brand-subtle-foreground-delected,#7c33b5)";
     if (state === "Selected-Hover") {
       bgClass = "bg-[#efdcff]";
     }
   } else if (hover) {
-    bgClass = "bg-[rgba(113,113,128,0.08)]";
+    bgClass =
+      "bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))]";
   }
 
   const iconName = ICON_BY_STATUS[status];
@@ -72,10 +80,10 @@ function Chip({
 
   return (
     <div
-      className={`inline-flex items-center justify-center rounded-[40px] ${bgClass} ${
+      className={`inline-flex items-center justify-center rounded-[var(--spacing-mega,40px)] ${bgClass} ${
         isLarge ? "h-[34px] px-3 py-0.5" : "h-6 px-2 py-0.5"
       }`}
-      style={{ border: borderStyle, gap: "4px" }}
+      style={{ border: borderStyle, gap: "var(--numbers-4, 4px)" }}
       data-name={`State=${state}, Status=${status}, Size=${size}, Menu=${menu ? "Yes" : "No"}`}
     >
       <div className="flex shrink-0 items-center justify-center gap-1">
@@ -102,8 +110,12 @@ function Chip({
           className="whitespace-nowrap font-['DM_Sans',Helvetica] font-medium"
           style={{
             color: textColor,
-            fontSize: isLarge ? "14px" : "12px",
-            lineHeight: isLarge ? "20px" : "18px",
+            fontSize: isLarge
+              ? "var(--body-md-medium-size, 14px)"
+              : "var(--body-sm-medium-size, 12px)",
+            lineHeight: isLarge
+              ? "var(--body-md-medium-line-height, 20px)"
+              : "var(--body-sm-medium-line-height, 18px)",
           }}
         >
           {label}
@@ -115,9 +127,11 @@ function Chip({
             aria-hidden
             className="shrink-0 self-stretch"
             style={{
-              width: "1px",
-              backgroundColor: disabled ? "#d3d3d8" : "#e1e1e8",
-              margin: "4px 0",
+              width: "var(--old-stroke-thickness-1, 1px)",
+              backgroundColor: disabled
+                ? "#d3d3d8"
+                : "var(--border-dynamic-neutral-subtle-disabled, #e1e1e8)",
+              margin: "var(--numbers-4, 4px) 0",
             }}
           />
           <span
@@ -201,22 +215,29 @@ const chipConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "container/default/background": "#ffffff",
-    "container/default/border": "#c6c6cc",
-    "container/hover/background": "rgba(113,113,128,0.08)",
-    "container/selected/background": "#f6ebff",
-    "container/selected/background/hover": "#efdcff",
-    "container/selected/border": "#7c33b5",
-    "container/disabled/background": "rgba(113,113,128,0.1)",
-    "text/default": "#13131a",
-    "text/selected": "#7c33b5",
-    "text/disabled": "#a8a8b2",
-    "divider/default": "#e1e1e8",
-    "divider/disabled": "#d3d3d8",
-    "radius/container": "40px",
-    "size/large": "34px (text 14/20)",
-    "size/small": "24px (text 12/18)",
-    "gap/content": "4px",
+    "container/dynamic/neutral/subtle/background/default/regular":
+      "var(--container-dynamic-neutral-subtle-background-default-regular)",
+    "border/dynamic/neutral/subtle/default":
+      "var(--border-dynamic-neutral-subtle-default)",
+    "container/dynamic/neutral/subtle/background/hover":
+      "var(--container-dynamic-neutral-subtle-background-hover)",
+    "container/dynamic/brand/subtle/background/selected":
+      "var(--container-dynamic-brand-subtle-background-selected)",
+    "border/dynamic/brand/selected": "var(--border-dynamic-brand-selected)",
+    "container/dynamic/brand/subtle/foreground/delected":
+      "var(--container-dynamic-brand-subtle-foreground-delected)",
+    "container/dynamic/neutral/subtle/background/disabled":
+      "var(--container-dynamic-neutral-subtle-background-disabled)",
+    "container/dynamic/neutral/subtle/foreground/default/variation":
+      "var(--container-dynamic-neutral-subtle-foreground-default-variation)",
+    "container/dynamic/neutral/subtle/foreground/disabled":
+      "var(--container-dynamic-neutral-subtle-foreground-disabled)",
+    "border/dynamic/neutral/subtle/disabled":
+      "var(--border-dynamic-neutral-subtle-disabled)",
+    "Spacing/mega": "var(--spacing-mega)",
+    "Body Md/Medium": "var(--body-md-medium-size) / var(--body-md-medium-line-height)",
+    "Body Sm/Medium": "var(--body-sm-medium-size) / var(--body-sm-medium-line-height)",
+    "numbers/4": "var(--numbers-4)",
   },
 };
 

@@ -28,7 +28,7 @@ function UploadedFile({
     <div
       className={
         className ||
-        "flex w-full items-center gap-2 rounded-[4px] border border-solid border-[#e1e1e8] bg-white px-3 py-2"
+        "flex w-full items-center gap-[var(--spacing-100,8px)] rounded-[var(--radius-50,4px)] border border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--surface-background-lvl1,#ffffff)] px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)]"
       }
     >
       {/* Icon/file-pdf */}
@@ -41,16 +41,18 @@ function UploadedFile({
           />
         </div>
       </div>
-      <div className="relative flex min-w-0 flex-1 items-center gap-3">
+      <div className="relative flex min-w-0 flex-1 items-center gap-[var(--spacing-150,12px)]">
         <p
-          className={`min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap font-['DM_Sans',Helvetica] text-[14px] font-medium leading-[20px] [word-break:break-word] ${
-            isUploaded ? "text-[#13131a]" : "text-[#717180]"
+          className={`min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap font-['DM_Sans',Helvetica] text-[length:var(--body-md-medium-size,14px)] font-medium leading-[var(--body-md-medium-line-height,20px)] [word-break:break-word] ${
+            isUploaded
+              ? "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]"
+              : "text-[var(--surface-foreground-static-neutral-lvl3,#717180)]"
           }`}
         >
           {filename}
         </p>
-        <div className="relative flex shrink-0 items-center gap-3">
-          <div className="relative flex shrink-0 items-center gap-2">
+        <div className="relative flex shrink-0 items-center gap-[var(--spacing-150,12px)]">
+          <div className="relative flex shrink-0 items-center gap-[var(--spacing-100,8px)]">
             {!isUploaded && (
               <div className="relative flex size-[20px] shrink-0 items-center justify-center">
                 <div className="relative size-[20px] shrink-0">
@@ -62,12 +64,12 @@ function UploadedFile({
                 </div>
               </div>
             )}
-            <p className="relative shrink-0 overflow-hidden text-ellipsis whitespace-nowrap font-['DM_Sans',Helvetica] text-[14px] font-normal leading-[20px] text-[#13131a] [word-break:break-word]">
+            <p className="relative shrink-0 overflow-hidden text-ellipsis whitespace-nowrap font-['DM_Sans',Helvetica] text-[length:var(--body-md-regular-size,14px)] font-normal leading-[var(--body-md-regular-line-height,20px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] [word-break:break-word]">
               {isUploaded ? "45 MB" : "2 mins remaining (22%)"}
             </p>
           </div>
           {/* Icon Buttons */}
-          <div className="relative flex shrink-0 items-center rounded-[2px] p-[2px]">
+          <div className="relative flex shrink-0 items-center rounded-[var(--radius-25,2px)] p-[2px]">
             <div className="relative flex size-[20px] shrink-0 items-center justify-center p-[2px]">
               <div
                 className={`relative shrink-0 ${
@@ -105,37 +107,39 @@ function DropZone({
 
   const containerBorder =
     isDefaultAndHover || isUploadsAndHover
-      ? "border-[#662994]"
-      : "border-[#c6c6cc]";
-  const containerPad = hasFiles ? "gap-6 pb-4 pt-6" : "gap-0 py-6";
+      ? "border-[var(--border-dynamic-brand-hover,#662994)]"
+      : "border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]";
+  const containerPad = hasFiles
+    ? "gap-[var(--spacing-300,24px)] pb-[var(--spacing-200,16px)] pt-[var(--spacing-300,24px)]"
+    : "gap-[var(--spacing-0,0px)] py-[var(--spacing-300,24px)]";
 
   return (
     <div
-      className={`relative flex w-full max-w-[588px] flex-col items-center rounded-[2px] border border-dashed bg-white px-4 ${containerBorder} ${containerPad}`}
+      className={`relative flex w-full max-w-[588px] flex-col items-center rounded-[var(--radius-25,2px)] border border-dashed bg-[var(--surface-background-lvl1,#ffffff)] px-[var(--spacing-200,16px)] ${containerBorder} ${containerPad}`}
     >
       {/* Upload text */}
       <div className="relative flex w-full shrink-0 items-center justify-center">
         <div
-          className={`relative shrink-0 text-center font-['DM_Sans',Helvetica] leading-[0] not-italic text-[#13131a] ${
+          className={`relative shrink-0 text-center font-['DM_Sans',Helvetica] leading-[0] not-italic text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] ${
             isDefaultAndHover ? "w-full max-w-[556px]" : "whitespace-nowrap"
           }`}
         >
-          <p className="mb-0 text-[14px]">
+          <p className="mb-0 text-[length:var(--body-md-medium-size,14px)]">
             <span
-              className={`font-medium leading-[20px] [word-break:break-word] ${
+              className={`font-medium leading-[var(--body-md-medium-line-height,20px)] [word-break:break-word] ${
                 hover && (state === "Default" || state === "Uploads")
-                  ? "text-[#662994]"
-                  : "text-[#7c33b5]"
+                  ? "text-[var(--surface-foreground-dynamic-brand-hover,#662994)]"
+                  : "text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]"
               }`}
             >
               Upload a file
             </span>
-            <span className="leading-[20px]"> </span>
-            <span className="font-medium leading-[20px] text-[#13131a] [word-break:break-word]">
+            <span className="leading-[var(--body-md-medium-line-height,20px)]"> </span>
+            <span className="font-medium leading-[var(--body-md-medium-line-height,20px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] [word-break:break-word]">
               or drag and drop
             </span>
           </p>
-          <p className="font-normal leading-[18px] text-[12px] text-[#717180]">
+          <p className="font-normal leading-[var(--body-sm-regular-line-height,18px)] text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-static-neutral-lvl3,#717180)]">
             (Only .xls .xlsx .csv files supported)
           </p>
         </div>
@@ -150,7 +154,7 @@ function DropZone({
             </div>
           </div>
           {/* Uploaded_Files */}
-          <div className="relative flex w-full shrink-0 flex-col items-start gap-3">
+          <div className="relative flex w-full shrink-0 flex-col items-start gap-[var(--spacing-150,12px)]">
             {Array.from({ length: 6 }).map((_, i) => (
               <UploadedFile key={i} />
             ))}
@@ -218,13 +222,19 @@ const dropZoneConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "border/brand/active": "#662994",
-    "border/neutral/idle": "#c6c6cc",
-    "text/brand/link": "#7c33b5",
-    "text/brand/link/hover": "#662994",
-    "text/neutral/strong": "#13131a",
-    "text/neutral/muted": "#717180",
-    "radius/container": "2px",
+    "border/dynamic/brand/hover": "var(--border-dynamic-brand-hover)",
+    "border/dynamic/neutral/subtle/default":
+      "var(--border-dynamic-neutral-subtle-default)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "surface/foreground/dynamic/brand/default":
+      "var(--surface-foreground-dynamic-brand-default)",
+    "surface/foreground/dynamic/brand/hover":
+      "var(--surface-foreground-dynamic-brand-hover)",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/static/neutral/lvl3":
+      "var(--surface-foreground-static-neutral-lvl3)",
+    "radius/25": "var(--radius-25)",
   },
 };
 
@@ -258,10 +268,13 @@ const uploadedFileConfig: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "border/neutral/idle": "#e1e1e8",
-    "text/neutral/strong": "#13131a",
-    "text/neutral/muted": "#717180",
-    "radius/row": "4px",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/static/neutral/lvl3":
+      "var(--surface-foreground-static-neutral-lvl3)",
+    "radius/50": "var(--radius-50)",
   },
 };
 

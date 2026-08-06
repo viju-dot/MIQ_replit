@@ -15,19 +15,21 @@ type TabItemState =
   | "Hover-selected";
 
 const tabItemTextColor: Record<TabItemState, string> = {
-  Default: "#13131a",
-  Selected: "#7c33b5",
-  Disabled: "#a8a8b2",
-  Hover: "#13131a",
-  "Hover-selected": "#662994",
+  Default:
+    "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)",
+  Selected: "var(--surface-foreground-dynamic-brand-default, #7c33b5)",
+  Disabled: "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)",
+  Hover:
+    "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)",
+  "Hover-selected": "var(--surface-foreground-dynamic-brand-hover, #662994)",
 };
 
 const tabItemLineColor: Record<TabItemState, string> = {
-  Default: "#e1e1e8",
-  Selected: "#7c33b5",
-  Disabled: "#e1e1e8",
-  Hover: "#e1e1e8",
-  "Hover-selected": "#662994",
+  Default: "var(--border-static-subtle-neutral, #e1e1e8)",
+  Selected: "var(--border-dynamic-brand-selected, #7c33b5)",
+  Disabled: "var(--border-static-subtle-neutral, #e1e1e8)",
+  Hover: "var(--border-static-subtle-neutral, #e1e1e8)",
+  "Hover-selected": "var(--border-dynamic-brand-hover, #662994)",
 };
 
 function TabItem({
@@ -41,11 +43,18 @@ function TabItem({
   return (
     <div
       className="flex flex-col items-start gap-2"
-      style={isHoverBg ? { backgroundColor: "rgba(113,113,128,0.08)" } : undefined}
+      style={
+        isHoverBg
+          ? {
+              backgroundColor:
+                "var(--container-dynamic-neutral-subtle-background-hover, rgba(113,113,128,0.08))",
+            }
+          : undefined
+      }
     >
       <div className="flex items-center gap-2.5 px-4">
         <p
-          className="whitespace-nowrap text-[14px] leading-[20px] font-normal font-['DM_Sans',Helvetica]"
+          className="whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)] font-normal font-['DM_Sans',Helvetica]"
           style={{ color: tabItemTextColor[state] }}
         >
           {label}
@@ -77,10 +86,22 @@ function TabPill({
     TabPillState,
     { bg?: string; color: string }
   > = {
-    Selected: { bg: "#f6ebff", color: "#7c33b5" },
-    Active: { color: "#4b4b59" },
-    Disabled: { color: "#a8a8b2" },
-    Hover: { bg: "rgba(113,113,128,0.08)", color: "#13131a" },
+    Selected: {
+      bg: "var(--container-dynamic-brand-subtle-background-selected, #f6ebff)",
+      color: "var(--surface-foreground-dynamic-brand-default, #7c33b5)",
+    },
+    Active: {
+      color:
+        "var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59)",
+    },
+    Disabled: {
+      color: "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)",
+    },
+    Hover: {
+      bg: "var(--container-dynamic-neutral-subtle-background-hover, rgba(113,113,128,0.08))",
+      color:
+        "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)",
+    },
   };
   const s = styles[state];
   return (
@@ -89,7 +110,7 @@ function TabPill({
       style={{ backgroundColor: s.bg ?? "transparent" }}
     >
       <p
-        className="whitespace-nowrap text-[14px] leading-[20px] font-normal font-['DM_Sans',Helvetica]"
+        className="whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)] font-normal font-['DM_Sans',Helvetica]"
         style={{ color: s.color }}
       >
         {label}
@@ -160,7 +181,7 @@ function InteractiveRoundedTabs({
   const [active, setActive] = useState(0);
   const [hover, setHover] = useState<number | null>(null);
   return (
-    <div className="inline-flex flex-wrap items-center gap-1 rounded-[24px] bg-[#71718014] p-0.5">
+    <div className="inline-flex flex-wrap items-center gap-1 rounded-[24px] bg-[var(--container-dynamic-neutral-subtle-background-hover,#71718014)] p-0.5">
       {Array.from({ length: count }).map((_, i) => {
         const selected = i === active;
         const hovered = i === hover;
@@ -219,15 +240,20 @@ const tabItemConfig: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "text/default": "#13131a",
-    "text/selected": "#7c33b5",
-    "text/hover-selected": "#662994",
-    "text/disabled": "#a8a8b2",
-    "line/default": "#e1e1e8",
-    "line/selected": "#7c33b5",
-    "line/hover-selected": "#662994",
-    "surface/hover": "rgba(113,113,128,0.08)",
-    "type/size": "14px / 20px DM Sans",
+    "surface/foreground/dynamic/neutral/default/variation":
+      "var(--surface-foreground-dynamic-neutral-default-variation)",
+    "surface/foreground/dynamic/brand/default":
+      "var(--surface-foreground-dynamic-brand-default)",
+    "surface/foreground/dynamic/brand/hover":
+      "var(--surface-foreground-dynamic-brand-hover)",
+    "surface/foreground/dynamic/neutral/disabled":
+      "var(--surface-foreground-dynamic-neutral-disabled)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "border/dynamic/brand/selected": "var(--border-dynamic-brand-selected)",
+    "border/dynamic/brand/hover": "var(--border-dynamic-brand-hover)",
+    "container/dynamic/neutral/subtle/background/hover":
+      "var(--container-dynamic-neutral-subtle-background-hover)",
+    "Body Md/Regular": "var(--body-md-regular-size)",
   },
 };
 
@@ -247,7 +273,7 @@ const tabPillConfig: PlaygroundConfig = {
     { kind: "text", name: "label", label: "Label", defaultValue: "Tab 1" },
   ],
   render: (props) => (
-    <div className="rounded-[24px] bg-[#71718014] p-0.5">
+    <div className="rounded-[24px] bg-[var(--container-dynamic-neutral-subtle-background-hover,#71718014)] p-0.5">
       <TabPill
         label={String(props.label)}
         state={props.state as TabPillState}
@@ -255,15 +281,18 @@ const tabPillConfig: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "container/selected/background": "#f6ebff",
-    "container/hover/background": "rgba(113,113,128,0.08)",
-    "container/track/background": "#71718014",
-    "text/selected": "#7c33b5",
-    "text/active": "#4b4b59",
-    "text/hover": "#13131a",
-    "text/disabled": "#a8a8b2",
-    "radius/pill": "20px",
-    "size/height": "30px",
+    "container/dynamic/brand/subtle/background/selected":
+      "var(--container-dynamic-brand-subtle-background-selected)",
+    "container/dynamic/neutral/subtle/background/hover":
+      "var(--container-dynamic-neutral-subtle-background-hover)",
+    "surface/foreground/dynamic/brand/default":
+      "var(--surface-foreground-dynamic-brand-default)",
+    "surface/foreground/dynamic/neutral/default/regular":
+      "var(--surface-foreground-dynamic-neutral-default-regular)",
+    "surface/foreground/dynamic/neutral/default/variation":
+      "var(--surface-foreground-dynamic-neutral-default-variation)",
+    "surface/foreground/dynamic/neutral/disabled":
+      "var(--surface-foreground-dynamic-neutral-disabled)",
   },
 };
 
@@ -291,11 +320,13 @@ const underlineBarConfig: PlaygroundConfig = {
     </div>
   ),
   tokens: {
-    "text/default": "#13131a",
-    "text/selected": "#7c33b5",
-    "line/default": "#e1e1e8",
-    "line/selected": "#7c33b5",
-    "type/size": "14px / 20px DM Sans",
+    "surface/foreground/dynamic/neutral/default/variation":
+      "var(--surface-foreground-dynamic-neutral-default-variation)",
+    "surface/foreground/dynamic/brand/default":
+      "var(--surface-foreground-dynamic-brand-default)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "border/dynamic/brand/selected": "var(--border-dynamic-brand-selected)",
+    "Body Md/Regular": "var(--body-md-regular-size)",
   },
 };
 
@@ -321,12 +352,14 @@ const roundedBarConfig: PlaygroundConfig = {
     />
   ),
   tokens: {
-    "container/track/background": "#71718014",
-    "container/selected/background": "#f6ebff",
-    "text/selected": "#7c33b5",
-    "text/active": "#4b4b59",
-    "radius/track": "24px",
-    "radius/pill": "20px",
+    "container/dynamic/neutral/subtle/background/hover":
+      "var(--container-dynamic-neutral-subtle-background-hover)",
+    "container/dynamic/brand/subtle/background/selected":
+      "var(--container-dynamic-brand-subtle-background-selected)",
+    "surface/foreground/dynamic/brand/default":
+      "var(--surface-foreground-dynamic-brand-default)",
+    "surface/foreground/dynamic/neutral/default/regular":
+      "var(--surface-foreground-dynamic-neutral-default-regular)",
   },
 };
 

@@ -1,0 +1,46 @@
+{
+  "[old]Radiuses/14": {
+    "cssVar": "--old-radiuses-14",
+    "value": "14"
+  },
+  "[old]Sizing/20": {
+    "cssVar": "--old-sizing-20",
+    "value": "20"
+  },
+  "[old]Sizing/24": {
+    "cssVar": "--old-sizing-24",
+    "value": "24"
+  },
+  "[old]Sizing/28": {
+    "cssVar": "--old-sizing-28",
+    "value": "28"
+  },
+  "[old]Sizing/32": {
+    "cssVar": "--old-sizing-32",
+    "value": "32"
+  },
+  "controls/background/active": {
+    "cssVar": "--controls-background-active",
+    "value": "#7c33b5"
+  },
+  "controls/background/disabled": {
+    "cssVar": "--controls-background-disabled",
+    "value": "#7171801a"
+  },
+  "controls/background/inactive": {
+    "cssVar": "--controls-background-inactive",
+    "value": "#ebebf0"
+  },
+  "controls/foreground/default": {
+    "cssVar": "--controls-foreground-default",
+    "value": "#ffffff"
+  },
+  "controls/foreground/disabled": {
+    "cssVar": "--controls-foreground-disabled",
+    "value": "#c6c6cc"
+  },
+  "surface/background/lvl2": {
+    "cssVar": "--surface-background-lvl2",
+    "value": "#f7f7fa"
+  }
+}

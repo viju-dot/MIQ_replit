@@ -1,0 +1,75 @@
+Task: Fix Component Theme Synchronization
+Context
+
+The application currently supports a global Light and Dark theme switch, but the theme is only changing at the application level. Many imported Figma components are not updating their own colors when the theme changes.
+
+As a result, some components continue displaying Light Mode colors while the application is in Dark Mode (and vice versa).
+
+Objective
+
+Ensure every imported Figma component responds correctly to the global theme switch.
+
+When the user changes between Light and Dark Mode, all components should immediately update using the corresponding Figma Variable Collections and Design Tokens.
+
+Requirements
+Connect every component to the global theme state.
+Resolve colors using the active Figma Variables instead of static values.
+Ensure all nested elements inherit the correct theme.
+Do not hardcode Light or Dark colors.
+Preserve the original Figma token and variable references.
+Apply Theme Changes To
+
+Every component should update all theme-dependent properties, including:
+
+Background colors
+Text colors
+Border colors
+Icon colors
+Surface colors
+Fill colors
+Stroke colors
+Shadow/Elevation (if theme-specific)
+Status colors (Success, Warning, Error, Info)
+Any other color values defined through Figma Variables
+Component Scope
+
+This fix should apply to every imported component, regardless of its type or complexity.
+
+Examples include:
+
+Buttons
+Inputs
+Dropdowns
+Cards
+Tables
+Navigation
+Modals
+Badges
+Chips
+Checkboxes
+Radio Buttons
+Switches
+Tabs
+Tooltips
+Any future components imported from Figma
+
+The solution should be generic and automatically work for newly imported components without requiring component-specific fixes.
+
+Theme Behavior
+
+When the global theme changes:
+
+Every visible component should update instantly.
+All nested child elements should inherit the correct theme.
+Every color should be resolved from the active Figma Variable Collection.
+No page refresh should be required.
+Validation
+
+After implementing the fix:
+
+Switching between Light and Dark Mode should update every imported component.
+No component should retain colors from the previous theme.
+The visual appearance should match the original Figma Design System in both themes.
+Theme changes should be driven entirely by Figma Design Tokens and Variables, not by hardcoded CSS or manual overrides.
+
+Goal: The global theme switch should control the entire Design System, ensuring every imported Figma component stays synchronized with the active Light or Dark theme

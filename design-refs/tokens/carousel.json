@@ -1,0 +1,82 @@
+{
+  "Display Sm/Medium": {
+    "cssVar": "--display-sm-medium",
+    "value": "Font(family: \"DM Sans\", style: Medium, size: 40, weight: 500, lineHeight: 48, letterSpacing: -2.5)"
+  },
+  "Display Sm/Regular": {
+    "cssVar": "--display-sm-regular",
+    "value": "Font(family: \"DM Sans\", style: Regular, size: 40, weight: 400, lineHeight: 48, letterSpacing: -2.5)"
+  },
+  "border/static/bold/neutral": {
+    "cssVar": "--border-static-bold-neutral",
+    "value": "#4b4b59"
+  },
+  "controls/background/active": {
+    "cssVar": "--controls-background-active",
+    "value": "#7c33b5"
+  },
+  "controls/background/inactive": {
+    "cssVar": "--controls-background-inactive",
+    "value": "#ebebf0"
+  },
+  "radius/100": {
+    "cssVar": "--radius-100",
+    "value": "8"
+  },
+  "radius/25": {
+    "cssVar": "--radius-25",
+    "value": "2"
+  },
+  "screen/gutter": {
+    "cssVar": "--screen-gutter",
+    "value": "16"
+  },
+  "spacing/100": {
+    "cssVar": "--spacing-100",
+    "value": "8"
+  },
+  "spacing/150": {
+    "cssVar": "--spacing-150",
+    "value": "12"
+  },
+  "spacing/200": {
+    "cssVar": "--spacing-200",
+    "value": "16"
+  },
+  "spacing/400": {
+    "cssVar": "--spacing-400",
+    "value": "32"
+  },
+  "spacing/500": {
+    "cssVar": "--spacing-500",
+    "value": "40"
+  },
+  "spacing/800": {
+    "cssVar": "--spacing-800",
+    "value": "64"
+  },
+  "spacing/container/m": {
+    "cssVar": "--spacing-container-m",
+    "value": "7"
+  },
+  "surface/background/lvl1": {
+    "cssVar": "--surface-background-lvl1",
+    "value": "#ffffff"
+  },
+  "surface/background/lvl2": {
+    "cssVar": "--surface-background-lvl2",
+    "value": "#f7f7fa"
+  },
+  "surface/foreground/dynamic/neutral/default/regular": {
+    "cssVar": "--surface-foreground-dynamic-neutral-default-regular",
+    "value": "#4b4b59"
+  },
+  "surface/foreground/static/neutral/lvl1": {
+    "cssVar": "--surface-foreground-static-neutral-lvl1",
+    "value": "#13131a"
+  },
+  "surface/foreground/static/neutral/lvl3": {
+    "cssVar": "--surface-foreground-static-neutral-lvl3",
+    "value": "#717180"
+  }
+}

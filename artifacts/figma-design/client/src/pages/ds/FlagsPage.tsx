@@ -71,7 +71,7 @@ function FlagImage({
 }): JSX.Element {
   return (
     <span
-      className="inline-block overflow-hidden rounded-[2px] ring-1 ring-inset ring-[#71718014]"
+      className="inline-block overflow-hidden rounded-[var(--radius-25,2px)] ring-1 ring-inset ring-[var(--shadow-lvl8,#71718014)]"
       style={{ width: spec.width, height: spec.height }}
     >
       <img
@@ -88,25 +88,27 @@ function FlagImage({
 function FlagsGallery({
   spec,
   filter,
-  dark,
 }: {
   spec: SizeSpec;
   filter: string;
-  dark: boolean;
 }): JSX.Element {
   const q = filter.trim().toLowerCase();
   const countries = q
     ? COUNTRIES.filter((c) => c.name.toLowerCase().includes(q))
     : COUNTRIES;
 
-  const cardCls = dark
-    ? "border-[#33333d] bg-[#26262e]"
-    : "border-[#e1e1e8] bg-white";
-  const nameCls = dark ? "text-[#f7f7fa]" : "text-[#13131a]";
+  // Border + card surface + name colour all reference tokens whose
+  // [data-theme="dark"] values already match the previous dark literals, so
+  // the theme flips automatically and no per-theme branch is required.
+  const cardCls =
+    "border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--surface-background-lvl1,#ffffff)] shadow-[var(--elevation-regular)]";
+  const nameCls = "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]";
 
   if (countries.length === 0) {
+    // --surface-foreground-static-neutral-lvl3 is #717180 light / #a8a8b2 dark,
+    // so the empty state flips with the theme via the variable itself.
     return (
-      <p className={`text-[13px] ${dark ? "text-[#a8a8b2]" : "text-[#71717a]"}`}>
+      <p className="text-[13px] text-[var(--surface-foreground-static-neutral-lvl3,#717180)]">
         No countries match “{filter}”.
       </p>
     );
@@ -117,7 +119,7 @@ function FlagsGallery({
       {countries.map((country) => (
         <div
           key={country.name}
-          className={`flex flex-col items-center gap-3 rounded-[5px] border p-4 ${cardCls}`}
+          className={`flex flex-col items-center gap-3 rounded-[var(--odd-numbers-5,5px)] border p-4 ${cardCls}`}
         >
           <div className="flex h-8 items-center justify-center">
             <FlagImage country={country} spec={spec} />
@@ -152,19 +154,20 @@ const config: PlaygroundConfig = {
       placeholder: "Search country…",
     },
   ],
-  render: (props, theme) => (
+  render: (props) => (
     <FlagsGallery
       spec={SIZE_SPECS[String(props.size)] ?? SIZE_SPECS["24"]}
       filter={String(props.filter ?? "")}
-      dark={theme === "dark"}
     />
   ),
   tokens: {
-    "flag/ring": "#71718014",
-    "flag/radius": "2px",
-    "size/24": "32×24",
-    "size/20": "27×20",
-    "size/16": "21×16",
+    "radiuses/small": "var(--radius-25)",
+    "shadow/lvl8": "var(--shadow-lvl8)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "elevation/regular": "var(--elevation-regular)",
+    "surface/foreground/static/neutral/lvl1":
+      "var(--surface-foreground-static-neutral-lvl1)",
+    "odd-numbers/5": "var(--odd-numbers-5)",
   },
 };
 

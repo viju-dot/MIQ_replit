@@ -32,23 +32,29 @@ function Pill({
     <div
       className="flex items-center justify-center shrink-0"
       style={{
-        gap: 4,
-        paddingTop: 2,
-        paddingBottom: 2,
-        paddingLeft: isStandard ? 10 : 8,
-        paddingRight: isStandard ? 8 : 6,
-        height: isStandard ? 24 : 18,
-        borderRadius: 100,
+        gap: "var(--numbers-4, 4px)",
+        paddingTop: "var(--numbers-2, 2px)",
+        paddingBottom: "var(--numbers-2, 2px)",
+        paddingLeft: isStandard ? "var(--odd-numbers-10, 10px)" : "var(--numbers-8, 8px)",
+        paddingRight: isStandard ? "var(--numbers-8, 8px)" : "var(--numbers-6, 6px)",
+        height: isStandard ? "var(--old-sizing-24, 24px)" : "var(--old-sizing-18, 18px)",
+        borderRadius: "var(--old-radiuses-round, 100px)",
         backgroundColor: colors.bg,
-        border: colors.border ? `1px solid ${colors.border}` : undefined,
+        border: colors.border
+          ? `var(--old-stroke-thickness-1, 1px) solid ${colors.border}`
+          : undefined,
       }}
     >
       <span
         className="whitespace-nowrap"
         style={{
           ...fontMedium,
-          fontSize: isStandard ? 14 : 12,
-          lineHeight: isStandard ? "20px" : "18px",
+          fontSize: isStandard
+            ? "var(--body-md-medium-size, 14px)"
+            : "var(--body-sm-medium-size, 12px)",
+          lineHeight: isStandard
+            ? "var(--body-md-medium-line-height, 20px)"
+            : "var(--body-sm-medium-line-height, 18px)",
           color: colors.fg,
         }}
       >
@@ -74,8 +80,8 @@ function Pill({
  * ------------------------------------------------------------------ */
 
 const disabledColors = (icon: string): PillColors => ({
-  bg: "rgba(113,113,128,0.1)",
-  fg: "#a8a8b2",
+  bg: "var(--container-dynamic-neutral-subtle-background-disabled, rgba(113,113,128,0.1))",
+  fg: "var(--container-dynamic-neutral-subtle-foreground-disabled, #a8a8b2)",
   icon,
 });
 
@@ -89,35 +95,74 @@ function resolveRemovable(
   if (style === "Brand (Bold)") {
     if (fill === "Filled") {
       return hover
-        ? { bg: "#662994", fg: "#ffffff", icon: "close-white-hover.svg" }
-        : { bg: "#7c33b5", fg: "#ffffff", icon: "close-white.svg" };
+        ? {
+            bg: "#662994",
+            fg: "var(--container-dynamic-brand-bold-foreground-hover, #ffffff)",
+            icon: "close-white-hover.svg",
+          }
+        : {
+            bg: "var(--container-dynamic-brand-bold-background-default, #7c33b5)",
+            fg: "var(--container-dynamic-brand-bold-foreground-default, #ffffff)",
+            icon: "close-white.svg",
+          };
     }
     // Outline
     return hover
       ? {
-          bg: "rgba(113,113,128,0.08)",
-          border: "#662994",
-          fg: "#662994",
+          bg: "var(--container-dynamic-neutral-subtle-background-hover, rgba(113,113,128,0.08))",
+          border: "var(--border-dynamic-brand-hover, #662994)",
+          fg: "var(--container-dynamic-brand-subtle-foreground-hover, #662994)",
           icon: "close-brand-hover.svg",
         }
-      : { bg: "#ffffff", border: "#7c33b5", fg: "#7c33b5", icon: "close-brand.svg" };
+      : {
+          bg: "var(--surface-background-lvl1, #ffffff)",
+          border: "var(--border-dynamic-brand-default, #7c33b5)",
+          fg: "var(--container-dynamic-brand-subtle-foreground-default, #7c33b5)",
+          icon: "close-brand.svg",
+        };
   }
   if (style === "Brand (Subtle)") {
     // Subtle only has Filled variants in Figma
     return hover
-      ? { bg: "#e7c7ff", fg: "#662994", icon: "close-brand-hover.svg" }
-      : { bg: "#f6ebff", fg: "#7c33b5", icon: "close-brand.svg" };
+      ? {
+          bg: "var(--container-dynamic-brand-subtle-background-hover, #e7c7ff)",
+          fg: "var(--container-dynamic-brand-subtle-foreground-hover, #662994)",
+          icon: "close-brand-hover.svg",
+        }
+      : {
+          bg: "var(--container-dynamic-brand-subtle-background-default, #f6ebff)",
+          fg: "var(--container-dynamic-brand-subtle-foreground-default, #7c33b5)",
+          icon: "close-brand.svg",
+        };
   }
   // Warning
   if (fill === "Filled") {
     return hover
-      ? { bg: "#d1a600", fg: "#241c00", icon: "close-warning-hover.svg" }
-      : { bg: "#f8c500", fg: "#241c00", icon: "close-warning.svg" };
+      ? {
+          bg: "var(--container-dynamic-warning-bold-background-hover, #d1a600)",
+          fg: "var(--container-dynamic-warning-bold-foreground-hover, #241c00)",
+          icon: "close-warning-hover.svg",
+        }
+      : {
+          bg: "var(--container-dynamic-warning-bold-background-default, #f8c500)",
+          fg: "var(--container-dynamic-warning-bold-foreground-default, #241c00)",
+          icon: "close-warning.svg",
+        };
   }
   // Warning / Outline
   return hover
-    ? { bg: "#ffffff", border: "#d1a600", fg: "#241c00", icon: "close-warning-outline-hover.svg" }
-    : { bg: "#ffffff", border: "#f8c500", fg: "#483800", icon: "close-warning-outline.svg" };
+    ? {
+        bg: "var(--surface-background-lvl1, #ffffff)",
+        border: "var(--border-dynamic-warning-hover, #d1a600)",
+        fg: "var(--container-dynamic-warning-bold-foreground-hover, #241c00)",
+        icon: "close-warning-outline-hover.svg",
+      }
+    : {
+        bg: "var(--surface-background-lvl1, #ffffff)",
+        border: "var(--border-dynamic-warning-default, #f8c500)",
+        fg: "var(--container-dynamic-warning-subtle-foreground-default, #483800)",
+        icon: "close-warning-outline.svg",
+      };
 }
 
 // Draggable pill — Brand (Bold) only, Fill / State axes
@@ -125,16 +170,29 @@ function resolveDraggable(fill: string, state: string): PillColors {
   const activeState = state === "Active";
   if (fill === "Filled") {
     return activeState
-      ? { bg: "#7c33b5", fg: "#ffffff", icon: "drag-close-white.svg" }
-      : { bg: "#662994", fg: "#ffffff", icon: "drag-close-white-hover.svg" };
+      ? {
+          bg: "var(--container-dynamic-brand-bold-background-default, #7c33b5)",
+          fg: "var(--container-dynamic-brand-bold-foreground-default, #ffffff)",
+          icon: "drag-close-white.svg",
+        }
+      : {
+          bg: "#662994",
+          fg: "var(--container-dynamic-brand-bold-foreground-hover, #ffffff)",
+          icon: "drag-close-white-hover.svg",
+        };
   }
   // Outline
   return activeState
-    ? { bg: "#ffffff", border: "#7c33b5", fg: "#7c33b5", icon: "drag-close-brand.svg" }
+    ? {
+        bg: "var(--surface-background-lvl1, #ffffff)",
+        border: "var(--border-dynamic-brand-default, #7c33b5)",
+        fg: "var(--container-dynamic-brand-subtle-foreground-default, #7c33b5)",
+        icon: "drag-close-brand.svg",
+      }
     : {
-        bg: "rgba(113,113,128,0.08)",
-        border: "#662994",
-        fg: "#662994",
+        bg: "var(--container-dynamic-neutral-subtle-background-hover, rgba(113,113,128,0.08))",
+        border: "var(--border-dynamic-brand-hover, #662994)",
+        fg: "var(--container-dynamic-brand-subtle-foreground-hover, #662994)",
         icon: "drag-close-brand-hover.svg",
       };
 }
@@ -203,21 +261,29 @@ const removableConfig: PlaygroundConfig = {
     );
   },
   tokens: {
-    "container/brand/bold/background": "#7c33b5",
-    "container/brand/bold/hover": "#662994",
-    "container/brand/subtle/background": "#f6ebff",
-    "container/brand/subtle/hover": "#e7c7ff",
-    "container/warning/background": "#f8c500",
-    "container/warning/hover": "#d1a600",
-    "container/disabled/background": "rgba(113,113,128,0.1)",
-    "outline/hover/overlay": "rgba(113,113,128,0.08)",
-    "foreground/on-brand": "#ffffff",
-    "foreground/brand": "#7c33b5",
-    "foreground/warning": "#241c00",
-    "foreground/disabled": "#a8a8b2",
-    "radius/pill": "100px",
-    "size/compact": "h 18 (font 12/18)",
-    "size/standard": "h 24 (font 14/20)",
+    "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
+    "container/dynamic/brand/bold/foreground/default": "var(--container-dynamic-brand-bold-foreground-default)",
+    "container/dynamic/brand/subtle/background/default": "var(--container-dynamic-brand-subtle-background-default)",
+    "container/dynamic/brand/subtle/background/hover": "var(--container-dynamic-brand-subtle-background-hover)",
+    "container/dynamic/Brand/Subtle/foreground/default": "var(--container-dynamic-brand-subtle-foreground-default)",
+    "container/dynamic/brand/subtle/foreground/hover": "var(--container-dynamic-brand-subtle-foreground-hover)",
+    "border/dynamic/brand/default": "var(--border-dynamic-brand-default)",
+    "border/dynamic/brand/hover": "var(--border-dynamic-brand-hover)",
+    "border/dynamic/warning/default": "var(--border-dynamic-warning-default)",
+    "border/dynamic/warning/hover": "var(--border-dynamic-warning-hover)",
+    "container/dynamic/warning/bold/background/default": "var(--container-dynamic-warning-bold-background-default)",
+    "container/dynamic/warning/bold/background/hover": "var(--container-dynamic-warning-bold-background-hover)",
+    "container/dynamic/warning/bold/foreground/default": "var(--container-dynamic-warning-bold-foreground-default)",
+    "container/dynamic/warning/subtle/foreground/default": "var(--container-dynamic-warning-subtle-foreground-default)",
+    "container/dynamic/neutral/subtle/background/disabled": "var(--container-dynamic-neutral-subtle-background-disabled)",
+    "container/dynamic/neutral/subtle/background/hover": "var(--container-dynamic-neutral-subtle-background-hover)",
+    "container/dynamic/neutral/subtle/foreground/disabled": "var(--container-dynamic-neutral-subtle-foreground-disabled)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "[old]Radiuses/round": "var(--old-radiuses-round)",
+    "[old]Sizing/18": "var(--old-sizing-18)",
+    "[old]Sizing/24": "var(--old-sizing-24)",
+    "Body Md/Medium": "var(--body-md-medium-size) / var(--body-md-medium-line-height)",
+    "Body Sm/Medium": "var(--body-sm-medium-size) / var(--body-sm-medium-line-height)",
   },
 };
 
@@ -265,16 +331,21 @@ const draggableConfig: PlaygroundConfig = {
     return <Pill label={label} size={size} colors={resolveDraggable(fill, state)} />;
   },
   tokens: {
-    "container/brand/bold/background": "#7c33b5",
-    "container/brand/bold/hover": "#662994",
-    "container/disabled/background": "rgba(113,113,128,0.1)",
-    "outline/hover/overlay": "rgba(113,113,128,0.08)",
-    "foreground/on-brand": "#ffffff",
-    "foreground/brand": "#7c33b5",
-    "foreground/disabled": "#a8a8b2",
-    "radius/pill": "100px",
-    "size/compact": "h 18 (font 12/18)",
-    "size/standard": "h 24 (font 14/20)",
+    "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
+    "container/dynamic/brand/bold/foreground/default": "var(--container-dynamic-brand-bold-foreground-default)",
+    "container/dynamic/Brand/Subtle/foreground/default": "var(--container-dynamic-brand-subtle-foreground-default)",
+    "container/dynamic/brand/subtle/foreground/hover": "var(--container-dynamic-brand-subtle-foreground-hover)",
+    "border/dynamic/brand/default": "var(--border-dynamic-brand-default)",
+    "border/dynamic/brand/hover": "var(--border-dynamic-brand-hover)",
+    "container/dynamic/neutral/subtle/background/disabled": "var(--container-dynamic-neutral-subtle-background-disabled)",
+    "container/dynamic/neutral/subtle/background/hover": "var(--container-dynamic-neutral-subtle-background-hover)",
+    "container/dynamic/neutral/subtle/foreground/disabled": "var(--container-dynamic-neutral-subtle-foreground-disabled)",
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "[old]Radiuses/round": "var(--old-radiuses-round)",
+    "[old]Sizing/18": "var(--old-sizing-18)",
+    "[old]Sizing/24": "var(--old-sizing-24)",
+    "Body Md/Medium": "var(--body-md-medium-size) / var(--body-md-medium-line-height)",
+    "Body Sm/Medium": "var(--body-sm-medium-size) / var(--body-sm-medium-line-height)",
   },
 };
 
