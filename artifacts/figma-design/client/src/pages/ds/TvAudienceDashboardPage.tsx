@@ -910,10 +910,12 @@ export default function TvAudienceDashboardPage() {
         </p>
       </header>
 
-      {/* F1 — Global Filter Bar (sticky) */}
+      {/* F1 — Global Filter Bar (sticky). The sticky top offset is driven by
+          --tv-filter-top so a host page with its own sticky nav header can
+          push the filter bar below it (defaults to 0 in the explorer). */}
       <div
-        className="sticky top-0 z-40 -mx-6 px-6 py-[var(--spacing-200,16px)] md:-mx-10 md:px-10"
-        style={{ backgroundColor: "var(--surface-background-lvl2, #f7f7fa)", borderBottom: `1px solid ${GRID}` }}
+        className="sticky z-40 -mx-6 px-6 py-[var(--spacing-200,16px)] md:-mx-10 md:px-10"
+        style={{ top: "var(--tv-filter-top, 0px)", backgroundColor: "var(--surface-background-lvl2, #f7f7fa)", borderBottom: `1px solid ${GRID}` }}
       >
         <div className="flex flex-col gap-[var(--spacing-100,8px)]">
           <div className="flex items-center justify-between gap-[var(--spacing-100,8px)]">

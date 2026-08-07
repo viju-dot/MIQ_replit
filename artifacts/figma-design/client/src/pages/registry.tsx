@@ -219,11 +219,6 @@ export const dsPages: DsPage[] = [
     title: "Tooltip",
     component: lazy(() => import("@/pages/ds/TooltipPage")),
   },
-  {
-    slug: "tv-audience-intelligence",
-    title: "TV Audience Intelligence",
-    component: lazy(() => import("@/pages/ds/TvAudienceDashboardPage")),
-  },
 ];
 
 export function getPage(slug: string): DsPage | undefined {
