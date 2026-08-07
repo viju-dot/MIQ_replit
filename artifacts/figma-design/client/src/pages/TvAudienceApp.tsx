@@ -56,29 +56,12 @@ const ON_DARK_MUTED = "rgba(255,255,255,0.8)"; // #ffffffcc — inactive menu it
  * simple, robust vector that matches the Figma reference.) */
 function SigmaLogo() {
   return (
-    <svg
-      className="block shrink-0"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      role="img"
-      aria-label="MiQ Sigma"
+    <img
+      className="block h-[24px] w-[20px] shrink-0"
+      src={`${import.meta.env.BASE_URL}figmaAssets/sigma-lettermark.svg`}
+      alt="MiQ Sigma"
       data-name="Sigma Logo"
-    >
-      <defs>
-        <linearGradient id="tvSigmaGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-          <stop offset="0.13" stopColor="#d71982" />
-          <stop offset="0.6" stopColor="#ff540c" />
-          <stop offset="1" stopColor="#dad310" />
-        </linearGradient>
-      </defs>
-      {/* Uppercase sigma glyph (Favicon 24×24) */}
-      <path
-        d="M4.5 2.5h15v3H9.9l5.6 6.5-5.6 6.5h9.6v3h-15v-2.8L11.4 12 4.5 5.3V2.5z"
-        fill="url(#tvSigmaGrad)"
-      />
-    </svg>
+    />
   );
 }
 
