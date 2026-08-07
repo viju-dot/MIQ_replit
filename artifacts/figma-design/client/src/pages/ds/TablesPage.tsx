@@ -1,14 +1,23 @@
+import { useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
 /**
  * Tables — Design System playground.
- * Each atomic table building-block from the Figma "Tables" page is now an
- * interactive Playground with controls mapped to its real Figma variant axes:
+ *
+ * Primary: the full "Table Layout" master component composed exactly as in Figma:
+ *   Table Layout = Table header (title bar) + Table Conteiner
+ *     [ Filters row, optional Alert, Table Master (Column Header + Cell rows),
+ *       Footer container with Pagination ].
+ *
+ * Secondary: the atomic table building-blocks preserved from the original page:
  *   - Cell Body Content (Strong / Number)
  *   - Cell/Text (State, Checkbox, Children/Expand, Logo, Icon-right, Indent, Label)
  *   - Column Header (Checkbox, Label)
  *   - Cell/Action (Icon amount, State)
+ *
+ * All Figma component / variant / property NAMES are preserved so Developer Mode
+ * surfaces the real Figma names.
  */
 
 const ASSET = "/figmaAssets/tables";
@@ -23,6 +32,8 @@ const imgTtdOuter = `${ASSET}/ttd-outer.svg`;
 const imgActionEye = `${ASSET}/action-eye.svg`;
 const imgActionEdit = `${ASSET}/action-edit.svg`;
 const imgActionDots = `${ASSET}/action-dots.svg`;
+const imgPagCaretLeft = `/figmaAssets/pagination/caret-left.svg`;
+const imgPagCaretRight = `/figmaAssets/pagination/caret-right.svg`;
 
 /* ------------------------------------------------------------------ */
 /* Shared atoms (unchanged Figma markup)                               */
@@ -88,6 +99,63 @@ function ArrowSquareOut() {
         </div>
       </div>
     </div>
+  );
+}
+
+/* Inline icons used by the Table header / Alert (no static asset needed). */
+
+function IconSlidersHorizontal() {
+  return (
+    <svg
+      className="size-[24px] shrink-0"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="var(--container-dynamic-neutral-subtle-foreground-default-regular, #4b4b59)"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <line x1="3" y1="8" x2="21" y2="8" />
+      <line x1="3" y1="16" x2="21" y2="16" />
+      <circle cx="9" cy="8" r="2.2" fill="var(--surface-background-lvl1, #ffffff)" />
+      <circle cx="15" cy="16" r="2.2" fill="var(--surface-background-lvl1, #ffffff)" />
+    </svg>
+  );
+}
+
+function IconCaretDown({ stroke = "white" }: { stroke?: string }) {
+  return (
+    <svg
+      className="size-[20px] shrink-0"
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke={stroke}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 8l5 5 5-5" />
+    </svg>
+  );
+}
+
+function IconInfo() {
+  return (
+    <svg
+      className="size-[20px] shrink-0"
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="var(--border-static-bold-info, #2360db)"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="10" cy="10" r="7.5" />
+      <line x1="10" y1="9" x2="10" y2="14" />
+      <circle cx="10" cy="6.5" r="0.6" fill="var(--border-static-bold-info, #2360db)" stroke="none" />
+    </svg>
   );
 }
 
@@ -298,9 +366,493 @@ function CellAction({
   );
 }
 
+/* ================================================================== */
+/* Table Layout — full composed master component                       */
+/* ================================================================== */
+
+/* --- Table header (28603:24898 / 28587:17190) --- */
+
+function TableHeaderBar({ title = "Overview" }: { title?: string }) {
+  return (
+    <div
+      className="flex items-center justify-between relative shrink-0 w-full"
+      data-name="Table header"
+    >
+      <p className="[word-break:break-word] font-semibold leading-[32px] not-italic relative shrink-0 text-[24px] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] tracking-[-0.36px] whitespace-nowrap">
+        {title}
+      </p>
+      <div className="flex gap-[24px] items-center justify-end relative shrink-0" data-name="Right">
+        <div className="flex gap-[16px] items-center justify-end relative shrink-0" data-name="Actions">
+          {/* Secondary Button — Geo filters */}
+          <div className="flex items-center justify-end relative shrink-0" data-name="Button">
+            <div className="border-[1px] border-[var(--border-dynamic-neutral-bold-default,#4b4b59)] border-solid flex gap-[4px] h-[34px] items-center justify-center pl-[8px] pr-[12px] py-[8px] relative rounded-[var(--radius-25,2px)] shrink-0">
+              <IconSlidersHorizontal />
+              <p className="[word-break:break-word] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)] text-center whitespace-nowrap">
+                Geo filters
+              </p>
+            </div>
+          </div>
+          {/* Primary Button Dropdown — Export */}
+          <div className="flex items-center justify-end relative rounded-[var(--radius-25,2px)] shrink-0" data-name="Button Dropdown">
+            <div className="bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)] flex gap-[2px] h-[34px] items-center justify-center pl-[12px] pr-[4px] py-[7px] relative rounded-[var(--radius-25,2px)] shrink-0">
+              <p className="[word-break:break-word] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[var(--container-dynamic-brand-bold-foreground-default,#ffffff)] whitespace-nowrap">
+                Export
+              </p>
+              <IconCaretDown stroke="var(--container-dynamic-brand-bold-foreground-default, #ffffff)" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* --- Filters (28603:21770) --- */
+
+function FiltersRow() {
+  return (
+    <div className="flex items-center overflow-clip relative shrink-0 w-full" data-name="Filters">
+      <div className="flex flex-1 gap-[16px] items-center min-w-px p-[16px] relative" data-name="Container">
+        {/* Input/Standard — Filter keywords */}
+        <div className="bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] border-[1px] border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] border-solid flex flex-1 flex-col items-start min-w-px relative rounded-[var(--radius-25,2px)]">
+          <div className="flex gap-[8px] items-center px-[12px] relative rounded-[var(--radius-25,2px)] shrink-0 w-full">
+            <div className="flex flex-1 gap-[8px] h-[34px] items-start min-w-px py-[8px] relative">
+              <div className="[word-break:break-word] flex flex-1 flex-col font-normal h-full justify-center leading-[0] min-w-px not-italic overflow-hidden relative text-[14px] text-[var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)] text-ellipsis whitespace-nowrap">
+                <p className="leading-[20px] overflow-hidden text-ellipsis">Filter keywords...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Right Side */}
+        <div className="flex gap-[16px] items-center relative shrink-0" data-name="Right Side">
+          {/* Dropdown Closed */}
+          <div className="bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] border-[1px] border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] border-solid flex flex-col items-start justify-center relative rounded-[var(--radius-25,2px)] shrink-0 w-[274px]" data-name="Dropdown Closed">
+            <div className="flex gap-[8px] items-center justify-end pl-[12px] pr-[6px] relative shrink-0 w-full">
+              <div className="flex flex-1 items-start min-w-px py-[7px] relative">
+                <div className="[word-break:break-word] flex flex-1 flex-col font-normal justify-center leading-[0] min-w-px not-italic overflow-hidden relative text-[14px] text-[var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)] text-ellipsis whitespace-nowrap">
+                  <p className="leading-[20px] overflow-hidden text-ellipsis">Default / Hover</p>
+                </div>
+              </div>
+              <IconCaretDown stroke="var(--container-dynamic-neutral-subtle-foreground-default-regular, #4b4b59)" />
+            </div>
+          </div>
+          {/* Button Group — Domain / Category */}
+          <div className="flex items-start relative shrink-0" data-name="Button Group">
+            <div className="bg-[var(--container-dynamic-neutral-subtle-background-default-variation,#ebebf0)] border-[1px] border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] border-solid flex gap-[10px] h-[34px] items-center mr-[-1px] px-[24px] py-[7px] relative rounded-bl-[var(--radius-25,2px)] rounded-tl-[var(--radius-25,2px)] shrink-0">
+              <p className="[word-break:break-word] font-normal leading-[20px] not-italic relative shrink-0 text-[14px] text-[var(--container-dynamic-neutral-subtle-foreground-selected,#13131a)] text-center whitespace-nowrap">
+                Domain
+              </p>
+            </div>
+            <div className="bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] border-[1px] border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] border-solid flex gap-[10px] h-[34px] items-center px-[24px] py-[7.5px] relative rounded-br-[var(--radius-25,2px)] rounded-tr-[var(--radius-25,2px)] shrink-0">
+              <p className="[word-break:break-word] font-normal leading-[20px] not-italic relative shrink-0 text-[14px] text-[var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)] text-center whitespace-nowrap">
+                Category
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* --- Alert (28753:48062) --- */
+
+function TableAlert() {
+  return (
+    <div
+      className="bg-[var(--surface-background-lvl1,#ffffff)] border-[1px] border-[var(--border-static-bold-info,#2360db)] border-solid flex gap-[8px] items-start px-[12px] py-[7px] relative rounded-[var(--radius-25,2px)] shrink-0 w-full"
+      data-name="Alert"
+    >
+      <IconInfo />
+      <div className="flex flex-1 flex-col items-start min-w-px relative" data-name="Content">
+        <p className="[word-break:break-word] font-medium leading-[0] not-italic relative shrink-0 text-[0px] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] w-full">
+          <span className="leading-[20px] text-[14px]">{`Pixels selected as dimension - Go to `}</span>
+          <span className="leading-[20px] text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)] text-[14px]">
+            client reporting
+          </span>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* --- Table Master column-header cell (inline, tuned to master widths) --- */
+
+function MasterColumnHeader({
+  text,
+  hasCheckbox = false,
+  numeric = false,
+}: {
+  text: string;
+  hasCheckbox?: boolean;
+  numeric?: boolean;
+}) {
+  return (
+    <div
+      className="bg-[var(--surface-background-lvl2,#f7f7fa)] border-[var(--border-static-subtle-neutral,#e1e1e8)] border-b border-solid flex h-[40px] items-center py-[10px] relative shrink-0 w-full"
+      data-name="Column Header"
+    >
+      <div className="flex h-[20px] items-center relative shrink-0 w-[12px]" />
+      {hasCheckbox && (
+        <div className="flex items-center overflow-clip pr-[var(--spacing-50,4px)] relative shrink-0">
+          <CheckboxUnchecked />
+        </div>
+      )}
+      <div className="flex flex-1 items-start min-w-px relative">
+        <p
+          className={`[word-break:break-word] flex-1 font-medium leading-[var(--body-md-medium-line-height,20px)] min-w-px not-italic overflow-hidden relative text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-lvl2,#282833)] text-ellipsis whitespace-nowrap ${
+            numeric ? "text-right" : ""
+          }`}
+        >
+          {text}
+        </p>
+      </div>
+      <div className="flex h-[20px] items-center justify-end relative shrink-0 w-[16px]">
+        <div className="h-[20px] relative shrink-0 w-px">
+          <div className="absolute border border-[var(--border-static-subtle-neutral,#e1e1e8)] border-solid inset-0" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* --- Table Master data cell (Cell/Text with Cell Body Content) --- */
+
+type RowState = "Default" | "Hover" | "Selected";
+
+function MasterCell({
+  text,
+  rowState = "Default",
+  hasCheckbox = false,
+  checked = false,
+  numeric = false,
+}: {
+  text: string;
+  rowState?: RowState;
+  hasCheckbox?: boolean;
+  checked?: boolean;
+  numeric?: boolean;
+}) {
+  const bg =
+    rowState === "Selected"
+      ? "bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)]"
+      : rowState === "Hover"
+        ? "bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))]"
+        : "bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)]";
+  const numberStyle = numeric
+    ? ({ fontFeatureSettings: '"lnum" 1, "tnum" 1' } as React.CSSProperties)
+    : undefined;
+  return (
+    <div
+      className={`${bg} border-[var(--border-static-subtle-neutral,#e1e1e8)] border-b border-solid flex gap-[var(--spacing-50,4px)] h-[40px] items-center pl-[var(--spacing-150,12px)] pr-[var(--spacing-200,16px)] relative shrink-0 w-full`}
+      data-name="Cell/Text"
+    >
+      {hasCheckbox && (
+        <div className="flex items-center overflow-clip relative shrink-0" data-name="Checkbox Container">
+          {checked ? <CheckboxChecked /> : <CheckboxUnchecked />}
+        </div>
+      )}
+      <div className="flex flex-1 items-start min-w-px relative" data-name="Cell Body Content">
+        <p
+          className={`[word-break:break-word] flex-1 font-normal leading-[var(--body-sm-regular-line-height,18px)] min-w-px not-italic overflow-hidden relative text-[length:var(--body-sm-regular-size,12px)] text-[var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)] text-ellipsis whitespace-nowrap ${
+            numeric ? "text-right" : ""
+          }`}
+          style={numberStyle}
+        >
+          {text}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* --- Pagination (28603:21773) --- */
+
+function PaginationBar({ total = 20 }: { total?: number }) {
+  const [page, setPage] = useState(1);
+  const safeTotal = Math.max(1, total);
+  const current = Math.min(page, safeTotal);
+  return (
+    <div
+      className="bg-[var(--surface-background-lvl1,#ffffff)] flex items-center justify-end relative shrink-0"
+      data-name="Pagination"
+    >
+      <div className="flex items-center justify-end pr-[8px] relative shrink-0" data-name="Pagination/label">
+        <p className="[word-break:break-word] font-normal leading-[20px] not-italic relative shrink-0 text-[14px] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] text-right whitespace-nowrap">
+          {current} of {safeTotal}
+        </p>
+      </div>
+      <button
+        type="button"
+        aria-label="Previous page"
+        disabled={current <= 1}
+        onClick={() => setPage(() => Math.max(1, current - 1))}
+        className="flex items-center justify-center p-[7px] relative rounded-[var(--radius-25,2px)] shrink-0 transition-colors hover:bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+      >
+        <span className="flex items-center justify-center p-[2px] size-[20px]">
+          <img alt="" className="block max-w-none size-[20px]" src={imgPagCaretLeft} />
+        </span>
+      </button>
+      <button
+        type="button"
+        aria-label="Next page"
+        disabled={current >= safeTotal}
+        onClick={() => setPage(() => Math.min(safeTotal, current + 1))}
+        className="flex items-center justify-center p-[7px] relative rounded-[var(--radius-25,2px)] shrink-0 transition-colors hover:bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+      >
+        <span className="flex items-center justify-center p-[2px] size-[20px]">
+          <img alt="" className="block max-w-none size-[20px]" src={imgPagCaretRight} />
+        </span>
+      </button>
+    </div>
+  );
+}
+
+/* --- Column definitions & realistic sample data --- */
+
+type ColumnDef = {
+  key: string;
+  header: string;
+  width: string;
+  numeric?: boolean;
+  checkbox?: boolean; // first column carries selection checkbox
+};
+
+const ALL_COLUMNS: ColumnDef[] = [
+  { key: "name", header: "Column Header", width: "153px", checkbox: true },
+  { key: "fill", header: "Fill", width: "336px" },
+  { key: "impressions", header: "Column Header", width: "191px", numeric: true },
+  { key: "reach", header: "Column Header", width: "160px" },
+  { key: "ctr", header: "Column Header", width: "160px" },
+  { key: "spend", header: "Column Header", width: "160px" },
+];
+
+type RowData = {
+  name: string;
+  fill: string;
+  impressions: string;
+  reach: string;
+  ctr: string;
+  spend: string;
+};
+
+const SAMPLE_ROWS: RowData[] = [
+  { name: "Cell content", fill: "DE - DV360 - Display", impressions: "12,393", reach: "Cell content", ctr: "Cell content", spend: "Cell content" },
+  { name: "Cell content", fill: "DE - DV360 - Display", impressions: "12,393", reach: "Cell content", ctr: "Cell content", spend: "Cell content" },
+  { name: "Cell content", fill: "DE - DV360 - Display", impressions: "12,393", reach: "Cell content", ctr: "Cell content", spend: "Cell content" },
+  { name: "Cell content", fill: "DE - DV360 - Display", impressions: "12,393", reach: "Cell content", ctr: "Cell content", spend: "Cell content" },
+  { name: "Cell content", fill: "DE - DV360 - Display", impressions: "12,393", reach: "Cell content", ctr: "Cell content", spend: "Cell content" },
+  { name: "Cell content", fill: "DE - DV360 - Display", impressions: "12,393", reach: "Cell content", ctr: "Cell content", spend: "Cell content" },
+  { name: "Cell content", fill: "DE - DV360 - Display", impressions: "12,393", reach: "Cell content", ctr: "Cell content", spend: "Cell content" },
+  { name: "Cell content", fill: "DE - DV360 - Display", impressions: "12,393", reach: "Cell content", ctr: "Cell content", spend: "Cell content" },
+  { name: "Cell content", fill: "Cell content", impressions: "12,393", reach: "Cell content", ctr: "Cell content", spend: "Cell content" },
+  { name: "Cell content", fill: "Cell content", impressions: "12,393", reach: "Cell content", ctr: "Cell content", spend: "Cell content" },
+  { name: "Cell content", fill: "Cell content", impressions: "57,393", reach: "Cell content", ctr: "Cell content", spend: "Cell content" },
+  { name: "Cell content", fill: "Cell content", impressions: "12,393", reach: "Cell content", ctr: "Cell content", spend: "Cell content" },
+  { name: "Cell content", fill: "Cell content", impressions: "12,393", reach: "Cell content", ctr: "Cell content", spend: "Cell content" },
+  { name: "Cell content", fill: "Cell content", impressions: "12,393", reach: "Cell content", ctr: "Cell content", spend: "Cell content" },
+];
+
+/* --- Table Master (28603:21771) — column-oriented composition --- */
+
+function TableMaster({
+  columnCount,
+  rowCount,
+  hoverRow,
+  selectedRow,
+}: {
+  columnCount: number;
+  rowCount: number;
+  hoverRow: number;
+  selectedRow: number;
+}) {
+  const columns = ALL_COLUMNS.slice(0, Math.max(1, Math.min(columnCount, ALL_COLUMNS.length)));
+  const rows = SAMPLE_ROWS.slice(0, Math.max(1, Math.min(rowCount, SAMPLE_ROWS.length)));
+
+  const rowStateFor = (i: number): RowState =>
+    i === selectedRow ? "Selected" : i === hoverRow ? "Hover" : "Default";
+
+  return (
+    <div
+      className="border-[var(--border-static-subtle-neutral,#e1e1e8)] border-l border-r border-solid border-t flex items-start overflow-clip relative shrink-0 w-full"
+      data-name="Table Master"
+    >
+      <div className="flex flex-1 items-start min-w-px relative" data-name="Columns">
+        {columns.map((col) => (
+          <div
+            key={col.key}
+            className="flex flex-col items-start relative shrink-0"
+            style={{ width: col.width }}
+            data-name="Table/Column"
+          >
+            <MasterColumnHeader
+              text={col.header}
+              hasCheckbox={col.checkbox === true}
+              numeric={col.numeric === true}
+            />
+            {rows.map((row, i) => (
+              <MasterCell
+                key={i}
+                text={row[col.key as keyof RowData]}
+                rowState={rowStateFor(i)}
+                hasCheckbox={col.checkbox === true}
+                checked={rowStateFor(i) === "Selected"}
+                numeric={col.numeric === true}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* --- Table Layout (28603:22623) — master composition --- */
+
+function TableLayout({
+  tableHeader = true,
+  filters = true,
+  message = true,
+  footer = true,
+  pagination = true,
+  columnCount = 6,
+  rowCount = 14,
+  hoverRow = -1,
+  selectedRow = -1,
+}: {
+  tableHeader?: boolean;
+  filters?: boolean;
+  message?: boolean;
+  footer?: boolean;
+  pagination?: boolean;
+  columnCount?: number;
+  rowCount?: number;
+  hoverRow?: number;
+  selectedRow?: number;
+}) {
+  return (
+    <div
+      className="flex flex-col gap-[20px] items-start relative w-full max-w-[1200px]"
+      data-name="Table Layout"
+    >
+      {tableHeader && <TableHeaderBar />}
+      <div
+        className="bg-[var(--surface-background-lvl1,#ffffff)] flex flex-col items-center justify-center relative rounded-[var(--radius-25,2px)] shrink-0 w-full"
+        style={{
+          filter:
+            "drop-shadow(0px 1px 2px var(--shadow-lvl8, rgba(113,113,128,0.08))) drop-shadow(0px 8px 8px var(--shadow-lvl4, rgba(113,113,128,0.04)))",
+        }}
+        data-name="Table Conteiner"
+      >
+        {filters && <FiltersRow />}
+        <div
+          className="flex flex-col gap-[16px] items-center justify-center pb-[16px] px-[16px] relative shrink-0 w-full"
+          data-name="Bottom"
+        >
+          {message && <TableAlert />}
+          <TableMaster
+            columnCount={columnCount}
+            rowCount={rowCount}
+            hoverRow={hoverRow}
+            selectedRow={selectedRow}
+          />
+          {footer && (
+            <div
+              className="flex flex-col gap-[10px] items-end justify-center relative shrink-0 w-full"
+              data-name="Footer container"
+            >
+              {pagination && <PaginationBar total={20} />}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* Playground configs                                                  */
 /* ------------------------------------------------------------------ */
+
+const tableLayoutConfig: PlaygroundConfig = {
+  name: "Table Layout",
+  description:
+    "Full composed master — Table header + Table Conteiner (Filters, Alert, Table Master, Footer container with Pagination). Toggle parts and row/column config; hover & select individual rows.",
+  controls: [
+    { kind: "boolean", name: "tableHeader", label: "Table header", defaultValue: true },
+    { kind: "boolean", name: "filters", label: "Filters", defaultValue: true },
+    { kind: "boolean", name: "message", label: "Alert", defaultValue: true },
+    { kind: "boolean", name: "footer", label: "Footer container", defaultValue: true },
+    { kind: "boolean", name: "pagination", label: "Pagination", defaultValue: true },
+    {
+      kind: "select",
+      name: "columnCount",
+      label: "Columns",
+      options: ["2", "3", "4", "5", "6"],
+      defaultValue: "6",
+    },
+    {
+      kind: "select",
+      name: "rowCount",
+      label: "Rows",
+      options: ["4", "6", "8", "10", "14"],
+      defaultValue: "14",
+    },
+    {
+      kind: "select",
+      name: "hoverRow",
+      label: "Hover row",
+      options: ["None", "1", "2", "3", "4", "5"],
+      defaultValue: "None",
+    },
+    {
+      kind: "select",
+      name: "selectedRow",
+      label: "Selected row",
+      options: ["None", "1", "2", "3", "4", "5"],
+      defaultValue: "None",
+    },
+  ],
+  render: (p: PropValues) => {
+    const toIdx = (v: string | boolean) => (v === "None" ? -1 : Number(v) - 1);
+    return (
+      <TableLayout
+        tableHeader={p.tableHeader === true}
+        filters={p.filters === true}
+        message={p.message === true}
+        footer={p.footer === true}
+        pagination={p.pagination === true}
+        columnCount={Number(p.columnCount)}
+        rowCount={Number(p.rowCount)}
+        hoverRow={toIdx(p.hoverRow)}
+        selectedRow={toIdx(p.selectedRow)}
+      />
+    );
+  },
+  tokens: {
+    "surface/background/lvl1": "var(--surface-background-lvl1)",
+    "surface/background/lvl2": "var(--surface-background-lvl2)",
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "surface/foreground/static/neutral/lvl2": "var(--surface-foreground-static-neutral-lvl2)",
+    "surface/foreground/dynamic/brand/default": "var(--surface-foreground-dynamic-brand-default)",
+    "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
+    "container/dynamic/neutral/subtle/background/default/regular": "var(--container-dynamic-neutral-subtle-background-default-regular)",
+    "container/dynamic/neutral/subtle/background/default/variation": "var(--container-dynamic-neutral-subtle-background-default-variation)",
+    "container/dynamic/neutral/subtle/background/hover": "var(--container-dynamic-neutral-subtle-background-hover)",
+    "container/dynamic/brand/subtle/background/selected": "var(--container-dynamic-brand-subtle-background-selected)",
+    "container/dynamic/neutral/subtle/foreground/default/regular": "var(--container-dynamic-neutral-subtle-foreground-default-regular)",
+    "container/dynamic/neutral/subtle/foreground/default/variation": "var(--container-dynamic-neutral-subtle-foreground-default-variation)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "border/static/bold/info": "var(--border-static-bold-info)",
+    "border/dynamic/neutral/subtle/default": "var(--border-dynamic-neutral-subtle-default)",
+    "shadow/lvl8": "var(--shadow-lvl8)",
+    "radius/25": "var(--radius-25)",
+    "spacing/150": "var(--spacing-150)",
+    "spacing/200": "var(--spacing-200)",
+    "Body Md/Medium": "var(--body-md-medium-size)",
+    "Body Sm/Regular": "var(--body-sm-regular-size)",
+  },
+};
 
 const cellBodyConfig: PlaygroundConfig = {
   name: "Cell Body Content",
@@ -461,6 +1013,7 @@ const cellActionConfig: PlaygroundConfig = {
 export default function TablesPage(): JSX.Element {
   return (
     <section aria-label="Tables components" className="flex flex-col gap-6">
+      <Playground config={tableLayoutConfig} />
       <Playground config={cellBodyConfig} />
       <Playground config={cellTextConfig} />
       <Playground config={columnHeaderConfig} />

@@ -1,399 +1,451 @@
 /**
  * Icons page — interactive browsing playground for the Figma "Icons" catalog frame.
  *
- * This is a gallery/asset page, so instead of a single-component props preview it
- * offers a grid of every icon family, explored via controls (Style, Size and, for
- * directional families, Pointing). The glyphs are the exact hand-authored inline
- * SVGs reproduced from the Figma frame — colors, stroke widths and paths unchanged.
+ * The Fiber icon library is built directly on Phosphor icons, so each of the 109
+ * Figma icon component sets ("Icon/<name>") maps 1:1 to a Phosphor React component.
+ * Rather than hand-authoring 109×3×4 inline SVGs, we render the real Phosphor
+ * glyphs and drive them from the Figma variant axes:
+ *   - Style = Regular | Fill | Duotone   -> Phosphor weight regular | fill | duotone
+ *   - Size  = 16 | 20 | 24 | 32          -> Phosphor `size`
+ *   - State = Default                    (only state authored in the Figma frame)
+ *
+ * A couple of the Figma sets are "directional" families whose Figma variants use a
+ * Pointing axis (Up/Down/Left/Right). Phosphor ships those as discrete components
+ * (ArrowUp/ArrowDown/... , CaretUp/CaretDown/...), so the Pointing control selects
+ * the matching Phosphor export for the arrow/caret families.
+ *
+ * Mapping exceptions (documented inline in ICONS below):
+ *   - "ai"      -> Sparkle    (Figma "Icon/ai" is an AI-sparkle mark with Size-only
+ *                              variants; Phosphor has no "Ai" export, Sparkle is the
+ *                              closest semantic + visual match.)
+ *   - "arrow"   -> ArrowUp (+ directional siblings) — the Figma set is a single
+ *                              directional arrow whose Pointing variant rotates it.
+ *   - "caret"   -> CaretUp (+ directional siblings) — same directional pattern.
+ *   - "graph"   -> GraphIcon aliased via `Graph` (Phosphor export "Graph").
  */
+
+import { useMemo, useState } from "react";
+import type { ComponentType } from "react";
+import {
+  // directional arrow family
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  // directional caret family
+  CaretUp,
+  CaretDown,
+  CaretLeft,
+  CaretRight,
+  // everything else
+  Sparkle,
+  ArrowCounterClockwise,
+  ArrowsHorizontal,
+  ArrowsLeftRight,
+  ArrowsOut,
+  ArrowSquareOut,
+  Asterisk,
+  Baby,
+  Basket,
+  Bell,
+  Binoculars,
+  BookmarkSimple,
+  Briefcase,
+  Broadcast,
+  Browser,
+  Calendar,
+  CalendarBlank,
+  Cards,
+  CaretUpDown,
+  CellSignalFull,
+  ChartBar,
+  ChartLine,
+  Chat,
+  ChatCircleDots,
+  Check,
+  CheckCircle,
+  Circle,
+  CircleNotch,
+  ClipboardText,
+  Clock,
+  ClockCountdown,
+  Confetti,
+  Cookie,
+  Copy,
+  Cursor,
+  Desktop,
+  DeviceTablet,
+  DotsSixVertical,
+  DotsThree,
+  Download,
+  ExclamationMark,
+  Export,
+  Eye,
+  EyeSlash,
+  FileCode,
+  FileImage,
+  FileMagnifyingGlass,
+  FileText,
+  FileVideo,
+  FileXls,
+  FilmStrip,
+  Fire,
+  Folder,
+  Funnel,
+  GameController,
+  Gear,
+  Graph,
+  HandCoins,
+  Handshake,
+  Heart,
+  Heartbeat,
+  HourglassLow,
+  House,
+  IdentificationCard,
+  Info,
+  Lightbulb,
+  Lightning,
+  List,
+  LockOpen,
+  MagnifyingGlass,
+  MetaLogo,
+  NotePencil,
+  PlusCircle,
+  Receipt,
+  RocketLaunch,
+  Scales,
+  Shapes,
+  ShareNetwork,
+  ShieldCheck,
+  ShirtFolded,
+  ShootingStar,
+  SidebarSimple,
+  SignOut,
+  Signpost,
+  SlidersHorizontal,
+  SortAscending,
+  SortDescending,
+  SpeakerHigh,
+  Square,
+  Star,
+  StopCircle,
+  Student,
+  Table,
+  TelevisionSimple,
+  Translate,
+  Trash,
+  TrendDown,
+  TrendUp,
+  User,
+  UserCircle,
+  UserPlus,
+  UsersThree,
+  VideoCamera,
+  Warning,
+  WarningCircle,
+  Watch,
+  X,
+  type IconProps,
+  type IconWeight,
+} from "@phosphor-icons/react";
 
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
+type PhosphorIcon = ComponentType<IconProps>;
+
 type IconStyle = "Regular" | "Fill" | "Duotone";
 type Pointing = "Up" | "Down" | "Left" | "Right";
 
+const STYLE_OPTIONS: IconStyle[] = ["Regular", "Fill", "Duotone"];
+const SIZE_OPTIONS = ["16", "20", "24", "32"] as const;
+
+/** Figma Style variant -> Phosphor icon weight. */
+const WEIGHT_FOR_STYLE: Record<IconStyle, IconWeight> = {
+  Regular: "regular",
+  Fill: "fill",
+  Duotone: "duotone",
+};
+
 const ICON_COLOR = "var(--surface-foreground-static-neutral-lvl1, #13131a)";
-const DUOTONE_FILL = "#71718033"; // subtle neutral accent for duotone bodies (no matching token)
 
-const rotationForPointing: Record<Pointing, number> = {
-  Up: 0,
-  Down: 180,
-  Left: -90,
-  Right: 90,
+/* ------------------------------------------------------------------ *
+ * Directional families — Figma exposes a Pointing axis; Phosphor ships
+ * one component per direction.
+ * ------------------------------------------------------------------ */
+
+const ARROW_BY_POINTING: Record<Pointing, PhosphorIcon> = {
+  Up: ArrowUp,
+  Down: ArrowDown,
+  Left: ArrowLeft,
+  Right: ArrowRight,
 };
 
-type SvgProps = {
-  size: number;
-  style: IconStyle;
-  pointing?: Pointing;
+const CARET_BY_POINTING: Record<Pointing, PhosphorIcon> = {
+  Up: CaretUp,
+  Down: CaretDown,
+  Left: CaretLeft,
+  Right: CaretRight,
 };
 
 /* ------------------------------------------------------------------ *
- * Per-family glyph renderers (24x24 viewBox, scaled via width/height)
+ * Icon catalog — one entry per Figma "Icon/<name>" component set.
+ * `directional` families resolve their component from the Pointing axis.
  * ------------------------------------------------------------------ */
 
-function ArrowGlyph({ size, style, pointing = "Up" }: SvgProps) {
-  const rot = rotationForPointing[pointing];
-  if (style === "Fill") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ transform: `rotate(${rot}deg)` }}>
-        <path
-          d="M12 3.5a1 1 0 0 1 .7.29l7 7a1 1 0 0 1-1.4 1.42L13 7.4V19.5a1 1 0 1 1-2 0V7.4l-5.3 4.81A1 1 0 1 1 4.3 10.8l7-7A1 1 0 0 1 12 3.5Z"
-          fill={ICON_COLOR}
-        />
-      </svg>
-    );
-  }
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ transform: `rotate(${rot}deg)` }}>
-      {style === "Duotone" && (
-        <path d="M12 4.5 5 11.5h4V19h6v-7.5h4L12 4.5Z" fill={DUOTONE_FILL} />
-      )}
-      <path
-        d="M12 19.5V4.75M12 4.75 5.5 11.25M12 4.75l6.5 6.5"
-        stroke={ICON_COLOR}
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CaretGlyph({ size, style, pointing = "Up" }: SvgProps) {
-  const rot = rotationForPointing[pointing];
-  if (style === "Fill") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ transform: `rotate(${rot}deg)` }}>
-        <path d="M12 8 4.5 15.5h15L12 8Z" fill={ICON_COLOR} />
-      </svg>
-    );
-  }
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ transform: `rotate(${rot}deg)` }}>
-      {style === "Duotone" && <path d="M12 8 4.5 15.5h15L12 8Z" fill={DUOTONE_FILL} />}
-      <path
-        d="M5 15 12 8l7 7"
-        stroke={ICON_COLOR}
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CaretUpDownGlyph({ size, style }: SvgProps) {
-  if (style === "Fill") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-        <path d="M12 3 7 8.5h10L12 3Z" fill={ICON_COLOR} />
-        <path d="M12 21 7 15.5h10L12 21Z" fill={ICON_COLOR} />
-      </svg>
-    );
-  }
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      {style === "Duotone" && (
-        <>
-          <path d="M12 3 7 8.5h10L12 3Z" fill={DUOTONE_FILL} />
-          <path d="M12 21 7 15.5h10L12 21Z" fill={DUOTONE_FILL} />
-        </>
-      )}
-      <path d="M7.5 8.5 12 4l4.5 4.5" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M7.5 15.5 12 20l4.5-4.5" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function TrashGlyph({ size, style }: SvgProps) {
-  if (style === "Fill") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-        <path
-          d="M9 3.5h6a1 1 0 0 1 1 1V6h3.25a.75.75 0 0 1 0 1.5H4.75a.75.75 0 0 1 0-1.5H8V4.5a1 1 0 0 1 1-1Zm-3 6h12l-.83 10.05A1.5 1.5 0 0 1 15.68 21H8.32a1.5 1.5 0 0 1-1.49-1.45L6 9.5Z"
-          fill={ICON_COLOR}
-        />
-      </svg>
-    );
-  }
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      {style === "Duotone" && <path d="M6 6.75h12l-.9 12.1a1.5 1.5 0 0 1-1.5 1.4H8.4a1.5 1.5 0 0 1-1.5-1.4L6 6.75Z" fill={DUOTONE_FILL} />}
-      <path d="M4.75 6.75h14.5" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M8.5 6.75V5.5a1.25 1.25 0 0 1 1.25-1.25h4.5A1.25 1.25 0 0 1 15.5 5.5v1.25" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M6.5 6.75 7.4 18.9a1.5 1.5 0 0 0 1.5 1.35h6.2a1.5 1.5 0 0 0 1.5-1.35L17.5 6.75" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M10 10.5v6M14 10.5v6" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function WarningCircleGlyph({ size, style }: SvgProps) {
-  if (style === "Fill") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-        <path d="M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19Zm0 14.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm.75-4.25a.75.75 0 0 1-1.5 0V7.5a.75.75 0 0 1 1.5 0v5.25Z" fill={ICON_COLOR} />
-      </svg>
-    );
-  }
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      {style === "Duotone" && <circle cx="12" cy="12" r="9" fill={DUOTONE_FILL} />}
-      <circle cx="12" cy="12" r="9" stroke={ICON_COLOR} strokeWidth="1.5" />
-      <path d="M12 7.5v5.5" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="12" cy="16" r="1" fill={ICON_COLOR} />
-    </svg>
-  );
-}
-
-function WarningGlyph({ size, style }: SvgProps) {
-  if (style === "Fill") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-        <path d="M13.3 3.7a1.5 1.5 0 0 0-2.6 0L2.3 18.5A1.5 1.5 0 0 0 3.6 20.75h16.8A1.5 1.5 0 0 0 21.7 18.5L13.3 3.7ZM12 17.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm.75-4.25a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 1.5 0v4.25Z" fill={ICON_COLOR} />
-      </svg>
-    );
-  }
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      {style === "Duotone" && <path d="M11.13 4.2a1 1 0 0 1 1.74 0l8 14A1 1 0 0 1 20 19.75H4a1 1 0 0 1-.87-1.5l8-14.05Z" fill={DUOTONE_FILL} />}
-      <path d="M11.13 4.2a1 1 0 0 1 1.74 0l8 14A1 1 0 0 1 20 19.75H4a1 1 0 0 1-.87-1.5l8-14.05Z" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinejoin="round" />
-      <path d="M12 9v4" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="12" cy="16.25" r="1" fill={ICON_COLOR} />
-    </svg>
-  );
-}
-
-function CheckCircleGlyph({ size, style }: SvgProps) {
-  if (style === "Fill") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-        <path d="M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19Zm4.28 7.53-5 5a.75.75 0 0 1-1.06 0l-2.5-2.5a.75.75 0 1 1 1.06-1.06l1.97 1.97 4.47-4.47a.75.75 0 1 1 1.06 1.06Z" fill={ICON_COLOR} />
-      </svg>
-    );
-  }
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      {style === "Duotone" && <circle cx="12" cy="12" r="9" fill={DUOTONE_FILL} />}
-      <circle cx="12" cy="12" r="9" stroke={ICON_COLOR} strokeWidth="1.5" />
-      <path d="m8.5 12 2.5 2.5 4.5-4.5" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function XGlyph({ size, style }: SvgProps) {
-  if (style === "Fill") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-        <path d="M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19Zm3.53 12.47a.75.75 0 1 1-1.06 1.06L12 13.06l-2.47 2.47a.75.75 0 1 1-1.06-1.06L10.94 12 8.47 9.53a.75.75 0 0 1 1.06-1.06L12 10.94l2.47-2.47a.75.75 0 1 1 1.06 1.06L13.06 12l2.47 2.47Z" fill={ICON_COLOR} />
-      </svg>
-    );
-  }
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      {style === "Duotone" && <circle cx="12" cy="12" r="9" fill={DUOTONE_FILL} />}
-      <path d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function UserCircleGlyph({ size, style }: SvgProps) {
-  if (style === "Fill") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-        <path d="M12 2.5a9.5 9.5 0 0 0-6.3 16.62 7 7 0 0 1 12.6 0A9.5 9.5 0 0 0 12 2.5Zm0 9.5a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" fill={ICON_COLOR} />
-      </svg>
-    );
-  }
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      {style === "Duotone" && <circle cx="12" cy="12" r="9" fill={DUOTONE_FILL} />}
-      <circle cx="12" cy="12" r="9" stroke={ICON_COLOR} strokeWidth="1.5" />
-      <circle cx="12" cy="10" r="3" stroke={ICON_COLOR} strokeWidth="1.5" />
-      <path d="M6.2 18.4a6.5 6.5 0 0 1 11.6 0" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function UserPlusGlyph({ size, style }: SvgProps) {
-  if (style === "Fill") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-        <circle cx="9.5" cy="8" r="4" fill={ICON_COLOR} />
-        <path d="M9.5 13c-3.6 0-6.5 2.3-7.4 5.4A1 1 0 0 0 3.05 19.7h12.9a1 1 0 0 0 .95-1.3C15.99 15.3 13.1 13 9.5 13Z" fill={ICON_COLOR} />
-        <path d="M19 8.5v5M16.5 11h5" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    );
-  }
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      {style === "Duotone" && <circle cx="9.5" cy="8" r="4" fill={DUOTONE_FILL} />}
-      <circle cx="9.5" cy="8" r="4" stroke={ICON_COLOR} strokeWidth="1.5" />
-      <path d="M3.2 18.8a6.7 6.7 0 0 1 12.6 0" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M19 8.5v5M16.5 11h5" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function GearGlyph({ size, style }: SvgProps) {
-  const teeth = (
-    <path
-      d="M12 2.75c.6 0 1.16.05 1.7.15l.4 2.3 1.9.79 1.9-1.35c.86.66 1.6 1.4 2.26 2.26l-1.35 1.9.79 1.9 2.3.4c.1.54.15 1.1.15 1.7s-.05 1.16-.15 1.7l-2.3.4-.79 1.9 1.35 1.9a11.4 11.4 0 0 1-2.26 2.26l-1.9-1.35-1.9.79-.4 2.3c-.54.1-1.1.15-1.7.15s-1.16-.05-1.7-.15l-.4-2.3-1.9-.79-1.9 1.35a11.4 11.4 0 0 1-2.26-2.26l1.35-1.9-.79-1.9-2.3-.4A11.7 11.7 0 0 1 2.75 12c0-.6.05-1.16.15-1.7l2.3-.4.79-1.9-1.35-1.9A11.4 11.4 0 0 1 6.9 3.84l1.9 1.35 1.9-.79.4-2.3c.54-.1 1.1-.15 1.7-.15Z"
-    />
-  );
-  if (style === "Fill") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-        {teeth && <g fill={ICON_COLOR}>{teeth}</g>}
-        <circle cx="12" cy="12" r="3" fill="var(--surface-background-lvl1, #fff)" />
-      </svg>
-    );
-  }
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      {style === "Duotone" && <g fill={DUOTONE_FILL}>{teeth}</g>}
-      <g stroke={ICON_COLOR} strokeWidth="1.5" strokeLinejoin="round" fill="none">{teeth}</g>
-      <circle cx="12" cy="12" r="3" stroke={ICON_COLOR} strokeWidth="1.5" />
-    </svg>
-  );
-}
-
-function ChartLineGlyph({ size, style }: SvgProps) {
-  if (style === "Fill") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-        <path d="M4.5 3.5a.75.75 0 0 1 .75.75v13.5c0 .28.22.5.5.5h14a.75.75 0 0 1 0 1.5H5.75A1.75 1.75 0 0 1 4 17.75V4.25a.75.75 0 0 1 .5-.75Z" fill={ICON_COLOR} />
-        <path d="M18.53 6.97a.75.75 0 0 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0L11.5 10 8.53 12.97a.75.75 0 0 1-1.06-1.06l3.5-3.5a.75.75 0 0 1 1.06 0L14.5 10.94l4.03-3.97Z" fill={ICON_COLOR} />
-      </svg>
-    );
-  }
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      {style === "Duotone" && <path d="M5 5v13a1 1 0 0 0 1 1h13L14.5 12 11.5 15 8 11.5 5 5Z" fill={DUOTONE_FILL} />}
-      <path d="M5 4.75V18a1 1 0 0 0 1 1h13.25" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" />
-      <path d="m8 12 3.5-3.5 3 3L19.25 7" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function CircleGlyph({ size, style }: SvgProps) {
-  if (style === "Fill") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="9" fill={ICON_COLOR} />
-      </svg>
-    );
-  }
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      {style === "Duotone" && <circle cx="12" cy="12" r="9" fill={DUOTONE_FILL} />}
-      <circle cx="12" cy="12" r="9" stroke={ICON_COLOR} strokeWidth="1.5" />
-    </svg>
-  );
-}
-
-function BellGlyph({ size, style }: SvgProps) {
-  if (style === "Fill") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-        <path d="M12 2.5a6 6 0 0 0-6 6c0 3.2-.8 5.1-1.5 6.1a1 1 0 0 0 .82 1.6h13.36a1 1 0 0 0 .82-1.6C18.8 13.6 18 11.7 18 8.5a6 6 0 0 0-6-6Z" fill={ICON_COLOR} />
-        <path d="M9.5 18.5a2.5 2.5 0 0 0 5 0h-5Z" fill={ICON_COLOR} />
-      </svg>
-    );
-  }
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      {style === "Duotone" && <path d="M12 3.25a5.5 5.5 0 0 0-5.5 5.5c0 3.3-.85 5.35-1.6 6.4a.5.5 0 0 0 .4.8h13.4a.5.5 0 0 0 .4-.8c-.75-1.05-1.6-3.1-1.6-6.4a5.5 5.5 0 0 0-5.5-5.5Z" fill={DUOTONE_FILL} />}
-      <path d="M12 3.25a5.5 5.5 0 0 0-5.5 5.5c0 3.3-.85 5.35-1.6 6.4a.5.5 0 0 0 .4.8h13.4a.5.5 0 0 0 .4-.8c-.75-1.05-1.6-3.1-1.6-6.4a5.5 5.5 0 0 0-5.5-5.5Z" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinejoin="round" />
-      <path d="M9.75 18.5a2.25 2.25 0 0 0 4.5 0" stroke={ICON_COLOR} strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function StarGlyph({ size, style }: SvgProps) {
-  const d = "M12 3.5l2.6 5.27 5.82.85-4.21 4.1.99 5.8L12 16.78 6.8 19.52l.99-5.8-4.21-4.1 5.82-.85L12 3.5Z";
-  if (style === "Fill") {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-        <path d={d} fill={ICON_COLOR} />
-      </svg>
-    );
-  }
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      {style === "Duotone" && <path d={d} fill={DUOTONE_FILL} />}
-      <path d={d} stroke={ICON_COLOR} strokeWidth="1.5" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * Icon family catalog definitions (mirrors the Figma frame variants)
- * ------------------------------------------------------------------ */
-
-type Glyph = (props: SvgProps) => JSX.Element;
-
-type IconFamily = {
-  name: string; // e.g. "Icon/arrow"
-  glyph: Glyph;
-  directional: boolean; // has Pointing Up/Down/Left/Right
+type IconEntry = {
+  /** kebab name exactly as in icon-names.txt (Figma set is "Icon/<name>"). */
+  name: string;
+  /** Phosphor component (undefined for directional families). */
+  Comp?: PhosphorIcon;
+  /** true for arrow/caret (Pointing axis Up/Down/Left/Right). */
+  directional?: boolean;
+  /** resolver for directional families. */
+  byPointing?: Record<Pointing, PhosphorIcon>;
 };
 
-const FAMILIES: IconFamily[] = [
-  { name: "Icon/arrow", glyph: ArrowGlyph, directional: true },
-  { name: "Icon/caret", glyph: CaretGlyph, directional: true },
-  { name: "Icon/trash", glyph: TrashGlyph, directional: false },
-  { name: "Icon/warning-circle", glyph: WarningCircleGlyph, directional: false },
-  { name: "Icon/user-circle", glyph: UserCircleGlyph, directional: false },
-  { name: "Icon/user-plus", glyph: UserPlusGlyph, directional: false },
-  { name: "Icon/warning", glyph: WarningGlyph, directional: false },
-  { name: "Icon/check-circle", glyph: CheckCircleGlyph, directional: false },
-  { name: "Icon/x", glyph: XGlyph, directional: false },
-  { name: "Icon/gear", glyph: GearGlyph, directional: false },
-  { name: "Icon/chart-line", glyph: ChartLineGlyph, directional: false },
-  { name: "Icon/circle", glyph: CircleGlyph, directional: false },
-  { name: "Icon/bell", glyph: BellGlyph, directional: false },
-  { name: "Icon/caret-up-down", glyph: CaretUpDownGlyph, directional: false },
-  { name: "Icon/star", glyph: StarGlyph, directional: false },
+const ICONS: IconEntry[] = [
+  { name: "ai", Comp: Sparkle }, // exception: no Phosphor "Ai"; Sparkle is closest AI mark
+  { name: "arrow", directional: true, byPointing: ARROW_BY_POINTING },
+  { name: "arrow-counter-clockwise", Comp: ArrowCounterClockwise },
+  { name: "arrows-horizontal", Comp: ArrowsHorizontal },
+  { name: "arrows-left-right", Comp: ArrowsLeftRight },
+  { name: "arrows-out", Comp: ArrowsOut },
+  { name: "arrow-square-out", Comp: ArrowSquareOut },
+  { name: "asterisk", Comp: Asterisk },
+  { name: "baby", Comp: Baby },
+  { name: "basket", Comp: Basket },
+  { name: "bell", Comp: Bell },
+  { name: "binoculars", Comp: Binoculars },
+  { name: "bookmark-simple", Comp: BookmarkSimple },
+  { name: "briefcase", Comp: Briefcase },
+  { name: "broadcast", Comp: Broadcast },
+  { name: "browser", Comp: Browser },
+  { name: "calendar", Comp: Calendar },
+  { name: "calendar-blank", Comp: CalendarBlank },
+  { name: "cards", Comp: Cards },
+  { name: "caret", directional: true, byPointing: CARET_BY_POINTING },
+  { name: "caret-up-down", Comp: CaretUpDown },
+  { name: "cell-signal-full", Comp: CellSignalFull },
+  { name: "chart-bar", Comp: ChartBar },
+  { name: "chart-line", Comp: ChartLine },
+  { name: "chat", Comp: Chat },
+  { name: "chat-circle-dots", Comp: ChatCircleDots },
+  { name: "check", Comp: Check },
+  { name: "check-circle", Comp: CheckCircle },
+  { name: "circle", Comp: Circle },
+  { name: "circle-notch", Comp: CircleNotch },
+  { name: "clipboard-text", Comp: ClipboardText },
+  { name: "clock", Comp: Clock },
+  { name: "clock-countdown", Comp: ClockCountdown },
+  { name: "confetti", Comp: Confetti },
+  { name: "cookie", Comp: Cookie },
+  { name: "copy", Comp: Copy },
+  { name: "cursor", Comp: Cursor },
+  { name: "desktop", Comp: Desktop },
+  { name: "device-tablet", Comp: DeviceTablet },
+  { name: "dots-six-vertical", Comp: DotsSixVertical },
+  { name: "dots-three", Comp: DotsThree },
+  { name: "download", Comp: Download },
+  { name: "exclamation-mark", Comp: ExclamationMark },
+  { name: "export", Comp: Export },
+  { name: "eye", Comp: Eye },
+  { name: "eye-slash", Comp: EyeSlash },
+  { name: "file-code", Comp: FileCode },
+  { name: "file-image", Comp: FileImage },
+  { name: "file-magnifying-glass", Comp: FileMagnifyingGlass },
+  { name: "file-text", Comp: FileText },
+  { name: "file-video", Comp: FileVideo },
+  { name: "file-xls", Comp: FileXls },
+  { name: "film-strip", Comp: FilmStrip },
+  { name: "fire", Comp: Fire },
+  { name: "folder", Comp: Folder },
+  { name: "funnel", Comp: Funnel },
+  { name: "game-controller", Comp: GameController },
+  { name: "gear", Comp: Gear },
+  { name: "graph", Comp: Graph },
+  { name: "hand-coins", Comp: HandCoins },
+  { name: "handshake", Comp: Handshake },
+  { name: "heart", Comp: Heart },
+  { name: "heartbeat", Comp: Heartbeat },
+  { name: "hourglass-low", Comp: HourglassLow },
+  { name: "house", Comp: House },
+  { name: "identification-card", Comp: IdentificationCard },
+  { name: "info", Comp: Info },
+  { name: "lightbulb", Comp: Lightbulb },
+  { name: "lightning", Comp: Lightning },
+  { name: "list", Comp: List },
+  { name: "lock-open", Comp: LockOpen },
+  { name: "magnifying-glass", Comp: MagnifyingGlass },
+  { name: "MetaLogo", Comp: MetaLogo }, // Figma name is literally "Icon/MetaLogo"
+  { name: "note-pencil", Comp: NotePencil },
+  { name: "plus-circle", Comp: PlusCircle },
+  { name: "receipt", Comp: Receipt },
+  { name: "rocket-launch", Comp: RocketLaunch },
+  { name: "scales", Comp: Scales },
+  { name: "shapes", Comp: Shapes },
+  { name: "share-network", Comp: ShareNetwork },
+  { name: "shield-check", Comp: ShieldCheck },
+  { name: "shirt-folded", Comp: ShirtFolded },
+  { name: "shooting-star", Comp: ShootingStar },
+  { name: "sidebar-simple", Comp: SidebarSimple },
+  { name: "sign-out", Comp: SignOut },
+  { name: "signpost", Comp: Signpost },
+  { name: "sliders-horizontal", Comp: SlidersHorizontal },
+  { name: "sort-ascending", Comp: SortAscending },
+  { name: "sort-descending", Comp: SortDescending },
+  { name: "speaker-high", Comp: SpeakerHigh },
+  { name: "square", Comp: Square },
+  { name: "star", Comp: Star },
+  { name: "stop-circle", Comp: StopCircle },
+  { name: "student", Comp: Student },
+  { name: "table", Comp: Table },
+  { name: "television-simple", Comp: TelevisionSimple },
+  { name: "translate", Comp: Translate },
+  { name: "trash", Comp: Trash },
+  { name: "trend-down", Comp: TrendDown },
+  { name: "trend-up", Comp: TrendUp },
+  { name: "user", Comp: User },
+  { name: "user-circle", Comp: UserCircle },
+  { name: "user-plus", Comp: UserPlus },
+  { name: "users-three", Comp: UsersThree },
+  { name: "video-camera", Comp: VideoCamera },
+  { name: "warning", Comp: Warning },
+  { name: "warning-circle", Comp: WarningCircle },
+  { name: "watch", Comp: Watch },
+  { name: "x", Comp: X },
 ];
+
+/** Resolve the Phosphor component to render for an entry + current Pointing. */
+function resolveComp(entry: IconEntry, pointing: Pointing): PhosphorIcon {
+  if (entry.directional && entry.byPointing) return entry.byPointing[pointing];
+  return entry.Comp as PhosphorIcon;
+}
 
 /* ------------------------------------------------------------------ *
  * Interactive gallery preview
  * ------------------------------------------------------------------ */
 
-const STYLE_OPTIONS: IconStyle[] = ["Regular", "Fill", "Duotone"];
-const SIZE_OPTIONS = ["16", "20", "24", "32"] as const;
-const POINTING_OPTIONS: Pointing[] = ["Up", "Down", "Left", "Right"];
+function GlyphBox({
+  Comp,
+  size,
+  weight,
+}: {
+  Comp: PhosphorIcon;
+  size: number;
+  weight: IconWeight;
+}): JSX.Element {
+  return (
+    <span className="flex items-center justify-center" style={{ color: ICON_COLOR }}>
+      <Comp size={size} weight={weight} color={ICON_COLOR} />
+    </span>
+  );
+}
 
 function IconsGallery({ props }: { props: PropValues; dark: boolean }): JSX.Element {
   const style = props.style as IconStyle;
   const size = Number(props.size);
-  const pointing = props.pointing as Pointing;
+  const pointing = (props.pointing as Pointing) ?? "Up";
+  const weight = WEIGHT_FOR_STYLE[style];
 
-  const cardCls =
-    "border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]";
-  const captionCls = "text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]";
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return ICONS;
+    return ICONS.filter((e) => e.name.toLowerCase().includes(q));
+  }, [query]);
+
+  const selectedEntry = selected ? ICONS.find((e) => e.name === selected) ?? null : null;
+
+  const cardBase =
+    "flex flex-col items-center gap-2.5 rounded-[6px] border p-4 transition-colors cursor-pointer border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] hover:bg-[var(--container-dynamic-neutral-subtle-background-default-variation,#ebebf0)]";
+  const captionCls =
+    "text-center break-all text-[length:var(--body-sm-regular-size,12px)] leading-[var(--body-sm-regular-line-height,18px)] text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]";
 
   return (
-    <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-      {FAMILIES.map((family) => (
-        <div
-          key={family.name}
-          className={`flex flex-col items-center gap-2.5 rounded-[6px] border p-4 ${cardCls}`}
-        >
-          <div className="flex h-[48px] w-[48px] items-center justify-center">
-            <family.glyph
-              size={size}
-              style={style}
-              pointing={family.directional ? pointing : undefined}
-            />
-          </div>
-          <span className={`text-[length:var(--body-sm-regular-size,12px)] leading-[var(--body-sm-regular-line-height,18px)] ${captionCls}`}>
-            {family.name.replace("Icon/", "")}
+    <div className="flex w-full flex-col gap-4">
+      {/* Search */}
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2">
+            <MagnifyingGlass size={16} color="var(--container-dynamic-neutral-subtle-foreground-disabled, #a8a8b2)" />
           </span>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search 109 icons…"
+            className="w-full rounded-[6px] border border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] py-2 pl-8 pr-3 text-[13px] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] placeholder:text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)] focus:outline-none"
+          />
         </div>
-      ))}
+        <span className="shrink-0 text-[12px] text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]">
+          {filtered.length} / {ICONS.length}
+        </span>
+      </div>
+
+      {/* Selected-icon detail (Developer Mode style) */}
+      {selectedEntry && (
+        <div className="flex items-center justify-between gap-4 rounded-[6px] border border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--container-dynamic-neutral-subtle-background-default-variation,#ebebf0)] p-4">
+          <div className="flex items-center gap-4">
+            <div className="flex h-[48px] w-[48px] items-center justify-center rounded-[6px] bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)]">
+              <GlyphBox Comp={resolveComp(selectedEntry, pointing)} size={32} weight={weight} />
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="font-mono text-[13px] font-semibold text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
+                Icon/{selectedEntry.name}
+              </span>
+              <span className="text-[11px] text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]">
+                Style={style}, Size={size}, State=Default
+                {selectedEntry.directional ? `, Pointing=${pointing}` : ""}
+              </span>
+              <span className="text-[11px] text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]">
+                Variants: Style=Regular|Fill|Duotone · Size=16|20|24|32
+                {selectedEntry.directional ? " · Pointing=Up|Down|Left|Right" : ""}
+              </span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSelected(null)}
+            aria-label="Close detail"
+            className="flex h-7 w-7 items-center justify-center rounded-[6px] hover:bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)]"
+          >
+            <X size={16} color={ICON_COLOR} />
+          </button>
+        </div>
+      )}
+
+      {/* Grid */}
+      <div className="grid w-full grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
+        {filtered.map((entry) => {
+          const Comp = resolveComp(entry, pointing);
+          const active = selected === entry.name;
+          return (
+            <button
+              type="button"
+              key={entry.name}
+              onClick={() => setSelected((s) => (s === entry.name ? null : entry.name))}
+              className={`${cardBase} ${
+                active ? "outline outline-2 outline-[var(--border-static-subtle-neutral,#e1e1e8)]" : ""
+              }`}
+              title={`Icon/${entry.name}`}
+            >
+              <div className="flex h-[48px] w-[48px] items-center justify-center">
+                <GlyphBox Comp={Comp} size={size} weight={weight} />
+              </div>
+              <span className={captionCls}>{entry.name}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {filtered.length === 0 && (
+        <p className="py-8 text-center text-[13px] text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]">
+          No icons match “{query}”.
+        </p>
+      )}
     </div>
   );
 }
@@ -401,7 +453,7 @@ function IconsGallery({ props }: { props: PropValues; dark: boolean }): JSX.Elem
 const config: PlaygroundConfig = {
   name: "Icons",
   description:
-    "Phosphor-style icon catalog — browse every family across Regular / Fill / Duotone styles, four sizes, and directional pointing.",
+    "Phosphor-based icon catalog — all 109 Fiber icon sets. Browse across Regular / Fill / Duotone styles and four sizes, search by name, and click an icon to inspect its Figma name and variants.",
   controls: [
     {
       kind: "select",
@@ -421,8 +473,8 @@ const config: PlaygroundConfig = {
     {
       kind: "select",
       name: "pointing",
-      label: "Pointing (directional)",
-      options: POINTING_OPTIONS,
+      label: "Pointing (arrow / caret)",
+      options: ["Up", "Down", "Left", "Right"],
       defaultValue: "Up",
     },
   ],
@@ -432,9 +484,10 @@ const config: PlaygroundConfig = {
     "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
     "container/dynamic/neutral/subtle/background/default/regular":
       "var(--container-dynamic-neutral-subtle-background-default-regular)",
+    "container/dynamic/neutral/subtle/background/default/variation":
+      "var(--container-dynamic-neutral-subtle-background-default-variation)",
     "container/dynamic/neutral/subtle/foreground/disabled":
       "var(--container-dynamic-neutral-subtle-foreground-disabled)",
-    "surface/background/lvl1": "var(--surface-background-lvl1)",
   },
 };
 

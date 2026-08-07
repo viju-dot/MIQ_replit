@@ -3,25 +3,46 @@ import type { PlaygroundConfig, PropValues } from "@/components/playground/types
 
 const ASSET = "/figmaAssets/empty-state";
 
+/**
+ * Fiber Design System — Empty States page.
+ *
+ * Faithful reproduction of the Figma "Empty States" page. Figma exposes 11
+ * illustration templates driven by the `Template` component property. The
+ * composite "Empty State" component pairs one of those illustrations with a
+ * heading, description and up to three actions (with optional dot separators).
+ *
+ * All colours / spacing / typography reference CSS custom properties from
+ * tokens.css via var(--token, fallbackHex).
+ */
+
+// ----------------------------------------------------------------------------
+// Illustration templates (Figma `Template` property values -> asset)
+// ----------------------------------------------------------------------------
+
+/** Ordered map keyed by the exact Figma `Template` property name. */
 const illustrations = {
-  screenLock: `${ASSET}/illustration-screenlock.svg`,
-  womanMagnifying: `${ASSET}/illustration-woman-magnifying.svg`,
-  launchAirplane: `${ASSET}/illustration-launch-airplane.svg`,
+  LostInMountains: `${ASSET}/illustration-lost-in-mountains.svg`,
+  ScreenLock: `${ASSET}/illustration-screen-lock.svg`,
+  "404Mountains": `${ASSET}/illustration-404-mountains.svg`,
+  StaringEmpty: `${ASSET}/illustration-staring-empty.svg`,
+  Stopwatch: `${ASSET}/illustration-stopwatch.svg`,
+  Warning: `${ASSET}/illustration-warning.svg`,
+  ScreenExpand: `${ASSET}/illustration-screen-expand.svg`,
+  ManAndCharts: `${ASSET}/illustration-man-and-charts.svg`,
+  WomanMagnifyingGlass: `${ASSET}/illustration-woman-magnifying-glass.svg`,
+  WomanStaring: `${ASSET}/illustration-woman-staring.svg`,
+  LaunchAirplane: `${ASSET}/illustration-launch-airplane.svg`,
 } as const;
+
+type TemplateName = keyof typeof illustrations;
+
+const TEMPLATE_NAMES = Object.keys(illustrations) as TemplateName[];
 
 const imgButtonIconNeutral = `${ASSET}/button-icon-neutral.svg`;
 const imgButtonIconBrand = `${ASSET}/button-icon-brand.svg`;
 const imgButtonIconBold = `${ASSET}/button-icon-bold.svg`;
 const imgEllipseDot1 = `${ASSET}/ellipse-dot-1.svg`;
 const imgEllipseDot2 = `${ASSET}/ellipse-dot-2.svg`;
-
-type IllustrationKey = keyof typeof illustrations;
-
-const ILLUSTRATION_LABELS: Record<string, IllustrationKey> = {
-  ScreenLock: "screenLock",
-  WomanMagnifyingGlass: "womanMagnifying",
-  LaunchAirplane: "launchAirplane",
-};
 
 function ButtonIcon({ src }: { src: string }) {
   return (
@@ -33,6 +54,30 @@ function ButtonIcon({ src }: { src: string }) {
   );
 }
 
+// ----------------------------------------------------------------------------
+// Illustration — a single template thumbnail (used by the composite + gallery)
+// ----------------------------------------------------------------------------
+
+function Illustration({ template, size = 200 }: { template: TemplateName; size?: number }) {
+  return (
+    <div
+      className="overflow-clip relative shrink-0"
+      data-name={`Illustration=${template}`}
+      style={{ width: size, height: size }}
+    >
+      <img
+        alt={template}
+        className="absolute block inset-0 max-w-none size-full object-contain"
+        src={illustrations[template]}
+      />
+    </div>
+  );
+}
+
+// ----------------------------------------------------------------------------
+// Empty State composite
+// ----------------------------------------------------------------------------
+
 type EmptyStateProps = {
   className?: string;
   actions?: boolean;
@@ -40,7 +85,7 @@ type EmptyStateProps = {
   ellipse1?: boolean;
   ellipse2?: boolean;
   heading?: string;
-  illustration?: IllustrationKey;
+  illustration?: TemplateName;
   prop1Button?: boolean;
   prop2Button?: boolean;
   prop3Button?: boolean;
@@ -53,7 +98,7 @@ function EmptyState({
   ellipse1 = false,
   ellipse2 = false,
   heading = "Place holder here!",
-  illustration = "screenLock",
+  illustration = "ScreenLock",
   prop1Button = true,
   prop2Button = true,
   prop3Button = true,
@@ -68,13 +113,7 @@ function EmptyState({
     >
       <div className="flex flex-col gap-[var(--spacing-300,24px)] items-center w-full">
         {/* Illustration */}
-        <div className="overflow-clip relative shrink-0 size-[200px]">
-          <img
-            alt=""
-            className="absolute block inset-0 max-w-none size-full object-contain"
-            src={illustrations[illustration]}
-          />
-        </div>
+        <Illustration template={illustration} />
 
         {/* Content */}
         <div className="flex flex-col gap-[var(--spacing-250,20px)] items-center w-full">
@@ -147,6 +186,48 @@ function EmptyState({
   );
 }
 
+// ----------------------------------------------------------------------------
+// Illustrations gallery — all 11 templates
+// ----------------------------------------------------------------------------
+
+function IllustrationGallery() {
+  return (
+    <div className="grid grid-cols-2 gap-[var(--spacing-300,24px)] sm:grid-cols-3 lg:grid-cols-4 w-full">
+      {TEMPLATE_NAMES.map((template) => (
+        <div
+          key={template}
+          className="flex flex-col items-center gap-[var(--spacing-150,12px)] p-[var(--spacing-200,16px)] rounded-[var(--radius-100,8px)] border border-solid border-[var(--border-static-subtle-neutral,#e9e9eb)]"
+        >
+          <Illustration template={template} size={160} />
+          <p className="leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] font-medium text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] text-center whitespace-nowrap">
+            {`Template=${template}`}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ----------------------------------------------------------------------------
+// Playground configs
+// ----------------------------------------------------------------------------
+
+const galleryConfig: PlaygroundConfig = {
+  name: "Illustrations",
+  description:
+    "All 11 Figma illustration templates used by Empty States. Each is driven by the composite's `Template` property.",
+  controls: [],
+  render: () => <IllustrationGallery />,
+  tokens: {
+    "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
+    "radius/100": "var(--radius-100)",
+    "spacing/300": "var(--spacing-300)",
+    "spacing/200": "var(--spacing-200)",
+    "spacing/150": "var(--spacing-150)",
+  },
+};
+
 const config: PlaygroundConfig = {
   name: "Empty State",
   description:
@@ -155,8 +236,8 @@ const config: PlaygroundConfig = {
     {
       kind: "select",
       name: "illustration",
-      label: "Illustration",
-      options: ["ScreenLock", "WomanMagnifyingGlass", "LaunchAirplane"],
+      label: "Template",
+      options: TEMPLATE_NAMES.slice(),
       defaultValue: "ScreenLock",
       asTabs: true,
     },
@@ -181,19 +262,22 @@ const config: PlaygroundConfig = {
     { kind: "boolean", name: "ellipse1", label: "Dot separator 1", defaultValue: false },
     { kind: "boolean", name: "ellipse2", label: "Dot separator 2", defaultValue: false },
   ],
-  render: (props: PropValues) => (
-    <EmptyState
-      illustration={ILLUSTRATION_LABELS[String(props.illustration)] ?? "screenLock"}
-      heading={String(props.heading)}
-      description={String(props.description)}
-      actions={props.actions === true}
-      prop1Button={props.prop1Button === true}
-      prop2Button={props.prop2Button === true}
-      prop3Button={props.prop3Button === true}
-      ellipse1={props.ellipse1 === true}
-      ellipse2={props.ellipse2 === true}
-    />
-  ),
+  render: (props: PropValues) => {
+    const template = String(props.illustration) as TemplateName;
+    return (
+      <EmptyState
+        illustration={template in illustrations ? template : "ScreenLock"}
+        heading={String(props.heading)}
+        description={String(props.description)}
+        actions={props.actions === true}
+        prop1Button={props.prop1Button === true}
+        prop2Button={props.prop2Button === true}
+        prop3Button={props.prop3Button === true}
+        ellipse1={props.ellipse1 === true}
+        ellipse2={props.ellipse2 === true}
+      />
+    );
+  },
   tokens: {
     "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
     "container/dynamic/brand/bold/foreground/default": "var(--container-dynamic-brand-bold-foreground-default)",
@@ -213,6 +297,7 @@ const config: PlaygroundConfig = {
 export default function EmptyStatePage(): JSX.Element {
   return (
     <section aria-label="Empty State component playground" className="flex flex-col gap-6">
+      <Playground config={galleryConfig} />
       <Playground config={config} />
     </section>
   );
