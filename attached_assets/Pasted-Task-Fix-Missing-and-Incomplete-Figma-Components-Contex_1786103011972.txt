@@ -1,0 +1,77 @@
+Task: Fix Missing and Incomplete Figma Components
+Context
+
+After reviewing the current Design System Explorer, I found that several components and assets have not been imported correctly from the Figma Design System. Some components are incomplete, while others are missing entirely.
+
+Please review the original Figma source and ensure the application accurately reflects all available design assets.
+
+Objective
+
+Compare the imported components against the original Figma Design System and resolve any missing or incomplete imports.
+
+The application should faithfully represent everything available in the Figma source without omitting components, variants, or assets.
+
+Issues to Fix
+1. Empty States
+
+The Figma Design System contains multiple Empty State illustrations and variants.
+
+Currently, only a small subset is visible in the application.
+
+Expected Result
+
+Import all Empty State illustrations and variants from Figma.
+Ensure none of the available illustrations are missing.
+Preserve their original names, variants, and properties.
+2. Icons
+
+The current application displays only around 15 icons, which does not match the Figma Design System.
+
+Expected Result
+
+Import the complete icon library from Figma.
+Preserve categories, names, sizes, and variants.
+Ensure all icons available in Figma are accessible within the application.
+3. Master Table Component
+
+The Design System includes a complete Master Table component.
+
+Currently, the application only displays individual table cells instead of the complete table component.
+
+Expected Result
+
+Import the full Master Table component.
+Include all available variants and properties.
+Preserve the original component hierarchy and interactions.
+Do not limit the import to individual cell components.
+4. Primary Navigation
+
+The current Navigation section only displays a single header.
+
+However, the Figma Design System contains multiple navigation/header variants driven by design tokens and component properties.
+
+Examples include different navigation sizes such as:
+
+Small (SM)
+Medium (MD)
+Large (LG)
+Extra Large (XL)
+
+Expected Result
+
+Import all available Primary Navigation variants from Figma.
+Preserve their original properties, tokens, and responsive variants.
+Ensure every navigation variation available in the Design System is represented in the application.
+Validation
+
+For every imported page or component:
+
+Compare it against the original Figma source.
+Verify that no components, variants, assets, or illustrations are missing.
+Ensure the imported content matches the Figma Design System exactly.
+
+If a page contains multiple component sets or variants, import all of them—not just the first one discovered.
+
+Goal
+
+The Design System Explorer should be a complete and accurate representation of the Figma Design System. Every component, illustration, icon, navigation variant, and composite component available in Figma should be discoverable and interactable within the application, without missing assets or incomplete imports
