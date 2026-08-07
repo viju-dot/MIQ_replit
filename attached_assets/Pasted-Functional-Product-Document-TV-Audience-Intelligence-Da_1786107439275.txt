@@ -1,0 +1,173 @@
+Functional Product Document: TV Audience Intelligence Dashboard
+1. Executive Summary
+The TV Audience Intelligence Dashboard is an analytics product enabling media planners, sales teams, and advertising strategists to understand target audience TV viewing behaviour across Linear, Streaming, and FAST environments, benchmarked against national averages.
+2. Product Overview
+A single-page, dark-themed analytics dashboard combining KPI summary tiles, interactive filters, and drill-down visualisations covering consumption type, channel/app usage, genre, shows, and temporal viewing patterns.
+3. Business Goal
+Enable data-driven media planning and sales conversations by quantifying audience size, viewing habits, and platform preferences to inform activation decisions.
+4. Problem Statement
+Media planners lack a unified view of audience TV behaviour across fragmented Linear, Streaming, and FAST environments, making it difficult to decide where and when to activate campaigns.
+5. Objectives
+Provide MVP (Priority 0) insights: audience size, consumption by type, channel/app time spent
+Benchmark audience behaviour against national averages via indexing
+Support interactive drill-down filtering across all visualisations
+6. Target Users / Personas
+Media Planner: plans activation across TV types
+Sales Team Member: builds audience narratives for clients (values comparison mode)
+Advertising Strategist: identifies genre, show, and daypart opportunities
+7. User Needs
+Understand how much TV an audience watches vs. national average
+Identify which platform/channel/app to activate on
+Know what genres/shows the audience over-indexes on
+Know when the audience watches (day/time)
+8. Functional Requirements
+Global filter applies to all visualisations
+Consumption by Type chart acts as a secondary interactive filter for downstream charts
+All dropdowns searchable
+Toggle between Minutes Watched and Reach metrics on summary tiles
+Index vs. national average displayed on tiles and genre bars
+9. Feature Breakdown
+F1: Global Filter (P0)
+Description: Searchable dropdowns filtering the entire dashboard
+User Goal: Define the audience and scope of analysis
+Functional Behaviour: Selections update all visualisations
+Business Logic: If Market = UK → show Mosaic Group, Age & Gender, Presence of Children in HH, TV Consumption. Other EU4 markets → TV Consumption and Lookback Window (7/30/60 days) only
+Inputs: Market, Mosaic Group, Age & Gender, Children in HH, TV Consumption, Lookback Window
+Outputs: Filtered dataset across all charts
+Validation: Only valid dimension combinations selectable per market
+Edge Cases: Filter combination returns zero data → show empty state
+Expected System Response: Charts refresh with loading indicators
+Acceptance Criteria: UK-only dimensions hidden for non-UK markets; all dropdowns searchable; filters cascade to all charts
+F2: Exec Summary Tiles (P0)
+Description: KPI boxes summarising audience viewing
+User Goal: "How much TV is my audience watching vs. national average, and how big is this audience?"
+Functional Behaviour: Toggle between Minutes Watched and Reach (unique identifiers)
+Business Logic: Each tile shows metric value plus index vs. national average
+Inputs: Global filter selections, metric toggle
+Outputs: Total Households Viewing; Total Minutes Viewing; Avg Daily Consumption (mins) – All Streaming; Avg Daily Consumption (mins) – Linear; Avg Channels/Apps per Household; Optional: Avg Daily Consumption – Home Screen
+Validation: Index calculated against same lookback window
+Edge Cases: National average unavailable → hide index, show value only (assumption)
+Acceptance Criteria: Toggle switches all tiles; index displayed per tile
+F3: Consumption by Type (P0)
+Description: Horizontal stacked bar of viewing by Linear/Streaming/FAST (and Home Screen)
+User Goal: "Where should I activate to reach my audience?"
+Functional Behaviour: Clicking a segment filters all downstream visualisations; non-commercial toggle excludes ad-free environments (e.g. BBC)
+Inputs: Global filters, segment click, non-commercial toggle
+Outputs: Minutes watched, number of households per type
+Edge Cases: Segment selected then global filter changed → selection persists or resets (open question)
+Acceptance Criteria: Segment click updates downstream charts; toggle removes ad-free environments; clear indication of active selection
+F4: Time Spent by Channel/App (P0)
+Description: Combo chart — bars (avg mins/week) + line (% of total watch time)
+User Goal: Identify top channels/apps by audience time
+Business Logic: Top 10 from: Netflix, Amazon Prime, Disney+, Paramount, Apple TV, YouTube, BBC iPlayer, ITVX, Channel 4, Now, My5, U
+Outputs: Avg minutes/week (primary axis), % of total watch time (secondary axis)
+Edge Cases: Fewer than 10 apps with data → show available only (assumption)
+Acceptance Criteria: Dual axes render correctly; responds to F1 and F3 filters
+Note: App-overlap Sankey diagram flagged for feasibility exploration
+F5: Viewership by Genre (P1)
+Description: Bar chart of top 10 genres (IAB taxonomy: Comedy, News, Film, Sports, Drama, Reality, Action, Documentary, Kids, Travel, Food, Home Improvement)
+Metrics: Mins/week & % of total watch time OR index vs. national average (open question: confirm primary metric)
+Functional Behaviour: TV Type filter; directional index indicator at end of each bar
+Acceptance Criteria: IAB labels used; index indicator visible per bar; genre selection filters F6 (Top Shows)
+F6: Top 10 Indexing Shows (P1)
+Description: Combo chart — index (primary) + average daily minutes (secondary axis)
+Functional Behaviour: Linked to F5 — selecting a genre filters shows accordingly; TV Type filter
+Acceptance Criteria: Genre selection in F5 updates show list; both metrics displayed
+F7: Temporal Insights (P1)
+Description: Heat map/bar chart of consumption by day of week and time of day, split by TV type
+Metrics: Low/Medium/High consumption bands
+Open Question: Final visualisation type to be confirmed
+Acceptance Criteria: Day × time grid with consumption levels; TV Type filter functional
+F8: Genre-Level Platform Comparison (P1)
+Description: Horizontal stacked bar — share of viewing minutes per platform at genre level
+Acceptance Criteria: Distinct from F3 (channel-level); shares sum to 100% per genre
+F9: Comparison Mode (P2)
+Description: Side-by-side view of two audience segments (e.g. Male vs. Female) across dashboard metrics
+Assumption: Applies to all visualisations; scope to be confirmed
+Acceptance Criteria: Two segments selectable; metrics render in parallel
+10. User Journey
+User lands on dashboard → defaults load (assumption: default market/lookback needed)
+Sets global filters to define audience
+Reviews exec tiles for audience size and index
+Clicks consumption type to drill into platform
+Reviews channel/app, genre, show, and temporal insights
+Exports or shares findings (assumption — not specified)
+11. User Flows
+Filter flow: Select filters → charts reload → refine
+Drill-down flow: Click F3 segment → downstream charts filter → click genre in F5 → F6 filters shows
+Toggle flow: Switch Minutes/Reach on tiles; toggle non-commercial
+12. Screen-by-Screen Functional Behaviour
+Single-screen layout (top to bottom): Global Filter bar → Exec Summary Tiles → Consumption by Type (interactive filter) → Channel/App chart → Genre chart → Top Shows → Temporal heat map → Genre-level platform comparison → Comparison Mode (P2).
+13. Business Rules
+UK market unlocks Mosaic Group, Age & Gender, Children in HH dimensions
+Non-UK EU4 markets: TV Consumption + Lookback only
+Non-commercial toggle excludes ad-free environments (e.g. BBC)
+Genre labels follow IAB taxonomy
+Indexing benchmark = national average for selected market (assumption)
+14. Validation Rules
+Lookback restricted to 7, 30, 60 days
+Invalid filter combinations prevented at UI level
+Percentage metrics must sum to ≤100% per breakdown
+15. User Permissions / Roles
+Not specified. Assumption: single read-only analyst role; market-level access controls may be required. Open question.
+16. Edge Cases
+Zero-result filter combinations
+Missing national average benchmark
+New apps/channels not in top-10 list
+Home Screen data unavailable in some markets (assumption)
+17. Error States
+Data load failure → error message with retry
+Partial data failure → per-chart error, rest of dashboard functional (assumption)
+18. Empty States
+"No data available for this audience selection — adjust filters" per chart
+19. Success States
+Charts render fully; active filters/selections clearly indicated
+20. Loading States
+Per-chart skeleton loaders during filter changes (assumption)
+21. Notifications
+None specified. Assumption: none required for MVP
+22. Assumptions
+Default filter state exists on load
+Selection persistence behaviour on filter change
+Read-only single role
+National average available per market and lookback window
+23. Dependencies
+Unified data feeds across Linear, Streaming, FAST providers
+Mosaic segmentation data (UK)
+IAB genre taxonomy mapping
+National average benchmark dataset
+24. Technical Considerations
+Cross-filtering architecture (F3 → downstream charts; F5 → F6)
+Query performance for 60-day lookbacks
+Feasibility of Sankey overlap and comparison mode
+25. Analytics & Tracking Events
+Track: filter selections, metric toggles, chart segment clicks, non-commercial toggle usage, comparison mode usage (assumption).
+26. Success Metrics / KPIs
+Weekly active users; filter/drill-down engagement rate; sales team adoption (assumption — confirm with stakeholders)
+27. Accessibility Considerations
+Sufficient contrast on dark theme; colour not sole indicator (indexes/labels); keyboard-navigable dropdowns; screen-reader chart labels
+28. Risks
+Data feed inconsistencies across platforms
+Performance degradation with cascading filters
+Dark theme accent colours failing contrast checks
+29. Out of Scope
+Campaign activation/execution
+Non-EU4 markets
+Data export (assumption — confirm)
+30. Future Enhancements
+Comparison Mode (P2)
+App-overlap Sankey diagram
+Home Screen consumption tile
+31. Open Questions
+Best visualisation for Temporal Insights (heat map vs. bar)?
+Genre chart primary metric: mins/% or index?
+Does F3 selection persist across global filter changes?
+Feasibility of Sankey overlap and Sigma-style comparison mode?
+User roles/permissions and export requirements?
+Default filter state on load?
+32. Acceptance Criteria (Dashboard-Level)
+All P0 components functional at MVP launch
+Global filter cascades correctly with market-conditional dimensions
+F3 drill-down updates all downstream charts
+Index vs. national average shown on tiles and genre bars
+Empty, error, and loading states implemented per chart
