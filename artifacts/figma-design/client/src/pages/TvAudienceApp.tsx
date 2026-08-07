@@ -17,14 +17,7 @@
 
 import { useState, useEffect } from "react";
 import { Moon, Sun } from "lucide-react";
-import {
-  MagnifyingGlass,
-  Translate,
-  CaretDown,
-  Flask,
-  Bell,
-  Heart,
-} from "@phosphor-icons/react";
+import { Translate, CaretDown } from "@phosphor-icons/react";
 import { useTheme } from "@/lib/theme";
 import TvAudienceDashboardPage from "@/pages/ds/TvAudienceDashboardPage";
 
@@ -113,79 +106,14 @@ function LanguageSelector() {
   );
 }
 
-/* A right-cluster icon button (search / flask) — 24px, on-dark white. */
-function IconButton({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      className="flex size-[24px] shrink-0 items-center justify-center rounded-[var(--radiuses-small,2px)] transition-colors hover:bg-[rgba(255,255,255,0.15)]"
-    >
-      {children}
-    </button>
-  );
-}
-
-/* Bell / Heart with a small notification dot in the top-right corner. */
-function NotificationIcon({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      className="relative flex size-[24px] shrink-0 items-center justify-center rounded-[var(--radiuses-small,2px)] transition-colors hover:bg-[rgba(255,255,255,0.15)]"
-    >
-      {children}
-      <span
-        className="absolute right-[2px] top-[2px] size-[6px] rounded-full ring-2 ring-[var(--surface-background-miq,#2b0030)]"
-        style={{ backgroundColor: "#ff540c" }}
-        aria-hidden
-      />
-    </button>
-  );
-}
-
-/* The shared right-hand cluster (JSON order: search, language, flask, bell,
- * heart, diamond, avatar; gap 20). At narrow widths (sm variant) the
- * flask/bell/heart are hidden to preserve space (documented adaptation — see
- * report). Our theme toggle is prepended (unobtrusive icon button; not in the
- * Figma spec). Visibility is driven by the deterministic isLarge flag. */
-function RightCluster({ isLarge }: { isLarge: boolean }) {
+/* The right-hand cluster, per user request: theme toggle, language selector,
+ * diamond, avatar (gap 20). Search/flask/bell/heart removed. */
+function RightCluster() {
   return (
     <div className="relative flex shrink-0 items-center justify-end gap-[20px]" data-name="right">
       <ThemeToggle />
 
-      <IconButton label="Search">
-        <MagnifyingGlass size={24} weight="regular" style={{ color: ON_DARK }} aria-hidden />
-      </IconButton>
-
       <LanguageSelector />
-
-      {/* Secondary icons — hidden in the sm variant to keep the bar uncluttered. */}
-      {isLarge && (
-        <div className="flex items-center gap-[20px]">
-          <IconButton label="Innovation labs">
-            <Flask size={24} weight="regular" style={{ color: ON_DARK }} aria-hidden />
-          </IconButton>
-          <NotificationIcon label="Notifications">
-            <Bell size={24} weight="regular" style={{ color: ON_DARK }} aria-hidden />
-          </NotificationIcon>
-          <NotificationIcon label="Saved">
-            <Heart size={24} weight="regular" style={{ color: ON_DARK }} aria-hidden />
-          </NotificationIcon>
-        </div>
-      )}
 
       {/* Single Diamond (24) */}
       <div className="relative size-[24px] shrink-0" data-name="Single Diamond">
@@ -377,7 +305,7 @@ function PrimaryNavigation() {
       )}
 
       {/* Shared right cluster */}
-      <RightCluster isLarge={isLarge} />
+      <RightCluster />
     </div>
   );
 }
