@@ -1,0 +1,2009 @@
+{
+  "$comment": "This is structural design data exported by the Figma Raw plugin. It is formatted to help LLMs (Large Language Models) understand design structures and components from Figma designs.",
+  "name": "Primary Navigation",
+  "type": "COMPONENT_SET",
+  "width": 1480,
+  "height": 196,
+  "cornerRadius": 5,
+  "layoutMode": "NONE",
+  "primaryAxisSizingMode": "AUTO",
+  "counterAxisSizingMode": "FIXED",
+  "primaryAxisAlignItems": "MIN",
+  "counterAxisAlignItems": "MIN",
+  "strokes": [
+    {
+      "type": "SOLID",
+      "opacity": 1,
+      "color": {
+        "r": 0.5411764979362488,
+        "g": 0.21960784494876862,
+        "b": 0.9607843160629272,
+        "a": 1,
+        "hex": "#8a38f5"
+      }
+    }
+  ],
+  "strokeWeight": 1,
+  "strokeAlign": "INSIDE",
+  "strokeCap": "NONE",
+  "strokeJoin": "MITER",
+  "componentInterface": {
+    "Property 1": {
+      "type": "VARIANT",
+      "defaultValue": "sm",
+      "variantOptions": [
+        "sm",
+        "large"
+      ]
+    }
+  },
+  "children": [
+    {
+      "name": "Property 1=sm",
+      "type": "COMPONENT",
+      "width": 1440,
+      "height": 64,
+      "layoutMode": "HORIZONTAL",
+      "primaryAxisSizingMode": "FIXED",
+      "counterAxisSizingMode": "FIXED",
+      "primaryAxisAlignItems": "SPACE_BETWEEN",
+      "counterAxisAlignItems": "CENTER",
+      "paddingLeft": 24,
+      "paddingRight": 24,
+      "paddingTop": 24,
+      "paddingBottom": 24,
+      "itemSpacing": 380,
+      "fills": [
+        {
+          "name": "Variable 32217",
+          "fullName": "Variable 32217",
+          "notFound": true,
+          "actualValue": {
+            "type": "SOLID",
+            "opacity": 1,
+            "color": {
+              "r": 0.16862745583057404,
+              "g": 0,
+              "b": 0.1882352977991104,
+              "a": 1,
+              "hex": "#2b0030"
+            }
+          }
+        }
+      ],
+      "strokeWeight": 0,
+      "strokeAlign": "CENTER",
+      "strokeCap": "NONE",
+      "strokeJoin": "BEVEL",
+      "variables": {
+        "fills": [
+          {
+            "name": "Variable 32217",
+            "fullName": "Variable 32217",
+            "notFound": true,
+            "actualValue": {
+              "type": "SOLID",
+              "opacity": 1,
+              "color": {
+                "r": 0.16862745583057404,
+                "g": 0,
+                "b": 0.1882352977991104,
+                "a": 1,
+                "hex": "#2b0030"
+              }
+            }
+          }
+        ]
+      },
+      "componentInterfaceError": "Error: in get_componentPropertyDefinitions: Can only get component property definitions of a component set or non-variant component",
+      "children": [
+        {
+          "name": "Menu item",
+          "type": "FRAME",
+          "width": 124,
+          "height": 64,
+          "layoutMode": "HORIZONTAL",
+          "primaryAxisSizingMode": "AUTO",
+          "counterAxisSizingMode": "AUTO",
+          "primaryAxisAlignItems": "MIN",
+          "counterAxisAlignItems": "CENTER",
+          "strokeWeight": 1,
+          "strokeAlign": "INSIDE",
+          "strokeCap": "NONE",
+          "strokeJoin": "MITER",
+          "variables": {
+            "itemSpacing": {
+              "name": "Variable 45844",
+              "fullName": "Variable 45844",
+              "notFound": true
+            }
+          },
+          "itemSpacing": {
+            "name": "Variable 45844",
+            "fullName": "Variable 45844",
+            "notFound": true
+          },
+          "children": [
+            {
+              "name": "Menu",
+              "type": "FRAME",
+              "width": 100,
+              "height": 64,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "AUTO",
+              "counterAxisSizingMode": "FIXED",
+              "primaryAxisAlignItems": "CENTER",
+              "counterAxisAlignItems": "CENTER",
+              "itemSpacing": 32,
+              "fills": [
+                {
+                  "type": "SOLID",
+                  "opacity": 1,
+                  "color": {
+                    "r": 1,
+                    "g": 1,
+                    "b": 1,
+                    "a": 1,
+                    "hex": "#ffffff"
+                  }
+                }
+              ],
+              "strokeWeight": 0,
+              "strokeAlign": "CENTER",
+              "strokeCap": "NONE",
+              "strokeJoin": "BEVEL",
+              "children": [
+                {
+                  "name": "Intelligence",
+                  "type": "FRAME",
+                  "width": 100,
+                  "height": 64,
+                  "layoutMode": "NONE",
+                  "primaryAxisSizingMode": "AUTO",
+                  "counterAxisSizingMode": "FIXED",
+                  "primaryAxisAlignItems": "MIN",
+                  "counterAxisAlignItems": "MIN",
+                  "strokeWeight": 1,
+                  "strokeAlign": "INSIDE",
+                  "strokeCap": "NONE",
+                  "strokeJoin": "MITER",
+                  "children": [
+                    {
+                      "name": "Brands",
+                      "type": "TEXT",
+                      "width": 87,
+                      "height": 24,
+                      "fills": [
+                        {
+                          "name": "Variable 45505",
+                          "fullName": "Variable 45505",
+                          "notFound": true,
+                          "actualValue": {
+                            "type": "SOLID",
+                            "opacity": 1,
+                            "color": {
+                              "r": 1,
+                              "g": 1,
+                              "b": 1,
+                              "a": 1,
+                              "hex": "#ffffff"
+                            }
+                          }
+                        }
+                      ],
+                      "strokeWeight": 0,
+                      "strokeAlign": "CENTER",
+                      "strokeCap": "NONE",
+                      "strokeJoin": "MITER",
+                      "textStyle": {
+                        "name": "Library Style 87276fda",
+                        "fullName": "[Library] Style 87276fda",
+                        "estimated": true
+                      },
+                      "variables": {
+                        "fills": [
+                          {
+                            "name": "Variable 45505",
+                            "fullName": "Variable 45505",
+                            "notFound": true,
+                            "actualValue": {
+                              "type": "SOLID",
+                              "opacity": 1,
+                              "color": {
+                                "r": 1,
+                                "g": 1,
+                                "b": 1,
+                                "a": 1,
+                                "hex": "#ffffff"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "characters": "Intelligence",
+                      "fontSize": 16,
+                      "fontName": {
+                        "family": "DM Sans",
+                        "style": "Medium"
+                      },
+                      "fontWeight": 500,
+                      "letterSpacing": {
+                        "unit": "PERCENT",
+                        "value": 0
+                      },
+                      "lineHeight": {
+                        "unit": "PIXELS",
+                        "value": 24
+                      },
+                      "textAlignHorizontal": "LEFT",
+                      "textAlignVertical": "TOP",
+                      "textAutoResize": "WIDTH_AND_HEIGHT",
+                      "textCase": "ORIGINAL",
+                      "textDecoration": "NONE",
+                      "textStyleName": "Text Style 87276fda..."
+                    },
+                    {
+                      "name": "On",
+                      "type": "RECTANGLE",
+                      "width": 100,
+                      "height": 4,
+                      "topLeftRadius": 2,
+                      "topRightRadius": 2,
+                      "bottomLeftRadius": 0,
+                      "bottomRightRadius": 0,
+                      "fills": [
+                        {
+                          "type": "GRADIENT_LINEAR",
+                          "opacity": 1,
+                          "gradientType": "GRADIENT_LINEAR",
+                          "gradientStops": [
+                            {
+                              "position": 0.2552083432674408,
+                              "color": {
+                                "r": 0.841242790222168,
+                                "g": 0.09875718504190445,
+                                "b": 0.5098552703857422,
+                                "a": 1,
+                                "hex": "#d71982"
+                              }
+                            },
+                            {
+                              "position": 0.59375,
+                              "color": {
+                                "r": 1,
+                                "g": 0.3294117748737335,
+                                "b": 0.0470588244497776,
+                                "a": 1,
+                                "hex": "#ff540c"
+                              }
+                            },
+                            {
+                              "position": 1,
+                              "color": {
+                                "r": 0.8563051819801331,
+                                "g": 0.8286201357841492,
+                                "b": 0.0636947974562645,
+                                "a": 1,
+                                "hex": "#dad310"
+                              }
+                            }
+                          ],
+                          "gradientTransform": [
+                            [
+                              1,
+                              0,
+                              -4.9960036108132044e-15
+                            ],
+                            [
+                              0,
+                              1,
+                              4.9960036108132044e-15
+                            ]
+                          ]
+                        }
+                      ],
+                      "fillStyle": {
+                        "name": "Library Style 93c58400",
+                        "fullName": "[Library] Style 93c58400",
+                        "estimated": true
+                      },
+                      "strokeWeight": 0,
+                      "strokeAlign": "CENTER",
+                      "strokeCap": "NONE",
+                      "strokeJoin": "MITER"
+                    }
+                  ]
+                },
+                {
+                  "name": "Audiences",
+                  "type": "FRAME",
+                  "skippedByOptimize": true
+                },
+                {
+                  "name": "Creatives",
+                  "type": "FRAME",
+                  "skippedByOptimize": true
+                },
+                {
+                  "name": "Campaigns",
+                  "type": "FRAME",
+                  "skippedByOptimize": true
+                },
+                {
+                  "name": "Reports",
+                  "type": "FRAME",
+                  "skippedByOptimize": true
+                }
+              ]
+            },
+            {
+              "name": "Icon/caret",
+              "type": "INSTANCE",
+              "componentProperties": {
+                "Style": {
+                  "value": "Regular",
+                  "type": "VARIANT",
+                  "displayValue": "Regular"
+                },
+                "Size": {
+                  "value": "24",
+                  "type": "VARIANT",
+                  "displayValue": "24"
+                },
+                "State": {
+                  "value": "Default",
+                  "type": "VARIANT",
+                  "displayValue": "Default"
+                },
+                "Pointing": {
+                  "value": "Down",
+                  "type": "VARIANT",
+                  "displayValue": "Down"
+                }
+              },
+              "width": 24,
+              "height": 64,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "FIXED",
+              "counterAxisSizingMode": "FIXED",
+              "primaryAxisAlignItems": "CENTER",
+              "counterAxisAlignItems": "CENTER",
+              "paddingLeft": {
+                "name": "Variable 45846",
+                "fullName": "Variable 45846",
+                "notFound": true,
+                "actualValue": 4
+              },
+              "paddingRight": {
+                "name": "Variable 45846",
+                "fullName": "Variable 45846",
+                "notFound": true,
+                "actualValue": 4
+              },
+              "paddingTop": {
+                "name": "Variable 42862",
+                "fullName": "Variable 42862",
+                "notFound": true,
+                "actualValue": 6
+              },
+              "paddingBottom": {
+                "name": "Variable 45845",
+                "fullName": "Variable 45845",
+                "notFound": true,
+                "actualValue": 2
+              },
+              "itemSpacing": 10,
+              "strokeWeight": 0,
+              "strokeAlign": "CENTER",
+              "strokeCap": "NONE",
+              "strokeJoin": "BEVEL",
+              "variables": {
+                "paddingLeft": {
+                  "name": "Variable 45846",
+                  "fullName": "Variable 45846",
+                  "notFound": true,
+                  "actualValue": 4
+                },
+                "paddingTop": {
+                  "name": "Variable 42862",
+                  "fullName": "Variable 42862",
+                  "notFound": true,
+                  "actualValue": 6
+                },
+                "paddingRight": {
+                  "name": "Variable 45846",
+                  "fullName": "Variable 45846",
+                  "notFound": true,
+                  "actualValue": 4
+                },
+                "paddingBottom": {
+                  "name": "Variable 45845",
+                  "fullName": "Variable 45845",
+                  "notFound": true,
+                  "actualValue": 2
+                }
+              },
+              "mainComponent": {
+                "name": "Style=Regular,Size=24,State=Default,Pointing=Down"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logo and tags",
+          "type": "FRAME",
+          "width": 24,
+          "height": 24,
+          "layoutMode": "HORIZONTAL",
+          "primaryAxisSizingMode": "AUTO",
+          "counterAxisSizingMode": "AUTO",
+          "primaryAxisAlignItems": "MIN",
+          "counterAxisAlignItems": "CENTER",
+          "itemSpacing": {
+            "name": "Variable 45849",
+            "fullName": "Variable 45849",
+            "notFound": true,
+            "actualValue": 16
+          },
+          "strokeWeight": 1,
+          "strokeAlign": "INSIDE",
+          "strokeCap": "NONE",
+          "strokeJoin": "MITER",
+          "variables": {
+            "itemSpacing": {
+              "name": "Variable 45849",
+              "fullName": "Variable 45849",
+              "notFound": true,
+              "actualValue": 16
+            }
+          },
+          "children": [
+            {
+              "name": "Sigma Logo",
+              "type": "INSTANCE",
+              "componentProperties": {
+                "Type": {
+                  "value": "Favicon",
+                  "type": "VARIANT",
+                  "displayValue": "Favicon"
+                }
+              },
+              "width": 24,
+              "height": 24,
+              "layoutMode": "NONE",
+              "primaryAxisSizingMode": "AUTO",
+              "counterAxisSizingMode": "FIXED",
+              "primaryAxisAlignItems": "MIN",
+              "counterAxisAlignItems": "MIN",
+              "strokeWeight": 1,
+              "strokeAlign": "INSIDE",
+              "strokeCap": "NONE",
+              "strokeJoin": "MITER",
+              "mainComponent": {
+                "name": "Type=Favicon"
+              }
+            },
+            {
+              "name": "Badge/Standard",
+              "type": "INSTANCE",
+              "skippedByOptimize": true
+            }
+          ]
+        },
+        {
+          "name": "Menu list",
+          "type": "FRAME",
+          "skippedByOptimize": true
+        },
+        {
+          "name": "right",
+          "type": "FRAME",
+          "width": 228,
+          "height": 40,
+          "layoutMode": "HORIZONTAL",
+          "primaryAxisSizingMode": "AUTO",
+          "counterAxisSizingMode": "AUTO",
+          "primaryAxisAlignItems": "MAX",
+          "counterAxisAlignItems": "CENTER",
+          "itemSpacing": 20,
+          "strokeWeight": 1,
+          "strokeAlign": "INSIDE",
+          "strokeCap": "NONE",
+          "strokeJoin": "MITER",
+          "children": [
+            {
+              "name": "Icon/magnifying-glass",
+              "type": "INSTANCE",
+              "skippedByOptimize": true
+            },
+            {
+              "name": "language",
+              "type": "FRAME",
+              "width": 122,
+              "height": 34,
+              "cornerRadius": 2,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "AUTO",
+              "counterAxisSizingMode": "FIXED",
+              "primaryAxisAlignItems": "CENTER",
+              "counterAxisAlignItems": "CENTER",
+              "paddingLeft": 12,
+              "paddingRight": 12,
+              "paddingTop": 4,
+              "paddingBottom": 4,
+              "itemSpacing": 8,
+              "fills": [
+                {
+                  "type": "SOLID",
+                  "opacity": 0.20000000298023224,
+                  "color": {
+                    "r": 1,
+                    "g": 1,
+                    "b": 1,
+                    "a": 0.20000000298023224,
+                    "hex": "#ffffff33"
+                  }
+                }
+              ],
+              "strokeWeight": 1,
+              "strokeAlign": "INSIDE",
+              "strokeCap": "NONE",
+              "strokeJoin": "MITER",
+              "children": [
+                {
+                  "name": "Frame 3301",
+                  "type": "FRAME",
+                  "width": 70,
+                  "height": 20,
+                  "layoutMode": "HORIZONTAL",
+                  "primaryAxisSizingMode": "AUTO",
+                  "counterAxisSizingMode": "AUTO",
+                  "primaryAxisAlignItems": "MIN",
+                  "counterAxisAlignItems": "CENTER",
+                  "itemSpacing": 4,
+                  "strokeWeight": 1,
+                  "strokeAlign": "INSIDE",
+                  "strokeCap": "NONE",
+                  "strokeJoin": "MITER",
+                  "children": [
+                    {
+                      "name": "Icon/translate",
+                      "type": "INSTANCE",
+                      "componentProperties": {
+                        "Style": {
+                          "value": "Regular",
+                          "type": "VARIANT",
+                          "displayValue": "Regular"
+                        },
+                        "Size": {
+                          "value": "20",
+                          "type": "VARIANT",
+                          "displayValue": "20"
+                        },
+                        "State": {
+                          "value": "Default",
+                          "type": "VARIANT",
+                          "displayValue": "Default"
+                        }
+                      },
+                      "width": 20,
+                      "height": 20,
+                      "layoutMode": "HORIZONTAL",
+                      "primaryAxisSizingMode": "FIXED",
+                      "counterAxisSizingMode": "FIXED",
+                      "primaryAxisAlignItems": "CENTER",
+                      "counterAxisAlignItems": "CENTER",
+                      "paddingLeft": 2,
+                      "paddingRight": 2,
+                      "paddingTop": 2,
+                      "paddingBottom": 2,
+                      "itemSpacing": 10,
+                      "fills": [
+                        {
+                          "type": "SOLID",
+                          "opacity": 1,
+                          "color": {
+                            "r": 1,
+                            "g": 1,
+                            "b": 1,
+                            "a": 1,
+                            "hex": "#ffffff"
+                          }
+                        }
+                      ],
+                      "strokeWeight": 1,
+                      "strokeAlign": "INSIDE",
+                      "strokeCap": "NONE",
+                      "strokeJoin": "MITER",
+                      "mainComponent": {
+                        "name": "Style=Regular, Size=20, State=Default"
+                      }
+                    },
+                    {
+                      "name": "English",
+                      "type": "TEXT",
+                      "width": 46,
+                      "height": 20,
+                      "fills": [
+                        {
+                          "name": "Variable 45505",
+                          "fullName": "Variable 45505",
+                          "notFound": true,
+                          "actualValue": {
+                            "type": "SOLID",
+                            "opacity": 1,
+                            "color": {
+                              "r": 1,
+                              "g": 1,
+                              "b": 1,
+                              "a": 1,
+                              "hex": "#ffffff"
+                            }
+                          }
+                        }
+                      ],
+                      "strokeWeight": 1,
+                      "strokeAlign": "OUTSIDE",
+                      "strokeCap": "NONE",
+                      "strokeJoin": "MITER",
+                      "textStyle": {
+                        "name": "Library Style bc1d8b24",
+                        "fullName": "[Library] Style bc1d8b24",
+                        "estimated": true
+                      },
+                      "variables": {
+                        "fills": [
+                          {
+                            "name": "Variable 45505",
+                            "fullName": "Variable 45505",
+                            "notFound": true,
+                            "actualValue": {
+                              "type": "SOLID",
+                              "opacity": 1,
+                              "color": {
+                                "r": 1,
+                                "g": 1,
+                                "b": 1,
+                                "a": 1,
+                                "hex": "#ffffff"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "characters": "English",
+                      "fontSize": 14,
+                      "fontName": {
+                        "family": "DM Sans",
+                        "style": "Regular"
+                      },
+                      "fontWeight": 400,
+                      "letterSpacing": {
+                        "unit": "PIXELS",
+                        "value": 0
+                      },
+                      "lineHeight": {
+                        "unit": "PIXELS",
+                        "value": 20
+                      },
+                      "textAlignHorizontal": "LEFT",
+                      "textAlignVertical": "TOP",
+                      "textAutoResize": "WIDTH_AND_HEIGHT",
+                      "textCase": "ORIGINAL",
+                      "textDecoration": "NONE",
+                      "textStyleName": "Text Style bc1d8b24..."
+                    }
+                  ]
+                },
+                {
+                  "name": "Icon/caret",
+                  "type": "INSTANCE",
+                  "componentProperties": {
+                    "Style": {
+                      "value": "Regular",
+                      "type": "VARIANT",
+                      "displayValue": "Regular"
+                    },
+                    "Size": {
+                      "value": "20",
+                      "type": "VARIANT",
+                      "displayValue": "20"
+                    },
+                    "State": {
+                      "value": "Default",
+                      "type": "VARIANT",
+                      "displayValue": "Default"
+                    },
+                    "Pointing": {
+                      "value": "Down",
+                      "type": "VARIANT",
+                      "displayValue": "Down"
+                    }
+                  },
+                  "width": 20,
+                  "height": 20,
+                  "layoutMode": "HORIZONTAL",
+                  "primaryAxisSizingMode": "FIXED",
+                  "counterAxisSizingMode": "FIXED",
+                  "primaryAxisAlignItems": "CENTER",
+                  "counterAxisAlignItems": "CENTER",
+                  "itemSpacing": 10,
+                  "strokeWeight": 0,
+                  "strokeAlign": "CENTER",
+                  "strokeCap": "NONE",
+                  "strokeJoin": "BEVEL",
+                  "mainComponent": {
+                    "name": "Style=Regular,Size=20,State=Default,Pointing=Down"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Icon/flask",
+              "type": "INSTANCE",
+              "skippedByOptimize": true
+            },
+            {
+              "name": "Bell and notification",
+              "type": "GROUP",
+              "skippedByOptimize": true
+            },
+            {
+              "name": "Heart and notification",
+              "type": "GROUP",
+              "skippedByOptimize": true
+            },
+            {
+              "name": "Single Diamond",
+              "type": "INSTANCE",
+              "componentProperties": {
+                "Size": {
+                  "value": "24",
+                  "type": "VARIANT",
+                  "displayValue": "24"
+                }
+              },
+              "width": 24,
+              "height": 24,
+              "layoutMode": "NONE",
+              "primaryAxisSizingMode": "AUTO",
+              "counterAxisSizingMode": "FIXED",
+              "primaryAxisAlignItems": "MIN",
+              "counterAxisAlignItems": "MIN",
+              "strokeWeight": 1,
+              "strokeAlign": "INSIDE",
+              "strokeCap": "NONE",
+              "strokeJoin": "MITER",
+              "mainComponent": {
+                "name": "Size=24"
+              }
+            },
+            {
+              "name": "Avatar",
+              "type": "INSTANCE",
+              "componentProperties": {
+                "State": {
+                  "value": "Initials",
+                  "type": "VARIANT",
+                  "displayValue": "Initials"
+                },
+                "Plan": {
+                  "value": "Pro",
+                  "type": "VARIANT",
+                  "displayValue": "Pro"
+                },
+                "Size": {
+                  "value": "40",
+                  "type": "VARIANT",
+                  "displayValue": "40"
+                }
+              },
+              "width": 42,
+              "height": 40,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "AUTO",
+              "counterAxisSizingMode": "AUTO",
+              "primaryAxisAlignItems": "MIN",
+              "counterAxisAlignItems": "CENTER",
+              "paddingLeft": 3,
+              "paddingRight": 3,
+              "itemSpacing": 10,
+              "fills": [
+                {
+                  "type": "SOLID",
+                  "opacity": 1,
+                  "color": {
+                    "r": 1,
+                    "g": 1,
+                    "b": 1,
+                    "a": 1,
+                    "hex": "#ffffff"
+                  }
+                }
+              ],
+              "strokeWeight": 0,
+              "strokeAlign": "CENTER",
+              "strokeCap": "NONE",
+              "strokeJoin": "BEVEL",
+              "mainComponent": {
+                "name": "State = Initials, Plan = Pro, Size = 40"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Property 1=large",
+      "type": "COMPONENT",
+      "width": 1440,
+      "height": 64,
+      "layoutMode": "HORIZONTAL",
+      "primaryAxisSizingMode": "FIXED",
+      "counterAxisSizingMode": "FIXED",
+      "primaryAxisAlignItems": "SPACE_BETWEEN",
+      "counterAxisAlignItems": "CENTER",
+      "paddingLeft": 24,
+      "paddingRight": 24,
+      "paddingTop": 24,
+      "paddingBottom": 24,
+      "itemSpacing": 380,
+      "fills": [
+        {
+          "name": "Variable 32217",
+          "fullName": "Variable 32217",
+          "notFound": true,
+          "actualValue": {
+            "type": "SOLID",
+            "opacity": 1,
+            "color": {
+              "r": 0.16862745583057404,
+              "g": 0,
+              "b": 0.1882352977991104,
+              "a": 1,
+              "hex": "#2b0030"
+            }
+          }
+        }
+      ],
+      "strokeWeight": 0,
+      "strokeAlign": "CENTER",
+      "strokeCap": "NONE",
+      "strokeJoin": "BEVEL",
+      "variables": {
+        "fills": [
+          {
+            "name": "Variable 32217",
+            "fullName": "Variable 32217",
+            "notFound": true,
+            "actualValue": {
+              "type": "SOLID",
+              "opacity": 1,
+              "color": {
+                "r": 0.16862745583057404,
+                "g": 0,
+                "b": 0.1882352977991104,
+                "a": 1,
+                "hex": "#2b0030"
+              }
+            }
+          }
+        ]
+      },
+      "componentInterfaceError": "Error: in get_componentPropertyDefinitions: Can only get component property definitions of a component set or non-variant component",
+      "children": [
+        {
+          "name": "Menu item",
+          "type": "FRAME",
+          "skippedByOptimize": true
+        },
+        {
+          "name": "Logo and tags",
+          "type": "FRAME",
+          "width": 24,
+          "height": 24,
+          "layoutMode": "HORIZONTAL",
+          "primaryAxisSizingMode": "AUTO",
+          "counterAxisSizingMode": "AUTO",
+          "primaryAxisAlignItems": "MIN",
+          "counterAxisAlignItems": "CENTER",
+          "itemSpacing": {
+            "name": "Variable 45849",
+            "fullName": "Variable 45849",
+            "notFound": true,
+            "actualValue": 16
+          },
+          "strokeWeight": 1,
+          "strokeAlign": "INSIDE",
+          "strokeCap": "NONE",
+          "strokeJoin": "MITER",
+          "variables": {
+            "itemSpacing": {
+              "name": "Variable 45849",
+              "fullName": "Variable 45849",
+              "notFound": true,
+              "actualValue": 16
+            }
+          },
+          "children": [
+            {
+              "name": "Sigma Logo",
+              "type": "INSTANCE",
+              "componentProperties": {
+                "Type": {
+                  "value": "Favicon",
+                  "type": "VARIANT",
+                  "displayValue": "Favicon"
+                }
+              },
+              "width": 24,
+              "height": 24,
+              "layoutMode": "NONE",
+              "primaryAxisSizingMode": "AUTO",
+              "counterAxisSizingMode": "FIXED",
+              "primaryAxisAlignItems": "MIN",
+              "counterAxisAlignItems": "MIN",
+              "strokeWeight": 1,
+              "strokeAlign": "INSIDE",
+              "strokeCap": "NONE",
+              "strokeJoin": "MITER",
+              "mainComponent": {
+                "name": "Type=Favicon"
+              }
+            },
+            {
+              "name": "Badge/Standard",
+              "type": "INSTANCE",
+              "skippedByOptimize": true
+            }
+          ]
+        },
+        {
+          "name": "Menu list",
+          "type": "FRAME",
+          "width": 524,
+          "height": 64,
+          "layoutMode": "HORIZONTAL",
+          "primaryAxisSizingMode": "AUTO",
+          "counterAxisSizingMode": "FIXED",
+          "primaryAxisAlignItems": "CENTER",
+          "counterAxisAlignItems": "CENTER",
+          "itemSpacing": 32,
+          "fills": [
+            {
+              "type": "SOLID",
+              "opacity": 1,
+              "color": {
+                "r": 1,
+                "g": 1,
+                "b": 1,
+                "a": 1,
+                "hex": "#ffffff"
+              }
+            }
+          ],
+          "strokeWeight": 0,
+          "strokeAlign": "CENTER",
+          "strokeCap": "NONE",
+          "strokeJoin": "BEVEL",
+          "children": [
+            {
+              "name": "Intelligence",
+              "type": "FRAME",
+              "width": 100,
+              "height": 64,
+              "layoutMode": "NONE",
+              "primaryAxisSizingMode": "AUTO",
+              "counterAxisSizingMode": "FIXED",
+              "primaryAxisAlignItems": "MIN",
+              "counterAxisAlignItems": "MIN",
+              "strokeWeight": 1,
+              "strokeAlign": "INSIDE",
+              "strokeCap": "NONE",
+              "strokeJoin": "MITER",
+              "children": [
+                {
+                  "name": "Brands",
+                  "type": "TEXT",
+                  "width": 87,
+                  "height": 24,
+                  "fills": [
+                    {
+                      "name": "Variable 6455",
+                      "fullName": "Variable 6455",
+                      "notFound": true,
+                      "actualValue": {
+                        "type": "SOLID",
+                        "opacity": 0.800000011920929,
+                        "color": {
+                          "r": 1,
+                          "g": 1,
+                          "b": 1,
+                          "a": 0.800000011920929,
+                          "hex": "#ffffffcc"
+                        }
+                      }
+                    }
+                  ],
+                  "strokeWeight": 0,
+                  "strokeAlign": "CENTER",
+                  "strokeCap": "NONE",
+                  "strokeJoin": "MITER",
+                  "textStyle": {
+                    "name": "Library Style 87276fda",
+                    "fullName": "[Library] Style 87276fda",
+                    "estimated": true
+                  },
+                  "variables": {
+                    "fills": [
+                      {
+                        "name": "Variable 6455",
+                        "fullName": "Variable 6455",
+                        "notFound": true,
+                        "actualValue": {
+                          "type": "SOLID",
+                          "opacity": 0.800000011920929,
+                          "color": {
+                            "r": 1,
+                            "g": 1,
+                            "b": 1,
+                            "a": 0.800000011920929,
+                            "hex": "#ffffffcc"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "characters": "Intelligence",
+                  "fontSize": 16,
+                  "fontName": {
+                    "family": "DM Sans",
+                    "style": "Medium"
+                  },
+                  "fontWeight": 500,
+                  "letterSpacing": {
+                    "unit": "PERCENT",
+                    "value": 0
+                  },
+                  "lineHeight": {
+                    "unit": "PIXELS",
+                    "value": 24
+                  },
+                  "textAlignHorizontal": "LEFT",
+                  "textAlignVertical": "TOP",
+                  "textAutoResize": "HEIGHT",
+                  "textCase": "ORIGINAL",
+                  "textDecoration": "NONE",
+                  "textStyleName": "Text Style 87276fda..."
+                },
+                {
+                  "name": "On",
+                  "type": "RECTANGLE",
+                  "skippedByOptimize": true
+                }
+              ]
+            },
+            {
+              "name": "Audiences",
+              "type": "FRAME",
+              "width": 80,
+              "height": 64,
+              "layoutMode": "NONE",
+              "primaryAxisSizingMode": "FIXED",
+              "counterAxisSizingMode": "AUTO",
+              "primaryAxisAlignItems": "CENTER",
+              "counterAxisAlignItems": "CENTER",
+              "fills": [
+                {
+                  "type": "SOLID",
+                  "opacity": 1,
+                  "color": {
+                    "r": 1,
+                    "g": 1,
+                    "b": 1,
+                    "a": 1,
+                    "hex": "#ffffff"
+                  }
+                }
+              ],
+              "strokeWeight": 0,
+              "strokeAlign": "CENTER",
+              "strokeCap": "NONE",
+              "strokeJoin": "BEVEL",
+              "children": [
+                {
+                  "name": "On",
+                  "type": "RECTANGLE",
+                  "width": 80,
+                  "height": 4,
+                  "topLeftRadius": 2,
+                  "topRightRadius": 2,
+                  "bottomLeftRadius": 0,
+                  "bottomRightRadius": 0,
+                  "fills": [
+                    {
+                      "name": "Variable 13128",
+                      "fullName": "Variable 13128",
+                      "notFound": true,
+                      "actualValue": {
+                        "type": "GRADIENT_LINEAR",
+                        "opacity": 1,
+                        "gradientStops": [
+                          {
+                            "position": 0.2552083432674408,
+                            "color": {
+                              "r": 0.843137264251709,
+                              "g": 0.09803921729326248,
+                              "b": 0.5098039507865906,
+                              "a": 1,
+                              "hex": "#d71982"
+                            }
+                          },
+                          {
+                            "position": 0.59375,
+                            "color": {
+                              "r": 1,
+                              "g": 0.3294117748737335,
+                              "b": 0.0470588244497776,
+                              "a": 1,
+                              "hex": "#ff540c"
+                            }
+                          },
+                          {
+                            "position": 1,
+                            "color": {
+                              "r": 0.9400749206542969,
+                              "g": 0.909967839717865,
+                              "b": 0.07126821577548981,
+                              "a": 1,
+                              "hex": "#f0e812"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "Variable 40454",
+                      "fullName": "Variable 40454",
+                      "notFound": true
+                    },
+                    {
+                      "name": "Variable 40455",
+                      "fullName": "Variable 40455",
+                      "notFound": true
+                    }
+                  ],
+                  "fillStyle": {
+                    "name": "Library Style 905fa13e",
+                    "fullName": "[Library] Style 905fa13e",
+                    "estimated": true
+                  },
+                  "strokeWeight": 0,
+                  "strokeAlign": "CENTER",
+                  "strokeCap": "NONE",
+                  "strokeJoin": "MITER",
+                  "variables": {
+                    "fills": [
+                      {
+                        "name": "Variable 13128",
+                        "fullName": "Variable 13128",
+                        "notFound": true,
+                        "actualValue": {
+                          "type": "GRADIENT_LINEAR",
+                          "opacity": 1,
+                          "gradientStops": [
+                            {
+                              "position": 0.2552083432674408,
+                              "color": {
+                                "r": 0.843137264251709,
+                                "g": 0.09803921729326248,
+                                "b": 0.5098039507865906,
+                                "a": 1,
+                                "hex": "#d71982"
+                              }
+                            },
+                            {
+                              "position": 0.59375,
+                              "color": {
+                                "r": 1,
+                                "g": 0.3294117748737335,
+                                "b": 0.0470588244497776,
+                                "a": 1,
+                                "hex": "#ff540c"
+                              }
+                            },
+                            {
+                              "position": 1,
+                              "color": {
+                                "r": 0.9400749206542969,
+                                "g": 0.909967839717865,
+                                "b": 0.07126821577548981,
+                                "a": 1,
+                                "hex": "#f0e812"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "name": "Variable 40454",
+                        "fullName": "Variable 40454",
+                        "notFound": true
+                      },
+                      {
+                        "name": "Variable 40455",
+                        "fullName": "Variable 40455",
+                        "notFound": true
+                      }
+                    ]
+                  }
+                },
+                {
+                  "name": "Audiences",
+                  "type": "TEXT",
+                  "width": 80,
+                  "height": 24,
+                  "fills": [
+                    {
+                      "name": "Variable 45505",
+                      "fullName": "Variable 45505",
+                      "notFound": true,
+                      "actualValue": {
+                        "type": "SOLID",
+                        "opacity": 1,
+                        "color": {
+                          "r": 1,
+                          "g": 1,
+                          "b": 1,
+                          "a": 1,
+                          "hex": "#ffffff"
+                        }
+                      }
+                    }
+                  ],
+                  "strokeWeight": 0,
+                  "strokeAlign": "CENTER",
+                  "strokeCap": "NONE",
+                  "strokeJoin": "MITER",
+                  "textStyle": {
+                    "name": "Library Style 87276fda",
+                    "fullName": "[Library] Style 87276fda",
+                    "estimated": true
+                  },
+                  "variables": {
+                    "fills": [
+                      {
+                        "name": "Variable 45505",
+                        "fullName": "Variable 45505",
+                        "notFound": true,
+                        "actualValue": {
+                          "type": "SOLID",
+                          "opacity": 1,
+                          "color": {
+                            "r": 1,
+                            "g": 1,
+                            "b": 1,
+                            "a": 1,
+                            "hex": "#ffffff"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "characters": "Audiences",
+                  "fontSize": 16,
+                  "fontName": {
+                    "family": "DM Sans",
+                    "style": "Medium"
+                  },
+                  "fontWeight": 500,
+                  "letterSpacing": {
+                    "unit": "PERCENT",
+                    "value": 0
+                  },
+                  "lineHeight": {
+                    "unit": "PIXELS",
+                    "value": 24
+                  },
+                  "textAlignHorizontal": "LEFT",
+                  "textAlignVertical": "TOP",
+                  "textAutoResize": "WIDTH_AND_HEIGHT",
+                  "textCase": "ORIGINAL",
+                  "textDecoration": "NONE",
+                  "textStyleName": "Text Style 87276fda..."
+                }
+              ]
+            },
+            {
+              "name": "Creatives",
+              "type": "FRAME",
+              "width": 72,
+              "height": 64,
+              "layoutMode": "NONE",
+              "primaryAxisSizingMode": "AUTO",
+              "counterAxisSizingMode": "FIXED",
+              "primaryAxisAlignItems": "MIN",
+              "counterAxisAlignItems": "MIN",
+              "strokeWeight": 1,
+              "strokeAlign": "INSIDE",
+              "strokeCap": "NONE",
+              "strokeJoin": "MITER",
+              "children": [
+                {
+                  "name": "Analyze",
+                  "type": "TEXT",
+                  "width": 72,
+                  "height": 24,
+                  "fills": [
+                    {
+                      "name": "Variable 6455",
+                      "fullName": "Variable 6455",
+                      "notFound": true,
+                      "actualValue": {
+                        "type": "SOLID",
+                        "opacity": 0.800000011920929,
+                        "color": {
+                          "r": 1,
+                          "g": 1,
+                          "b": 1,
+                          "a": 0.800000011920929,
+                          "hex": "#ffffffcc"
+                        }
+                      }
+                    }
+                  ],
+                  "strokeWeight": 0,
+                  "strokeAlign": "CENTER",
+                  "strokeCap": "NONE",
+                  "strokeJoin": "MITER",
+                  "textStyle": {
+                    "name": "Library Style 87276fda",
+                    "fullName": "[Library] Style 87276fda",
+                    "estimated": true
+                  },
+                  "variables": {
+                    "fills": [
+                      {
+                        "name": "Variable 6455",
+                        "fullName": "Variable 6455",
+                        "notFound": true,
+                        "actualValue": {
+                          "type": "SOLID",
+                          "opacity": 0.800000011920929,
+                          "color": {
+                            "r": 1,
+                            "g": 1,
+                            "b": 1,
+                            "a": 0.800000011920929,
+                            "hex": "#ffffffcc"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "characters": "Creatives",
+                  "fontSize": 16,
+                  "fontName": {
+                    "family": "DM Sans",
+                    "style": "Medium"
+                  },
+                  "fontWeight": 500,
+                  "letterSpacing": {
+                    "unit": "PERCENT",
+                    "value": 0
+                  },
+                  "lineHeight": {
+                    "unit": "PIXELS",
+                    "value": 24
+                  },
+                  "textAlignHorizontal": "LEFT",
+                  "textAlignVertical": "TOP",
+                  "textAutoResize": "HEIGHT",
+                  "textCase": "ORIGINAL",
+                  "textDecoration": "NONE",
+                  "textStyleName": "Text Style 87276fda..."
+                },
+                {
+                  "name": "On",
+                  "type": "RECTANGLE",
+                  "skippedByOptimize": true
+                }
+              ]
+            },
+            {
+              "name": "Campaigns",
+              "type": "FRAME",
+              "width": 85,
+              "height": 64,
+              "layoutMode": "NONE",
+              "primaryAxisSizingMode": "AUTO",
+              "counterAxisSizingMode": "FIXED",
+              "primaryAxisAlignItems": "MIN",
+              "counterAxisAlignItems": "MIN",
+              "fills": [
+                {
+                  "type": "SOLID",
+                  "opacity": 1,
+                  "color": {
+                    "r": 1,
+                    "g": 1,
+                    "b": 1,
+                    "a": 1,
+                    "hex": "#ffffff"
+                  }
+                }
+              ],
+              "strokeWeight": 0,
+              "strokeAlign": "CENTER",
+              "strokeCap": "NONE",
+              "strokeJoin": "BEVEL",
+              "children": [
+                {
+                  "name": "Report",
+                  "type": "TEXT",
+                  "width": 85,
+                  "height": 24,
+                  "fills": [
+                    {
+                      "name": "Variable 6455",
+                      "fullName": "Variable 6455",
+                      "notFound": true,
+                      "actualValue": {
+                        "type": "SOLID",
+                        "opacity": 0.800000011920929,
+                        "color": {
+                          "r": 1,
+                          "g": 1,
+                          "b": 1,
+                          "a": 0.800000011920929,
+                          "hex": "#ffffffcc"
+                        }
+                      }
+                    }
+                  ],
+                  "strokeWeight": 0,
+                  "strokeAlign": "CENTER",
+                  "strokeCap": "NONE",
+                  "strokeJoin": "MITER",
+                  "textStyle": {
+                    "name": "Library Style 87276fda",
+                    "fullName": "[Library] Style 87276fda",
+                    "estimated": true
+                  },
+                  "variables": {
+                    "fills": [
+                      {
+                        "name": "Variable 6455",
+                        "fullName": "Variable 6455",
+                        "notFound": true,
+                        "actualValue": {
+                          "type": "SOLID",
+                          "opacity": 0.800000011920929,
+                          "color": {
+                            "r": 1,
+                            "g": 1,
+                            "b": 1,
+                            "a": 0.800000011920929,
+                            "hex": "#ffffffcc"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "characters": "Campaigns",
+                  "fontSize": 16,
+                  "fontName": {
+                    "family": "DM Sans",
+                    "style": "Medium"
+                  },
+                  "fontWeight": 500,
+                  "letterSpacing": {
+                    "unit": "PERCENT",
+                    "value": 0
+                  },
+                  "lineHeight": {
+                    "unit": "PIXELS",
+                    "value": 24
+                  },
+                  "textAlignHorizontal": "CENTER",
+                  "textAlignVertical": "TOP",
+                  "textAutoResize": "WIDTH_AND_HEIGHT",
+                  "textCase": "ORIGINAL",
+                  "textDecoration": "NONE",
+                  "textStyleName": "Text Style 87276fda..."
+                },
+                {
+                  "name": "On",
+                  "type": "RECTANGLE",
+                  "skippedByOptimize": true
+                }
+              ]
+            },
+            {
+              "name": "Reports",
+              "type": "FRAME",
+              "width": 59,
+              "height": 64,
+              "layoutMode": "NONE",
+              "primaryAxisSizingMode": "AUTO",
+              "counterAxisSizingMode": "FIXED",
+              "primaryAxisAlignItems": "MIN",
+              "counterAxisAlignItems": "MIN",
+              "strokeWeight": 1,
+              "strokeAlign": "INSIDE",
+              "strokeCap": "NONE",
+              "strokeJoin": "MITER",
+              "children": [
+                {
+                  "name": "Reports",
+                  "type": "TEXT",
+                  "width": 59,
+                  "height": 24,
+                  "fills": [
+                    {
+                      "name": "Variable 6455",
+                      "fullName": "Variable 6455",
+                      "notFound": true,
+                      "actualValue": {
+                        "type": "SOLID",
+                        "opacity": 0.800000011920929,
+                        "color": {
+                          "r": 1,
+                          "g": 1,
+                          "b": 1,
+                          "a": 0.800000011920929,
+                          "hex": "#ffffffcc"
+                        }
+                      }
+                    }
+                  ],
+                  "strokeWeight": 0,
+                  "strokeAlign": "CENTER",
+                  "strokeCap": "NONE",
+                  "strokeJoin": "MITER",
+                  "textStyle": {
+                    "name": "Library Style 87276fda",
+                    "fullName": "[Library] Style 87276fda",
+                    "estimated": true
+                  },
+                  "variables": {
+                    "fills": [
+                      {
+                        "name": "Variable 6455",
+                        "fullName": "Variable 6455",
+                        "notFound": true,
+                        "actualValue": {
+                          "type": "SOLID",
+                          "opacity": 0.800000011920929,
+                          "color": {
+                            "r": 1,
+                            "g": 1,
+                            "b": 1,
+                            "a": 0.800000011920929,
+                            "hex": "#ffffffcc"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "characters": "Reports",
+                  "fontSize": 16,
+                  "fontName": {
+                    "family": "DM Sans",
+                    "style": "Medium"
+                  },
+                  "fontWeight": 500,
+                  "letterSpacing": {
+                    "unit": "PERCENT",
+                    "value": 0
+                  },
+                  "lineHeight": {
+                    "unit": "PIXELS",
+                    "value": 24
+                  },
+                  "textAlignHorizontal": "LEFT",
+                  "textAlignVertical": "TOP",
+                  "textAutoResize": "WIDTH_AND_HEIGHT",
+                  "textCase": "ORIGINAL",
+                  "textDecoration": "NONE",
+                  "textStyleName": "Text Style 87276fda..."
+                },
+                {
+                  "name": "On",
+                  "type": "RECTANGLE",
+                  "skippedByOptimize": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "right",
+          "type": "FRAME",
+          "width": 228,
+          "height": 40,
+          "layoutMode": "HORIZONTAL",
+          "primaryAxisSizingMode": "AUTO",
+          "counterAxisSizingMode": "AUTO",
+          "primaryAxisAlignItems": "MAX",
+          "counterAxisAlignItems": "CENTER",
+          "itemSpacing": 20,
+          "strokeWeight": 1,
+          "strokeAlign": "INSIDE",
+          "strokeCap": "NONE",
+          "strokeJoin": "MITER",
+          "children": [
+            {
+              "name": "Icon/magnifying-glass",
+              "type": "INSTANCE",
+              "skippedByOptimize": true
+            },
+            {
+              "name": "language",
+              "type": "FRAME",
+              "width": 122,
+              "height": 34,
+              "cornerRadius": 2,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "AUTO",
+              "counterAxisSizingMode": "FIXED",
+              "primaryAxisAlignItems": "CENTER",
+              "counterAxisAlignItems": "CENTER",
+              "paddingLeft": 12,
+              "paddingRight": 12,
+              "paddingTop": 4,
+              "paddingBottom": 4,
+              "itemSpacing": 8,
+              "fills": [
+                {
+                  "type": "SOLID",
+                  "opacity": 0.20000000298023224,
+                  "color": {
+                    "r": 1,
+                    "g": 1,
+                    "b": 1,
+                    "a": 0.20000000298023224,
+                    "hex": "#ffffff33"
+                  }
+                }
+              ],
+              "strokeWeight": 1,
+              "strokeAlign": "INSIDE",
+              "strokeCap": "NONE",
+              "strokeJoin": "MITER",
+              "children": [
+                {
+                  "name": "Frame 3301",
+                  "type": "FRAME",
+                  "width": 70,
+                  "height": 20,
+                  "layoutMode": "HORIZONTAL",
+                  "primaryAxisSizingMode": "AUTO",
+                  "counterAxisSizingMode": "AUTO",
+                  "primaryAxisAlignItems": "MIN",
+                  "counterAxisAlignItems": "CENTER",
+                  "itemSpacing": 4,
+                  "strokeWeight": 1,
+                  "strokeAlign": "INSIDE",
+                  "strokeCap": "NONE",
+                  "strokeJoin": "MITER",
+                  "children": [
+                    {
+                      "name": "Icon/translate",
+                      "type": "INSTANCE",
+                      "componentProperties": {
+                        "Style": {
+                          "value": "Regular",
+                          "type": "VARIANT",
+                          "displayValue": "Regular"
+                        },
+                        "Size": {
+                          "value": "20",
+                          "type": "VARIANT",
+                          "displayValue": "20"
+                        },
+                        "State": {
+                          "value": "Default",
+                          "type": "VARIANT",
+                          "displayValue": "Default"
+                        }
+                      },
+                      "width": 20,
+                      "height": 20,
+                      "layoutMode": "HORIZONTAL",
+                      "primaryAxisSizingMode": "FIXED",
+                      "counterAxisSizingMode": "FIXED",
+                      "primaryAxisAlignItems": "CENTER",
+                      "counterAxisAlignItems": "CENTER",
+                      "paddingLeft": 2,
+                      "paddingRight": 2,
+                      "paddingTop": 2,
+                      "paddingBottom": 2,
+                      "itemSpacing": 10,
+                      "fills": [
+                        {
+                          "type": "SOLID",
+                          "opacity": 1,
+                          "color": {
+                            "r": 1,
+                            "g": 1,
+                            "b": 1,
+                            "a": 1,
+                            "hex": "#ffffff"
+                          }
+                        }
+                      ],
+                      "strokeWeight": 1,
+                      "strokeAlign": "INSIDE",
+                      "strokeCap": "NONE",
+                      "strokeJoin": "MITER",
+                      "mainComponent": {
+                        "name": "Style=Regular, Size=20, State=Default"
+                      }
+                    },
+                    {
+                      "name": "English",
+                      "type": "TEXT",
+                      "width": 46,
+                      "height": 20,
+                      "fills": [
+                        {
+                          "name": "Variable 45505",
+                          "fullName": "Variable 45505",
+                          "notFound": true,
+                          "actualValue": {
+                            "type": "SOLID",
+                            "opacity": 1,
+                            "color": {
+                              "r": 1,
+                              "g": 1,
+                              "b": 1,
+                              "a": 1,
+                              "hex": "#ffffff"
+                            }
+                          }
+                        }
+                      ],
+                      "strokeWeight": 1,
+                      "strokeAlign": "OUTSIDE",
+                      "strokeCap": "NONE",
+                      "strokeJoin": "MITER",
+                      "textStyle": {
+                        "name": "Library Style bc1d8b24",
+                        "fullName": "[Library] Style bc1d8b24",
+                        "estimated": true
+                      },
+                      "variables": {
+                        "fills": [
+                          {
+                            "name": "Variable 45505",
+                            "fullName": "Variable 45505",
+                            "notFound": true,
+                            "actualValue": {
+                              "type": "SOLID",
+                              "opacity": 1,
+                              "color": {
+                                "r": 1,
+                                "g": 1,
+                                "b": 1,
+                                "a": 1,
+                                "hex": "#ffffff"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "characters": "English",
+                      "fontSize": 14,
+                      "fontName": {
+                        "family": "DM Sans",
+                        "style": "Regular"
+                      },
+                      "fontWeight": 400,
+                      "letterSpacing": {
+                        "unit": "PIXELS",
+                        "value": 0
+                      },
+                      "lineHeight": {
+                        "unit": "PIXELS",
+                        "value": 20
+                      },
+                      "textAlignHorizontal": "LEFT",
+                      "textAlignVertical": "TOP",
+                      "textAutoResize": "WIDTH_AND_HEIGHT",
+                      "textCase": "ORIGINAL",
+                      "textDecoration": "NONE",
+                      "textStyleName": "Text Style bc1d8b24..."
+                    }
+                  ]
+                },
+                {
+                  "name": "Icon/caret",
+                  "type": "INSTANCE",
+                  "componentProperties": {
+                    "Style": {
+                      "value": "Regular",
+                      "type": "VARIANT",
+                      "displayValue": "Regular"
+                    },
+                    "Size": {
+                      "value": "20",
+                      "type": "VARIANT",
+                      "displayValue": "20"
+                    },
+                    "State": {
+                      "value": "Default",
+                      "type": "VARIANT",
+                      "displayValue": "Default"
+                    },
+                    "Pointing": {
+                      "value": "Down",
+                      "type": "VARIANT",
+                      "displayValue": "Down"
+                    }
+                  },
+                  "width": 20,
+                  "height": 20,
+                  "layoutMode": "HORIZONTAL",
+                  "primaryAxisSizingMode": "FIXED",
+                  "counterAxisSizingMode": "FIXED",
+                  "primaryAxisAlignItems": "CENTER",
+                  "counterAxisAlignItems": "CENTER",
+                  "itemSpacing": 10,
+                  "strokeWeight": 0,
+                  "strokeAlign": "CENTER",
+                  "strokeCap": "NONE",
+                  "strokeJoin": "BEVEL",
+                  "mainComponent": {
+                    "name": "Style=Regular,Size=20,State=Default,Pointing=Down"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Icon/flask",
+              "type": "INSTANCE",
+              "skippedByOptimize": true
+            },
+            {
+              "name": "Bell and notification",
+              "type": "GROUP",
+              "skippedByOptimize": true
+            },
+            {
+              "name": "Heart and notification",
+              "type": "GROUP",
+              "skippedByOptimize": true
+            },
+            {
+              "name": "Single Diamond",
+              "type": "INSTANCE",
+              "componentProperties": {
+                "Size": {
+                  "value": "24",
+                  "type": "VARIANT",
+                  "displayValue": "24"
+                }
+              },
+              "width": 24,
+              "height": 24,
+              "layoutMode": "NONE",
+              "primaryAxisSizingMode": "AUTO",
+              "counterAxisSizingMode": "FIXED",
+              "primaryAxisAlignItems": "MIN",
+              "counterAxisAlignItems": "MIN",
+              "strokeWeight": 1,
+              "strokeAlign": "INSIDE",
+              "strokeCap": "NONE",
+              "strokeJoin": "MITER",
+              "mainComponent": {
+                "name": "Size=24"
+              }
+            },
+            {
+              "name": "Avatar",
+              "type": "INSTANCE",
+              "componentProperties": {
+                "State": {
+                  "value": "Initials",
+                  "type": "VARIANT",
+                  "displayValue": "Initials"
+                },
+                "Plan": {
+                  "value": "Pro",
+                  "type": "VARIANT",
+                  "displayValue": "Pro"
+                },
+                "Size": {
+                  "value": "40",
+                  "type": "VARIANT",
+                  "displayValue": "40"
+                }
+              },
+              "width": 42,
+              "height": 40,
+              "layoutMode": "HORIZONTAL",
+              "primaryAxisSizingMode": "AUTO",
+              "counterAxisSizingMode": "AUTO",
+              "primaryAxisAlignItems": "MIN",
+              "counterAxisAlignItems": "CENTER",
+              "paddingLeft": 3,
+              "paddingRight": 3,
+              "itemSpacing": 10,
+              "fills": [
+                {
+                  "type": "SOLID",
+                  "opacity": 1,
+                  "color": {
+                    "r": 1,
+                    "g": 1,
+                    "b": 1,
+                    "a": 1,
+                    "hex": "#ffffff"
+                  }
+                }
+              ],
+              "strokeWeight": 0,
+              "strokeAlign": "CENTER",
+              "strokeCap": "NONE",
+              "strokeJoin": "BEVEL",
+              "mainComponent": {
+                "name": "State = Initials, Plan = Pro, Size = 40"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "textContent": [
+    {
+      "name": "Brands",
+      "text": "Intelligence",
+      "path": "Primary Navigation/Property 1=sm/Menu item/Menu/Intelligence/Brands",
+      "nodeType": "TEXT"
+    },
+    {
+      "name": "English",
+      "text": "English",
+      "path": "Primary Navigation/Property 1=sm/right/language/Frame 3301/English",
+      "nodeType": "TEXT"
+    },
+    {
+      "name": "Brands",
+      "text": "Intelligence",
+      "path": "Primary Navigation/Property 1=large/Menu list/Intelligence/Brands",
+      "nodeType": "TEXT"
+    },
+    {
+      "name": "Audiences",
+      "text": "Audiences",
+      "path": "Primary Navigation/Property 1=large/Menu list/Audiences/Audiences",
+      "nodeType": "TEXT"
+    },
+    {
+      "name": "Analyze",
+      "text": "Creatives",
+      "path": "Primary Navigation/Property 1=large/Menu list/Creatives/Analyze",
+      "nodeType": "TEXT"
+    },
+    {
+      "name": "Report",
+      "text": "Campaigns",
+      "path": "Primary Navigation/Property 1=large/Menu list/Campaigns/Report",
+      "nodeType": "TEXT"
+    },
+    {
+      "name": "Reports",
+      "text": "Reports",
+      "path": "Primary Navigation/Property 1=large/Menu list/Reports/Reports",
+      "nodeType": "TEXT"
+    },
+    {
+      "name": "English",
+      "text": "English",
+      "path": "Primary Navigation/Property 1=large/right/language/Frame 3301/English",
+      "nodeType": "TEXT"
+    }
+  ]
+}
