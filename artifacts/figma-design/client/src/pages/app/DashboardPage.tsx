@@ -1,13 +1,22 @@
 /* =========================================================================
- * Fiber Workspace — Dashboard (/)
+ * Fiber Workspace — Welcome / Module Selection (/)
  *
- * Welcome header + module cards using the Fiber card anatomy (icon, title,
- * description, arrow CTA).
+ * Standalone entry point rendered WITHOUT the left sidebar: a slim shared
+ * header (reused by the sidebar AppShell) over a centered welcome heading and
+ * the four module tiles. Selecting a module routes into the sidebar workspace.
+ *
+ * Each tile is a SINGLE clickable <Link> — no nested interactive controls (the
+ * arrow is a decorative icon only).
+ *
+ * COLOR CONVENTION: token-driven colors use inline style objects
+ * (var(--token, fallbackHex)) — Tailwind arbitrary var()/rgba color classes can
+ * silently fail. Layout / spacing / typography-size classes stay as utilities.
  *
  * FUTURE WORKFLOW (not implemented): the modules are designed to connect as
  *   Design System → AI Prototype → Flow Chart → Usability Testing.
  * ========================================================================= */
 
+import { useState } from "react";
 import { Link } from "wouter";
 import {
   Palette,
@@ -17,11 +26,20 @@ import {
   ArrowRight,
   type IconProps,
 } from "@phosphor-icons/react";
+import { WorkspaceHeader } from "./WorkspaceHeader";
+import { CURRENT_USER } from "./auth";
 
-const surface = "bg-[var(--surface-background-lvl1,#ffffff)]";
-const borderToken = "border-[var(--border-static-subtle-neutral,#e1e1e8)]";
-const textPrimary = "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]";
-const textMuted = "text-[var(--surface-foreground-static-neutral-lvl3,#717180)]";
+// Token-driven colors (var(--token, fallbackHex)) — flip with [data-theme].
+const C = {
+  surface: "var(--surface-background-lvl1,#ffffff)",
+  canvasBg: "var(--surface-background-lvl2,#f7f7fa)",
+  border: "var(--border-static-subtle-neutral,#e1e1e8)",
+  textPrimary: "var(--surface-foreground-static-neutral-lvl1,#13131a)",
+  textMuted: "var(--surface-foreground-static-neutral-lvl3,#717180)",
+  brandSubtle: "var(--container-dynamic-brand-subtle-background-default,#f6ebff)",
+  brandFg: "var(--surface-foreground-dynamic-brand-default,#7c33b5)",
+  arrow: "var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)",
+};
 
 type IconType = React.ComponentType<IconProps>;
 
@@ -35,7 +53,7 @@ interface ModuleCard {
 const CARDS: ModuleCard[] = [
   {
     href: "/design-system",
-    title: "Design System",
+    title: "Fiber Design System",
     description: "Explore Fiber components, variants and tokens imported live from Figma.",
     icon: Palette,
   },
@@ -59,63 +77,88 @@ const CARDS: ModuleCard[] = [
   },
 ];
 
-export default function DashboardPage(): JSX.Element {
+function ModuleTile({ card }: { card: ModuleCard }) {
+  const [hover, setHover] = useState(false);
+  const Icon = card.icon;
   return (
-    <div className="mx-auto w-full max-w-[1080px] px-6 py-8 md:px-10 md:py-10">
-      {/* Welcome header */}
-      <div className="flex flex-col gap-[var(--spacing-100,8px)]">
-        <h1
-          className={`text-[length:var(--headline-lg-semibold-size,28px)] font-semibold tracking-[-1px] ${textPrimary}`}
+    <Link
+      href={card.href}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      className="group flex flex-col gap-[var(--spacing-300,24px)] rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-400,32px)] transition-shadow"
+      style={{
+        backgroundColor: C.surface,
+        borderColor: C.border,
+        boxShadow: hover ? "var(--elevation-hover)" : undefined,
+      }}
+    >
+      <div className="flex items-center justify-between">
+        <span
+          className="flex size-[52px] items-center justify-center rounded-[var(--radius-100,8px)]"
+          style={{ backgroundColor: C.brandSubtle }}
         >
-          Welcome back, Vijay
-        </h1>
-        <p className={`max-w-[640px] text-[length:var(--body-lg-regular-size,16px)] ${textMuted}`}>
-          Jump into a module below. The workspace is designed as a connected pipeline:{" "}
-          <span className="font-medium text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]">
-            Design System → AI Prototype → Flow Chart → Usability Testing
-          </span>
-          .
+          <Icon size={28} weight="fill" style={{ color: C.brandFg }} />
+        </span>
+        <ArrowRight
+          size={20}
+          className="translate-x-0 transition-transform group-hover:translate-x-0.5"
+          style={{ color: C.arrow }}
+        />
+      </div>
+      <div className="flex flex-col gap-[var(--spacing-75,6px)]">
+        <h2 className="text-[18px] font-semibold" style={{ color: C.textPrimary }}>
+          {card.title}
+        </h2>
+        <p
+          className="text-[length:var(--body-md-regular-size,14px)]"
+          style={{ color: C.textMuted }}
+        >
+          {card.description}
         </p>
       </div>
+    </Link>
+  );
+}
 
-      {/* Module cards */}
-      <div className="mt-[var(--spacing-400,32px)] grid grid-cols-1 gap-[var(--spacing-200,16px)] sm:grid-cols-2">
-        {CARDS.map((card) => {
-          const Icon = card.icon;
-          return (
-            <Link
-              key={card.href}
-              href={card.href}
-              className={`group flex flex-col gap-[var(--spacing-200,16px)] rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-300,24px)] transition-shadow hover:shadow-[var(--elevation-hover)] ${borderToken} ${surface}`}
+export default function DashboardPage(): JSX.Element {
+  return (
+    <div
+      className="flex min-h-screen flex-col"
+      style={{ backgroundColor: C.canvasBg, fontFamily: '"Poppins", "DM Sans", sans-serif' }}
+    >
+      {/* Shared slim header — no logo link (already on the Welcome screen). */}
+      <WorkspaceHeader />
+
+      <main className="flex flex-1 items-start justify-center px-6 py-12 md:py-16">
+        <div className="flex w-full max-w-[1080px] flex-col">
+          {/* Welcome header */}
+          <div className="flex flex-col items-center gap-[var(--spacing-100,8px)] text-center">
+            <h1
+              className="text-[length:var(--headline-lg-semibold-size,28px)] font-semibold tracking-[-1px]"
+              style={{ color: C.textPrimary }}
             >
-              <div className="flex items-center justify-between">
-                <span className="flex size-[40px] items-center justify-center rounded-[var(--radius-50,4px)] bg-[var(--container-dynamic-brand-subtle-background-default,#f6ebff)]">
-                  <Icon
-                    size={22}
-                    weight="fill"
-                    color="var(--surface-foreground-dynamic-brand-default,#7c33b5)"
-                  />
-                </span>
-                <ArrowRight
-                  size={18}
-                  className="translate-x-0 transition-transform group-hover:translate-x-0.5"
-                  color="var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)"
-                />
-              </div>
-              <div className="flex flex-col gap-[var(--spacing-50,4px)]">
-                <h2
-                  className={`text-[length:var(--headline-xs-medium-size,16px)] font-semibold ${textPrimary}`}
-                >
-                  {card.title}
-                </h2>
-                <p className={`text-[length:var(--body-md-regular-size,14px)] ${textMuted}`}>
-                  {card.description}
-                </p>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+              Welcome back, {CURRENT_USER}
+            </h1>
+            <p
+              className="max-w-[640px] text-[length:var(--body-lg-regular-size,16px)]"
+              style={{ color: C.textMuted }}
+            >
+              Choose a module to get started. The workspace is designed as a connected pipeline:{" "}
+              <span className="font-medium" style={{ color: C.brandFg }}>
+                Design System → AI Prototype → Flow Chart → Usability Testing
+              </span>
+              .
+            </p>
+          </div>
+
+          {/* Module tiles */}
+          <div className="mt-[var(--spacing-500,40px)] grid grid-cols-1 gap-[var(--spacing-300,24px)] sm:grid-cols-2">
+            {CARDS.map((card) => (
+              <ModuleTile key={card.href} card={card} />
+            ))}
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

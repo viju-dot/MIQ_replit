@@ -97,8 +97,14 @@ function Router() {
         </RequireAuth>
       </Route>
 
-      {/* Dashboard */}
-      <Route path="/">{shell(DashboardPage)}</Route>
+      {/* Welcome / module selection — standalone (no sidebar), still auth-gated. */}
+      <Route path="/">
+        <RequireAuth>
+          <Suspense fallback={null}>
+            <DashboardPage />
+          </Suspense>
+        </RequireAuth>
+      </Route>
 
       {/* Design System explorer (module root + component slug). */}
       <Route path="/design-system">{shell(DsLayout)}</Route>

@@ -1,0 +1,162 @@
+Task 1: Create a Component Rules Page for the Fiber Design System
+Description
+
+Now that the Design System Explorer is becoming more complete, I want to introduce a new page called Component Rules under the Fiber Design System module.
+
+The goal of this page is to create a reusable rule engine for Design System components.
+
+Currently, many of our Figma components use Slots, Preferred Instances, Component Properties, and nested components. As the Design System grows, it becomes difficult to remember how each component should behave and how different properties should be configured.
+
+Instead of defining the same behavior repeatedly for every component, I want to define common reusable rules that can later be applied across multiple components.
+
+Think of this page as the foundation for a future AI-powered Component Behavior Engine.
+
+Navigation
+
+Inside the Fiber Design System module, create a new page called:
+
+Component Rules
+
+Place it alongside the existing Design System pages.
+
+Objective
+
+Build the first version of a reusable Component Rules workspace.
+
+This version is only for creating and managing rules.
+
+Do not apply the rules to components yet.
+
+User Experience
+
+Rather than creating a complicated configuration screen, make the experience conversational and easy to understand.
+
+Split the page into two sections.
+
+Left Panel
+
+Display all created rules.
+
+Features:
+
+Search Rules
+Rule Categories
+Create New Rule
+Edit Rule
+Delete Rule
+Duplicate Rule
+Right Panel
+
+Create an AI-style chat interface where I can describe component behavior using natural language.
+
+For example:
+
+"Buttons should always have a text label. Leading and trailing icons are optional. Loading state disables interaction. Disabled buttons cannot receive hover states."
+
+The system should capture this conversation and convert it into a reusable rule.
+
+The chat should feel like I'm teaching the Design System how a component should behave.
+
+Rule Structure
+
+Internally, every rule should support information such as:
+
+Rule Name
+Description
+Target Component(s)
+Supported Properties
+Allowed Variants
+Allowed States
+Restrictions
+Default Behavior
+Notes
+
+Keep this structure internal. The UI should remain simple and conversational.
+
+Reusability
+
+The primary purpose of this page is to avoid recreating the same behavior repeatedly.
+
+One rule should be reusable across multiple components.
+
+Examples:
+
+A "Disabled State" rule could later be applied to:
+
+Buttons
+Inputs
+Dropdowns
+Checkboxes
+Switches
+
+This should become the common behavior library for the entire Design System.
+
+Future Architecture (Do Not Implement Yet)
+
+Design the architecture so we can later support:
+
+AI-generated rules
+Rule templates
+Rule inheritance
+Rule version history
+Rule validation against Figma components
+Apply one rule to multiple components
+Conflict detection
+AI behavior recommendations
+
+Do not build these features yet—only ensure the architecture supports future expansion.
+
+Task 2: Improve the Login & Welcome Experience
+Description
+
+I reviewed the current login and welcome experience and found some usability improvements.
+
+Login Screen
+
+Update the login page to use the official MIQ logo.
+
+I will attach the logo separately.
+
+Keep the login experience clean, modern, and minimal.
+
+Welcome Screen
+
+After a successful login, users should first see the Welcome / Module Selection page.
+
+Since this page only serves as the entry point to the application, remove the left sidebar navigation from this screen.
+
+The sidebar should not be visible until the user enters one of the modules.
+
+Module Selection
+
+The Welcome screen should act as a dashboard where users can choose one of the available modules.
+
+For example:
+
+Fiber Design System
+AI Prototype
+Flow Chart
+Usability Testing
+
+Each module should be presented as a clickable card or tile.
+
+Once a module is selected, the user enters that workspace, and the left sidebar navigation becomes visible.
+
+Navigation Flow
+
+The expected navigation flow should be:
+
+Login
+→ Welcome / Module Selection
+→ Selected Module
+→ Sidebar Navigation appears
+
+The sidebar should only exist inside the active module, not on the Welcome page.
+
+Goal
+
+The application should feel like a professional product platform rather than a collection of pages.
+
+The Welcome screen should act as the central entry point.
+The Component Rules page should become the foundation for reusable Design System behavior.
+The architecture should be scalable, intuitive, and easy to extend as more AI-powered features are introduced in future iterations

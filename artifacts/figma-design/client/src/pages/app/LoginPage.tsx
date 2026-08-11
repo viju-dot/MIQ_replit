@@ -4,20 +4,34 @@
  * Prototype auth gate: a single centered Fiber-styled card. Exactly one
  * credential is accepted (see auth.ts). On success we set the sessionStorage
  * flag and redirect to "/". Client-side only — there is no backend.
+ *
+ * COLOR CONVENTION: token-driven colors use inline style objects
+ * (var(--token, fallbackHex)) — Tailwind arbitrary var()/rgba color classes can
+ * silently fail. Focus/hover color changes use React state. Layout / spacing /
+ * typography-size classes stay as utilities.
  * ========================================================================= */
 
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Sparkle, WarningCircle } from "@phosphor-icons/react";
+import { WarningCircle } from "@phosphor-icons/react";
 import { login } from "./auth";
 
-// Token-driven palette (var(--token, fallbackHex)) — flips with [data-theme].
-const surface = "bg-[var(--surface-background-lvl1,#ffffff)]";
-const canvasBg = "bg-[var(--surface-background-lvl2,#f7f7fa)]";
-const borderToken = "border-[var(--border-static-subtle-neutral,#e1e1e8)]";
-const inputBorder = "border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]";
-const textPrimary = "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]";
-const textMuted = "text-[var(--surface-foreground-static-neutral-lvl3,#717180)]";
+// Token-driven colors (var(--token, fallbackHex)) — flip with [data-theme].
+const C = {
+  surface: "var(--surface-background-lvl1,#ffffff)",
+  canvasBg: "var(--surface-background-lvl2,#f7f7fa)",
+  border: "var(--border-static-subtle-neutral,#e1e1e8)",
+  inputBorder: "var(--border-dynamic-neutral-subtle-default,#c6c6cc)",
+  inputBorderFocus: "var(--border-dynamic-brand-default,#7c33b5)",
+  textPrimary: "var(--surface-foreground-static-neutral-lvl1,#13131a)",
+  textMuted: "var(--surface-foreground-static-neutral-lvl3,#717180)",
+  errorBorder: "var(--border-dynamic-error-default,#da294b)",
+  errorBg: "var(--container-dynamic-error-subtle-background-selected,#ffedef)",
+  errorFg: "var(--container-dynamic-error-subtle-foreground-default,#da294b)",
+  brandBg: "var(--container-dynamic-brand-bold-background-default,#7c33b5)",
+  brandBgHover: "var(--container-dynamic-brand-bold-background-hover,#702ea3)",
+  brandFg: "var(--container-dynamic-brand-bold-foreground-default,#ffffff)",
+};
 
 function Field({
   id,
@@ -34,10 +48,12 @@ function Field({
   onChange: (v: string) => void;
   autoComplete?: string;
 }) {
+  const [focused, setFocused] = useState(false);
   return (
     <label htmlFor={id} className="flex w-full flex-col gap-[var(--spacing-75,6px)]">
       <span
-        className={`text-[length:var(--body-sm-medium-size,12px)] font-medium ${textPrimary}`}
+        className="text-[length:var(--body-sm-medium-size,12px)] font-medium"
+        style={{ color: C.textPrimary }}
       >
         {label}
       </span>
@@ -47,7 +63,14 @@ function Field({
         value={value}
         autoComplete={autoComplete}
         onChange={(e) => onChange(e.target.value)}
-        className={`h-[36px] w-full rounded-[2px] border border-solid px-[var(--spacing-150,12px)] text-[length:var(--body-md-regular-size,14px)] transition-colors duration-150 outline-none ${inputBorder} ${surface} ${textPrimary} placeholder:text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)] focus:border-[var(--border-dynamic-brand-default,#7c33b5)]`}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        className="h-[36px] w-full rounded-[2px] border border-solid px-[var(--spacing-150,12px)] text-[length:var(--body-md-regular-size,14px)] transition-colors duration-150 outline-none"
+        style={{
+          backgroundColor: C.surface,
+          borderColor: focused ? C.inputBorderFocus : C.inputBorder,
+          color: C.textPrimary,
+        }}
       />
     </label>
   );
@@ -58,6 +81,7 @@ export default function LoginPage(): JSX.Element {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
+  const [submitHover, setSubmitHover] = useState(false);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,28 +95,37 @@ export default function LoginPage(): JSX.Element {
 
   return (
     <div
-      className={`flex min-h-screen items-center justify-center px-[var(--spacing-200,16px)] py-[var(--spacing-500,40px)] ${canvasBg}`}
-      style={{ fontFamily: '"Poppins", "DM Sans", sans-serif' }}
+      className="flex min-h-screen items-center justify-center px-[var(--spacing-200,16px)] py-[var(--spacing-500,40px)]"
+      style={{ backgroundColor: C.canvasBg, fontFamily: '"Poppins", "DM Sans", sans-serif' }}
     >
       <div
-        className={`flex w-full max-w-[400px] flex-col gap-[var(--spacing-400,32px)] rounded-[var(--radius-100,8px)] border border-solid px-[var(--spacing-500,40px)] py-[var(--spacing-500,40px)] shadow-[var(--elevation-regular)] ${borderToken} ${surface}`}
+        className="flex w-full max-w-[400px] flex-col gap-[var(--spacing-400,32px)] rounded-[var(--radius-100,8px)] border border-solid px-[var(--spacing-500,40px)] py-[var(--spacing-500,40px)]"
+        style={{
+          backgroundColor: C.surface,
+          borderColor: C.border,
+          boxShadow: "var(--elevation-regular)",
+        }}
       >
         {/* Brand / title */}
         <div className="flex flex-col items-center gap-[var(--spacing-150,12px)] text-center">
-          <div className="flex size-[48px] items-center justify-center rounded-[var(--radius-100,8px)] bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)]">
-            <Sparkle
-              size={26}
-              weight="fill"
-              color="var(--container-dynamic-brand-bold-foreground-default,#ffffff)"
-            />
-          </div>
+          <img
+            src={`${import.meta.env.BASE_URL}figmaAssets/miq-lettermark.svg`}
+            alt="MIQ"
+            className="block w-auto"
+            style={{ height: 44 }}
+          />
+
           <div className="flex flex-col gap-[var(--spacing-25,2px)]">
             <h1
-              className={`text-[length:var(--headline-sm-semibold-size,20px)] font-semibold tracking-[-0.4px] ${textPrimary}`}
+              className="text-[length:var(--headline-sm-semibold-size,20px)] font-semibold tracking-[-0.4px]"
+              style={{ color: C.textPrimary }}
             >
               Fiber Workspace
             </h1>
-            <p className={`text-[length:var(--body-md-regular-size,14px)] ${textMuted}`}>
+            <p
+              className="text-[length:var(--body-md-regular-size,14px)]"
+              style={{ color: C.textMuted }}
+            >
               Sign in to continue
             </p>
           </div>
@@ -126,7 +159,8 @@ export default function LoginPage(): JSX.Element {
           {/* Fiber-style inline error state */}
           {error && (
             <div
-              className="flex items-center gap-[var(--spacing-100,8px)] rounded-[2px] border border-solid border-[var(--border-dynamic-error-default,#da294b)] bg-[var(--container-dynamic-error-subtle-background-selected,#ffedef)] px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)]"
+              className="flex items-center gap-[var(--spacing-100,8px)] rounded-[2px] border border-solid px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)]"
+              style={{ backgroundColor: C.errorBg, borderColor: C.errorBorder }}
               role="alert"
             >
               <WarningCircle
@@ -134,7 +168,10 @@ export default function LoginPage(): JSX.Element {
                 weight="fill"
                 color="var(--surface-foreground-static-error,#da294b)"
               />
-              <span className="text-[length:var(--body-sm-regular-size,12px)] text-[var(--container-dynamic-error-subtle-foreground-default,#da294b)]">
+              <span
+                className="text-[length:var(--body-sm-regular-size,12px)]"
+                style={{ color: C.errorFg }}
+              >
                 Incorrect username or password.
               </span>
             </div>
@@ -143,7 +180,13 @@ export default function LoginPage(): JSX.Element {
           {/* Primary Fill button */}
           <button
             type="submit"
-            className="mt-[var(--spacing-50,4px)] flex h-[36px] w-full items-center justify-center rounded-[2px] bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)] text-[length:var(--body-md-medium-size,14px)] font-medium text-[var(--container-dynamic-brand-bold-foreground-default,#ffffff)] transition-colors hover:bg-[var(--container-dynamic-brand-bold-background-hover,#702ea3)]"
+            onMouseEnter={() => setSubmitHover(true)}
+            onMouseLeave={() => setSubmitHover(false)}
+            className="mt-[var(--spacing-50,4px)] flex h-[36px] w-full items-center justify-center rounded-[2px] text-[length:var(--body-md-medium-size,14px)] font-medium transition-colors"
+            style={{
+              backgroundColor: submitHover ? C.brandBgHover : C.brandBg,
+              color: C.brandFg,
+            }}
           >
             Sign in
           </button>

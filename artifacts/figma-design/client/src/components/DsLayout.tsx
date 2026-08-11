@@ -1,7 +1,7 @@
 import { Suspense, useState } from "react";
 import { Link, useRoute } from "wouter";
 import { Menu, X } from "lucide-react";
-import { dsPages, getPage } from "@/pages/registry";
+import { dsPages, getPage, type DsPage } from "@/pages/registry";
 
 /*
  * Design System explorer — now mounted INSIDE the app shell at /design-system.
@@ -23,7 +23,34 @@ const textBody = "text-[var(--surface-foreground-dynamic-neutral-default-regular
 // Explorer routes live under the /design-system module prefix.
 const BASE = "/design-system";
 
+function SidebarLink({
+  page,
+  activeSlug,
+  onNavigate,
+}: {
+  page: DsPage;
+  activeSlug?: string;
+  onNavigate?: () => void;
+}) {
+  const active = page.slug === activeSlug;
+  return (
+    <Link
+      href={`${BASE}/${page.slug}`}
+      onClick={onNavigate}
+      className={`block rounded-md px-2.5 py-1.5 text-[14px] transition-colors ${
+        active
+          ? "bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)] font-medium text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]"
+          : `${textPrimary} hover:bg-[var(--container-dynamic-neutral-subtle-background-hover,#71718014)]`
+      }`}
+    >
+      {page.title}
+    </Link>
+  );
+}
+
 function Sidebar({ activeSlug, onNavigate }: { activeSlug?: string; onNavigate?: () => void }) {
+  const systemPages = dsPages.filter((p) => p.group === "System");
+  const componentPages = dsPages.filter((p) => p.group !== "System");
   return (
     <nav className={`flex h-full flex-col ${surface}`} aria-label="Design system pages">
       <div className={`border-b px-5 py-5 ${borderToken}`}>
@@ -37,28 +64,29 @@ function Sidebar({ activeSlug, onNavigate }: { activeSlug?: string; onNavigate?:
         <p className={`mt-0.5 text-[12px] ${textMuted}`}>Component explorer</p>
       </div>
       <div className="flex-1 overflow-y-auto px-3 py-3">
+        {systemPages.length > 0 && (
+          <div className="mb-3">
+            <p className={`px-2 pb-2 text-[11px] font-medium uppercase tracking-wide ${textMuted}`}>
+              System
+            </p>
+            <ul className="space-y-0.5">
+              {systemPages.map((page) => (
+                <li key={page.slug}>
+                  <SidebarLink page={page} activeSlug={activeSlug} onNavigate={onNavigate} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         <p className={`px-2 pb-2 text-[11px] font-medium uppercase tracking-wide ${textMuted}`}>
           Components
         </p>
         <ul className="space-y-0.5">
-          {dsPages.map((page) => {
-            const active = page.slug === activeSlug;
-            return (
-              <li key={page.slug}>
-                <Link
-                  href={`${BASE}/${page.slug}`}
-                  onClick={onNavigate}
-                  className={`block rounded-md px-2.5 py-1.5 text-[14px] transition-colors ${
-                    active
-                      ? "bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)] font-medium text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]"
-                      : `${textPrimary} hover:bg-[var(--container-dynamic-neutral-subtle-background-hover,#71718014)]`
-                  }`}
-                >
-                  {page.title}
-                </Link>
-              </li>
-            );
-          })}
+          {componentPages.map((page) => (
+            <li key={page.slug}>
+              <SidebarLink page={page} activeSlug={activeSlug} onNavigate={onNavigate} />
+            </li>
+          ))}
         </ul>
       </div>
     </nav>
@@ -112,8 +140,17 @@ export function DsLayout() {
           </span>
         </header>
 
-        <main className="min-w-0">
-          {page ? (
+        <main className="min-w-0 max-w-full">
+          {page && page.workspace ? (
+            // Workspace pages own the full content area — no Figma header chrome
+            // or padded playground container. Clip here so an internally-scrolling
+            // workspace never introduces page-level horizontal/vertical scroll.
+            <div className="min-w-0 max-w-full overflow-hidden">
+              <Suspense fallback={<p className={`px-6 py-8 text-[14px] ${textMuted}`}>Loading…</p>}>
+                <page.component />
+              </Suspense>
+            </div>
+          ) : page ? (
             <div>
               <div
                 className={`flex flex-wrap items-center justify-between gap-3 border-b px-6 py-5 md:px-10 ${borderToken} ${surface}`}

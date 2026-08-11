@@ -4,11 +4,29 @@ export interface DsPage {
   slug: string;
   title: string;
   component: LazyExoticComponent<ComponentType>;
+  /**
+   * Workspace pages take over the full content area (no per-component header
+   * chrome or padded playground container). Used by system-level tools such as
+   * the Component Rules rule engine rather than component playgrounds.
+   */
+  workspace?: boolean;
+  /**
+   * Sidebar grouping key. Defaults to the "Components" list. "System" pins the
+   * entry to a dedicated group rendered above the component list.
+   */
+  group?: "System" | "Components";
 }
 
 // Each imported Figma page registers here and automatically appears in the sidebar.
 // Keep alphabetical by title.
 export const dsPages: DsPage[] = [
+  {
+    slug: "component-rules",
+    title: "Component Rules",
+    component: lazy(() => import("@/pages/ds/ComponentRulesPage")),
+    workspace: true,
+    group: "System",
+  },
   {
     slug: "accordion",
     title: "Accordion",
