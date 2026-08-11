@@ -1,0 +1,104 @@
+Task: Restructure the Prototype into a User-Friendly Multi-Module Application
+Description
+
+Now that most of the Design System components have been imported, I want to restructure the application into a more user-friendly experience. The current prototype feels like a collection of pages rather than a connected product.
+
+The first step is to create a proper application structure with authentication and module-based navigation.
+
+Step 1: Create a Login Page
+
+Create a clean login page before users can access the application.
+
+Use only one login credential for now:
+
+Username: vijay
+
+Password: ChallengeACompetions
+
+No registration, forgot password, or multiple users are required at this stage. This is only for accessing the prototype.
+
+Step 2: Create the Main Application
+
+After logging in, users should land on a dashboard that provides access to four primary modules.
+
+Modules
+1. Design System
+
+This module will contain everything related to our Figma Design System.
+
+Examples include:
+
+Components
+Design Tokens
+Variables
+Typography
+Colors
+Icons
+Logos
+Style Guides
+Component Explorer
+
+This should remain the central source for all Design System assets.
+
+2. AI Prototype
+
+This module is where we will build and explore AI-powered product ideas and prototypes.
+
+Initially, it can act as a workspace for ideation, but it should be designed so future AI prototypes can be added without changing the overall architecture.
+
+Think of this as the innovation workspace.
+
+3. Flow Chart
+
+This module will become the central place for documenting user flows, AI workflows, decision trees, and version history.
+
+For now, create the structure only.
+
+No implementation of flow editing is required yet.
+
+4. Usability Testing
+
+This module will be used for testing and validating prototypes created in the AI Prototype module.
+
+For now, create the module structure and navigation only.
+
+No testing functionality is required at this stage.
+
+Module Relationships (For Architecture Only)
+
+Although these modules are displayed separately for easier navigation, they are designed to work together as one connected product.
+
+Please keep this relationship in mind while designing the application architecture.
+
+Future workflow will look like this:
+
+Design System → AI Prototype → Flow Chart → Usability Testing
+
+Example future workflow:
+
+The user creates a prototype inside the AI Prototype module.
+That prototype is automatically documented inside the Flow Chart module with version history.
+The same prototype is then available inside the Usability Testing module for validation.
+Throughout this process, the Design System module provides reusable components, tokens, and assets to ensure design consistency.
+
+Do not implement this workflow now. This is only to guide the application architecture so the modules are built with future integration in mind.
+
+Navigation
+
+Create a clean application layout with:
+
+Login screen
+Sidebar navigation
+Dashboard/Home page
+Four main modules
+Consistent header and layout across all modules
+
+The navigation should make it easy for users to switch between modules without losing context.
+
+Focus
+Build a clean, scalable application architecture.
+Separate the application into logical modules while designing them to be interconnected in the future.
+Prioritize usability and navigation over functionality.
+Do not implement the future workflows yet—only prepare the foundation for them.
+
+The goal is to transform the current prototype into a structured platform that can grow into a complete AI-powered UX design workspace

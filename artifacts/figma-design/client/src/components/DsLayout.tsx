@@ -1,10 +1,14 @@
 import { Suspense, useState } from "react";
 import { Link, useRoute } from "wouter";
-import { Menu, Moon, Sun, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { dsPages, getPage } from "@/pages/registry";
-import { useTheme } from "@/lib/theme";
 
 /*
+ * Design System explorer — now mounted INSIDE the app shell at /design-system.
+ * It renders its own secondary (narrow) component list column plus the live
+ * component preview. The app shell already provides the primary sidebar,
+ * header and theme toggle, so this component no longer renders those.
+ *
  * Explorer chrome is token-driven: every color references a Figma variable
  * from tokens.css, so [data-theme="dark"] flips the whole layout with no
  * per-component conditionals.
@@ -16,28 +20,15 @@ const textPrimary = "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)
 const textMuted = "text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)]";
 const textBody = "text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]";
 
-function ThemeSwitch() {
-  const { theme, setTheme } = useTheme();
-  const dark = theme === "dark";
-  return (
-    <button
-      type="button"
-      onClick={() => setTheme(dark ? "light" : "dark")}
-      aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
-      className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-[12px] font-medium transition-colors ${borderToken} ${surface} ${textBody} hover:bg-[var(--container-dynamic-neutral-subtle-background-hover,#71718014)]`}
-    >
-      {dark ? <Moon className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
-      {dark ? "Dark" : "Light"}
-    </button>
-  );
-}
+// Explorer routes live under the /design-system module prefix.
+const BASE = "/design-system";
 
 function Sidebar({ activeSlug, onNavigate }: { activeSlug?: string; onNavigate?: () => void }) {
   return (
     <nav className={`flex h-full flex-col ${surface}`} aria-label="Design system pages">
       <div className={`border-b px-5 py-5 ${borderToken}`}>
         <Link
-          href="/"
+          href={BASE}
           onClick={onNavigate}
           className={`font-headline-sm-semibold text-[17px] font-semibold ${textPrimary}`}
         >
@@ -55,7 +46,7 @@ function Sidebar({ activeSlug, onNavigate }: { activeSlug?: string; onNavigate?:
             return (
               <li key={page.slug}>
                 <Link
-                  href={`/${page.slug}`}
+                  href={`${BASE}/${page.slug}`}
                   onClick={onNavigate}
                   className={`block rounded-md px-2.5 py-1.5 text-[14px] transition-colors ${
                     active
@@ -75,21 +66,21 @@ function Sidebar({ activeSlug, onNavigate }: { activeSlug?: string; onNavigate?:
 }
 
 export function DsLayout() {
-  const [, params] = useRoute("/:slug");
+  const [, params] = useRoute(`${BASE}/:slug`);
   const slug = params?.slug;
   const page = slug ? getPage(slug) : undefined;
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className={`flex min-h-screen ${canvasBg}`}>
-      {/* Desktop sidebar */}
+    <div className={`flex min-h-full ${canvasBg}`}>
+      {/* Desktop secondary component list column */}
       <aside
-        className={`sticky top-0 hidden h-screen w-64 shrink-0 border-r md:block ${borderToken}`}
+        className={`sticky top-[57px] hidden h-[calc(100vh-57px)] w-56 shrink-0 border-r md:block ${borderToken}`}
       >
         <Sidebar activeSlug={page?.slug} />
       </aside>
 
-      {/* Mobile sidebar */}
+      {/* Mobile component list */}
       {mobileOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div
@@ -104,13 +95,13 @@ export function DsLayout() {
       )}
 
       <div className="min-w-0 flex-1">
-        {/* Mobile top bar */}
+        {/* Mobile explorer bar to reach the component list */}
         <header
-          className={`sticky top-0 z-30 flex items-center gap-3 border-b px-4 py-3 md:hidden ${borderToken} ${surface}`}
+          className={`sticky top-[57px] z-20 flex items-center gap-3 border-b px-4 py-3 md:hidden ${borderToken} ${surface}`}
         >
           <button
             type="button"
-            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+            aria-label={mobileOpen ? "Close component list" : "Open component list"}
             onClick={() => setMobileOpen((open) => !open)}
             className={textPrimary}
           >
@@ -119,7 +110,6 @@ export function DsLayout() {
           <span className={`flex-1 text-[15px] font-semibold ${textPrimary}`}>
             {page?.title ?? "Fiber Design System"}
           </span>
-          <ThemeSwitch />
         </header>
 
         <main className="min-w-0">
@@ -134,9 +124,6 @@ export function DsLayout() {
                     Imported from Figma — explore variants and properties live
                   </p>
                 </div>
-                <div className="hidden md:block">
-                  <ThemeSwitch />
-                </div>
               </div>
               <div className="px-6 py-8 md:px-10">
                 <Suspense fallback={<p className={`text-[14px] ${textMuted}`}>Loading…</p>}>
@@ -148,8 +135,8 @@ export function DsLayout() {
             <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 text-center">
               <h1 className={`text-[26px] font-semibold ${textPrimary}`}>Fiber Design System</h1>
               <p className={`mt-2 max-w-md text-[14px] ${textBody}`}>
-                Select a component page from the sidebar to explore its variants, adjust
-                properties, and preview it live in light or dark mode.
+                Select a component page from the list to explore its variants, adjust properties,
+                and preview it live in light or dark mode.
               </p>
             </div>
           )}
