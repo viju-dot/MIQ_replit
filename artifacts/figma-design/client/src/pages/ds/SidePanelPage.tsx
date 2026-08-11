@@ -7,20 +7,23 @@ const A = "/figmaAssets/side-panel";
 /* Header Action                                                       */
 /* ------------------------------------------------------------------ */
 
+const iconBtn =
+  "flex items-center justify-center p-[7px] rounded-[var(--radiuses-small,2px)] shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)]";
+
 function HeaderActionPagination() {
   return (
     <div className="flex h-[42px] flex-col items-end justify-end shrink-0">
       <div className="flex items-center justify-end bg-[var(--surface-background-lvl1,#ffffff)] shrink-0">
-        <div className="flex items-center justify-center p-[7px] rounded-[var(--radiuses-small,2px)] shrink-0">
+        <button type="button" aria-label="Previous" className={iconBtn}>
           <div className="flex items-center justify-center p-[2px] size-[20px] shrink-0">
             <img alt="" className="block size-full max-w-none" src={`${A}/caret-left.svg`} />
           </div>
-        </div>
-        <div className="flex items-center justify-center p-[7px] rounded-[var(--radiuses-small,2px)] shrink-0">
+        </button>
+        <button type="button" aria-label="Next" className={iconBtn}>
           <div className="flex items-center justify-center p-[2px] size-[20px] shrink-0">
             <img alt="" className="block size-full max-w-none" src={`${A}/caret-right.svg`} />
           </div>
-        </div>
+        </button>
       </div>
     </div>
   );
@@ -29,11 +32,11 @@ function HeaderActionPagination() {
 function HeaderActionClose() {
   return (
     <div className="flex flex-col items-end justify-center shrink-0">
-      <div className="flex items-center justify-center p-[7px] rounded-[var(--radiuses-small,2px)] shrink-0">
+      <button type="button" aria-label="Close" className={iconBtn}>
         <div className="flex items-center justify-center p-[5px] size-[20px] shrink-0">
           <img alt="Close" className="block size-full max-w-none" src={`${A}/x-close.svg`} />
         </div>
-      </div>
+      </button>
     </div>
   );
 }
@@ -63,26 +66,26 @@ function DateInput() {
 
 function CampaignLink() {
   return (
-    <div className="flex items-center justify-end gap-1 shrink-0">
+    <button type="button" className="flex items-center justify-end gap-1 shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)]">
       <div className="flex items-center justify-center size-[24px] shrink-0">
         <img alt="" className="block size-[24px] max-w-none" src={`${A}/arrow-square-out.svg`} />
       </div>
       <p className="whitespace-nowrap text-center font-['DM_Sans:Medium',_Helvetica] font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]">
         Full campaign details
       </p>
-    </div>
+    </button>
   );
 }
 
 function SmallOutlineButton() {
   return (
-    <div className="flex h-[24px] items-start gap-0 rounded-[var(--radiuses-small,2px)] shrink-0">
+    <button type="button" className="flex h-[24px] items-start gap-0 rounded-[var(--radiuses-small,2px)] shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)]">
       <div className="flex h-[24px] items-center justify-center gap-[10px] rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-neutral-bold-default,#4b4b59)] pl-[6px] pr-[6px] py-[2px] shrink-0">
         <div className="flex flex-col justify-center whitespace-nowrap text-center font-['DM_Sans:Medium',_Helvetica] font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]">
           <p className="leading-[var(--body-md-medium-line-height,20px)]">Button</p>
         </div>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -93,25 +96,34 @@ function SmallOutlineButton() {
 function FooterActions() {
   return (
     <div className="flex flex-1 items-center justify-end gap-4 min-w-px px-4 py-4">
-      <div className="flex items-center gap-1 rounded-[var(--radiuses-small,2px)] shrink-0">
+      <button
+        type="button"
+        className="flex items-center gap-1 rounded-[var(--radiuses-small,2px)] shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)]"
+      >
         <p className="whitespace-nowrap text-center font-['DM_Sans:Medium',_Helvetica] font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]">
           Link
         </p>
-      </div>
-      <div className="flex items-center justify-end gap-0 rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-neutral-bold-default,#4b4b59)] px-[12px] py-[7px] shrink-0">
+      </button>
+      <button
+        type="button"
+        className="flex items-center justify-end gap-0 rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-neutral-bold-default,#4b4b59)] px-[12px] py-[7px] shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)]"
+      >
         <div className="flex items-center justify-center gap-1 rounded-[var(--radiuses-small,2px)] shrink-0">
           <p className="whitespace-nowrap text-center font-['DM_Sans:Medium',_Helvetica] font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]">
             Default
           </p>
         </div>
-      </div>
-      <div className="flex items-center justify-end gap-0 rounded-[var(--radiuses-small,2px)] bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)] px-[12px] py-[7px] shrink-0">
+      </button>
+      <button
+        type="button"
+        className="flex items-center justify-end gap-0 rounded-[var(--radiuses-small,2px)] bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)] px-[12px] py-[7px] shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)]"
+      >
         <div className="flex items-center justify-center gap-1 rounded-[var(--radiuses-small,2px)] shrink-0">
           <p className="whitespace-nowrap text-center font-['DM_Sans:Medium',_Helvetica] font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[var(--container-dynamic-brand-bold-foreground-default,#ffffff)]">
             Default
           </p>
         </div>
-      </div>
+      </button>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
@@ -40,6 +41,42 @@ const STD_STATES: StdState[] = [
   "Disabled",
   "Error",
 ];
+
+/**
+ * Live interaction hook shared by the input fields.
+ *
+ * The panel `state` selector is the base/source-of-truth state. On top of it we
+ * layer real :hover/:focus/:active from the actual field so natural interaction
+ * matches the corresponding Figma variant exactly:
+ *   - Disabled always wins (no hover/focus/active).
+ *   - When the panel forces an explicit interactive state (Hover / Active/Focus /
+ *     Error) we keep it, but still allow focusing to reach Active/Focus.
+ *   - When the panel is a resting state (Default / Filled) hover -> Hover and
+ *     focus/active -> Active / Focus, then falls back to the base state.
+ */
+function useFieldInteraction(base: StdState) {
+  const [hover, setHover] = useState(false);
+  const [focus, setFocus] = useState(false);
+  const isDisabled = base === "Disabled";
+
+  let effective: StdState = base;
+  if (!isDisabled) {
+    if (focus) effective = "Active / Focus";
+    else if (base === "Error") effective = "Error";
+    else if (hover || base === "Hover") effective = "Hover";
+  }
+
+  const handlers = isDisabled
+    ? {}
+    : {
+        onMouseEnter: () => setHover(true),
+        onMouseLeave: () => setHover(false),
+        onFocus: () => setFocus(true),
+        onBlur: () => setFocus(false),
+      };
+
+  return { effective, isDisabled, handlers };
+}
 
 /* ---------- shared style helpers ---------- */
 
@@ -121,9 +158,9 @@ function StandardField(props: {
     compact = false,
   } = props;
 
-  const cs = containerStyle(state);
+  const { effective, isDisabled, handlers } = useFieldInteraction(state);
+  const cs = containerStyle(effective);
   const isError = state === "Error";
-  const isDisabled = state === "Disabled";
 
   const value =
     state === "Filled"
@@ -178,8 +215,15 @@ function StandardField(props: {
         </div>
       )}
       <div
-        className="flex w-full flex-col rounded-[2px] border border-solid"
-        style={{ background: cs.background, borderColor: cs.borderColor }}
+        className="flex w-full flex-col rounded-[2px] border border-solid transition-colors duration-150"
+        style={{
+          background: cs.background,
+          borderColor: cs.borderColor,
+          cursor: isDisabled ? "not-allowed" : "text",
+        }}
+        tabIndex={isDisabled ? -1 : 0}
+        aria-disabled={isDisabled || undefined}
+        {...handlers}
       >
         <div
           className="flex w-full items-center gap-[8px] rounded-[2px]"
@@ -198,13 +242,13 @@ function StandardField(props: {
             style={{ height: fieldH }}
           >
             <p
-              className="overflow-hidden text-ellipsis whitespace-nowrap"
+              className="overflow-hidden text-ellipsis whitespace-nowrap transition-colors duration-150"
               style={{
                 fontFamily: "'DM Sans', Helvetica",
                 fontWeight: "var(--body-md-regular-weight,400)",
                 fontSize,
                 lineHeight,
-                color: textColor(state),
+                color: textColor(state === "Filled" || state === "Error" ? state : effective),
               }}
             >
               {value}
@@ -273,9 +317,9 @@ function PasswordField(props: {
     titleText = "Title:",
     errorText = "Incorrect password",
   } = props;
-  const cs = containerStyle(state);
+  const { effective, isDisabled, handlers } = useFieldInteraction(state);
+  const cs = containerStyle(effective);
   const isError = state === "Error";
-  const isDisabled = state === "Disabled";
 
   const value =
     state === "Filled"
@@ -299,12 +343,12 @@ function PasswordField(props: {
   const iconSrc = eyeShown
     ? isDisabled
       ? eye.disabled
-      : state === "Active / Focus"
+      : effective === "Active / Focus"
         ? eye.focus
         : eye.default
     : isDisabled
       ? eyeSlash.disabled
-      : state === "Active / Focus"
+      : effective === "Active / Focus"
         ? eyeSlash.focus
         : eyeSlash.default;
 
@@ -325,8 +369,15 @@ function PasswordField(props: {
         </div>
       )}
       <div
-        className="flex w-full flex-col rounded-[2px] border border-solid"
-        style={{ background: cs.background, borderColor: cs.borderColor }}
+        className="flex w-full flex-col rounded-[2px] border border-solid transition-colors duration-150"
+        style={{
+          background: cs.background,
+          borderColor: cs.borderColor,
+          cursor: isDisabled ? "not-allowed" : "text",
+        }}
+        tabIndex={isDisabled ? -1 : 0}
+        aria-disabled={isDisabled || undefined}
+        {...handlers}
       >
         <div
           className="flex w-full items-center gap-[8px] rounded-[2px]"
@@ -337,13 +388,13 @@ function PasswordField(props: {
             style={{ height: "var(--sizing-34,34px)" }}
           >
             <p
-              className="overflow-hidden text-ellipsis whitespace-nowrap"
+              className="overflow-hidden text-ellipsis whitespace-nowrap transition-colors duration-150"
               style={{
                 fontFamily: "'DM Sans', Helvetica",
                 fontWeight: "var(--body-md-regular-weight,400)",
                 fontSize: "var(--body-md-regular-size,14px)",
                 lineHeight: "var(--body-md-regular-line-height,20px)",
-                color: textColor(state),
+                color: textColor(state === "Filled" || state === "Error" ? state : effective),
               }}
             >
               {value}
@@ -443,6 +494,34 @@ function rangeContainer(state: RangeState): {
   }
 }
 
+/**
+ * Live interaction for the Range field. Mirrors useFieldInteraction but uses
+ * the range's own state axis: hover -> Hover, focus -> ActiveStart.
+ */
+function useRangeInteraction(base: RangeState) {
+  const [hover, setHover] = useState(false);
+  const [focus, setFocus] = useState(false);
+  const isDisabled = base === "Disabled";
+
+  let effective: RangeState = base;
+  if (!isDisabled) {
+    if (focus && (base === "Default" || base === "Hover")) effective = "ActiveStart";
+    else if (base === "Error") effective = "Error";
+    else if (hover && base === "Default") effective = "Hover";
+  }
+
+  const handlers = isDisabled
+    ? {}
+    : {
+        onMouseEnter: () => setHover(true),
+        onMouseLeave: () => setHover(false),
+        onFocus: () => setFocus(true),
+        onBlur: () => setFocus(false),
+      };
+
+  return { effective, isDisabled, handlers };
+}
+
 function rangeText(state: RangeState): string {
   if (state === "StartFilled" || state === "Error" || state === "Filled")
     return "var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)";
@@ -457,11 +536,11 @@ function RangeField(props: {
   errorText?: string;
 }) {
   const { state, compact = false, errorText = "This date range is not valid" } = props;
-  const cs = rangeContainer(state);
+  const { effective, isDisabled, handlers } = useRangeInteraction(state);
+  const cs = rangeContainer(effective);
   const isError = state === "Error";
-  const isDisabled = state === "Disabled";
   const isFilledLike = state === "Error" || state === "Filled";
-  const showStartBadge = state === "ActiveStart" || state === "StartFilled";
+  const showStartBadge = effective === "ActiveStart" || state === "StartFilled";
 
   const startText = isFilledLike
     ? "31/05/2023"
@@ -491,14 +570,18 @@ function RangeField(props: {
   return (
     <div className="flex w-full max-w-[250px] flex-col gap-[8px]">
       <div
-        className="flex w-full items-center gap-[8px] rounded-[2px] border border-solid"
+        className="flex w-full items-center gap-[8px] rounded-[2px] border border-solid transition-colors duration-150"
         style={{
           background: cs.background,
           borderColor: cs.borderColor,
           paddingLeft: "12px",
           paddingRight: "8px",
           minHeight: fieldH,
+          cursor: isDisabled ? "not-allowed" : "text",
         }}
+        tabIndex={isDisabled ? -1 : 0}
+        aria-disabled={isDisabled || undefined}
+        {...handlers}
       >
         {showStartBadge ? (
           <span

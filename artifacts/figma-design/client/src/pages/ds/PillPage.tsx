@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
@@ -22,16 +23,24 @@ function Pill({
   label,
   size,
   colors,
+  interactive,
+  onHoverChange,
 }: {
   label: string;
   size: Size;
   colors: PillColors;
+  /** When set, the pill responds to real hover with cursor + handlers. */
+  interactive?: boolean;
+  onHoverChange?: (hovered: boolean) => void;
 }) {
   const isStandard = size === "Standard";
   return (
     <div
-      className="flex items-center justify-center shrink-0"
+      className="flex items-center justify-center shrink-0 transition-colors duration-150"
+      onMouseEnter={interactive ? () => onHoverChange?.(true) : undefined}
+      onMouseLeave={interactive ? () => onHoverChange?.(false) : undefined}
       style={{
+        cursor: interactive ? "pointer" : undefined,
         gap: "var(--numbers-4, 4px)",
         paddingTop: "var(--numbers-2, 2px)",
         paddingBottom: "var(--numbers-2, 2px)",
@@ -198,6 +207,74 @@ function resolveDraggable(fill: string, state: string): PillColors {
 }
 
 /* ------------------------------------------------------------------ *
+ * Interactive wrappers — panel "state" sets the base; real hover      *
+ * mirrors the Figma Hover variant. Disabled suppresses interaction.   *
+ * ------------------------------------------------------------------ */
+function RemovablePill({
+  style,
+  fill,
+  state,
+  size,
+  label,
+}: {
+  style: string;
+  fill: string;
+  state: string;
+  size: Size;
+  label: string;
+}) {
+  const [hovered, setHovered] = useState(false);
+  useEffect(() => setHovered(false), [state, style, fill, size]);
+  const disabled = state === "Disabled";
+  const effectiveFill = style === "Brand (Subtle)" ? "Filled" : fill;
+
+  if (disabled) {
+    const icon = size === "Compact" ? "close-disabled-compact.svg" : "close-disabled-standard.svg";
+    return <Pill label={label} size={size} colors={disabledColors(icon)} />;
+  }
+  const effectiveState = hovered ? "Hover" : state;
+  return (
+    <Pill
+      label={label}
+      size={size}
+      colors={resolveRemovable(style, effectiveFill, effectiveState)}
+      interactive
+      onHoverChange={setHovered}
+    />
+  );
+}
+
+function DraggablePill({
+  fill,
+  state,
+  size,
+  label,
+}: {
+  fill: string;
+  state: string;
+  size: Size;
+  label: string;
+}) {
+  const [hovered, setHovered] = useState(false);
+  useEffect(() => setHovered(false), [state, fill, size]);
+  const disabled = state === "Disabled";
+  if (disabled) {
+    return <Pill label={label} size={size} colors={disabledColors("drag-close-disabled.svg")} />;
+  }
+  // Hover and Pressed share the same appearance in Figma.
+  const effectiveState = hovered ? "Hover" : state;
+  return (
+    <Pill
+      label={label}
+      size={size}
+      colors={resolveDraggable(fill, effectiveState)}
+      interactive
+      onHoverChange={setHovered}
+    />
+  );
+}
+
+/* ------------------------------------------------------------------ *
  * Playground configs                                                  *
  * ------------------------------------------------------------------ */
 
@@ -237,29 +314,15 @@ const removableConfig: PlaygroundConfig = {
     },
     { kind: "text", name: "label", label: "Label", defaultValue: "Label title" },
   ],
-  render: (props: PropValues) => {
-    const style = String(props.style);
-    const fill = String(props.fill);
-    const state = String(props.state);
-    const size = props.size === "Compact" ? "Compact" : "Standard";
-    const label = String(props.label);
-
-    // Brand (Subtle) has no Outline variant in Figma — fall back to Filled.
-    const effectiveFill = style === "Brand (Subtle)" ? "Filled" : fill;
-
-    if (state === "Disabled") {
-      const icon =
-        size === "Compact" ? "close-disabled-compact.svg" : "close-disabled-standard.svg";
-      return <Pill label={label} size={size} colors={disabledColors(icon)} />;
-    }
-    return (
-      <Pill
-        label={label}
-        size={size}
-        colors={resolveRemovable(style, effectiveFill, state)}
-      />
-    );
-  },
+  render: (props: PropValues) => (
+    <RemovablePill
+      style={String(props.style)}
+      fill={String(props.fill)}
+      state={String(props.state)}
+      size={props.size === "Compact" ? "Compact" : "Standard"}
+      label={String(props.label)}
+    />
+  ),
   tokens: {
     "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
     "container/dynamic/brand/bold/foreground/default": "var(--container-dynamic-brand-bold-foreground-default)",
@@ -316,20 +379,14 @@ const draggableConfig: PlaygroundConfig = {
     },
     { kind: "text", name: "label", label: "Label", defaultValue: "Collect" },
   ],
-  render: (props: PropValues) => {
-    const fill = String(props.fill);
-    const state = String(props.state);
-    const size = props.size === "Compact" ? "Compact" : "Standard";
-    const label = String(props.label);
-
-    if (state === "Disabled") {
-      return (
-        <Pill label={label} size={size} colors={disabledColors("drag-close-disabled.svg")} />
-      );
-    }
-    // Hover and Pressed share the same appearance in Figma.
-    return <Pill label={label} size={size} colors={resolveDraggable(fill, state)} />;
-  },
+  render: (props: PropValues) => (
+    <DraggablePill
+      fill={String(props.fill)}
+      state={String(props.state)}
+      size={props.size === "Compact" ? "Compact" : "Standard"}
+      label={String(props.label)}
+    />
+  ),
   tokens: {
     "container/dynamic/brand/bold/background/default": "var(--container-dynamic-brand-bold-background-default)",
     "container/dynamic/brand/bold/foreground/default": "var(--container-dynamic-brand-bold-foreground-default)",

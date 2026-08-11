@@ -1,7 +1,13 @@
+import { useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
 const ASSET = "/figmaAssets/button-group";
+
+// Focus ring via inline boxShadow (var() in Tailwind arbitrary ring classes
+// silently fails in this project, so it is driven from focus-visible state).
+const FOCUS_RING =
+  "0 0 0 2px var(--surface-background-lvl1,#ffffff), 0 0 0 4px var(--border-dynamic-brand-selected,#7c33b5)";
 
 type Side = "Left" | "Middle" | "Right";
 type State = "Selected" | "Unselected" | "Hover" | "Disabled";
@@ -66,26 +72,55 @@ type IconSegmentProps = {
   state: State;
   compact: boolean;
   overlap?: boolean;
+  onClick?: () => void;
 };
 
-function IconSegment({ side, state, compact, overlap = false }: IconSegmentProps) {
+function IconSegment({ side, state, compact, overlap = false, onClick }: IconSegmentProps) {
   const boxClass = compact
     ? "h-[var(--old-sizing-24,24px)] w-[var(--old-sizing-34,34px)]"
     : "size-[var(--old-sizing-34,34px)]";
   const iconBoxSize = compact
     ? "var(--old-sizing-16,16px)"
     : "var(--old-sizing-24,24px)";
+  // Natural interactivity only applies to interactive (composite-group)
+  // segments. In the individual-segment playground the panel forces the state
+  // explicitly, so live hover must not override it (state stays forced).
+  const [pointerHover, setPointerHover] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const clickable = !!onClick && state !== "Disabled";
+  const effState: State =
+    clickable && pointerHover && state !== "Selected" ? "Hover" : state;
   return (
     <div
-      className={`relative shrink-0 overflow-hidden ${boxClass} ${overlap ? "mr-[var(--odd-numbers-1,-1px)]" : ""}`}
-      style={radiusStyle(side)}
+      role={clickable ? "button" : undefined}
+      aria-pressed={clickable ? state === "Selected" : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onClick={clickable ? onClick : undefined}
+      onKeyDown={
+        clickable
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick?.();
+              }
+            }
+          : undefined
+      }
+      onMouseEnter={clickable ? () => setPointerHover(true) : undefined}
+      onMouseLeave={clickable ? () => setPointerHover(false) : undefined}
+      onFocus={clickable ? (e) => setFocused(e.currentTarget.matches(":focus-visible")) : undefined}
+      onBlur={clickable ? () => setFocused(false) : undefined}
+      className={`relative shrink-0 overflow-hidden outline-none ${focused ? "z-10" : ""} ${boxClass} ${
+        state === "Disabled" ? "cursor-not-allowed" : clickable ? "cursor-pointer" : ""
+      } ${overlap ? "mr-[var(--odd-numbers-1,-1px)]" : ""}`}
+      style={{ ...radiusStyle(side), ...(focused ? { boxShadow: FOCUS_RING } : null) }}
     >
       {/* base fill + border */}
       <div
-        className="absolute inset-0 border border-solid"
+        className="absolute inset-0 border border-solid transition-colors duration-150"
         style={{
-          backgroundColor: BG[state],
-          borderColor: BORDER(state),
+          backgroundColor: BG[effState],
+          borderColor: BORDER(effState),
           ...radiusStyle(side),
         }}
       />
@@ -97,7 +132,7 @@ function IconSegment({ side, state, compact, overlap = false }: IconSegmentProps
         <img
           alt=""
           className="block size-full max-w-none"
-          src={iconSrc(state, compact)}
+          src={iconSrc(effState, compact)}
         />
       </div>
     </div>
@@ -113,20 +148,50 @@ type TextSegmentProps = {
   compact: boolean;
   overlap?: boolean;
   label?: string;
+  onClick?: () => void;
 };
 
-function TextSegment({ side, state, compact, overlap = false, label = "Button" }: TextSegmentProps) {
+function TextSegment({ side, state, compact, overlap = false, label = "Button", onClick }: TextSegmentProps) {
+  // Natural interactivity only applies to interactive (composite-group)
+  // segments. In the individual-segment playground the panel forces the state
+  // explicitly, so live hover must not override it (state stays forced).
+  const [pointerHover, setPointerHover] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const clickable = !!onClick && state !== "Disabled";
+  const effState: State =
+    clickable && pointerHover && state !== "Selected" ? "Hover" : state;
   return (
     <div
-      className={`relative flex shrink-0 items-center justify-center px-[var(--spacing-300,24px)] border border-solid ${
+      role={clickable ? "button" : undefined}
+      aria-pressed={clickable ? state === "Selected" : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onClick={clickable ? onClick : undefined}
+      onKeyDown={
+        clickable
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick?.();
+              }
+            }
+          : undefined
+      }
+      onMouseEnter={clickable ? () => setPointerHover(true) : undefined}
+      onMouseLeave={clickable ? () => setPointerHover(false) : undefined}
+      onFocus={clickable ? (e) => setFocused(e.currentTarget.matches(":focus-visible")) : undefined}
+      onBlur={clickable ? () => setFocused(false) : undefined}
+      className={`relative flex shrink-0 items-center justify-center px-[var(--spacing-300,24px)] border border-solid transition-colors duration-150 outline-none ${focused ? "z-10" : ""} ${
         compact
           ? "h-[var(--old-sizing-24,24px)] py-[var(--odd-numbers-2-5,2.5px)]"
           : "h-[var(--old-sizing-34,34px)] py-[var(--odd-numbers-7,7px)]"
+      } ${
+        state === "Disabled" ? "cursor-not-allowed" : clickable ? "cursor-pointer" : ""
       } ${overlap ? "mr-[var(--odd-numbers-1,-1px)]" : ""}`}
       style={{
-        backgroundColor: BG[state],
-        borderColor: BORDER(state),
+        backgroundColor: BG[effState],
+        borderColor: BORDER(effState),
         ...radiusStyle(side),
+        ...(focused ? { boxShadow: FOCUS_RING } : null),
       }}
     >
       <p
@@ -135,7 +200,7 @@ function TextSegment({ side, state, compact, overlap = false, label = "Button" }
             ? "text-[length:var(--body-sm-medium-size,12px)] leading-[var(--body-sm-medium-line-height,18px)]"
             : "text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)]"
         }`}
-        style={{ color: TEXT[state] }}
+        style={{ color: TEXT[effState] }}
       >
         {label}
       </p>
@@ -155,17 +220,21 @@ function sideForIndex(index: number, total: number): Side {
 type TextGroupProps = { amount: number; compact: boolean; label?: string };
 
 function TextButtonGroup({ amount, compact, label }: TextGroupProps) {
-  // First item selected, remaining unselected — matches the Figma composite.
+  // First item selected by default; clicking a segment selects it (its nature),
+  // and unselected segments show their Hover variant on pointer hover.
+  const [selected, setSelected] = useState(0);
+  const active = selected < amount ? selected : 0;
   return (
     <div className="flex items-start">
       {Array.from({ length: amount }).map((_, i) => (
         <TextSegment
           key={i}
           side={sideForIndex(i, amount)}
-          state={i === 0 ? "Selected" : "Unselected"}
+          state={i === active ? "Selected" : "Unselected"}
           compact={compact}
           overlap={i < amount - 1}
           label={label}
+          onClick={() => setSelected(i)}
         />
       ))}
     </div>
@@ -175,16 +244,19 @@ function TextButtonGroup({ amount, compact, label }: TextGroupProps) {
 type IconGroupProps = { amount: number; compact: boolean };
 
 function IconButtonGroup({ amount, compact }: IconGroupProps) {
-  // First item selected, remaining unselected.
+  // First item selected by default; clicking a segment selects it.
+  const [selected, setSelected] = useState(0);
+  const active = selected < amount ? selected : 0;
   return (
     <div className="flex items-start">
       {Array.from({ length: amount }).map((_, i) => (
         <IconSegment
           key={i}
           side={sideForIndex(i, amount)}
-          state={i === 0 ? "Selected" : "Unselected"}
+          state={i === active ? "Selected" : "Unselected"}
           compact={compact}
           overlap={i < amount - 1}
+          onClick={() => setSelected(i)}
         />
       ))}
     </div>

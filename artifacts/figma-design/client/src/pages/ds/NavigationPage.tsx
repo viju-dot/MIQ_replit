@@ -392,7 +392,7 @@ function ToggleControl({ initial }: { initial: boolean }): JSX.Element {
     <button
       type="button"
       onClick={() => setOn((v) => !v)}
-      className={`relative flex h-[24px] max-h-[24px] w-[46px] min-w-[46px] max-w-[46px] items-center rounded-[20px] p-[var(--numbers-2,2px)] ${
+      className={`relative flex h-[24px] max-h-[24px] w-[46px] min-w-[46px] max-w-[46px] items-center rounded-[20px] p-[var(--numbers-2,2px)] transition-colors duration-150 ${
         on
           ? "justify-end bg-[var(--controls-background-active,#7c33b5)]"
           : "justify-start bg-[var(--controls-background-inactive,#ebebf0)]"
@@ -405,6 +405,17 @@ function ToggleControl({ initial }: { initial: boolean }): JSX.Element {
   );
 }
 
+/**
+ * Figma User Menu Row "Hover" state colors. These hover tokens are not present
+ * as real CSS custom properties in tokens.css (the Figma export referenced
+ * slash-named vars that don't resolve), so the literal Figma values are used
+ * via inline styles — arbitrary Tailwind var()/rgba classes silently fail here.
+ */
+const USER_MENU_ROW_HOVER = {
+  background: "rgba(113,113,128,0.08)",
+  foreground: "#13131a",
+} as const;
+
 function MenuRow({
   icon,
   label,
@@ -414,8 +425,17 @@ function MenuRow({
   label: string;
   toggleInitial?: boolean;
 }): JSX.Element {
+  const [hovered, setHovered] = useState(false);
   return (
-    <div className="relative flex h-[32px] w-[242px] items-center gap-[var(--spacing-24,24px)] rounded-[var(--radiuses-small,2px)] bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] p-[var(--numbers-4,4px)]" data-name="User Menu Row">
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative flex h-[32px] w-[242px] items-center gap-[var(--spacing-24,24px)] rounded-[var(--radiuses-small,2px)] p-[var(--numbers-4,4px)] transition-colors duration-150"
+      style={{
+        backgroundColor: hovered ? USER_MENU_ROW_HOVER.background : "#ffffff",
+      }}
+      data-name="User Menu Row"
+    >
       <div className="relative flex min-w-0 flex-1 items-center gap-[var(--numbers-12,12px)]" data-name="Row">
         {icon && (
           <div className="relative flex size-[24px] shrink-0 items-center justify-center p-[var(--numbers-2,2px)]">
@@ -426,7 +446,14 @@ function MenuRow({
             />
           </div>
         )}
-        <p className="min-w-0 flex-1 text-[length:var(--body-md-regular-size,14px)] font-normal not-italic leading-[var(--body-md-regular-line-height,20px)] text-[var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)]">
+        <p
+          className="min-w-0 flex-1 text-[length:var(--body-md-regular-size,14px)] font-normal not-italic leading-[var(--body-md-regular-line-height,20px)] transition-colors duration-150"
+          style={{
+            color: hovered
+              ? USER_MENU_ROW_HOVER.foreground
+              : "var(--container-dynamic-neutral-subtle-foreground-default-variation, #13131a)",
+          }}
+        >
           {label}
         </p>
       </div>
@@ -539,18 +566,25 @@ function UserMenu({
 function UserMenuRow({
   state,
   menu = "Pixels and searches",
+  interactive = false,
 }: {
   state: "Default" | "Hover";
   menu?: string;
+  /** When true, derive Default/Hover from real pointer hover. */
+  interactive?: boolean;
 }): JSX.Element {
-  const isHover = state === "Hover";
+  const [hovered, setHovered] = useState(false);
+  const isHover = interactive ? hovered : state === "Hover";
   return (
     <div
-      className={`relative flex h-[32px] w-[242px] items-center gap-[var(--spacing-24,24px)] rounded-[var(--radiuses-small,2px)] p-[var(--numbers-4,4px)] ${
-        isHover
-          ? "bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))]"
-          : "bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)]"
+      onMouseEnter={interactive ? () => setHovered(true) : undefined}
+      onMouseLeave={interactive ? () => setHovered(false) : undefined}
+      className={`relative flex h-[32px] w-[242px] items-center gap-[var(--spacing-24,24px)] rounded-[var(--radiuses-small,2px)] p-[var(--numbers-4,4px)] transition-colors duration-150 ${
+        interactive ? "cursor-pointer" : ""
       }`}
+      style={{
+        backgroundColor: isHover ? USER_MENU_ROW_HOVER.background : "#ffffff",
+      }}
       data-name="User Menu Row"
     >
       <div className="relative flex min-w-0 flex-1 items-center gap-[var(--numbers-12,12px)]" data-name="Row">
@@ -563,7 +597,14 @@ function UserMenuRow({
             />
           </div>
         </div>
-        <p className="min-w-0 flex-1 text-[length:var(--body-md-regular-size,14px)] font-normal not-italic leading-[var(--body-md-regular-line-height,20px)] text-[var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)]">
+        <p
+          className="min-w-0 flex-1 text-[length:var(--body-md-regular-size,14px)] font-normal not-italic leading-[var(--body-md-regular-line-height,20px)] transition-colors duration-150"
+          style={{
+            color: isHover
+              ? USER_MENU_ROW_HOVER.foreground
+              : "var(--container-dynamic-neutral-subtle-foreground-default-variation, #13131a)",
+          }}
+        >
           {menu}
         </p>
       </div>
@@ -988,7 +1029,10 @@ const userMenuConfig: PlaygroundConfig = {
     "controls/background/inactive": "var(--controls-background-inactive)",
     "controls/foreground/default": "var(--controls-foreground-default)",
     "container/dynamic/neutral/subtle/background/default/regular": "var(--container-dynamic-neutral-subtle-background-default-regular)",
+    "container/dynamic/neutral/subtle/background/hover": "rgba(113,113,128,0.08)",
     "container/dynamic/neutral/subtle/foreground/default/variation": "var(--container-dynamic-neutral-subtle-foreground-default-variation)",
+    "container/dynamic/neutral/subtle/foreground/hover": "#13131a",
+    "controls/background/active": "var(--controls-background-active)",
     "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
     "surface/foreground/static/neutral/lvl3": "var(--surface-foreground-static-neutral-lvl3)",
     "Body Lg/Medium": "var(--body-lg-medium-size)",
@@ -1019,16 +1063,22 @@ const userMenuRowConfig: PlaygroundConfig = {
       placeholder: "Menu label",
     },
   ],
-  render: (props) => (
-    <UserMenuRow
-      state={props.state as "Default" | "Hover"}
-      menu={String(props.label)}
-    />
-  ),
+  render: (props) => {
+    const state = props.state as "Default" | "Hover";
+    return (
+      <UserMenuRow
+        key={state}
+        state={state}
+        menu={String(props.label)}
+        interactive={state === "Default"}
+      />
+    );
+  },
   tokens: {
     "container/dynamic/neutral/subtle/background/default/regular": "var(--container-dynamic-neutral-subtle-background-default-regular)",
-    "container/dynamic/neutral/subtle/background/hover": "var(--container-dynamic-neutral-subtle-background-hover)",
+    "container/dynamic/neutral/subtle/background/hover": "rgba(113,113,128,0.08)",
     "container/dynamic/neutral/subtle/foreground/default/variation": "var(--container-dynamic-neutral-subtle-foreground-default-variation)",
+    "container/dynamic/neutral/subtle/foreground/hover": "#13131a",
     "Body Md/Regular": "var(--body-md-regular-size)",
     "Radiuses/small": "var(--radiuses-small)",
   },

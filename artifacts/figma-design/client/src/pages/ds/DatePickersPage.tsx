@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
@@ -327,22 +328,98 @@ const columns: { name: string; head: string; days: Day[] }[] = [
   },
 ];
 
-function dayColor(tone: Day["tone"]): string {
+function dayColorValue(tone: Day["tone"]): string {
   switch (tone) {
     case "brand":
-      return "text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]";
+      return "var(--surface-foreground-dynamic-brand-default,#7c33b5)";
     case "brandFg":
-      return "text-[var(--surface-foreground-static-neutral-inversed,#ffffff)]";
+      return "var(--surface-foreground-static-neutral-inversed,#ffffff)";
     case "disabled":
-      return "text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)]";
+      return "var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)";
     default:
-      return "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]";
+      return "var(--surface-foreground-static-neutral-lvl1,#13131a)";
   }
 }
 
 const colLeft = [16, 50, 87, 121, 159, 193, 227];
 
+/**
+ * A single calendar day. Non-disabled cells reproduce the Figma day states:
+ *   - Hover   -> brand-subtle background
+ *   - Selected (click) -> brand-subtle background + brand foreground
+ * Disabled days keep their static styling and are not interactive.
+ */
+function DayCell({
+  day,
+  cellKey,
+  selectedKey,
+  onSelect,
+}: {
+  day: Day;
+  cellKey: string;
+  selectedKey: string | null;
+  onSelect: (k: string) => void;
+}): JSX.Element {
+  const [hover, setHover] = useState(false);
+  const isDisabled = day.tone === "disabled";
+  const isSelected = selectedKey === cellKey || (selectedKey === null && day.tone === "brandFg");
+
+  // State-driven colors via inline styles (Tailwind var()/rgba arbitrary classes
+  // are unreliable in this project). var(--token, fallback) preserves fidelity.
+  const color =
+    isSelected && day.tone !== "brandFg"
+      ? "var(--surface-foreground-dynamic-brand-default,#7c33b5)"
+      : dayColorValue(day.tone);
+  const background =
+    !isDisabled && (isSelected || hover)
+      ? "var(--container-dynamic-brand-subtle-background-selected,#f6ebff)"
+      : "transparent";
+
+  return (
+    <button
+      type="button"
+      disabled={isDisabled}
+      onMouseEnter={isDisabled ? undefined : () => setHover(true)}
+      onMouseLeave={isDisabled ? undefined : () => setHover(false)}
+      onClick={isDisabled ? undefined : () => onSelect(cellKey)}
+      aria-pressed={isDisabled ? undefined : isSelected}
+      className={`flex size-[20px] items-center justify-center rounded-full font-['DM_Sans'] transition-colors duration-150 ${
+        isDisabled ? "cursor-not-allowed" : "cursor-pointer"
+      }`}
+      style={{ color, background }}
+    >
+      {day.label}
+    </button>
+  );
+}
+
+/** Month-navigation arrow. Hover bg is applied via inline style (state-driven). */
+function NavArrow({ label, src }: { label: string; src: string }): JSX.Element {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      className="flex items-center justify-center p-[7px] relative rounded-[var(--radiuses-small,2px)] shrink-0 cursor-pointer transition-colors duration-150"
+      style={{
+        background: hover
+          ? "var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))"
+          : "transparent",
+      }}
+    >
+      <div className="flex items-center justify-center p-[2px] relative shrink-0 size-[20px]">
+        <div className="relative shrink-0 size-[20px]">
+          <img alt={label} className="absolute block inset-0 max-w-none size-full" src={src} />
+        </div>
+      </div>
+    </button>
+  );
+}
+
 function DateTimePicker({ month }: { month: string }): JSX.Element {
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
   return (
     <div
       className="bg-[var(--surface-background-lvl1,#ffffff)] relative h-[305px] w-[260px] rounded-[var(--radiuses-small,2px)]"
@@ -377,12 +454,13 @@ function DateTimePicker({ month }: { month: string }): JSX.Element {
               {col.head}
             </p>
             {col.days.map((d, j) => (
-              <p
+              <DayCell
                 key={j}
-                className={`font-['DM_Sans'] relative shrink-0 ${dayColor(d.tone)}`}
-              >
-                {d.label}
-              </p>
+                day={d}
+                cellKey={`${i}-${j}`}
+                selectedKey={selectedKey}
+                onSelect={setSelectedKey}
+              />
             ))}
           </div>
         ))}
@@ -397,28 +475,8 @@ function DateTimePicker({ month }: { month: string }): JSX.Element {
           </p>
         </div>
         <div className="absolute flex items-center justify-end left-[192px] top-[8px]">
-          <div className="flex items-center justify-center p-[7px] relative rounded-[var(--radiuses-small,2px)] shrink-0">
-            <div className="flex items-center justify-center p-[2px] relative shrink-0 size-[20px]">
-              <div className="relative shrink-0 size-[20px]">
-                <img
-                  alt="Previous month"
-                  className="absolute block inset-0 max-w-none size-full"
-                  src={dateTime.pageLeft}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center justify-center p-[7px] relative rounded-[var(--radiuses-small,2px)] shrink-0">
-            <div className="flex items-center justify-center p-[2px] relative shrink-0 size-[20px]">
-              <div className="relative shrink-0 size-[20px]">
-                <img
-                  alt="Next month"
-                  className="absolute block inset-0 max-w-none size-full"
-                  src={dateTime.pageRight}
-                />
-              </div>
-            </div>
-          </div>
+          <NavArrow label="Previous month" src={dateTime.pageLeft} />
+          <NavArrow label="Next month" src={dateTime.pageRight} />
         </div>
       </div>
 
@@ -452,6 +510,8 @@ const dateTimeConfig: PlaygroundConfig = {
     "surface/foreground/static/neutral/inversed": "var(--surface-foreground-static-neutral-inversed)",
     "surface/foreground/dynamic/neutral/disabled": "var(--surface-foreground-dynamic-neutral-disabled)",
     "surface/foreground/static/neutral/lvl1": "var(--surface-foreground-static-neutral-lvl1)",
+    "container/dynamic/brand/subtle/background/selected": "var(--container-dynamic-brand-subtle-background-selected)",
+    "container/dynamic/neutral/subtle/background/hover": "var(--container-dynamic-neutral-subtle-background-hover)",
     "Radiuses/small": "var(--radiuses-small)",
   },
 };

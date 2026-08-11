@@ -1,5 +1,47 @@
+import { useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
+
+/**
+ * Modal close button. The Figma ref annotates only ONE interaction on the
+ * dialog: the close icon should change colour on hover to
+ * surface/foreground/dynamic/neutral/hover. We honour that exactly by
+ * rendering the X as a CSS mask and recolouring it via inline hover state
+ * (Tailwind v3 arbitrary hover:* with var()/rgba silently fails here). No
+ * hover is invented for Cancel / Confirm, which the ref does not define.
+ */
+function ModalCloseButton() {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      type="button"
+      aria-label="Close"
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
+      className="flex items-center justify-center p-[5px] shrink-0 size-6 rounded-[var(--radiuses-small,2px)] outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)]"
+    >
+      <span
+        aria-hidden
+        className="block size-[15px] shrink-0 transition-colors duration-150"
+        style={{
+          backgroundColor: hover
+            ? "var(--surface-foreground-dynamic-neutral-hover,#282833)"
+            : "var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)",
+          WebkitMaskImage: `url(${ICON_X})`,
+          maskImage: `url(${ICON_X})`,
+          WebkitMaskRepeat: "no-repeat",
+          maskRepeat: "no-repeat",
+          WebkitMaskPosition: "center",
+          maskPosition: "center",
+          WebkitMaskSize: "contain",
+          maskSize: "contain",
+        }}
+      />
+    </button>
+  );
+}
 
 const ICON_X = "/figmaAssets/modals/icon-x.svg";
 const ICON_WARNING = "/figmaAssets/modals/icon-warning.svg";
@@ -115,13 +157,7 @@ function Modal({
               {title ?? defaultTitle}
             </p>
           </div>
-          <div className="flex items-center justify-center p-[5px] shrink-0 size-6">
-            <img
-              alt="Close"
-              className="block size-[15px] shrink-0"
-              src={ICON_X}
-            />
-          </div>
+          <ModalCloseButton />
         </div>
       </div>
 
@@ -137,13 +173,17 @@ function Modal({
         }`}
       >
         <div className="flex flex-1 items-center justify-end gap-4 min-w-px">
-          <div className="flex items-center gap-1 rounded-[var(--radiuses-small,2px)] shrink-0">
+          <button
+            type="button"
+            className="flex items-center gap-1 rounded-[var(--radiuses-small,2px)] shrink-0 px-1 py-0.5 outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)]"
+          >
             <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)] text-center whitespace-nowrap">
               Cancel
             </p>
-          </div>
-          <div
-            className={`flex items-center justify-end gap-0 rounded-[var(--radiuses-small,2px)] bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)] shrink-0 ${
+          </button>
+          <button
+            type="button"
+            className={`flex items-center justify-end gap-0 rounded-[var(--radiuses-small,2px)] bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)] shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)] ${
               isLarge ? "px-3 py-[7px]" : "px-[6px] py-[2px]"
             }`}
           >
@@ -152,7 +192,7 @@ function Modal({
                 Confirm
               </p>
             </div>
-          </div>
+          </button>
         </div>
       </div>
     </div>

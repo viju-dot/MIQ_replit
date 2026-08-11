@@ -1,5 +1,55 @@
+import { useEffect, useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig } from "@/components/playground/types";
+
+/**
+ * Resolve the effective visual state from a panel-selected base state plus
+ * live interaction. Figma defines Default / Hover / Selected / Disabled for
+ * tiles, so natural :hover and click-to-select mirror those exact variants.
+ *
+ * State-resolution policy:
+ *  - A panel-forced state (Hover / Selected / Disabled) stays FORCED — live
+ *    interaction never removes it.
+ *  - Natural interaction only derives states when the panel base is Default.
+ *  - Disabled always wins and suppresses hover / click / keyboard.
+ */
+function useInteractiveState(base: State) {
+  const [hovered, setHovered] = useState(false);
+  const [selected, setSelected] = useState(false);
+  // Reset live interaction whenever the panel selector changes.
+  useEffect(() => {
+    setSelected(false);
+    setHovered(false);
+  }, [base]);
+
+  const disabled = base === "Disabled";
+  const forced = base !== "Default"; // Hover / Selected / Disabled are forced
+
+  let effective: State = base;
+  if (base === "Default") {
+    if (selected) effective = "Selected";
+    else if (hovered) effective = "Hover";
+    else effective = "Default";
+  }
+
+  // Interaction is only live when the base is Default and not disabled.
+  const handlers =
+    disabled || forced
+      ? {}
+      : {
+          onMouseEnter: () => setHovered(true),
+          onMouseLeave: () => setHovered(false),
+          onClick: () => setSelected((s) => !s),
+          onKeyDown: (e: React.KeyboardEvent) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setSelected((s) => !s);
+            }
+          },
+        };
+
+  return { effective, disabled, selected, handlers };
+}
 
 const ASSET = {
   television: "/figmaAssets/tile/television-default.svg",
@@ -66,28 +116,49 @@ function StaticCompactTile({
 /* ------------------------------------------------------------------ */
 /* Dynamic / Standard tile (checkbox + title + description)            */
 /* ------------------------------------------------------------------ */
-const standardStyles: Record<State, { container: string; title: string; desc: string }> = {
+/**
+ * Container colours are applied via inline styles because Tailwind v3
+ * arbitrary `bg-[var(--x,rgba(...))]` values silently fail to compile in
+ * this project (the rgba fallback comma breaks the class). Text colours keep
+ * hex-fallback classes (no comma → safe).
+ */
+const standardStyles: Record<
+  State,
+  { container: React.CSSProperties; title: string; desc: string }
+> = {
   Default: {
-    container:
-      "border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)]",
+    container: {
+      borderColor: "var(--border-dynamic-neutral-subtle-default,#c6c6cc)",
+      backgroundColor:
+        "var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)",
+    },
     title: "text-[var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)]",
     desc: "text-[var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)]",
   },
   Hover: {
-    container:
-      "border-[var(--border-dynamic-neutral-subtle-hover,#a8a8b2)] bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))]",
+    container: {
+      borderColor: "var(--border-dynamic-neutral-subtle-hover,#a8a8b2)",
+      backgroundColor:
+        "var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))",
+    },
     title: "text-[var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)]",
     desc: "text-[var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)]",
   },
   Selected: {
-    container:
-      "border-[var(--border-dynamic-brand-selected,#7c33b5)] bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)]",
+    container: {
+      borderColor: "var(--border-dynamic-brand-selected,#7c33b5)",
+      backgroundColor:
+        "var(--container-dynamic-brand-subtle-background-selected,#f6ebff)",
+    },
     title: "text-[var(--container-dynamic-brand-subtle-foreground-delected,#7c33b5)]",
     desc: "text-[var(--container-dynamic-brand-subtle-foreground-delected,#7c33b5)]",
   },
   Disabled: {
-    container:
-      "border-[var(--border-dynamic-neutral-subtle-disabled,#e1e1e8)] bg-[var(--container-dynamic-neutral-subtle-background-disabled,rgba(113,113,128,0.1))]",
+    container: {
+      borderColor: "var(--border-dynamic-neutral-subtle-disabled,#e1e1e8)",
+      backgroundColor:
+        "var(--container-dynamic-neutral-subtle-background-disabled,rgba(113,113,128,0.1))",
+    },
     title: "text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]",
     desc: "text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]",
   },
@@ -133,17 +204,26 @@ function DynamicStandardTile({
   title?: string;
   description?: string;
 }) {
-  const s = standardStyles[state];
+  const { effective, disabled, handlers } = useInteractiveState(state);
+  const s = standardStyles[effective];
   return (
     <div
-      className={`flex w-[363px] max-w-full min-w-[180px] flex-col items-start gap-2 overflow-clip rounded-[var(--radius-25,2px)] border border-solid p-4 ${s.container}`}
+      role="checkbox"
+      aria-checked={effective === "Selected"}
+      aria-disabled={disabled || undefined}
+      tabIndex={disabled ? -1 : 0}
+      {...handlers}
+      style={s.container}
+      className={`flex w-[363px] max-w-full min-w-[180px] flex-col items-start gap-2 overflow-clip rounded-[var(--radius-25,2px)] border border-solid p-4 outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)] ${
+        disabled ? "cursor-not-allowed" : "cursor-pointer"
+      }`}
     >
       {/* Header and actions */}
       <div className="flex w-full items-center gap-2">
         <div className="relative size-[24px] shrink-0">
           <div className="absolute left-0 top-1/2 size-[24px] -translate-y-1/2">
             <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1">
-              <StandardCheckbox state={state} />
+              <StandardCheckbox state={effective} />
             </div>
           </div>
         </div>
@@ -172,38 +252,62 @@ function DynamicStandardTile({
 /* ------------------------------------------------------------------ */
 /* Dynamic / Compact tile (icon + CTV label)                           */
 /* ------------------------------------------------------------------ */
-const compactStyles: Record<State, { container: string; text: string; icon: string }> = {
+const compactStyles: Record<
+  State,
+  { container: React.CSSProperties; text: string; icon: string }
+> = {
   Default: {
-    container:
-      "border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)]",
+    container: {
+      borderColor: "var(--border-dynamic-neutral-subtle-default,#c6c6cc)",
+      backgroundColor:
+        "var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)",
+    },
     text: "text-[var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)]",
     icon: ASSET.tvCompactDefault,
   },
   Hover: {
-    container:
-      "border-[var(--border-dynamic-neutral-subtle-hover,#a8a8b2)] bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))]",
+    container: {
+      borderColor: "var(--border-dynamic-neutral-subtle-hover,#a8a8b2)",
+      backgroundColor:
+        "var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))",
+    },
     text: "text-[var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)]",
     icon: ASSET.tvCompactHover,
   },
   Selected: {
-    container:
-      "border-[var(--border-dynamic-brand-selected,#7c33b5)] bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)]",
+    container: {
+      borderColor: "var(--border-dynamic-brand-selected,#7c33b5)",
+      backgroundColor:
+        "var(--container-dynamic-brand-subtle-background-selected,#f6ebff)",
+    },
     text: "text-[var(--container-dynamic-brand-subtle-foreground-delected,#7c33b5)]",
     icon: ASSET.tvCompactSelected,
   },
   Disabled: {
-    container:
-      "border-[var(--border-dynamic-neutral-subtle-disabled,#e1e1e8)] bg-[var(--container-dynamic-neutral-subtle-background-disabled,rgba(113,113,128,0.1))]",
+    container: {
+      borderColor: "var(--border-dynamic-neutral-subtle-disabled,#e1e1e8)",
+      backgroundColor:
+        "var(--container-dynamic-neutral-subtle-background-disabled,rgba(113,113,128,0.1))",
+    },
     text: "text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]",
     icon: ASSET.tvCompactDisabled,
   },
 };
 
 function DynamicCompactTile({ state, label = "CTV" }: { state: State; label?: string }) {
-  const s = compactStyles[state];
+  const { effective, disabled, handlers } = useInteractiveState(state);
+  const s = compactStyles[effective];
   return (
     <div
-      className={`flex flex-col items-center justify-center overflow-clip rounded-[var(--radius-25,2px)] border border-solid px-6 py-3 ${s.container}`}
+      role="checkbox"
+      aria-checked={effective === "Selected"}
+      aria-disabled={disabled || undefined}
+      tabIndex={disabled ? -1 : 0}
+      {...handlers}
+      style={s.container}
+      className={`flex flex-col items-center justify-center overflow-clip rounded-[var(--radius-25,2px)] border border-solid px-6 py-3 outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)] ${
+        disabled ? "cursor-not-allowed" : "cursor-pointer"
+      }`}
     >
       <div className="flex flex-col items-center justify-center">
         <div className="flex size-[20px] shrink-0 items-center justify-center overflow-clip">
@@ -227,10 +331,19 @@ function DynamicCompactTile({ state, label = "CTV" }: { state: State; label?: st
 /* Dynamic / Mini tile (icon only)                                     */
 /* ------------------------------------------------------------------ */
 function DynamicMiniTile({ state }: { state: State }) {
-  const s = compactStyles[state];
+  const { effective, disabled, handlers } = useInteractiveState(state);
+  const s = compactStyles[effective];
   return (
     <div
-      className={`flex flex-col items-center justify-center overflow-clip rounded-[var(--radius-25,2px)] border border-solid p-[7px] ${s.container}`}
+      role="checkbox"
+      aria-checked={effective === "Selected"}
+      aria-disabled={disabled || undefined}
+      tabIndex={disabled ? -1 : 0}
+      {...handlers}
+      style={s.container}
+      className={`flex flex-col items-center justify-center overflow-clip rounded-[var(--radius-25,2px)] border border-solid p-[7px] outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)] ${
+        disabled ? "cursor-not-allowed" : "cursor-pointer"
+      }`}
     >
       <div className="flex flex-col items-center justify-center">
         <div className="flex size-[20px] shrink-0 items-center justify-center overflow-clip">

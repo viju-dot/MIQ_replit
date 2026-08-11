@@ -30,17 +30,21 @@ function Accordion({
   title = "Accordion Title",
   body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor labore incididunt et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
 }: AccordionProps) {
-  const isExpanded = type === "Expanded";
+  const [expanded, setExpanded] = useState(type === "Expanded");
+  const [hovered, setHovered] = useState(false);
+  const isExpanded = expanded;
   const [checked, setChecked] = useState(false);
 
-  // Root background:
+  // Root background (inline style — an rgba() fallback inside an arbitrary
+  // Tailwind class breaks class parsing because of the commas):
   //  - disabled => subtle disabled grey
   //  - otherwise background on => white
-  let rootBg = "";
+  let rootBgColor: string | undefined;
   if (disabled) {
-    rootBg = "bg-[var(--container-dynamic-neutral-subtle-background-disabled,rgba(113,113,128,0.1))]";
+    rootBgColor =
+      "var(--container-dynamic-neutral-subtle-background-disabled, rgba(113,113,128,0.1))";
   } else if (background) {
-    rootBg = "bg-[var(--surface-background-lvl1,#ffffff)]";
+    rootBgColor = "var(--surface-background-lvl1, #ffffff)";
   }
 
   // Header rounding
@@ -71,29 +75,57 @@ function Accordion({
       : `${ASSET}/caret-down-collapse.svg`;
 
   return (
-    <div className={`flex w-[600px] max-w-full flex-col items-start ${rootBg}`}>
+    <div
+      className="flex w-[600px] max-w-full flex-col items-start"
+      style={rootBgColor ? { backgroundColor: rootBgColor } : undefined}
+    >
       <div className="flex w-full min-w-[180px] flex-col items-start">
         <div className="flex w-full flex-col items-start">
-          {/* Header row */}
+          {/* Header row.
+             The expand/collapse trigger is an absolutely-positioned <button>
+             that fills the header (accordionTriggerId). The visible header is a
+             presentation container so we never nest an interactive control (the
+             checkbox) inside another interactive control — the checkbox sits in
+             the normal flow above the trigger via z-index. */}
           <div className="flex w-full flex-col items-start">
             <div
-              className={`flex w-full flex-col items-start overflow-clip border-b border-t border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] px-3 py-2 ${headerRadius}`}
+              onMouseEnter={() => !disabled && setHovered(true)}
+              onMouseLeave={() => setHovered(false)}
+              className={`relative flex w-full flex-col items-start overflow-clip border-b border-t border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] px-3 py-2 transition-colors duration-150 ${headerRadius}`}
+              style={
+                hovered && !disabled
+                  ? {
+                      backgroundColor:
+                        "var(--container-dynamic-neutral-subtle-background-hover, rgba(113,113,128,0.08))",
+                    }
+                  : undefined
+              }
             >
-              <div className="flex w-full items-center gap-5">
+              {/* Full-header expand/collapse trigger (sits behind the content) */}
+              <button
+                type="button"
+                disabled={disabled}
+                aria-expanded={isExpanded}
+                aria-label={`${isExpanded ? "Collapse" : "Expand"} ${title}`}
+                onClick={() => !disabled && setExpanded((e) => !e)}
+                className={`absolute inset-0 z-0 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--border-dynamic-brand-default,#7c33b5)] ${headerRadius} ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+              />
+              <div className="pointer-events-none relative z-10 flex w-full items-center gap-5">
                 {/* Title-Left */}
                 <div className="relative flex min-w-px flex-1 items-center gap-1.5">
                   {leftSlot === "Check-box" ? (
                     <button
                       type="button"
+                      disabled={disabled}
                       onClick={() => setChecked((c) => !c)}
-                      className="flex shrink-0 items-center justify-center rounded-[var(--radius-25,2px)] p-0.5"
+                      className="pointer-events-auto flex shrink-0 items-center justify-center rounded-[var(--radius-25,2px)] p-0.5 disabled:cursor-not-allowed"
                       aria-pressed={checked}
                       aria-label="Toggle"
                     >
                       <div className="flex size-5 shrink-0 items-center justify-center rounded-[var(--radius-25,2px)] p-[7px]">
                         <div className="flex shrink-0 items-center overflow-clip p-0.5">
                           <div
-                            className={`size-4 shrink-0 overflow-clip rounded-[var(--radius-25,2px)] border-[1.5px] border-solid ${
+                            className={`size-4 shrink-0 overflow-clip rounded-[var(--radius-25,2px)] border-[1.5px] border-solid transition-colors duration-150 ${
                               checked
                                 ? "border-[var(--border-dynamic-brand-default,#7c33b5)] bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)]"
                                 : "border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]"
@@ -216,6 +248,7 @@ const config: PlaygroundConfig = {
   ],
   render: (props) => (
     <Accordion
+      key={String(props.type)}
       type={props.type === "Expanded" ? "Expanded" : "Collapse"}
       leftSlot={props.leftSlot as LeftSlot}
       border={props.border as Border}
@@ -232,6 +265,8 @@ const config: PlaygroundConfig = {
     "surface/background/lvl1": "var(--surface-background-lvl1)",
     "container/dynamic/neutral/subtle/background/disabled":
       "var(--container-dynamic-neutral-subtle-background-disabled)",
+    "container/dynamic/neutral/subtle/background/hover":
+      "var(--container-dynamic-neutral-subtle-background-hover)",
     "container/dynamic/brand/bold/background/default":
       "var(--container-dynamic-brand-bold-background-default)",
     "border/dynamic/brand/default": "var(--border-dynamic-brand-default)",

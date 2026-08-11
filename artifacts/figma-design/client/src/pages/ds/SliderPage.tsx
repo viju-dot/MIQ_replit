@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
@@ -42,9 +43,38 @@ type IndicatorProps = {
 
 function Indicator({
   showNumberTooltip = false,
-  state = "Default",
+  state: baseState = "Default",
   type = "Discrete",
 }: IndicatorProps): JSX.Element {
+  const [hover, setHover] = useState(false);
+  const [pressed, setPressed] = useState(false);
+  const [focus, setFocus] = useState(false);
+  const isBaseDisabled = baseState === "Disabled";
+
+  // Policy: the panel state is FORCED. Live hover/press/focus only derive a
+  // state when the panel base is "Default"; a forced "Active"/"Disabled" stays.
+  // Disabled always wins and suppresses interaction. Interaction promotes the
+  // knob to the Figma "Active" variant + the hover glow the Figma design note
+  // specifies (rgba(168,87,229,0.2)).
+  const interacting = !isBaseDisabled && (hover || pressed || focus);
+  const showGlow = interacting;
+  const state: IndicatorState =
+    baseState === "Default" && interacting ? "Active" : baseState;
+
+  const interactionHandlers = isBaseDisabled
+    ? {}
+    : {
+        onMouseEnter: () => setHover(true),
+        onMouseLeave: () => {
+          setHover(false);
+          setPressed(false);
+        },
+        onMouseDown: () => setPressed(true),
+        onMouseUp: () => setPressed(false),
+        onFocus: () => setFocus(true),
+        onBlur: () => setFocus(false),
+      };
+
   const isContinuousAndActive = type === "Continuous" && state === "Active";
   const isContinuousAndDefault = type === "Continuous" && state === "Default";
   const isContinuousAndDisabled = type === "Continuous" && state === "Disabled";
@@ -79,8 +109,23 @@ function Indicator({
       : "size-[24px]";
 
   return (
-    <div
-      className={`flex flex-col items-center justify-end relative ${containerCls}`}
+    <button
+      type="button"
+      aria-label={showNumberTooltip ? "Slider value 100" : "Slider handle"}
+      aria-disabled={isBaseDisabled || undefined}
+      disabled={isBaseDisabled}
+      className={`flex flex-col items-center justify-end relative appearance-none border-0 bg-transparent p-0 transition-[filter] duration-150 ${
+        isBaseDisabled ? "cursor-not-allowed" : "cursor-grab active:cursor-grabbing"
+      } ${containerCls}`}
+      style={
+        showGlow
+          ? {
+              filter:
+                "drop-shadow(0 0 3px var(--slider-hover-glow, rgba(168,87,229,0.2))) drop-shadow(0 0 3px var(--slider-hover-glow, rgba(168,87,229,0.2)))",
+            }
+          : undefined
+      }
+      {...interactionHandlers}
     >
       {isDefaultOrActive && showNumberTooltip && (
         <div
@@ -157,7 +202,7 @@ function Indicator({
           />
         </div>
       )}
-    </div>
+    </button>
   );
 }
 

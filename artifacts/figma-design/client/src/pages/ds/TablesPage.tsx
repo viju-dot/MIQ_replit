@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
@@ -218,12 +218,12 @@ function CellText({
   indent?: 0 | 1 | 2;
   text?: string;
 }) {
-  const bg =
+  const bgColor =
     state === "Selected"
-      ? "bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)]"
+      ? "var(--container-dynamic-brand-subtle-background-selected,#f6ebff)"
       : state === "Hover"
-        ? "bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))]"
-        : "bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)]";
+        ? "var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))"
+        : "var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)";
   const pl = indent === 2 ? "pl-[72px]" : indent === 1 ? "pl-[40px]" : "pl-[var(--spacing-150,12px)]";
   const textCls =
     state === "Selected"
@@ -241,7 +241,8 @@ function CellText({
 
   return (
     <div
-      className={`${bg} ${pl} border-[var(--border-static-subtle-neutral,#e1e1e8)] border-b border-solid flex gap-[var(--spacing-50,4px)] h-[40px] items-center pr-[var(--spacing-200,16px)] relative w-[192px]`}
+      style={{ backgroundColor: bgColor }}
+      className={`${pl} border-[var(--border-static-subtle-neutral,#e1e1e8)] border-b border-solid flex gap-[var(--spacing-50,4px)] h-[40px] items-center pr-[var(--spacing-200,16px)] relative w-[192px]`}
     >
       {hasLogo && <TtdLogo />}
       {hasChildren && (
@@ -328,12 +329,12 @@ function CellAction({
   iconAmount?: 1 | 2 | 3;
   state?: ActionState;
 }) {
-  const bg =
+  const bgColor =
     state === "Selected"
-      ? "bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)]"
+      ? "var(--container-dynamic-brand-subtle-background-selected,#f6ebff)"
       : state === "Hover"
-        ? "bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))]"
-        : "bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)]";
+        ? "var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))"
+        : "var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)";
 
   // Icon set per amount (dots menu shown for 3-icon, extra icons revealed on hover/selected)
   const icons: string[] =
@@ -345,7 +346,8 @@ function CellAction({
 
   return (
     <div
-      className={`${bg} border-[var(--border-static-subtle-neutral,#e1e1e8)] border-b border-solid flex h-[44px] items-center justify-end px-[8px] py-[5px] relative w-[118px]`}
+      style={{ backgroundColor: bgColor }}
+      className="border-[var(--border-static-subtle-neutral,#e1e1e8)] border-b border-solid flex h-[44px] items-center justify-end px-[8px] py-[5px] relative w-[118px]"
     >
       {iconAmount === 1 ? (
         <div className="flex items-center justify-center p-[7px] relative rounded-[var(--radius-25,2px)] shrink-0">
@@ -533,18 +535,21 @@ function MasterCell({
   checked?: boolean;
   numeric?: boolean;
 }) {
-  const bg =
+  // Inline background (Tailwind v3 arbitrary bg-[var(--x,rgba(...))] with an
+  // rgba fallback silently fails to compile here).
+  const bgColor =
     rowState === "Selected"
-      ? "bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)]"
+      ? "var(--container-dynamic-brand-subtle-background-selected,#f6ebff)"
       : rowState === "Hover"
-        ? "bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))]"
-        : "bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)]";
+        ? "var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))"
+        : "var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)";
   const numberStyle = numeric
     ? ({ fontFeatureSettings: '"lnum" 1, "tnum" 1' } as React.CSSProperties)
     : undefined;
   return (
     <div
-      className={`${bg} border-[var(--border-static-subtle-neutral,#e1e1e8)] border-b border-solid flex gap-[var(--spacing-50,4px)] h-[40px] items-center pl-[var(--spacing-150,12px)] pr-[var(--spacing-200,16px)] relative shrink-0 w-full`}
+      style={{ backgroundColor: bgColor }}
+      className="border-[var(--border-static-subtle-neutral,#e1e1e8)] border-b border-solid flex gap-[var(--spacing-50,4px)] h-[40px] items-center pl-[var(--spacing-150,12px)] pr-[var(--spacing-200,16px)] relative shrink-0 w-full transition-colors duration-150"
       data-name="Cell/Text"
     >
       {hasCheckbox && (
@@ -669,8 +674,33 @@ function TableMaster({
   const columns = ALL_COLUMNS.slice(0, Math.max(1, Math.min(columnCount, ALL_COLUMNS.length)));
   const rows = SAMPLE_ROWS.slice(0, Math.max(1, Math.min(rowCount, SAMPLE_ROWS.length)));
 
+  // State-resolution policy:
+  //  - Panel-selected `selectedRow` / `hoverRow` are FORCED — that row stays
+  //    Selected / Hover and live interaction cannot remove the forced row.
+  //  - Live clicks select ADDITIONAL rows; live hover highlights the whole row
+  //    across all columns (mirroring the Figma Hover / Selected row variants).
+  //  - The forced hover row wins for its own row regardless of pointer.
+  const [liveHover, setLiveHover] = useState<number>(-1);
+  const [liveSelected, setLiveSelected] = useState<Set<number>>(new Set());
+  useEffect(() => {
+    setLiveSelected(new Set());
+    setLiveHover(-1);
+  }, [selectedRow, rowCount]);
+
+  const isSelected = (i: number) => i === selectedRow || liveSelected.has(i);
+  const effHover = liveHover >= 0 ? liveHover : hoverRow;
   const rowStateFor = (i: number): RowState =>
-    i === selectedRow ? "Selected" : i === hoverRow ? "Hover" : "Default";
+    isSelected(i) ? "Selected" : i === effHover ? "Hover" : "Default";
+
+  const toggleSelect = (i: number) => {
+    if (i === selectedRow) return; // forced selection cannot be removed
+    setLiveSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
+  };
 
   return (
     <div
@@ -690,16 +720,49 @@ function TableMaster({
               hasCheckbox={col.checkbox === true}
               numeric={col.numeric === true}
             />
-            {rows.map((row, i) => (
-              <MasterCell
-                key={i}
-                text={row[col.key as keyof RowData]}
-                rowState={rowStateFor(i)}
-                hasCheckbox={col.checkbox === true}
-                checked={rowStateFor(i) === "Selected"}
-                numeric={col.numeric === true}
-              />
-            ))}
+            {rows.map((row, i) => {
+              const selectable = col.checkbox === true;
+              const forcedRow = i === selectedRow;
+              // Only the checkbox (first) column exposes the row-selection
+              // control with full keyboard/ARIA semantics; other columns just
+              // mirror hover so the whole row highlights. The forced panel row
+              // is not operable (its state is locked).
+              const a11y =
+                selectable && !forcedRow
+                  ? {
+                      role: "checkbox" as const,
+                      "aria-checked": isSelected(i),
+                      "aria-label": `Select row ${i + 1}`,
+                      tabIndex: 0,
+                      onClick: () => toggleSelect(i),
+                      onKeyDown: (e: React.KeyboardEvent) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          toggleSelect(i);
+                        }
+                      },
+                    }
+                  : {};
+              return (
+                <div
+                  key={i}
+                  {...a11y}
+                  className={`w-full outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)] ${
+                    selectable && !forcedRow ? "cursor-pointer" : ""
+                  }`}
+                  onMouseEnter={() => setLiveHover(i)}
+                  onMouseLeave={() => setLiveHover((h) => (h === i ? -1 : h))}
+                >
+                  <MasterCell
+                    text={row[col.key as keyof RowData]}
+                    rowState={rowStateFor(i)}
+                    hasCheckbox={col.checkbox === true}
+                    checked={rowStateFor(i) === "Selected"}
+                    numeric={col.numeric === true}
+                  />
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>

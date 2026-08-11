@@ -24,6 +24,11 @@ import type { PlaygroundConfig, PropValues } from "@/components/playground/types
 
 const caretSrc = "/figmaAssets/button/caret.svg";
 
+// Focus ring applied via inline boxShadow (var() in a Tailwind arbitrary
+// ring class silently fails in this project, so we drive it from focus state).
+const FOCUS_RING =
+  "0 0 0 2px var(--surface-background-lvl1,#ffffff), 0 0 0 4px var(--border-dynamic-brand-selected,#7c33b5)";
+
 // ----------------------------------------------------------------------------
 // Small building blocks
 // ----------------------------------------------------------------------------
@@ -134,7 +139,13 @@ function DemoButton({
 }: DemoButtonProps) {
   const box = sizeBox[size];
   const disabled = state === "disabled";
-  const hover = state === "hover";
+  // Natural interactivity: real pointer hover mirrors the Figma "Hover"
+  // variant. A panel-forced hover stays forced; natural hover only adds when
+  // the panel base is Default. Disabled always suppresses hover.
+  const [pointerHover, setPointerHover] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const forcedHover = state === "hover";
+  const hover = !disabled && (forcedHover || pointerHover);
 
   const style: React.CSSProperties = {};
 
@@ -182,16 +193,28 @@ function DemoButton({
     }
   }
 
+  if (focused && !disabled) {
+    style.boxShadow = FOCUS_RING;
+  }
+
   return (
     <button
       type="button"
       disabled={disabled}
+      aria-disabled={disabled}
       style={style}
-      className={`inline-flex items-center justify-center gap-[var(--numbers-6,6px)] rounded-[var(--radiuses-small,2px)] font-medium [font-weight:var(--body-md-medium-weight,500)] ${box.h} ${
+      onMouseEnter={() => setPointerHover(true)}
+      onMouseLeave={() => setPointerHover(false)}
+      onFocus={(e) => setFocused(e.currentTarget.matches(":focus-visible"))}
+      onBlur={() => {
+        setPointerHover(false);
+        setFocused(false);
+      }}
+      className={`inline-flex items-center justify-center gap-[var(--numbers-6,6px)] rounded-[var(--radiuses-small,2px)] font-medium [font-weight:var(--body-md-medium-weight,500)] transition-colors duration-150 outline-none ${!disabled ? "active:brightness-95" : ""} ${box.h} ${
         fullWidth ? "w-full" : ""
       } ${
         iconOnly ? (size === "compact" ? "w-[24px] px-0" : "w-[var(--height-34,34px)] px-0") : box.px
-      } ${box.text} ${disabled ? "cursor-not-allowed" : ""}`}
+      } ${box.text} ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
     >
       {iconOnly ? (
         <span

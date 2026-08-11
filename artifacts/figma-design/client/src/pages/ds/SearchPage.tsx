@@ -1,4 +1,4 @@
-import { JSX } from "react";
+import { JSX, useState, type CSSProperties } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig } from "@/components/playground/types";
 
@@ -45,38 +45,61 @@ type SearchStandardProps = {
 function SearchStandard({
   background = false,
   showIcon = false,
-  state = "Default",
+  state: baseState = "Default",
   label,
 }: SearchStandardProps): JSX.Element {
-  const isBackgroundAndActiveFocus = background && state === "Active / Focus";
-  const isBackgroundAndDisabled = background && state === "Disabled";
-  const isBackgroundAndHover = background && state === "Hover";
+  const [hover, setHover] = useState(false);
+  const [focus, setFocus] = useState(false);
+  const baseDisabled = baseState === "Disabled";
+
+  // Policy: the panel state is FORCED — live hover/focus only derive a state when
+  // the panel base is "Default". Disabled always wins and suppresses interaction.
+  let state: StandardState = baseState;
+  if (baseState === "Default") {
+    if (focus) state = "Active / Focus";
+    else if (hover) state = "Hover";
+  }
+
+  const interactionHandlers = baseDisabled
+    ? {}
+    : {
+        onMouseEnter: () => setHover(true),
+        onMouseLeave: () => setHover(false),
+        onFocus: () => setFocus(true),
+        onBlur: () => setFocus(false),
+      };
+
   const isDisabled = state === "Disabled";
-  const isNotBackgroundAndActiveFocus = !background && state === "Active / Focus";
-  const isNotBackgroundAndDisabled = !background && state === "Disabled";
-  const isNotBackgroundAndHover = !background && state === "Hover";
 
-  const containerColors = isBackgroundAndDisabled
-    ? "bg-[var(--container-dynamic-neutral-subtle-background-disabled,rgba(113,113,128,0.1))] border-[var(--border-dynamic-neutral-subtle-disabled,#e1e1e8)]"
-    : isBackgroundAndActiveFocus
-    ? "bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] border-[var(--border-dynamic-brand-default,#7c33b5)]"
-    : isBackgroundAndHover
-    ? "bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))] border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]"
-    : background && ["Default", "Filled"].includes(state)
-    ? "bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]"
-    : isNotBackgroundAndDisabled
-    ? "border-[var(--border-dynamic-neutral-subtle-disabled,#e1e1e8)]"
-    : isNotBackgroundAndActiveFocus
-    ? "border-[var(--border-dynamic-brand-default,#7c33b5)]"
-    : isNotBackgroundAndHover
-    ? "border-[var(--border-dynamic-neutral-subtle-hover,#a8a8b2)]"
-    : "border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]";
+  // State-driven colors as inline styles (Tailwind var()/rgba arbitrary classes
+  // are unreliable in this project). var(--token, fallback) keeps token fidelity.
+  const bgByState: Record<StandardState, string> = {
+    Default: "var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)",
+    Filled: "var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)",
+    Hover: "var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))",
+    "Active / Focus": "var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)",
+    Disabled: "var(--container-dynamic-neutral-subtle-background-disabled,rgba(113,113,128,0.1))",
+  };
+  const borderByState: Record<StandardState, string> = {
+    Default: "var(--border-dynamic-neutral-subtle-default,#c6c6cc)",
+    Filled: "var(--border-dynamic-neutral-subtle-default,#c6c6cc)",
+    Hover: background
+      ? "var(--border-dynamic-neutral-subtle-default,#c6c6cc)"
+      : "var(--border-dynamic-neutral-subtle-hover,#a8a8b2)",
+    "Active / Focus": "var(--border-dynamic-brand-default,#7c33b5)",
+    Disabled: "var(--border-dynamic-neutral-subtle-disabled,#e1e1e8)",
+  };
+  const containerStyle: CSSProperties = {
+    borderColor: borderByState[state],
+    ...(background ? { background: bgByState[state] } : {}),
+  };
 
-  const textColor = isDisabled
-    ? "text-[var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)]"
-    : ["Active / Focus", "Filled"].includes(state)
-    ? "text-[var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)]"
-    : "text-[var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)]";
+  const textColorValue =
+    isDisabled
+      ? "var(--container-dynamic-neutral-subtle-foreground-disabled,#a8a8b2)"
+      : ["Active / Focus", "Filled"].includes(state) || baseState === "Filled"
+        ? "var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)"
+        : "var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)";
 
   const iconSrc = isDisabled
     ? imgMagnifyingGlassDisabled
@@ -87,13 +110,17 @@ function SearchStandard({
   const resolvedLabel =
     label && label.length > 0
       ? label
-      : ["Filled", "Disabled"].includes(state)
+      : ["Filled", "Disabled"].includes(baseState)
       ? "Filled content..."
       : "Search…";
 
   return (
     <div
-      className={`flex w-[300px] min-w-[180px] flex-col items-start gap-[var(--odd-numbers-10,10px)] rounded-[var(--radiuses-small,2px)] border border-solid ${containerColors}`}
+      className="flex w-[300px] min-w-[180px] flex-col items-start gap-[var(--odd-numbers-10,10px)] rounded-[var(--radiuses-small,2px)] border border-solid transition-colors duration-150"
+      style={{ ...containerStyle, cursor: baseDisabled ? "not-allowed" : "text" }}
+      tabIndex={baseDisabled ? -1 : 0}
+      aria-disabled={baseDisabled || undefined}
+      {...interactionHandlers}
     >
       <div className="flex h-[var(--height-34,34px)] w-full items-center gap-[var(--numbers-6,6px)] p-[var(--odd-numbers-10,10px)]">
         <div className="flex h-[24px] shrink-0 items-start gap-[var(--odd-numbers-10,10px)]">
@@ -112,8 +139,8 @@ function SearchStandard({
           }`}
         >
           <p
-            className={`relative min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)] [word-break:break-word] ${textColor}`}
-            style={{ fontFamily: '"DM Sans", Helvetica' }}
+            className="relative min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)] transition-colors duration-150 [word-break:break-word]"
+            style={{ fontFamily: '"DM Sans", Helvetica', color: textColorValue }}
           >
             {resolvedLabel}
           </p>

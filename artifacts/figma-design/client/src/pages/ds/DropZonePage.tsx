@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig } from "@/components/playground/types";
 
@@ -69,7 +70,11 @@ function UploadedFile({
             </p>
           </div>
           {/* Icon Buttons */}
-          <div className="relative flex shrink-0 items-center rounded-[var(--radius-25,2px)] p-[2px]">
+          <button
+            type="button"
+            aria-label={isUploaded ? "Remove file" : "Cancel upload"}
+            className="relative flex shrink-0 items-center rounded-[var(--radius-25,2px)] p-[2px] outline-none transition-colors duration-150 hover:bg-[var(--surface-background-hover,#7171801a)] focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)]"
+          >
             <div className="relative flex size-[20px] shrink-0 items-center justify-center p-[2px]">
               <div
                 className={`relative shrink-0 ${
@@ -83,7 +88,7 @@ function UploadedFile({
                 />
               </div>
             </div>
-          </div>
+          </button>
         </div>
       </div>
     </div>
@@ -93,12 +98,16 @@ function UploadedFile({
 type DropZoneState = "Default" | "File uploads" | "Uploads";
 
 function DropZone({
-  hover = false,
+  hover: panelHover = false,
   state = "Default",
 }: {
   hover?: boolean;
   state?: DropZoneState;
 }) {
+  // Panel "Hover" toggle OR real pointer hover both drive the brand accent —
+  // matching the Figma "Hover=Yes" variants (Default & Uploads only).
+  const [realHover, setRealHover] = useState(false);
+  const hover = panelHover || realHover;
   const isDefaultAndHover = state === "Default" && hover;
   const isFileUploadsAndNotHover = state === "File uploads" && !hover;
   const isUploadsAndHover = state === "Uploads" && hover;
@@ -115,7 +124,10 @@ function DropZone({
 
   return (
     <div
-      className={`relative flex w-full max-w-[588px] flex-col items-center rounded-[var(--radius-25,2px)] border border-dashed bg-[var(--surface-background-lvl1,#ffffff)] px-[var(--spacing-200,16px)] ${containerBorder} ${containerPad}`}
+      onMouseEnter={() => setRealHover(true)}
+      onMouseLeave={() => setRealHover(false)}
+      style={{ cursor: showHandCursor ? "pointer" : undefined }}
+      className={`relative flex w-full max-w-[588px] flex-col items-center rounded-[var(--radius-25,2px)] border border-dashed bg-[var(--surface-background-lvl1,#ffffff)] px-[var(--spacing-200,16px)] transition-colors duration-150 ${containerBorder} ${containerPad}`}
     >
       {/* Upload text */}
       <div className="relative flex w-full shrink-0 items-center justify-center">

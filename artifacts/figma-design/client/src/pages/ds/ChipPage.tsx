@@ -1,5 +1,11 @@
+import { useEffect, useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
+
+// Focus ring via inline boxShadow (var() in Tailwind arbitrary ring classes
+// silently fails in this project, so it is driven from focus-visible state).
+const FOCUS_RING =
+  "0 0 0 2px var(--surface-background-lvl1,#ffffff), 0 0 0 4px var(--border-dynamic-brand-selected,#7c33b5)";
 
 type ChipState =
   | "Default"
@@ -43,9 +49,48 @@ function Chip({
   label = "3 campaign budget changes",
 }: ChipProps) {
   const isLarge = size === "Large";
-  const selected = state === "Selected" || state === "Selected-Hover";
-  const hover = state === "Default-Hover" || state === "Selected-Hover";
-  const disabled = state === "Disabled";
+  const baseState = state;
+  const disabled = baseState === "Disabled";
+
+  // State-resolution policy: a panel-forced state (Selected / *-Hover) stays
+  // forced during live interaction. Natural interaction (click-to-toggle,
+  // pointer hover) only derives states when the panel base is "Default".
+  // Disabled always wins and suppresses hover/click.
+  const isDefaultBase = baseState === "Default";
+  const baseSelected = baseState === "Selected" || baseState === "Selected-Hover";
+  const baseHover = baseState === "Default-Hover" || baseState === "Selected-Hover";
+
+  const [selectedState, setSelectedState] = useState(false);
+  const [pointerHover, setPointerHover] = useState(false);
+  const [focused, setFocused] = useState(false);
+  // Reset local interaction whenever the panel base changes.
+  useEffect(() => {
+    setSelectedState(false);
+    setPointerHover(false);
+  }, [baseState]);
+
+  const selected = disabled
+    ? false
+    : isDefaultBase
+      ? selectedState
+      : baseSelected;
+  const hover = disabled
+    ? false
+    : isDefaultBase
+      ? pointerHover
+      : baseHover;
+
+  // Recompose the effective ChipState so all downstream styling is derived
+  // from the same Figma variant logic.
+  state = disabled
+    ? "Disabled"
+    : selected
+      ? hover
+        ? "Selected-Hover"
+        : "Selected"
+      : hover
+        ? "Default-Hover"
+        : "Default";
 
   // Container background / border
   let bgClass =
@@ -79,11 +124,26 @@ function Chip({
   const iconSrc = `/figmaAssets/chip/${isLarge ? iconName.lg : iconName.sm}.svg`;
 
   return (
-    <div
-      className={`inline-flex items-center justify-center rounded-[var(--spacing-mega,40px)] ${bgClass} ${
+    <button
+      type="button"
+      disabled={disabled}
+      aria-disabled={disabled}
+      aria-pressed={selected}
+      onMouseEnter={() => isDefaultBase && !disabled && setPointerHover(true)}
+      onMouseLeave={() => setPointerHover(false)}
+      onFocus={(e) => setFocused(e.currentTarget.matches(":focus-visible"))}
+      onBlur={() => setFocused(false)}
+      onClick={() => isDefaultBase && !disabled && setSelectedState((s) => !s)}
+      className={`inline-flex items-center justify-center rounded-[var(--spacing-mega,40px)] transition-colors duration-150 outline-none ${bgClass} ${
+        disabled ? "cursor-not-allowed" : "cursor-pointer"
+      } ${
         isLarge ? "h-[34px] px-3 py-0.5" : "h-6 px-2 py-0.5"
       }`}
-      style={{ border: borderStyle, gap: "var(--numbers-4, 4px)" }}
+      style={{
+        border: borderStyle,
+        gap: "var(--numbers-4, 4px)",
+        ...(focused && !disabled ? { boxShadow: FOCUS_RING } : null),
+      }}
       data-name={`State=${state}, Status=${status}, Size=${size}, Menu=${menu ? "Yes" : "No"}`}
     >
       <div className="flex shrink-0 items-center justify-center gap-1">
@@ -148,7 +208,7 @@ function Chip({
           </span>
         </>
       )}
-    </div>
+    </button>
   );
 }
 

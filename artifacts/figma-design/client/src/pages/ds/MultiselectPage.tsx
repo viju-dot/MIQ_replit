@@ -90,14 +90,26 @@ function OptionRow({
   onToggle?: () => void;
   disabled?: boolean;
 }): JSX.Element {
+  const [hover, setHover] = useState(false);
+  // State-driven row background via inline style (Tailwind hover:/var() arbitrary
+  // classes are unreliable here). var(--token, fallback) preserves fidelity.
+  const rowBg = checked
+    ? "var(--container-dynamic-brand-subtle-background-selected,#f6ebff)"
+    : !disabled && hover
+      ? "var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))"
+      : "var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)";
   return (
     <button
       type="button"
       onClick={onToggle}
       disabled={disabled}
-      className={`flex w-full items-center gap-2 border-b border-[var(--border-static-subtle-neutral,#e1e1e8)] py-2 pl-2 pr-3 text-left ${
-        checked ? "bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)]" : "bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] hover:bg-[var(--container-dynamic-neutral-subtle-background-hover,#71718014)]"
-      } disabled:cursor-not-allowed`}
+      aria-pressed={disabled ? undefined : checked}
+      onMouseEnter={disabled ? undefined : () => setHover(true)}
+      onMouseLeave={disabled ? undefined : () => setHover(false)}
+      className={`flex w-full items-center gap-2 border-b border-[var(--border-static-subtle-neutral,#e1e1e8)] py-2 pl-2 pr-3 text-left transition-colors duration-150 ${
+        disabled ? "cursor-not-allowed" : "cursor-pointer"
+      }`}
+      style={{ background: rowBg }}
     >
       <span
         className={`flex size-4 shrink-0 items-center justify-center rounded-[var(--radiuses-small,2px)] border-[1.5px] ${

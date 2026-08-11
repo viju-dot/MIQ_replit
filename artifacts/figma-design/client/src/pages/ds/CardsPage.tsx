@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig } from "@/components/playground/types";
 
@@ -38,13 +39,14 @@ function DragSection({
   return (
     <div className="flex items-center self-stretch shrink-0">
       <div
-        className={`flex h-full w-[40px] items-center justify-center border-r border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] rounded-l-[var(--radius-25,2px)] shrink-0 ${
-          hover
-            ? "bg-[var(--surface-background-hover,rgba(113,113,128,0.08))]"
+        className="flex h-full w-[40px] items-center justify-center border-r border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] rounded-l-[var(--radius-25,2px)] shrink-0"
+        style={{
+          backgroundColor: hover
+            ? "var(--surface-background-hover,rgba(113,113,128,0.08))"
             : disabled
-              ? ""
-              : "bg-[var(--surface-background-lvl1,#ffffff)]"
-        }`}
+              ? undefined
+              : "var(--surface-background-lvl1,#ffffff)",
+        }}
       >
         <span className="flex items-center justify-center shrink-0 w-[24px] h-[24px] overflow-hidden">
           <img alt="" className="block max-w-none w-full h-full" src={DRAG} />
@@ -250,9 +252,36 @@ function SmartCard({
   showFooter?: boolean;
   showDragSection?: boolean;
 }) {
-  const isSelected = state === "selected";
-  const isDisabled = state === "disabled";
-  const isHover = state === "hover";
+  // State-resolution policy:
+  //  - A panel-forced state (hover / selected / disabled) stays FORCED.
+  //  - Natural pointer hover only derives the Hover elevation when the panel
+  //    base is Default.
+  //  - Disabled always wins.
+  // The card contains its own interactive controls (header/footer buttons,
+  // drag handle), so the container itself is NOT a button/role — it only
+  // applies the decorative Hover elevation on pointer hover. Selection is a
+  // panel-forced preview state (no invalid container-level ARIA / nested
+  // interactive controls).
+  const [hovered, setHovered] = useState(false);
+  useEffect(() => {
+    setHovered(false);
+  }, [state]);
+
+  const baseDisabled = state === "disabled";
+  let effective: SmartCardState = state;
+  if (state === "default" && hovered) effective = "hover";
+
+  const isSelected = effective === "selected";
+  const isDisabled = effective === "disabled";
+  const isHover = effective === "hover";
+
+  const interactiveHandlers =
+    baseDisabled || state !== "default"
+      ? {}
+      : {
+          onMouseEnter: () => setHovered(true),
+          onMouseLeave: () => setHovered(false),
+        };
 
   const shadow = isHover
     ? "0px 1px 4px 0px var(--shadow-lvl8,rgba(113,113,128,0.08)), 0px 12px 20px 0px var(--shadow-lvl10,rgba(113,113,128,0.1))"
@@ -262,10 +291,17 @@ function SmartCard({
 
   return (
     <div
-      className={`flex items-start min-w-[180px] overflow-hidden rounded-[var(--radius-25,2px)] ${
-        isDisabled ? "bg-[rgba(113,113,128,0.1)]" : "bg-[var(--surface-background-lvl1,#ffffff)]"
-      } ${isSelected ? "border border-solid border-[var(--border-dynamic-brand-selected,#7c33b5)]" : ""}`}
-      style={{ boxShadow: shadow }}
+      {...interactiveHandlers}
+      style={{
+        boxShadow: shadow,
+        cursor: isDisabled ? "not-allowed" : undefined,
+        backgroundColor: isDisabled
+          ? "rgba(113,113,128,0.1)"
+          : "var(--surface-background-lvl1,#ffffff)",
+      }}
+      className={`flex items-start min-w-[180px] overflow-hidden rounded-[var(--radius-25,2px)] transition-shadow duration-150 ${
+        isSelected ? "border border-solid border-[var(--border-dynamic-brand-selected,#7c33b5)]" : ""
+      }`}
     >
       {showDragSection && (
         <DragSection disabled={isDisabled} hover={isHover} />

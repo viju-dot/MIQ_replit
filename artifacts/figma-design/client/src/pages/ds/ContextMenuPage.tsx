@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
@@ -7,6 +8,23 @@ const shadowStyle = {
   filter:
     "drop-shadow(0px 1px 2px rgba(113,113,128,0.08)) drop-shadow(0px 8px 8px rgba(113,113,128,0.04))",
 };
+
+/**
+ * Menu-item state colors. The Figma hover/selected tokens are NOT present as
+ * real CSS custom properties in tokens.css, so arbitrary Tailwind var()/rgba
+ * classes (e.g. bg-[var(--x,#71718014)]) silently fail. These literal Figma
+ * values are therefore applied via inline styles — the single source of truth
+ * for both the panel-forced MenuItem states and the natural interactive rows.
+ */
+const CM_COLORS = {
+  bgDefault: "#ffffff",
+  bgHover: "rgba(113,113,128,0.08)",
+  bgSelected: "#f6ebff",
+  fgDefaultRegular: "#4b4b59",
+  fgDefaultVariation: "#13131a",
+  fgHover: "#13131a",
+  fgSelected: "#7c33b5",
+} as const;
 
 /* ------------------------------------------------------------------ */
 /* Menu Items component (State variants)                              */
@@ -62,11 +80,17 @@ function CheckboxBox({ checked }: { checked?: boolean }) {
     <div className="flex items-center justify-center overflow-hidden p-[2px] rounded-[var(--radius-25,2px)] shrink-0">
       <div className="flex items-center overflow-hidden p-[2px] shrink-0">
         <div
-          className={`overflow-hidden relative rounded-[var(--radius-25,2px)] shrink-0 size-[16px] ${
-            checked
-              ? "bg-[var(--controls-background-selected,#7c33b5)]"
-              : "border-[1.5px] border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]"
+          className={`overflow-hidden relative rounded-[var(--radius-25,2px)] shrink-0 size-[16px] transition-colors duration-150 ${
+            checked ? "" : "border-[1.5px]"
           }`}
+          style={{
+            backgroundColor: checked
+              ? "var(--controls-background-selected, #7c33b5)"
+              : "transparent",
+            borderColor: checked
+              ? undefined
+              : "var(--border-dynamic-neutral-subtle-default, #c6c6cc)",
+          }}
         >
           {checked && (
             <div className="absolute flex flex-col items-center justify-center left-0 overflow-hidden px-px py-[3px] size-[16px] top-0">
@@ -108,15 +132,16 @@ function MenuItem({
     );
   }
 
-  const bg = isSelected
-    ? "bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)]"
+  const bgColor = isSelected
+    ? CM_COLORS.bgSelected
     : isHover
-      ? "bg-[var(--container-dynamic-neutral-subtle-background-hover,#71718014)]"
-      : "bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)]";
+      ? CM_COLORS.bgHover
+      : CM_COLORS.bgDefault;
 
   return (
     <div
-      className={`flex items-center gap-[4px] border-b border-[var(--border-static-subtle-neutral,#e1e1e8)] border-solid pl-[8px] pr-[12px] py-[8px] ${bg}`}
+      className="flex items-center gap-[4px] border-b border-[var(--border-static-subtle-neutral,#e1e1e8)] border-solid pl-[8px] pr-[12px] py-[8px] transition-colors duration-150"
+      style={{ backgroundColor: bgColor }}
     >
       {(isDefault || isHover) && (
         <>
@@ -126,11 +151,10 @@ function MenuItem({
             }
           />
           <p
-            className={`font-['DM_Sans'] leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] whitespace-nowrap ${
-              isHover
-                ? "text-[var(--container-dynamic-neutral-subtle-foreground-hover,#13131a)]"
-                : "text-[var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)]"
-            }`}
+            className="font-['DM_Sans'] leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] whitespace-nowrap"
+            style={{
+              color: isHover ? CM_COLORS.fgHover : CM_COLORS.fgDefaultRegular,
+            }}
           >
             {label}
           </p>
@@ -148,11 +172,12 @@ function MenuItem({
           <div className="flex items-center gap-[4px] shrink-0">
             <CheckboxBox checked={isSelected} />
             <p
-              className={`font-['DM_Sans'] leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] whitespace-nowrap ${
-                isSelected
-                  ? "text-[var(--container-dynamic-brand-subtle-foreground-delected,#7c33b5)]"
-                  : "text-[var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)]"
-              }`}
+              className="font-['DM_Sans'] leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] whitespace-nowrap"
+              style={{
+                color: isSelected
+                  ? CM_COLORS.fgSelected
+                  : CM_COLORS.fgDefaultVariation,
+              }}
             >
               {label}
             </p>
@@ -177,23 +202,34 @@ function MenuItem({
 /* ------------------------------------------------------------------ */
 
 function ContextMenuRow({ label }: { label: string }) {
+  const [hovered, setHovered] = useState(false);
   return (
-    <div className="bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] border-b border-[var(--border-static-subtle-neutral,#e1e1e8)] border-solid flex gap-[4px] items-center pl-[8px] pr-[12px] py-[8px] shrink-0 w-full">
+    <button
+      type="button"
+      role="menuitem"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="border-b border-[var(--border-static-subtle-neutral,#e1e1e8)] border-solid flex gap-[4px] items-center pl-[8px] pr-[12px] py-[8px] shrink-0 w-full cursor-pointer text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--border-dynamic-brand-default,#7c33b5)] transition-colors duration-150"
+      style={{ backgroundColor: hovered ? CM_COLORS.bgHover : CM_COLORS.bgDefault }}
+    >
       <div className="flex items-center p-[2px] shrink-0 size-[24px]">
         <div className="flex items-center justify-center overflow-hidden p-[2px] shrink-0 size-[20px]">
           <div className="relative shrink-0 size-[16.25px]">
             <img
               alt=""
               className="absolute block inset-0 max-w-none size-full"
-              src={`${ASSET}/x-circle-menus.svg`}
+              src={hovered ? `${ASSET}/x-circle-hover.svg` : `${ASSET}/x-circle-menus.svg`}
             />
           </div>
         </div>
       </div>
-      <p className="font-['DM_Sans'] leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] text-[var(--container-dynamic-neutral-subtle-foreground-default-regular,#4b4b59)] whitespace-nowrap">
+      <p
+        className="font-['DM_Sans'] leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] whitespace-nowrap transition-colors duration-150"
+        style={{ color: hovered ? CM_COLORS.fgHover : CM_COLORS.fgDefaultRegular }}
+      >
         {label}
       </p>
-    </div>
+    </button>
   );
 }
 
@@ -215,13 +251,35 @@ function ContextMenus({ amount, label }: { amount: number; label: string }) {
 /* ------------------------------------------------------------------ */
 
 function CheckboxRow({ label }: { label: string }) {
+  const [checked, setChecked] = useState(false);
+  const [hovered, setHovered] = useState(false);
   return (
-    <div className="bg-[var(--container-dynamic-neutral-subtle-background-default-regular,#ffffff)] border-b border-[var(--border-static-subtle-neutral,#e1e1e8)] border-solid flex gap-[4px] items-center pl-[8px] pr-[12px] py-[8px] shrink-0 w-full">
-      <CheckboxBox />
-      <p className="font-['DM_Sans'] leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] text-[var(--container-dynamic-neutral-subtle-foreground-default-variation,#13131a)] whitespace-nowrap">
+    <button
+      type="button"
+      role="menuitemcheckbox"
+      aria-checked={checked}
+      onClick={() => setChecked((c) => !c)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="border-b border-[var(--border-static-subtle-neutral,#e1e1e8)] border-solid flex gap-[4px] items-center pl-[8px] pr-[12px] py-[8px] shrink-0 w-full cursor-pointer text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--border-dynamic-brand-default,#7c33b5)] transition-colors duration-150"
+      style={{
+        backgroundColor: checked
+          ? CM_COLORS.bgSelected
+          : hovered
+            ? CM_COLORS.bgHover
+            : CM_COLORS.bgDefault,
+      }}
+    >
+      <CheckboxBox checked={checked} />
+      <p
+        className="font-['DM_Sans'] leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] whitespace-nowrap transition-colors duration-150"
+        style={{
+          color: checked ? CM_COLORS.fgSelected : CM_COLORS.fgDefaultVariation,
+        }}
+      >
         {label}
       </p>
-    </div>
+    </button>
   );
 }
 
@@ -368,9 +426,13 @@ const contextMenusConfig: PlaygroundConfig = {
   tokens: {
     "container/dynamic/neutral/subtle/background/default/regular":
       "var(--container-dynamic-neutral-subtle-background-default-regular)",
+    "container/dynamic/neutral/subtle/background/hover":
+      "var(--container-dynamic-neutral-subtle-background-hover)",
     "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
     "container/dynamic/neutral/subtle/foreground/default/regular":
       "var(--container-dynamic-neutral-subtle-foreground-default-regular)",
+    "container/dynamic/neutral/subtle/foreground/hover":
+      "var(--container-dynamic-neutral-subtle-foreground-hover)",
     "radius/25": "var(--radius-25)",
     "shadow/menu":
       "0px 1px 2px rgba(113,113,128,0.08), 0px 8px 8px rgba(113,113,128,0.04)",
@@ -410,6 +472,12 @@ const contextMenuCheckboxConfig: PlaygroundConfig = {
     "border/static/subtle/neutral": "var(--border-static-subtle-neutral)",
     "container/dynamic/neutral/subtle/foreground/default/variation":
       "var(--container-dynamic-neutral-subtle-foreground-default-variation)",
+    "container/dynamic/brand/subtle/background/selected":
+      "var(--container-dynamic-brand-subtle-background-selected)",
+    "container/dynamic/brand/subtle/foreground/delected":
+      "var(--container-dynamic-brand-subtle-foreground-delected)",
+    "container/dynamic/neutral/subtle/background/hover":
+      "var(--container-dynamic-neutral-subtle-background-hover)",
     "border/dynamic/neutral/subtle/default":
       "var(--border-dynamic-neutral-subtle-default)",
     "controls/background/selected": "var(--controls-background-selected)",

@@ -440,11 +440,12 @@ function InteractiveTooltip({
             }`}
             data-name="Link Buttons"
           >
-            <p
-              className={`[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] not-italic relative shrink-0 text-[length:var(--body-md-medium-size,14px)] text-center whitespace-nowrap ${linkText}`}
+            <button
+              type="button"
+              className={`[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] not-italic relative shrink-0 text-[length:var(--body-md-medium-size,14px)] text-center whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)] ${linkText}`}
             >
               Learn more
-            </p>
+            </button>
           </div>
           <div
             className={`flex flex-col items-end justify-center relative ${
@@ -458,8 +459,9 @@ function InteractiveTooltip({
               }`}
               data-name="Button"
             >
-              <div
-                className={`flex gap-[var(--odd-numbers-10,10px)] h-[24px] items-center justify-center pl-[6px] pr-[6px] py-[2px] relative rounded-[var(--radiuses-small,2px)] shrink-0 ${
+              <button
+                type="button"
+                className={`flex gap-[var(--odd-numbers-10,10px)] h-[24px] items-center justify-center pl-[6px] pr-[6px] py-[2px] relative rounded-[var(--radiuses-small,2px)] shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)] ${
                   isLight
                     ? "border-[length:var(--old-stroke-thickness-1,1px)] border-[var(--border-dynamic-brand-default,#7c33b5)] border-solid"
                     : "bg-[var(--container-dynamic-neutral-bold-background-default,#4b4b59)]"
@@ -476,7 +478,7 @@ function InteractiveTooltip({
                     Confirm
                   </p>
                 )}
-              </div>
+              </button>
             </div>
           </div>
         </div>

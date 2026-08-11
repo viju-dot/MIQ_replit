@@ -1,5 +1,11 @@
+import { useEffect, useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
+
+// Focus ring via inline boxShadow (var() in Tailwind arbitrary ring classes
+// silently fails in this project, so it is driven from focus-visible state).
+const FOCUS_RING =
+  "0 0 0 2px var(--surface-background-lvl1,#ffffff), 0 0 0 4px var(--border-dynamic-brand-selected,#7c33b5)";
 
 const CHECK_ICON = "/figmaAssets/check/check.svg";
 const CHECK_ICON_DISABLED = "/figmaAssets/check/check-disabled.svg";
@@ -23,6 +29,8 @@ type CheckboxProps = {
   isCompact?: boolean;
   hasLabel?: boolean;
   labelValue?: string;
+  /** When provided, the control becomes clickable (toggles checked/unchecked). */
+  onToggle?: () => void;
 };
 
 /**
@@ -37,33 +45,38 @@ function Checkbox({
   isCompact = true,
   hasLabel = true,
   labelValue = "Option",
+  onToggle,
 }: CheckboxProps) {
+  // State-resolution policy: a panel-forced "Hover" stays forced; natural
+  // pointer hover only derives Hover when the panel base is "Default".
+  // Disabled always wins and suppresses hover/click.
+  const [pointerHover, setPointerHover] = useState(false);
+  const [focused, setFocused] = useState(false);
+  if (!disabled && state === "Default" && pointerHover) state = "Hover";
+  const interactive = !disabled && !!onToggle;
   const isChecked = variant === "Checked" || variant === "Checked Error";
   const isPartial = variant === "Partial" || variant === "Partial Error";
   const isUnchecked = variant === "Unchecked" || variant === "Unchecked Error";
   const isFilled = isChecked || isPartial;
 
-  // 16px container box styling
-  let boxClass: string;
+  // 16px container box styling — driven by inline styles because Tailwind
+  // arbitrary classes with var()/rgba silently fail in this project.
+  const boxStyle: React.CSSProperties = {};
   if (!disabled && (variant === "Checked Error" || variant === "Partial Error")) {
-    boxClass =
-      "bg-[var(--controls-background-selected,#7c33b5)] border-[1.5px] border-[var(--border-dynamic-error-default,#da294b)] border-solid";
+    boxStyle.backgroundColor = "var(--controls-background-selected,#7c33b5)";
+    boxStyle.border = "1.5px solid var(--border-dynamic-error-default,#da294b)";
   } else if (state === "Default" && disabled && isFilled) {
-    boxClass = "bg-[var(--controls-background-disabled,rgba(113,113,128,0.1))]";
+    boxStyle.backgroundColor = "var(--controls-background-disabled,rgba(113,113,128,0.1))";
   } else if (!disabled && (variant === "Checked" || variant === "Partial")) {
-    boxClass = "bg-[var(--controls-background-selected,#7c33b5)]";
+    boxStyle.backgroundColor = "var(--controls-background-selected,#7c33b5)";
   } else if (state === "Default" && disabled && isUnchecked) {
-    boxClass =
-      "border-[1.5px] border-[var(--border-dynamic-neutral-subtle-disabled,#e1e1e8)] border-solid";
+    boxStyle.border = "1.5px solid var(--border-dynamic-neutral-subtle-disabled,#e1e1e8)";
   } else if (variant === "Unchecked" && state === "Hover" && !disabled) {
-    boxClass =
-      "border-[1.5px] border-[var(--border-dynamic-neutral-subtle-hover,#a8a8b2)] border-solid";
+    boxStyle.border = "1.5px solid var(--border-dynamic-neutral-subtle-hover,#a8a8b2)";
   } else if (variant === "Unchecked Error" && !disabled) {
-    boxClass =
-      "border-[1.5px] border-[var(--border-dynamic-error-default,#da294b)] border-solid";
+    boxStyle.border = "1.5px solid var(--border-dynamic-error-default,#da294b)";
   } else {
-    boxClass =
-      "border-[1.5px] border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] border-solid";
+    boxStyle.border = "1.5px solid var(--border-dynamic-neutral-subtle-default,#c6c6cc)";
   }
 
   // Wrapper padding + hover background
@@ -71,9 +84,9 @@ function Checkbox({
   const wrapperPad = isCompact
     ? "p-[var(--spacing-container-s,2px)]"
     : "p-[var(--spacing-container-m,7px)]";
-  const wrapperBg = hoverBg
-    ? "bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))]"
-    : "";
+  const wrapperBg: React.CSSProperties = hoverBg
+    ? { backgroundColor: "var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))" }
+    : {};
 
   // Gap between control and label
   const gap =
@@ -121,14 +134,17 @@ function Checkbox({
   const minusSrc =
     state === "Default" && disabled ? MINUS_ICON_DISABLED : MINUS_ICON;
 
-  return (
-    <div className={`flex items-center relative ${gap}`}>
+  const rootClass = `flex items-center relative ${gap}`;
+  const inner = (
+    <>
       <div
-        className={`flex items-center justify-center overflow-hidden rounded-[var(--radius-25,2px)] shrink-0 ${wrapperPad} ${wrapperBg}`}
+        className={`flex items-center justify-center overflow-hidden rounded-[var(--radius-25,2px)] shrink-0 transition-colors duration-150 ${wrapperPad}`}
+        style={wrapperBg}
       >
         <div className="flex items-center overflow-hidden p-[var(--spacing-container-s,2px)] shrink-0">
           <div
-            className={`overflow-hidden relative rounded-[var(--radius-25,2px)] shrink-0 h-[16px] w-[16px] ${boxClass}`}
+            className="overflow-hidden relative rounded-[var(--radius-25,2px)] shrink-0 h-[16px] w-[16px] transition-colors duration-150"
+            style={boxStyle}
           >
             {isChecked && (
               <div className="absolute left-0 top-0 h-[16px] w-[16px] flex flex-col items-center justify-center overflow-hidden px-px py-[3px]">
@@ -163,6 +179,36 @@ function Checkbox({
           {labelValue}
         </p>
       )}
+    </>
+  );
+
+  if (interactive) {
+    return (
+      <button
+        type="button"
+        role="checkbox"
+        aria-checked={isPartial ? "mixed" : isChecked}
+        aria-disabled={disabled}
+        onMouseEnter={() => setPointerHover(true)}
+        onMouseLeave={() => setPointerHover(false)}
+        onFocus={(e) => setFocused(e.currentTarget.matches(":focus-visible"))}
+        onBlur={() => setFocused(false)}
+        onClick={onToggle}
+        className={`${rootClass} border-0 bg-transparent p-0 text-left outline-none rounded-[2px] cursor-pointer`}
+        style={focused ? { boxShadow: FOCUS_RING } : undefined}
+      >
+        {inner}
+      </button>
+    );
+  }
+
+  return (
+    <div
+      className={`${rootClass} ${disabled ? "cursor-not-allowed" : ""}`}
+      onMouseEnter={() => !disabled && setPointerHover(true)}
+      onMouseLeave={() => setPointerHover(false)}
+    >
+      {inner}
     </div>
   );
 }
@@ -176,6 +222,33 @@ function toVariant(checkbox: string, error: boolean): Variant {
         ? "Partial"
         : "Unchecked";
   return (error ? `${base} Error` : base) as Variant;
+}
+
+// Interactive wrapper: clicking the checkbox toggles its checked/unchecked
+// value (its nature) while the panel controls seed and re-sync the base
+// selection. Partial is treated as "checked" for toggle purposes.
+function CheckboxPreview({ props }: { props: PropValues }): JSX.Element {
+  const base = String(props.checkbox);
+  const error = props.error === true;
+  const disabled = props.disabled === true;
+  const forcedHover = props.state === "Hover";
+  const [checkbox, setCheckbox] = useState(base);
+  useEffect(() => {
+    setCheckbox(base);
+  }, [base]);
+  return (
+    <Checkbox
+      variant={toVariant(checkbox, error)}
+      state={forcedHover ? "Hover" : "Default"}
+      disabled={disabled}
+      isCompact={props.isCompact === true}
+      hasLabel={props.hasLabel === true}
+      labelValue={String(props.labelValue)}
+      onToggle={() =>
+        setCheckbox((c) => (c === "Unchecked" ? base === "Unchecked" ? "Checked" : base : "Unchecked"))
+      }
+    />
+  );
 }
 
 const checkboxConfig: PlaygroundConfig = {
@@ -204,16 +277,7 @@ const checkboxConfig: PlaygroundConfig = {
     { kind: "boolean", name: "hasLabel", label: "Show label", defaultValue: true },
     { kind: "text", name: "labelValue", label: "Label", defaultValue: "Option" },
   ],
-  render: (props: PropValues) => (
-    <Checkbox
-      variant={toVariant(String(props.checkbox), props.error === true)}
-      state={props.state === "Hover" ? "Hover" : "Default"}
-      disabled={props.disabled === true}
-      isCompact={props.isCompact === true}
-      hasLabel={props.hasLabel === true}
-      labelValue={String(props.labelValue)}
-    />
-  ),
+  render: (props: PropValues) => <CheckboxPreview props={props} />,
   tokens: {
     "controls/background/selected": "var(--controls-background-selected)",
     "controls/background/disabled": "var(--controls-background-disabled)",

@@ -434,7 +434,9 @@ function BadgeDescription({
                   type="button"
                   disabled={disabled}
                   onClick={() => !disabled && setChecked((v) => !v)}
-                  className="flex size-[16px] items-center justify-center overflow-hidden rounded-[var(--radius-25,2px)]"
+                  aria-checked={checked}
+                  role="checkbox"
+                  className="flex size-[16px] items-center justify-center overflow-hidden rounded-[var(--radius-25,2px)] outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)]"
                   style={{
                     border: `1.5px solid ${
                       checked && !disabled
@@ -483,11 +485,17 @@ function BadgeDescription({
         </div>
       </div>
       <div className="flex items-start gap-[4px] self-stretch">
-        <span className="flex w-[16px] items-start justify-end pt-[4px]">
-          <span className="flex size-[16px] items-center justify-center">
+        <button
+          type="button"
+          disabled={disabled}
+          aria-label="Dismiss"
+          className="flex w-[16px] items-start justify-end pt-[4px] outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)] disabled:cursor-not-allowed"
+          style={{ cursor: disabled ? "not-allowed" : "pointer" }}
+        >
+          <span className="flex size-[16px] items-center justify-center rounded-[var(--radius-25,2px)]">
             <img alt="" className="block size-[10px]" src={`${ASSET}/close-x.svg`} />
           </span>
-        </span>
+        </button>
       </div>
     </div>
   );

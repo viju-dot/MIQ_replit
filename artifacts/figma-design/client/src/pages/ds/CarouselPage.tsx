@@ -17,7 +17,7 @@ function NavButton({ direction, onClick, disabled }: NavButtonProps): JSX.Elemen
       onClick={onClick}
       disabled={disabled}
       aria-label={direction === "left" ? "Previous" : "Next"}
-      className="flex items-center justify-center rounded-[var(--radius-25,2px)] p-[var(--spacing-container-m,7px)] transition-colors hover:bg-[var(--surface-background-hover,#7171801a)] disabled:opacity-40 disabled:hover:bg-transparent"
+      className="flex items-center justify-center rounded-[var(--radius-25,2px)] p-[var(--spacing-container-m,7px)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)] disabled:cursor-not-allowed disabled:opacity-40"
     >
       <span className="flex items-center justify-center p-[var(--spacing-25,2px)]">
         <img
@@ -46,10 +46,10 @@ function CarouselPagination({ count, active, onSelect }: PaginationProps): JSX.E
           onClick={() => onSelect?.(index)}
           aria-label={`Go to slide ${index + 1}`}
           aria-current={index === active}
-          className="flex flex-col items-start overflow-hidden rounded-full"
+          className="flex flex-col items-start overflow-hidden rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)]"
         >
           <span
-            className="h-2 w-2 rounded-full"
+            className="h-2 w-2 rounded-full transition-colors duration-150"
             style={{
               backgroundColor:
                 index === active

@@ -81,7 +81,11 @@ function ActionBar({
       {/* Left */}
       <div className="flex shrink-0 items-center gap-[var(--odd-numbers-11,11px)]">
         <div className="flex shrink-0 items-center gap-[var(--numbers-8,8px)]">
-          <div className="flex shrink-0 items-center justify-center rounded-[var(--radiuses-small,2px)] p-[var(--spacing-container-m,7px)]">
+          <button
+            type="button"
+            aria-label="Toggle selection"
+            className="flex shrink-0 items-center justify-center rounded-[var(--radiuses-small,2px)] p-[var(--spacing-container-m,7px)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)]"
+          >
             <div className="flex size-[20px] shrink-0 items-center justify-center p-[2px]">
               <div className="relative size-[12.5px] shrink-0">
                 <img
@@ -91,7 +95,7 @@ function ActionBar({
                 />
               </div>
             </div>
-          </div>
+          </button>
           <p
             className={`whitespace-nowrap font-['DM_Sans',Helvetica] text-[length:var(--body-md-medium-size,14px)] font-medium leading-[var(--body-md-medium-line-height,20px)] [word-break:break-word] ${
               isWhite
@@ -107,9 +111,10 @@ function ActionBar({
       {/* Right */}
       <div className="flex shrink-0 flex-wrap items-center justify-end gap-4">
         {actions.map((action) => (
-          <div
+          <button
+            type="button"
             key={action.label}
-            className="flex shrink-0 items-center justify-center rounded-[var(--radiuses-small,2px)] px-[var(--spacing-150,12px)] py-[var(--spacing-container-m,7px)]"
+            className="flex shrink-0 items-center justify-center rounded-[var(--radiuses-small,2px)] px-[var(--spacing-150,12px)] py-[var(--spacing-container-m,7px)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)]"
           >
             <div className="flex shrink-0 items-center justify-center gap-[var(--spacing-50,4px)] rounded-[var(--radiuses-small,2px)]">
               <div
@@ -129,7 +134,7 @@ function ActionBar({
                 {action.label}
               </p>
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </div>

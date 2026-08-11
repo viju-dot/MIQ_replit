@@ -15,10 +15,46 @@
  * their plain fallback hex values (this project is Tailwind v3).
  */
 
+import { useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig } from "@/components/playground/types";
 
 const ASSET = "/figmaAssets/notification";
+
+/* ------------------------------------------------------------------ *
+ * Shared icon button — inline-style hover (Tailwind v3 arbitrary      *
+ * hover:bg with var()/rgba fails silently in this project).           *
+ * ------------------------------------------------------------------ */
+
+function IconHoverButton({
+  label,
+  hoverBg,
+  className = "",
+  size = "size-6",
+  children,
+}: {
+  label: string;
+  hoverBg: string;
+  className?: string;
+  size?: string;
+  children: React.ReactNode;
+}) {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
+      className={`flex ${size} shrink-0 items-center justify-center rounded-[var(--radius-25,2px)] outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)] ${className}`}
+      style={{ backgroundColor: hover ? hoverBg : "transparent" }}
+    >
+      {children}
+    </button>
+  );
+}
 
 /* ------------------------------------------------------------------ */
 /* Notification Global Banner                                          */
@@ -94,14 +130,14 @@ function GlobalBanner({
 
       {/* Right close icon */}
       {close && (
-        <div className="flex size-6 shrink-0 items-center justify-center">
+        <IconHoverButton label="Dismiss" hoverBg="rgba(255,255,255,0.16)">
           <img
             alt=""
             className="block max-w-none"
             src={`${ASSET}/banner-close.svg`}
             style={{ width: "15px", height: "15px" }}
           />
-        </div>
+        </IconHoverButton>
       )}
     </div>
   );
@@ -213,7 +249,12 @@ function AlertIcon({ state }: { state: AlertState }) {
 
 function CloseButton() {
   return (
-    <div className="flex shrink-0 items-center justify-center p-0.5">
+    <IconHoverButton
+      label="Dismiss"
+      hoverBg="#7171801a"
+      size=""
+      className="p-0.5"
+    >
       <div className="flex size-5 items-center justify-center p-1">
         <img
           alt=""
@@ -222,7 +263,7 @@ function CloseButton() {
           style={{ width: "12.5px", height: "12.5px" }}
         />
       </div>
-    </div>
+    </IconHoverButton>
   );
 }
 
@@ -353,9 +394,43 @@ const alertConfig: PlaygroundConfig = {
 /* Notification Card                                                   */
 /* ------------------------------------------------------------------ */
 
+function DownloadReportButton() {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      type="button"
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
+      className="flex h-6 items-center justify-center gap-1 rounded-[var(--radius-25,2px)] border pl-1 pr-1.5 py-[3px] outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)]"
+      style={{
+        borderColor: hover
+          ? "var(--border-dynamic-brand-hover,#662994)"
+          : "var(--border-dynamic-brand-default,#7c33b5)",
+        backgroundColor: hover
+          ? "var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))"
+          : "transparent",
+      }}
+    >
+      <div className="flex size-5 items-center justify-center p-px">
+        <img
+          alt=""
+          className="block max-w-none"
+          src={`${ASSET}/card-download.svg`}
+          style={{ width: "17.5px", height: "15.6px" }}
+        />
+      </div>
+      <p className="font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[color:var(--surface-foreground-dynamic-brand-default,#7c33b5)]">
+        Download report
+      </p>
+    </button>
+  );
+}
+
 function NotificationCard({
   isNew,
-  isHover,
+  isHover: panelHover,
   title,
   body,
 }: {
@@ -365,10 +440,16 @@ function NotificationCard({
   body: string;
 }) {
   const isRead = !isNew;
+  // Panel "Hover" toggle OR real pointer hover both apply the Figma Hover
+  // variant background.
+  const [realHover, setRealHover] = useState(false);
+  const isHover = panelHover || realHover;
 
   return (
     <div
-      className="flex w-[400px] max-w-full flex-col items-start gap-4 rounded-[var(--radius-25,2px)] border p-[17px]"
+      onMouseEnter={() => setRealHover(true)}
+      onMouseLeave={() => setRealHover(false)}
+      className="flex w-[400px] max-w-full flex-col items-start gap-4 rounded-[var(--radius-25,2px)] border p-[17px] transition-colors duration-150"
       style={{
         borderColor: "var(--border-static-subtle-neutral,#e1e1e8)",
         backgroundColor: isHover
@@ -388,12 +469,14 @@ function NotificationCard({
         <p className="[word-break:break-word] w-[310px] overflow-hidden text-ellipsis whitespace-nowrap font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[color:var(--surface-foreground-static-neutral-lvl1,#13131a)]">
           {title}
         </p>
-        <div className="absolute right-0 top-0 flex size-6 items-center justify-center">
-          <img
-            alt=""
-            className="block size-6 max-w-none"
-            src={`${ASSET}/card-dots.svg`}
-          />
+        <div className="absolute right-0 top-0">
+          <IconHoverButton label="More options" hoverBg="#7171801a">
+            <img
+              alt=""
+              className="block size-6 max-w-none"
+              src={`${ASSET}/card-dots.svg`}
+            />
+          </IconHoverButton>
         </div>
       </div>
 
@@ -429,19 +512,7 @@ function NotificationCard({
 
       {/* button */}
       <div className="flex w-full justify-end">
-        <div className="flex h-6 items-center justify-center gap-1 rounded-[var(--radius-25,2px)] border border-[var(--border-dynamic-brand-default,#7c33b5)] pl-1 pr-1.5 py-[3px]">
-          <div className="flex size-5 items-center justify-center p-px">
-            <img
-              alt=""
-              className="block max-w-none"
-              src={`${ASSET}/card-download.svg`}
-              style={{ width: "17.5px", height: "15.6px" }}
-            />
-          </div>
-          <p className="font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)] text-[color:var(--surface-foreground-dynamic-brand-default,#7c33b5)]">
-            Download report
-          </p>
-        </div>
+        <DownloadReportButton />
       </div>
     </div>
   );

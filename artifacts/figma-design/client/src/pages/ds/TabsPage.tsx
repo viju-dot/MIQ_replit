@@ -42,7 +42,7 @@ function TabItem({
   const isHoverBg = state === "Hover" || state === "Hover-selected";
   return (
     <div
-      className="flex flex-col items-start gap-2"
+      className="flex flex-col items-start gap-2 transition-colors duration-150"
       style={
         isHoverBg
           ? {
@@ -61,7 +61,7 @@ function TabItem({
         </p>
       </div>
       <div
-        className="h-0 w-full border-t"
+        className="h-0 w-full border-t transition-colors duration-150"
         style={{ borderColor: tabItemLineColor[state] }}
       />
     </div>
@@ -106,7 +106,7 @@ function TabPill({
   const s = styles[state];
   return (
     <div
-      className="flex h-[30px] items-center rounded-[20px] px-4 py-[5px]"
+      className="flex h-[30px] items-center rounded-[20px] px-4 py-[5px] transition-colors duration-150"
       style={{ backgroundColor: s.bg ?? "transparent" }}
     >
       <p
@@ -152,6 +152,9 @@ function InteractiveUnderlineTabs({
             key={i}
             type="button"
             disabled={disabled}
+            aria-disabled={disabled}
+            aria-selected={selected}
+            role="tab"
             className={`bg-transparent p-0 outline-none ${
               disabled ? "cursor-not-allowed" : "cursor-pointer"
             }`}
@@ -197,6 +200,9 @@ function InteractiveRoundedTabs({
             key={i}
             type="button"
             disabled={disabled}
+            aria-disabled={disabled}
+            aria-selected={selected}
+            role="tab"
             className={`bg-transparent p-0 outline-none ${
               disabled ? "cursor-not-allowed" : "cursor-pointer"
             }`}

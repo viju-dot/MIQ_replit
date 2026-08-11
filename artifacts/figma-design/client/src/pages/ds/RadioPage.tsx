@@ -1,8 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig } from "@/components/playground/types";
 
 const ASSET = "/figmaAssets/radio";
+
+// Focus ring via inline boxShadow (var() in Tailwind arbitrary ring classes
+// silently fails in this project, so it is driven from focus-visible state).
+const FOCUS_RING =
+  "0 0 0 2px var(--surface-background-lvl1,#ffffff), 0 0 0 4px var(--border-dynamic-brand-selected,#7c33b5)";
 
 const imgSelected = `${ASSET}/selected.svg`;
 const imgSelectedDisabled = `${ASSET}/selected-disabled.svg`;
@@ -27,43 +32,62 @@ function Radio({
   labelText,
   disabled,
   dark: _dark,
+  onSelect,
 }: {
   selected: boolean;
   label: boolean;
   labelText: string;
   disabled: boolean;
   dark: boolean;
+  onSelect?: () => void;
 }): JSX.Element {
   const src = radioSrc(selected, disabled, label);
+  const [focused, setFocused] = useState(false);
+
+  const control = (
+    <div className="relative shrink-0 size-[var(--sizing-lg,24px)]">
+      <div className="absolute left-0 size-[var(--sizing-lg,24px)] top-0">
+        <img
+          alt=""
+          className="absolute block inset-0 max-w-none size-full transition-opacity duration-150"
+          src={src}
+        />
+      </div>
+    </div>
+  );
 
   if (!label) {
-    return (
-      <div className="relative size-[var(--sizing-lg,24px)]">
-        <div className="absolute left-0 size-[var(--sizing-lg,24px)] top-0">
-          <img
-            alt=""
-            className="absolute block inset-0 max-w-none size-full"
-            src={src}
-          />
-        </div>
-      </div>
-    );
+    // Interactive when a selection handler is supplied (its nature is to
+    // select on click). Disabled suppresses the interaction.
+    if (onSelect) {
+      return (
+        <button
+          type="button"
+          role="radio"
+          aria-checked={selected}
+          aria-disabled={disabled}
+          disabled={disabled}
+          onClick={() => !disabled && onSelect()}
+          onFocus={(e) => setFocused(e.currentTarget.matches(":focus-visible"))}
+          onBlur={() => setFocused(false)}
+          className={`relative inline-flex border-0 bg-transparent p-0 outline-none rounded-full ${
+            disabled ? "cursor-not-allowed" : "cursor-pointer"
+          }`}
+          style={focused && !disabled ? { boxShadow: FOCUS_RING } : undefined}
+        >
+          {control}
+        </button>
+      );
+    }
+    return <div className="relative size-[var(--sizing-lg,24px)]">{control}</div>;
   }
 
   const enabledText =
     "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]";
 
-  return (
-    <div className="flex gap-[var(--numbers-4,4px)] items-center">
-      <div className="relative shrink-0 size-[var(--sizing-lg,24px)]">
-        <div className="absolute left-0 size-[var(--sizing-lg,24px)] top-0">
-          <img
-            alt=""
-            className="absolute block inset-0 max-w-none size-full"
-            src={src}
-          />
-        </div>
-      </div>
+  const body = (
+    <>
+      {control}
       <div
         className={`flex flex-col justify-center leading-[0] not-italic relative shrink-0 text-[length:var(--body-md-regular-size,14px)] whitespace-nowrap ${
           disabled
@@ -79,7 +103,61 @@ function Radio({
           {labelText || "Option"}
         </p>
       </div>
-    </div>
+    </>
+  );
+
+  if (onSelect) {
+    return (
+      <button
+        type="button"
+        role="radio"
+        aria-checked={selected}
+        aria-disabled={disabled}
+        disabled={disabled}
+        onClick={() => !disabled && onSelect()}
+        onFocus={(e) => setFocused(e.currentTarget.matches(":focus-visible"))}
+        onBlur={() => setFocused(false)}
+        className={`flex gap-[var(--numbers-4,4px)] items-center border-0 bg-transparent p-0 text-left outline-none rounded-[2px] ${
+          disabled ? "cursor-not-allowed" : "cursor-pointer"
+        }`}
+        style={focused && !disabled ? { boxShadow: FOCUS_RING } : undefined}
+      >
+        {body}
+      </button>
+    );
+  }
+
+  return <div className="flex gap-[var(--numbers-4,4px)] items-center">{body}</div>;
+}
+
+// Interactive wrapper for the single-radio playground: clicking toggles the
+// selection (its nature), while the panel "State" control seeds/re-syncs it.
+function SingleRadioPreview({
+  selected,
+  label,
+  labelText,
+  disabled,
+  dark,
+}: {
+  selected: boolean;
+  label: boolean;
+  labelText: string;
+  disabled: boolean;
+  dark: boolean;
+}): JSX.Element {
+  const [checked, setChecked] = useState(selected);
+  useEffect(() => {
+    setChecked(selected);
+  }, [selected]);
+  return (
+    <Radio
+      selected={!disabled && checked}
+      label={label}
+      labelText={labelText}
+      disabled={disabled}
+      dark={dark}
+      onSelect={() => setChecked((c) => !c)}
+    />
   );
 }
 
@@ -107,7 +185,7 @@ const radioConfig: PlaygroundConfig = {
     { kind: "boolean", name: "disabled", label: "Disabled", defaultValue: false },
   ],
   render: (props, theme) => (
-    <Radio
+    <SingleRadioPreview
       selected={props.state === "Selected"}
       label={props.label === true}
       labelText={String(props.labelText ?? "")}
@@ -141,7 +219,11 @@ function RadioGroup({
     "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]";
   const options = [0, 1, 2];
   return (
-    <div className="flex flex-col gap-[var(--numbers-6,6px)] items-start">
+    <div
+      role="radiogroup"
+      aria-label={labelText || "Radio group title:"}
+      className="flex flex-col gap-[var(--numbers-6,6px)] items-start"
+    >
       <p
         className={`leading-[var(--body-md-regular-line-height,20px)] not-italic relative shrink-0 text-[length:var(--body-md-regular-size,14px)] ${titleColor} whitespace-nowrap`}
         style={{
@@ -152,22 +234,43 @@ function RadioGroup({
         {labelText || "Radio group title:"}
       </p>
       {options.map((i) => (
-        <button
+        <RadioOption
           key={i}
-          type="button"
-          onClick={() => onSelect(i)}
-          className="cursor-pointer bg-transparent p-0 border-0"
-        >
-          <Radio
-            selected={selectedIndex === i}
-            label
-            labelText="Option"
-            disabled={false}
-            dark={dark}
-          />
-        </button>
+          selected={selectedIndex === i}
+          onSelect={() => onSelect(i)}
+          dark={dark}
+        />
       ))}
     </div>
+  );
+}
+
+// One selectable option inside a radio group. The outer <button> is the single
+// interactive element; the Radio it renders is non-interactive (no onSelect),
+// so there are no nested interactive controls.
+function RadioOption({
+  selected,
+  onSelect,
+  dark,
+}: {
+  selected: boolean;
+  onSelect: () => void;
+  dark: boolean;
+}): JSX.Element {
+  const [focused, setFocused] = useState(false);
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      onClick={onSelect}
+      onFocus={(e) => setFocused(e.currentTarget.matches(":focus-visible"))}
+      onBlur={() => setFocused(false)}
+      className="cursor-pointer bg-transparent p-0 border-0 outline-none rounded-[2px]"
+      style={focused ? { boxShadow: FOCUS_RING } : undefined}
+    >
+      <Radio selected={selected} label labelText="Option" disabled={false} dark={dark} />
+    </button>
   );
 }
 

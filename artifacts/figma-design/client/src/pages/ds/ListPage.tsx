@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig, PropValues } from "@/components/playground/types";
 
@@ -48,14 +49,17 @@ function LeftCheckbox({
     <button
       type="button"
       disabled={disabled}
-      onClick={onChange}
+      onClick={(ev) => {
+        ev.stopPropagation();
+        onChange?.();
+      }}
       aria-checked={checked}
       role="checkbox"
       className="flex items-center justify-center overflow-hidden p-[2px] rounded-[var(--radius-25,2px)] shrink-0 all-unset cursor-pointer disabled:cursor-not-allowed"
     >
       <div className="flex items-center overflow-hidden p-[2px] shrink-0">
         <div
-          className={`flex h-[16px] w-[16px] items-center justify-center rounded-[var(--radius-25,2px)] border-[1.5px] border-solid ${
+          className={`flex h-[16px] w-[16px] items-center justify-center rounded-[var(--radius-25,2px)] border-[1.5px] border-solid transition-colors duration-150 ${
             checked
               ? disabled
                 ? "border-transparent bg-[var(--container-dynamic-neutral-subtle-background-disabled,#7171801a)]"
@@ -77,6 +81,46 @@ function LeftCheckbox({
         </div>
       </div>
     </button>
+  );
+}
+
+/* ---------------------------------------------------------------------------
+ * Checkbox visual (non-interactive) — used when the whole row is a <button>,
+ * so we never nest an interactive control inside another interactive control.
+ * ------------------------------------------------------------------------- */
+function CheckboxVisual({
+  checked = false,
+  disabled = false,
+}: {
+  checked?: boolean;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-center overflow-hidden p-[2px] rounded-[var(--radius-25,2px)] shrink-0">
+      <div className="flex items-center overflow-hidden p-[2px] shrink-0">
+        <div
+          className={`flex h-[16px] w-[16px] items-center justify-center rounded-[var(--radius-25,2px)] border-[1.5px] border-solid transition-colors duration-150 ${
+            checked
+              ? disabled
+                ? "border-transparent bg-[var(--container-dynamic-neutral-subtle-background-disabled,#7171801a)]"
+                : "border-[var(--border-dynamic-brand-default,#7c33b5)] bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)]"
+              : "border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] bg-transparent"
+          }`}
+        >
+          {checked && (
+            <svg width="10" height="8" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M1 4L3.5 6.5L9 1"
+                stroke={disabled ? "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)" : "var(--container-dynamic-brand-bold-foreground-default, #ffffff)"}
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -110,10 +154,48 @@ type ListItemProps = {
   checked?: boolean;
   disabled?: boolean;
   onCheckChange?: () => void;
-  /* visual state background */
-  backgroundClass?: string;
-  headingClass?: string;
+  /**
+   * Forced visual state from the Properties panel. When set to anything other
+   * than "Default" it stays FORCED — live hover/click will not override it
+   * (state-resolution policy). "Disabled" always wins.
+   */
+  state?: ListStateName;
+  /* When true, the row responds to real hover / click-to-select itself. */
+  interactive?: boolean;
 };
+
+/**
+ * Shared state → inline-style map (single source of truth for panel + natural
+ * states). Inline styles are used because arbitrary Tailwind classes built from
+ * var()/rgba (e.g. bg-[var(--x,#71718014)]) silently fail to compile in this
+ * project. Values below mirror the Figma list-item Default/Hover/Selected/
+ * Disabled variants; each routes through a CSS var with the Figma literal as a
+ * fallback so it stays pixel-accurate even when the var is undefined.
+ */
+type ListStateName = "Default" | "Hover" | "Selected" | "Disabled";
+const LIST_STATE_STYLES: Record<
+  ListStateName,
+  { background: string; heading: string }
+> = {
+  Default: {
+    background: "transparent",
+    heading: "var(--surface-foreground-static-neutral-lvl1, #13131a)",
+  },
+  Hover: {
+    background:
+      "var(--container-dynamic-neutral-subtle-background-hover, rgba(113,113,128,0.08))",
+    heading: "var(--surface-foreground-static-neutral-lvl1, #13131a)",
+  },
+  Selected: {
+    background:
+      "var(--container-dynamic-brand-subtle-background-selected, #f6ebff)",
+    heading: "var(--surface-foreground-dynamic-brand-default, #7c33b5)",
+  },
+  Disabled: {
+    background: "transparent",
+    heading: "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)",
+  },
+} as const;
 
 function ListItem({
   headingValue = "Placeholder text",
@@ -129,57 +211,109 @@ function ListItem({
   checked = false,
   disabled = false,
   onCheckChange,
-  backgroundClass = "",
-  headingClass = "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]",
+  state = "Default",
+  interactive = false,
 }: ListItemProps) {
-  return (
-    <div className="flex flex-col items-start relative w-full min-w-[200px]">
-      <div
-        className={`flex flex-col gap-[var(--spacing-100,8px)] items-start justify-center p-[var(--spacing-100,8px)] relative w-full ${backgroundClass}`}
-      >
-        <div className="flex gap-[var(--spacing-100,8px)] items-start relative w-full">
-          {/* leftSlot */}
-          {leftSlot && (
-            <div className="flex gap-[var(--spacing-100,8px)] items-center relative shrink-0">
-              <div className="flex flex-col items-start overflow-hidden relative shrink-0">
-                {leftItem ?? (
+  const [hovered, setHovered] = useState(false);
+  const [selfSelected, setSelfSelected] = useState(false);
+
+  // Resolve the effective visual state (policy: Disabled always wins; a
+  // non-Default forced panel state stays forced; only when the panel base is
+  // Default does natural hover / click-to-select drive the state).
+  const forced = disabled ? "Disabled" : state;
+  let effective: ListStateName = forced;
+  let rowChecked = checked;
+  if (interactive && forced === "Default") {
+    effective = selfSelected ? "Selected" : hovered ? "Hover" : "Default";
+    rowChecked = selfSelected;
+  }
+  const styleFor = LIST_STATE_STYLES[effective];
+
+  // The row is only a real control when it is interactive AND enabled. Using a
+  // native <button> gives keyboard (Enter/Space) + focus for free. When the row
+  // is a button we must NOT nest another interactive control inside it, so the
+  // leftItem checkbox is rendered as a non-interactive visual in that mode
+  // (activating the row toggles selection).
+  const rowIsButton = interactive && !disabled;
+
+  const rowClassName = `flex flex-col gap-[var(--spacing-100,8px)] items-start justify-center p-[var(--spacing-100,8px)] relative w-full text-left transition-colors duration-150 ${
+    rowIsButton ? "cursor-pointer" : ""
+  }`;
+
+  const centre = (
+    <>
+      <div className="flex gap-[var(--spacing-100,8px)] items-start relative w-full">
+        {/* leftSlot */}
+        {leftSlot && (
+          <div className="flex gap-[var(--spacing-100,8px)] items-center relative shrink-0">
+            <div className="flex flex-col items-start overflow-hidden relative shrink-0">
+              {leftItem ??
+                (rowIsButton ? (
+                  // Non-interactive checkbox visual (row button owns activation)
+                  <CheckboxVisual checked={rowChecked} disabled={disabled} />
+                ) : (
                   <LeftCheckbox
-                    checked={checked}
+                    checked={rowChecked}
                     disabled={disabled}
                     onChange={onCheckChange}
                   />
-                )}
-              </div>
+                ))}
             </div>
-          )}
-          {/* centreSlot */}
-          <div className="flex flex-1 flex-col gap-[var(--spacing-100,8px)] items-start min-w-0 pt-[2px] relative self-stretch">
-            <div className="flex flex-col gap-[var(--spacing-50,4px)] items-start relative w-full">
-              <p
-                className={`leading-[var(--body-md-medium-line-height,20px)] overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--body-md-medium-size,14px)] w-full ${headingClass}`}
-              >
-                {headingValue}
+          </div>
+        )}
+        {/* centreSlot */}
+        <div className="flex flex-1 flex-col gap-[var(--spacing-100,8px)] items-start min-w-0 pt-[2px] relative self-stretch">
+          <div className="flex flex-col gap-[var(--spacing-50,4px)] items-start relative w-full">
+            <p
+              className="leading-[var(--body-md-medium-line-height,20px)] overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--body-md-medium-size,14px)] w-full transition-colors duration-150"
+              style={{ color: styleFor.heading }}
+            >
+              {headingValue}
+            </p>
+            {description && (
+              <p className="h-[18px] leading-[var(--body-sm-regular-line-height,18px)] overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)] w-full">
+                {descriptionValue}
               </p>
-              {description && (
-                <p className="h-[18px] leading-[var(--body-sm-regular-line-height,18px)] overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)] w-full">
-                  {descriptionValue}
-                </p>
-              )}
-            </div>
-            {contentSlot && (
-              <div className="h-[27px] relative w-full">{contentItem}</div>
             )}
           </div>
-          {/* trailingSlot */}
-          {rightSlot && (
-            <div className="flex gap-[var(--spacing-100,8px)] items-center justify-end relative shrink-0">
-              <div className="flex gap-[var(--spacing-100,8px)] h-[24px] items-center justify-end overflow-hidden shrink-0">
-                {rightItem ?? <TrailingButton />}
-              </div>
-            </div>
+          {contentSlot && (
+            <div className="h-[27px] relative w-full">{contentItem}</div>
           )}
         </div>
+        {/* trailingSlot */}
+        {rightSlot && (
+          <div className="flex gap-[var(--spacing-100,8px)] items-center justify-end relative shrink-0">
+            <div className="flex gap-[var(--spacing-100,8px)] h-[24px] items-center justify-end overflow-hidden shrink-0">
+              {rightItem ?? <TrailingButton />}
+            </div>
+          </div>
+        )}
       </div>
+    </>
+  );
+
+  return (
+    <div className="flex flex-col items-start relative w-full min-w-[200px]">
+      {rowIsButton ? (
+        <button
+          type="button"
+          aria-pressed={rowChecked}
+          onClick={() => setSelfSelected((v) => !v)}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+          className={`${rowClassName} all-unset w-full`}
+          style={{ backgroundColor: styleFor.background }}
+        >
+          {centre}
+        </button>
+      ) : (
+        <div
+          className={rowClassName}
+          style={{ backgroundColor: styleFor.background }}
+        >
+          {centre}
+        </div>
+      )}
       {hasSeparator && <div className="h-0 w-full border-t border-[var(--border-static-subtle-neutral,#e1e1e8)]" />}
     </div>
   );
@@ -216,43 +350,17 @@ function List({
  * State, leftItem type, description toggle, rightSlot, contentSlot, separator,
  * and editable heading / description text.
  * ------------------------------------------------------------------------- */
-type StateName = "Default" | "Hover" | "Selected" | "Disabled";
+type StateName = ListStateName;
 
-function stateStyles(state: StateName): {
-  backgroundClass: string;
-  headingClass: string;
-  disabled: boolean;
-  checked: boolean;
-} {
+/** Panel-forced state → its checked/disabled companions. */
+function stateFlags(state: StateName): { disabled: boolean; checked: boolean } {
   switch (state) {
-    case "Hover":
-      return {
-        backgroundClass: "bg-[var(--container-dynamic-neutral-subtle-background-hover,#71718014)]",
-        headingClass: "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]",
-        disabled: false,
-        checked: false,
-      };
     case "Selected":
-      return {
-        backgroundClass: "bg-[var(--container-dynamic-brand-subtle-background-selected,#f6ebff)]",
-        headingClass: "text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]",
-        disabled: false,
-        checked: true,
-      };
+      return { disabled: false, checked: true };
     case "Disabled":
-      return {
-        backgroundClass: "",
-        headingClass: "text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)]",
-        disabled: true,
-        checked: false,
-      };
+      return { disabled: true, checked: false };
     default:
-      return {
-        backgroundClass: "",
-        headingClass: "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]",
-        disabled: false,
-        checked: false,
-      };
+      return { disabled: false, checked: false };
   }
 }
 
@@ -303,11 +411,15 @@ const listItemConfig: PlaygroundConfig = {
   ],
   render: (props: PropValues) => {
     const state = props.state as StateName;
-    const s = stateStyles(state);
+    const s = stateFlags(state);
     const leftItemChoice = String(props.leftItem);
+    // When the panel is on Default, let the row respond to real hover/click
+    // (natural interactivity mirroring the Figma Hover/Selected variants).
+    const interactive = state === "Default";
     return (
       <div className="w-[394px] max-w-full">
         <ListItem
+          key={state}
           headingValue={String(props.heading)}
           descriptionValue={String(props.descriptionText)}
           description={props.description === true}
@@ -321,8 +433,8 @@ const listItemConfig: PlaygroundConfig = {
           hasSeparator={props.hasSeparator === true}
           checked={s.checked}
           disabled={s.disabled}
-          backgroundClass={s.backgroundClass}
-          headingClass={s.headingClass}
+          state={state}
+          interactive={interactive}
         />
       </div>
     );
@@ -384,11 +496,17 @@ const listConfig: PlaygroundConfig = {
             description
             descriptionValue="Agency director"
             hasSeparator={!last}
+            interactive
           />
         );
       }
       return (
-        <ListItem key={i} headingValue="Placeholder text" hasSeparator={!last} />
+        <ListItem
+          key={i}
+          headingValue="Placeholder text"
+          hasSeparator={!last}
+          interactive
+        />
       );
     });
     return <List hasScroll={props.hasScroll === true}>{items}</List>;
