@@ -1,57 +1,24 @@
 /* =========================================================================
- * Fiber Workspace — Flow Chart (/flow-chart)
+ * Fiber Workspace — Flow Chart landing (/flow-chart)
  *
- * Structure only: header + description + Fiber empty-state. No editor.
+ * Lists prototypes (from prototypeStore) as entry points into their per-
+ * prototype Flow Chart context view (/flow-chart/:prototypeId).
  *
  * FUTURE WORKFLOW: flows here will map AI Prototype outputs and feed Usability
  * Testing. Not implemented yet.
  * ========================================================================= */
 
-const textPrimary = "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]";
-const textMuted = "text-[var(--surface-foreground-static-neutral-lvl3,#717180)]";
-
-const ILLUSTRATION = "/figmaAssets/empty-state/illustration-man-and-charts.svg";
+import { FlowArrow } from "@phosphor-icons/react";
+import { ModuleLanding } from "./ModuleLanding";
 
 export default function FlowChartPage(): JSX.Element {
   return (
-    <div className="mx-auto w-full max-w-[1080px] px-6 py-8 md:px-10 md:py-10">
-      {/* Header */}
-      <div className="flex flex-col gap-[var(--spacing-100,8px)]">
-        <h1
-          className={`text-[length:var(--headline-lg-semibold-size,28px)] font-semibold tracking-[-1px] ${textPrimary}`}
-        >
-          Flow Chart
-        </h1>
-        <p className={`max-w-[640px] text-[length:var(--body-lg-regular-size,16px)] ${textMuted}`}>
-          Design user flows, AI workflows and decision trees, with version history to track how
-          each flow evolves over time.
-        </p>
-      </div>
-
-      {/* Empty state */}
-      <div className="mt-[var(--spacing-500,40px)] flex min-h-[50vh] items-center justify-center">
-        <div className="flex w-full max-w-[520px] flex-col items-center gap-[var(--spacing-300,24px)] text-center">
-          <img
-            src={ILLUSTRATION}
-            alt=""
-            className="h-[200px] w-[200px] object-contain"
-            aria-hidden
-          />
-          <div className="flex flex-col gap-[var(--spacing-100,8px)]">
-            <p
-              className={`text-[length:var(--headline-md-semibold-size,24px)] font-medium tracking-[-0.36px] ${textPrimary}`}
-            >
-              Flow editing is coming
-            </p>
-            <p
-              className={`text-[length:var(--body-lg-regular-size,16px)] tracking-[-0.08px] ${textMuted}`}
-            >
-              Soon you'll be able to build and version user flows, AI workflows and decision trees
-              right here.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ModuleLanding
+      title="Flow Chart"
+      description="Design user flows, AI workflows and decision trees, with version history to track how each flow evolves over time. Select a prototype to map its flows."
+      moduleIcon={FlowArrow}
+      toHref={(id) => `/flow-chart/${id}`}
+      emptyLabel="No prototypes yet. Create one in AI Prototype to start mapping flows."
+    />
   );
 }

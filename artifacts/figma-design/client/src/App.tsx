@@ -37,6 +37,10 @@ const DashboardPage = lazy(() => import("@/pages/app/DashboardPage"));
 const AiPrototypePage = lazy(() => import("@/pages/app/AiPrototypePage"));
 const FlowChartPage = lazy(() => import("@/pages/app/FlowChartPage"));
 const UsabilityTestingPage = lazy(() => import("@/pages/app/UsabilityTestingPage"));
+const FlowChartContextPage = lazy(() => import("@/pages/app/FlowChartContextPage"));
+const UsabilityTestingContextPage = lazy(
+  () => import("@/pages/app/UsabilityTestingContextPage"),
+);
 
 // Standalone TV Audience Intelligence product page — auth-gated but rendered
 // OUTSIDE the app shell (it has its own Fiber navigation header).
@@ -110,8 +114,17 @@ function Router() {
       <Route path="/design-system">{shell(DsLayout)}</Route>
       <Route path="/design-system/:slug">{shell(DsLayout)}</Route>
 
-      {/* Other modules */}
+      {/* AI Prototype — the central workspace. */}
       <Route path="/ai-prototype">{shell(AiPrototypePage)}</Route>
+
+      {/* Prototype-scoped context views — registered BEFORE the bare module
+          landings and the /:slug catch-all so they always match first. */}
+      <Route path="/flow-chart/:prototypeId">{shell(FlowChartContextPage)}</Route>
+      <Route path="/usability-testing/:prototypeId">
+        {shell(UsabilityTestingContextPage)}
+      </Route>
+
+      {/* Bare module landing pages (list prototypes as entry points). */}
       <Route path="/flow-chart">{shell(FlowChartPage)}</Route>
       <Route path="/usability-testing">{shell(UsabilityTestingPage)}</Route>
 

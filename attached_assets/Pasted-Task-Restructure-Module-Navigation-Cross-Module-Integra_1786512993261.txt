@@ -1,0 +1,101 @@
+Task: Restructure Module Navigation & Cross-Module Integration
+Description
+
+After reviewing the latest prototype, I think the navigation can be simplified and made more scalable.
+
+We already removed the sidebar from the Welcome screen, which is the right direction. However, once I enter any module, the sidebar appears again. I no longer want module navigation on the left.
+
+Instead, move all primary module navigation into the global header so it remains consistent throughout the application.
+
+The header should become the main navigation for switching between modules, while the page content focuses entirely on the selected workspace.
+
+Task 1: Remove the Sidebar Inside Modules
+
+Remove the left sidebar from every module.
+
+This includes:
+
+Fiber Design System
+AI Prototype
+Flow Chart
+Usability Testing
+
+The sidebar should no longer be used for switching between modules.
+
+Task 2: Create a Global Header Navigation
+
+Move the module navigation into the application's header.
+
+The header should always be visible after login and include navigation for:
+
+Fiber Design System
+AI Prototype
+Flow Chart
+Usability Testing
+
+This allows users to switch between modules from anywhere without relying on a sidebar.
+
+The Welcome screen should remain unchanged.
+
+Navigation flow should now be:
+
+Login → Welcome → Module → Global Header Navigation
+
+Task 3: Improve the Relationship Between AI Prototype, Flow Chart & Testing
+Current Problem
+
+Right now, AI Prototype, Flow Chart, and Usability Testing feel like completely separate modules.
+
+In reality, they are part of the same workflow.
+
+If a user creates an AI prototype, it should be easy to open its corresponding Flow Chart or Testing workspace without manually navigating through different modules.
+
+Proposed Solution
+
+Inside the AI Prototype module, every prototype should include two quick actions instead of only displaying a standard card.
+
+Each prototype should display two action icons:
+
+Flow Chart
+Usability Testing
+
+For example:
+
+Prototype Name
+
+[ Flow Chart Icon ]   [ Testing Icon ]
+Expected Behavior
+
+When the user selects the Flow Chart icon:
+
+Open the Flow Chart workspace for that specific prototype.
+Display the prototype within the Flow Chart context.
+Show Flow Chart-related navigation for that prototype.
+
+When the user selects the Testing icon:
+
+Open the Usability Testing workspace for that specific prototype.
+Display only testing-related information for that prototype.
+Show Testing-specific navigation.
+
+This creates a direct connection between modules without requiring users to search for the same prototype again.
+
+Navigation Experience
+
+Think of AI Prototype as the central workspace.
+
+From there, users can jump directly into:
+
+Prototype Details
+Flow Chart
+Usability Testing
+
+without losing context.
+
+Goal
+
+The application should feel like one connected product instead of four isolated modules.
+
+The global header should become the primary navigation.
+AI Prototype should act as the entry point for related workflows.
+Flow Chart and Usability Testing should open in the context of the selected prototype, creating a seamless and intuitive user experience
