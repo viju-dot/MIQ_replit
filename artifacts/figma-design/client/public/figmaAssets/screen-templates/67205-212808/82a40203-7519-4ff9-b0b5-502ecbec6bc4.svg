@@ -1,0 +1,10 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="15" height="16.25" viewBox="0 0 15 16.25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Vector frame">
+<g id="Vector">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M0 2.5C0 1.80964 0.559644 1.25 1.25 1.25H13.75C14.4404 1.25 15 1.80964 15 2.5V15C15 15.6904 14.4404 16.25 13.75 16.25H1.25C0.559644 16.25 0 15.6904 0 15V2.5ZM13.75 2.5H1.25V15H13.75V2.5Z" fill="#7C33B5"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M11.25 0C11.5952 0 11.875 0.279822 11.875 0.625V3.125C11.875 3.47018 11.5952 3.75 11.25 3.75C10.9048 3.75 10.625 3.47018 10.625 3.125V0.625C10.625 0.279822 10.9048 0 11.25 0Z" fill="#7C33B5"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M3.75 0C4.09518 0 4.375 0.279822 4.375 0.625V3.125C4.375 3.47018 4.09518 3.75 3.75 3.75C3.40482 3.75 3.125 3.47018 3.125 3.125V0.625C3.125 0.279822 3.40482 0 3.75 0Z" fill="#7C33B5"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M0 5.625C0 5.27982 0.279822 5 0.625 5H14.375C14.7202 5 15 5.27982 15 5.625C15 5.97018 14.7202 6.25 14.375 6.25H0.625C0.279822 6.25 0 5.97018 0 5.625Z" fill="#7C33B5"/>
+</g>
+</g>
+</svg>

@@ -1,0 +1,1149 @@
+const imgLine70 = "figmaAssets/screen-templates/67205-212808/214068f9-b8d9-414f-95cc-c168a8884469.svg";
+const imgVectorContainer = "figmaAssets/screen-templates/67205-212808/d129578f-d8f4-4328-8db3-9cddc12459ed.svg";
+const imgVector = "figmaAssets/screen-templates/67205-212808/1a0bc82f-ec17-4c19-8773-7d500101a56d.svg";
+const imgVector1 = "figmaAssets/screen-templates/67205-212808/a11107dc-f86f-42bf-a2c8-fb04f6a94749.svg";
+const imgVector2 = "figmaAssets/screen-templates/67205-212808/54db211c-fee4-47a2-915b-c16da32331a4.svg";
+const imgVector3 = "figmaAssets/screen-templates/67205-212808/c3a61b33-b6f2-4708-9660-994e5f354911.svg";
+const imgVector4 = "figmaAssets/screen-templates/67205-212808/c3cc0aef-5229-4cfc-8ea0-27dff04ca42c.svg";
+const imgVector5 = "figmaAssets/screen-templates/67205-212808/ac4213d3-8269-4ac3-9c72-f67195938488.svg";
+const imgVector6 = "figmaAssets/screen-templates/67205-212808/d7537d0f-a3d5-4aa8-8806-7beed5b45e1a.svg";
+const imgVector7 = "figmaAssets/screen-templates/67205-212808/0d9ab826-a135-4d2e-9a1a-38a22a420952.svg";
+const imgVector8 = "figmaAssets/screen-templates/67205-212808/b7e425eb-fe65-4cd4-a334-c67b25af2319.svg";
+const imgVectorFrame = "figmaAssets/screen-templates/67205-212808/b2acddc6-346c-4ef0-922b-069988c92d82.svg";
+const imgEllipse1 = "figmaAssets/screen-templates/67205-212808/c2bdff40-a3bc-47a1-b8cf-fb731f64e4b9.svg";
+const imgVector9 = "figmaAssets/screen-templates/67205-212808/8dbf6d1d-d72f-4899-89bf-7cbf70037a5b.svg";
+const imgVectorFrame1 = "figmaAssets/screen-templates/67205-212808/42de7b93-eef2-4bab-a4c1-8fb86e313f27.svg";
+const imgIconCheckCircle = "figmaAssets/screen-templates/67205-212808/ed6f27e6-47b2-4b23-8f36-87a8b042224e.svg";
+const imgStep1LineContainer = "figmaAssets/screen-templates/67205-212808/adf84baf-e82e-4ff2-bb20-a6a1303d5a02.svg";
+const imgStepperInactive2 = "figmaAssets/screen-templates/67205-212808/29ada4d3-0acd-4c2d-b1c8-9bfff5af79b8.svg";
+const imgCircle = "figmaAssets/screen-templates/67205-212808/61094fbc-322a-4546-b525-ec690d072ea8.svg";
+const imgStep2LineContainer = "figmaAssets/screen-templates/67205-212808/c022084a-efee-4b5d-8d9a-6bd1abcd27f6.svg";
+const imgStepperInactive3 = "figmaAssets/screen-templates/67205-212808/8622018d-6c7f-4a6a-85df-515daa87911f.svg";
+const imgLineContainer = "figmaAssets/screen-templates/67205-212808/1cbe56c3-1c5e-4600-b3b2-bf6cad1b0012.svg";
+const imgVectorFrame2 = "figmaAssets/screen-templates/67205-212808/3b91d51b-3764-40a5-a838-afd07eca9570.svg";
+const imgVectorFrame3 = "figmaAssets/screen-templates/67205-212808/82a40203-7519-4ff9-b0b5-502ecbec6bc4.svg";
+const imgVectorFrame4 = "figmaAssets/screen-templates/67205-212808/24a340c8-5fe5-4992-9784-576529bdd706.svg";
+const imgCreativeDurationTile = "figmaAssets/screen-templates/67205-212808/4189ed4b-8ccf-4820-b000-f3e029fa55ee.svg";
+const imgQuintileBudgetSplits = "figmaAssets/screen-templates/67205-212808/85453222-8788-41e2-889a-120ec67d84bf.svg";
+const imgVectorFrame5 = "figmaAssets/screen-templates/67205-212808/435fb720-ba7e-477a-8dce-959818de7a53.svg";
+const imgLineContainer1 = "figmaAssets/screen-templates/67205-212808/8a040612-91a6-4fc5-8662-4311cc6e7259.svg";
+
+function Separator({ className }: { className?: string }) {
+  return (
+    <div className={className || "content-stretch flex items-center relative w-[249px]"} data-node-id="66821:241842" data-name="Separator">
+      <div className="flex-[1_0_0] h-0 min-w-px relative" data-node-id="66821:241843">
+        <div className="absolute inset-[-1px_0_0_0]">
+          <img alt="" className="block max-w-none size-full" src={imgLine70} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type SingleDiamondProps = {
+  className?: string;
+  size?: "24";
+};
+
+function SingleDiamond({ className, size = "24" }: SingleDiamondProps) {
+  return (
+    <div className={className || "relative size-[24px]"} data-node-id="67196:203545">
+      <div className="-translate-x-1/2 -translate-y-1/2 absolute left-1/2 size-[20px] top-1/2" data-node-id="67196:203563" data-name="Vector Container">
+        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVectorContainer} />
+      </div>
+    </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <div className="bg-[var(--surface/background/lvl2,#f7f7fa)] content-stretch flex flex-col gap-[var(--spacing\/400,32px)] items-start pb-[var(--spacing\/0,0px)] relative size-full" data-node-id="67205:212808" data-name="Page">
+      <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-node-id="I67205:212808;49565:35145" data-name="Navigation">
+        <div className="bg-[var(--surface/background/miq,#2b0030)] content-stretch flex h-[64px] items-center justify-between p-[24px] relative shrink-0 w-full" data-node-id="I67205:212808;49565:35145;49504:10370" data-name="Primary Navigation">
+          <div className="content-stretch flex gap-[var(--spacing\/200,16px)] items-center relative shrink-0" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564342" data-name="Logo and tags">
+            <div className="overflow-clip relative shrink-0 size-[24px]" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564343" data-name="Sigma Logo">
+              <div className="-translate-x-1/2 absolute aspect-[249/300] bottom-[7.5%] left-1/2 top-[7.5%]" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564343;39375:762" data-name="Logo">
+                <div className="absolute contents inset-[0_0.26%_0_0.05%]" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564343;39375:763" data-name="SHADOWS">
+                  <div className="absolute contents inset-[0_0.26%_0_0.05%]" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564343;39375:764" data-name="Clip path group">
+                    <div className="absolute contents inset-[-151.65%_-112.65%_-135.31%_-149.22%]" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564343;39375:767" data-name="Group">
+                      <div className="absolute inset-[0_0_0_0.05%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[0px_-0.002px] mask-size-[281.134px_340px]" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564343;39375:768" style={{ maskImage: `url("${imgVector}")` }} data-name="Vector">
+                        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector1} />
+                      </div>
+                      <div className="absolute flex inset-[-151.64%_-112.65%_-0.66%_-89.46%] items-center justify-center" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564343;39375:769" style={{ containerType: "size" }}>
+                        <div className="-rotate-90 flex-none h-[100cqw] w-[100cqh]">
+                          <div className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[252.416px_515.579px] mask-size-[281.134px_340px] relative size-full" style={{ maskImage: `url("${imgVector}")` }} data-name="Vector">
+                            <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector2} />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="absolute inset-[45.14%_236.65%_49.83%_-149.22%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[420.924px_-153.482px] mask-size-[281.134px_340px]" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564343;39375:770" style={{ maskImage: `url("${imgVector}")` }} data-name="Vector">
+                        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector3} />
+                      </div>
+                      <div className="absolute contents inset-[202.06%_77.9%_-135.3%_-46.04%] mix-blend-multiply" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564343;39375:771" data-name="Group">
+                        <div className="absolute inset-[202.06%_77.9%_-135.3%_-46.04%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[129.968px_-687px] mask-size-[281.134px_340px] mix-blend-multiply opacity-60" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564343;39375:772" style={{ maskImage: `url("${imgVector}")` }} data-name="Vector">
+                          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector4} />
+                        </div>
+                      </div>
+                      <div className="absolute contents inset-[168.82%_77.9%_-102.06%_-46.04%] mix-blend-multiply" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564343;39375:773" data-name="Group">
+                        <div className="absolute inset-[168.82%_77.9%_-102.06%_-46.04%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[129.968px_-573.984px] mask-size-[281.134px_340px] mix-blend-multiply opacity-60" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564343;39375:774" style={{ maskImage: `url("${imgVector}")` }} data-name="Vector">
+                          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector5} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-[16.76%] contents left-[0.05%] mix-blend-multiply right-[31.81%] top-1/2" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564343;39375:781" data-name="Group">
+                    <div className="absolute bottom-[16.76%] left-[0.05%] mix-blend-multiply opacity-60 right-[31.81%] top-1/2" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564343;39375:782" data-name="Vector">
+                      <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector6} />
+                    </div>
+                  </div>
+                  <div className="absolute bottom-1/2 contents left-[0.05%] mix-blend-multiply right-[31.81%] top-[16.75%]" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564343;39375:783" data-name="Group">
+                    <div className="absolute bottom-1/2 left-[0.05%] mix-blend-multiply opacity-60 right-[31.81%] top-[16.75%]" data-node-id="I67205:212808;49565:35145;49504:10370;45372:564343;39375:784" data-name="Vector">
+                      <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector7} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="content-stretch flex gap-[32px] h-[64px] items-center justify-center relative shrink-0" data-node-id="I67205:212808;49565:35145;49504:10370;20931:12199" data-name="Menu list">
+            <div className="h-full relative shrink-0 w-[100px]" data-node-id="I67205:212808;49565:35145;49504:10370;20931:12206" data-name="Intelligence">
+              <p className="[word-break:break-word] absolute font-['DM_Sans:Medium'] leading-[24px] left-[calc(50%-43.23px)] not-italic text-[16px] text-[color:var(--surface/foreground/dynamic/neutral/inversed/default/variation,rgba(255,255,255,0.8))] top-[calc(50%-10px)] w-[87px]" data-node-id="I67205:212808;49565:35145;49504:10370;20931:12207">
+                Intelligence
+              </p>
+            </div>
+            <div className="h-full overflow-clip relative shrink-0 w-[80px]" data-node-id="I67205:212808;49565:35145;49504:10370;20931:12200" data-name="Audiences">
+              <div className="absolute bg-gradient-to-r bottom-0 from-[25.521%] from-[var(--gradients\/sigma\/1,#d71982)] h-[4px] left-0 rounded-tl-[2px] rounded-tr-[2px] to-[var(--gradients\/sigma\/3,#f0e812)] via-[59.375%] via-[var(--gradients\/sigma\/2,#ff540c)] w-[80px]" data-node-id="I67205:212808;49565:35145;49504:10370;20931:12201" data-name="On" />
+              <p className="[word-break:break-word] absolute font-['DM_Sans:Medium'] leading-[24px] left-[calc(50%-40px)] not-italic text-[16px] text-[color:var(--surface/foreground/dynamic/neutral/inversed/selected,white)] top-[22px] whitespace-nowrap" data-node-id="I67205:212808;49565:35145;49504:10370;20931:12202">
+                Audiences
+              </p>
+            </div>
+            <div className="h-full relative shrink-0 w-[72px]" data-node-id="I67205:212808;49565:35145;49504:10370;20931:12203" data-name="Creatives">
+              <p className="[word-break:break-word] absolute font-['DM_Sans:Medium'] leading-[24px] left-[calc(50%-36px)] not-italic text-[16px] text-[color:var(--surface/foreground/dynamic/neutral/inversed/default/variation,rgba(255,255,255,0.8))] top-[calc(50%-10px)] w-[72px]" data-node-id="I67205:212808;49565:35145;49504:10370;20931:12204">
+                Creatives
+              </p>
+            </div>
+            <div className="h-full overflow-clip relative shrink-0 w-[85px]" data-node-id="I67205:212808;49565:35145;49504:10370;20931:12209" data-name="Campaigns">
+              <p className="-translate-x-1/2 [word-break:break-word] absolute font-['DM_Sans:Medium'] leading-[24px] left-1/2 not-italic text-[16px] text-[color:var(--surface/foreground/dynamic/neutral/inversed/default/variation,rgba(255,255,255,0.8))] text-center top-[calc(50%-10px)] whitespace-nowrap" data-node-id="I67205:212808;49565:35145;49504:10370;20931:12210">
+                Campaigns
+              </p>
+            </div>
+            <div className="h-full relative shrink-0 w-[59px]" data-node-id="I67205:212808;49565:35145;49504:10370;20931:12212" data-name="Reports">
+              <p className="[word-break:break-word] absolute font-['DM_Sans:Medium'] leading-[24px] left-[calc(50%-29.5px)] not-italic text-[16px] text-[color:var(--surface/foreground/dynamic/neutral/inversed/default/variation,rgba(255,255,255,0.8))] top-[calc(50%-10px)] whitespace-nowrap" data-node-id="I67205:212808;49565:35145;49504:10370;20931:12213">
+                Reports
+              </p>
+            </div>
+          </div>
+          <div className="content-stretch flex gap-[20px] items-center justify-end relative shrink-0" data-node-id="I67205:212808;49565:35145;49504:10370;20931:12218" data-name="right">
+            <div className="bg-[rgba(255,255,255,0.2)] content-stretch flex gap-[8px] h-[34px] items-center justify-center px-[12px] py-[4px] relative rounded-[2px] shrink-0" data-node-id="I67205:212808;49565:35145;49504:10370;45492:26296" data-name="language">
+              <div className="content-stretch flex gap-[4px] items-center relative shrink-0" data-node-id="I67205:212808;49565:35145;49504:10370;45492:26297">
+                <div className="content-stretch flex items-center justify-center overflow-clip p-[2px] relative shrink-0 size-[20px]" data-node-id="I67205:212808;49565:35145;49504:10370;45696:9151" data-name="Icon/translate">
+                  <div className="h-[15.625px] relative shrink-0 w-[17.5px]" data-node-id="I67205:212808;49565:35145;49504:10370;45696:9151;45696:684" data-name="Vector">
+                    <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector8} />
+                  </div>
+                </div>
+                <p className="[word-break:break-word] font-['DM_Sans:Regular'] leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--surface/foreground/dynamic/neutral/inversed/selected,white)] whitespace-nowrap" data-node-id="I67205:212808;49565:35145;49504:10370;45492:26301">
+                  English
+                </p>
+              </div>
+              <div className="content-stretch flex items-center justify-center relative shrink-0 size-[20px]" data-node-id="I67205:212808;49565:35145;49504:10370;45492:26302" data-name="Icon/caret">
+                <div className="relative shrink-0 size-[20px]" data-node-id="I67205:212808;49565:35145;49504:10370;45492:26302;20202:762" data-name="Vector frame">
+                  <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVectorFrame} />
+                </div>
+              </div>
+            </div>
+            <SingleDiamond className="relative shrink-0 size-[24px]" />
+            <div className="h-[40px] overflow-clip relative shrink-0 w-[42px]" data-node-id="I67205:212808;49565:35145;49504:10370;38008:778" data-name="Avatar">
+              <div className="-translate-x-1/2 absolute h-[40px] left-1/2 top-0 w-[36px]" data-node-id="I67205:212808;49565:35145;49504:10370;38008:778;37996:34741" data-name="Avatar">
+                <div className="-translate-x-1/2 absolute left-1/2 size-[32px] top-0" data-node-id="I67205:212808;49565:35145;49504:10370;38008:778;37996:34742" data-name="Initials">
+                  <div className="absolute left-0 size-[32px] top-0" data-node-id="I67205:212808;49565:35145;49504:10370;38008:778;37996:34743">
+                    <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgEllipse1} />
+                  </div>
+                  <p className="-translate-x-full [word-break:break-word] absolute font-['DM_Sans:Medium'] leading-[normal] left-[calc(50%+8px)] not-italic text-[14px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-right top-[7px] whitespace-nowrap" data-node-id="I67205:212808;49565:35145;49504:10370;38008:778;37996:34744">
+                    JS
+                  </p>
+                </div>
+                <div className="-translate-x-1/2 absolute bottom-0 content-stretch flex items-start left-1/2" data-node-id="I67205:212808;49565:35145;49504:10370;38008:778;41496:1426" data-name="Badge/rounded">
+                  <div className="content-stretch flex gap-[var(--odd_numbers\/10,10px)] h-[18px] items-start relative shrink-0" data-node-id="I67205:212808;49565:35145;49504:10370;38008:778;41496:1426;41496:1380" data-name="Badge/rounded">
+                    <div className="bg-gradient-to-r content-stretch flex from-[25.521%] from-[var(--gradients\/sigma\/1,#d71982)] gap-[var(--numbers\/4,4px)] h-[18px] items-center justify-center px-[var(--numbers\/8,8px)] py-[var(--numbers\/2,2px)] relative rounded-[var(--\[old\]radiuses\/round,100px)] shrink-0 to-[var(--gradients\/sigma\/3,#f0e812)] via-[59.375%] via-[var(--gradients\/sigma\/2,#ff540c)]" data-node-id="I67205:212808;49565:35145;49504:10370;38008:778;41496:1426;41496:1380;34051:126">
+                      <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--container/static/brand/bold/foreground,white)] text-center whitespace-nowrap" data-node-id="I67205:212808;49565:35145;49504:10370;38008:778;41496:1426;41496:1380;34051:127">
+                        Pro+
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-[var(--surface/background/lvl1,white)] drop-shadow-[0px_1px_2px_var(--shadow/lvl8,rgba(113,113,128,0.08)),0px_8px_8px_var(--shadow/lvl4,rgba(113,113,128,0.04))] h-[56px] relative shrink-0 w-full" data-node-id="I67205:212808;49565:35145;49552:24815" data-name="Secondary Navigation">
+          <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute content-stretch flex gap-[24px] items-start leading-[20px] left-1/2 not-italic text-[14px] top-[calc(50%+0.5px)] whitespace-nowrap" data-node-id="I67205:212808;49565:35145;49552:24815;20931:12236" data-name="Menu Items">
+            <p className="font-['DM_Sans:SemiBold'] relative shrink-0 text-[color:var(--surface/foreground/dynamic/neutral/default/variation,#13131a)]" data-node-id="I67205:212808;49565:35145;49552:24815;20931:12244">
+              My audience
+            </p>
+            <p className="font-['DM_Sans:Regular'] relative shrink-0 text-[color:var(--surface/foreground/dynamic/neutral/default/regular,#4b4b59)]" data-node-id="I67205:212808;49565:35145;49552:24815;20931:12243">
+              Saved audiences
+            </p>
+            <p className="font-['DM_Sans:Regular'] relative shrink-0 text-[color:var(--surface/foreground/dynamic/neutral/default/regular,#4b4b59)]" data-node-id="I67205:212808;49565:35145;49552:24815;28206:6234">
+              Monitor
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="content-stretch flex items-start overflow-clip pb-[var(--spacing\/400,32px)] px-[var(--screen\/margin,64px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:13814" data-name="body">
+        <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/300,24px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674" data-name="Plan channel">
+          <div className="content-stretch flex h-[68px] items-start justify-between relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:203120">
+            <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/100,8px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:203121">
+              <p className="[word-break:break-word] font-['DM_Sans:SemiBold'] leading-[40px] min-w-full not-italic relative shrink-0 text-[32px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] tracking-[-0.64px] w-[min-content]" data-node-id="I67205:212808;49504:16674;67196:203122">
+                Create campaign planning
+              </p>
+            </div>
+            <div className="content-stretch flex gap-[16px] items-center opacity-0 relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:203124">
+              <div className="border-[length:var(--stroke_weight\/15,1px)] border-[var(--border/dynamic/neutral/bold/default,#4b4b59)] border-solid content-stretch flex gap-[var(--numbers\/none,0px)] items-center justify-center px-[var(--spacing\/150,12px)] py-[var(--spacing\/container\/m,7px)] relative rounded-[var(--radius\/25,2px)] shrink-0" data-node-id="I67205:212808;49504:16674;67196:203125" data-name="Button 2.0">
+                <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-center justify-center relative rounded-[var(--radiuses\/small,2px)] shrink-0" data-node-id="I67205:212808;49504:16674;67196:203125;45750:1617" data-name="button-medium">
+                  <div className="content-stretch flex flex-col items-center justify-center overflow-clip p-[2px] relative shrink-0 size-[20px]" data-node-id="I67205:212808;49504:16674;67196:203125;45750:1618" data-name="Style=Regular,Size=20,State=Default">
+                    <div className="h-[16.25px] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:203125;45750:1618;28935:1929" data-name="Vector frame">
+                      <div className="-translate-x-1/2 -translate-y-1/2 absolute h-[16.25px] left-[calc(50%+0.13px)] top-1/2 w-[16.251px]" data-node-id="I67205:212808;49504:16674;67196:203125;45750:1618;22158:810" data-name="Vector">
+                        <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVector9} />
+                      </div>
+                    </div>
+                  </div>
+                  <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] text-center whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:203125;45750:1619">
+                    Compare
+                  </p>
+                </div>
+              </div>
+              <div className="bg-[var(--container/dynamic/brand/bold/background/default,#7c33b5)] content-stretch flex gap-[var(--numbers\/none,0px)] items-center justify-center px-[var(--spacing\/150,12px)] py-[var(--spacing\/container\/m,7px)] relative rounded-[var(--radius\/25,2px)] shrink-0" data-node-id="I67205:212808;49504:16674;67196:203126" data-name="Button 2.0">
+                <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-center justify-center relative rounded-[var(--radiuses\/small,2px)] shrink-0" data-node-id="I67205:212808;49504:16674;67196:203126;45750:1539" data-name="button-medium">
+                  <div className="content-stretch flex items-center justify-center overflow-clip p-[3px] relative shrink-0 size-[20px]" data-node-id="I67205:212808;49504:16674;67196:203126;45750:1540" data-name="Style=Regular,Size=20,State=Default">
+                    <div className="relative shrink-0 size-[15px]" data-node-id="I67205:212808;49504:16674;67196:203126;45750:1540;28905:4890" data-name="Vector frame">
+                      <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVectorFrame1} />
+                    </div>
+                  </div>
+                  <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--container/dynamic/brand/bold/foreground/default,white)] text-center whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:203126;45750:1541">
+                    New plan
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:203127" data-name="Stepper Horizontal">
+            <div className="content-stretch flex items-start justify-between relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:203127;186:3509" data-name="Stepper">
+              <div className="content-stretch flex flex-col items-start py-[10px] relative shrink-0 w-[60px]" data-node-id="I67205:212808;49504:16674;67196:203127;44058:34791" data-name="End Point Left container">
+                <div className="bg-[var(--progress/neutral,#e1e1e8)] h-[2px] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:203127;186:3514" data-name="End Point Left" />
+              </div>
+              <div className="content-stretch flex flex-col gap-[var(--spacing\/150,12px)] items-center relative shrink-0 w-[24px]" data-node-id="I67205:212808;49504:16674;67196:203127;44058:34974" data-name="Step 1 container">
+                <div className="relative shrink-0 size-[24px]" data-node-id="I67205:212808;49504:16674;67196:203127;186:3517" data-name="Stepper/Inactive 1">
+                  <div className="-translate-x-1/2 -translate-y-1/2 absolute left-1/2 size-[24px] top-1/2" data-node-id="I67205:212808;49504:16674;67196:203127;186:3517;20844:31654" data-name="Icon/check-circle">
+                    <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgIconCheckCircle} />
+                  </div>
+                </div>
+                <div className="content-stretch flex items-center justify-center relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:203127;44167:469785" data-name="text container">
+                  <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-center whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:203127;186:3520">
+                    Audience
+                  </p>
+                </div>
+              </div>
+              <div className="flex-[1_0_0] h-[24px] min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:203127;44058:34741" data-name="Step 1 Line container">
+                <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgStep1LineContainer} />
+              </div>
+              <div className="content-stretch flex flex-col gap-[var(--spacing\/150,12px)] items-center relative shrink-0 w-[24px]" data-node-id="I67205:212808;49504:16674;67196:203127;44058:35108" data-name="Step 2 container">
+                <div className="relative shrink-0 size-[24px]" data-node-id="I67205:212808;49504:16674;67196:203127;186:3516" data-name="Stepper/Inactive 2">
+                  <div className="absolute inset-[-33.33%_-66.67%_-100%_-66.67%]">
+                    <img alt="" className="block max-w-none size-full" src={imgStepperInactive2} />
+                  </div>
+                  <div className="absolute inset-[31.25%]" data-node-id="I67205:212808;49504:16674;67196:203127;186:3516;186:3507" data-name="Circle">
+                    <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgCircle} />
+                  </div>
+                </div>
+                <div className="content-stretch flex items-center justify-center relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:203127;44167:469826" data-name="text container">
+                  <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-center whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:203127;186:3519">
+                    Channel
+                  </p>
+                </div>
+              </div>
+              <div className="flex-[1_0_0] h-[24px] min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:203127;44058:34698" data-name="Step 2 Line container">
+                <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgStep2LineContainer} />
+              </div>
+              <div className="content-stretch flex flex-col gap-[var(--spacing\/150,12px)] items-center relative shrink-0 w-[24px]" data-node-id="I67205:212808;49504:16674;67196:203127;44058:35249" data-name="Step 3 container">
+                <div className="relative shrink-0 size-[24px]" data-node-id="I67205:212808;49504:16674;67196:203127;186:3515" data-name="Stepper/Inactive 3">
+                  <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgStepperInactive3} />
+                </div>
+                <div className="content-stretch flex items-center justify-center relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:203127;44167:469859" data-name="text container">
+                  <p className="[word-break:break-word] font-['DM_Sans:Regular'] leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-center whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:203127;186:3518">
+                    Forecast
+                  </p>
+                </div>
+              </div>
+              <div className="content-stretch flex flex-col items-start py-[11px] relative shrink-0 w-[60px]" data-node-id="I67205:212808;49504:16674;67196:203127;44058:34578" data-name="End Point Right container">
+                <div className="bg-[var(--progress/neutral,#e1e1e8)] h-[2px] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:203127;186:3511" data-name="End Point Right" />
+              </div>
+            </div>
+          </div>
+          <div className="content-start flex flex-wrap gap-[var(--spacing\/300,24px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904" data-name="Plan channel context screen">
+            <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/300,24px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237610">
+              <div className="bg-[var(--surface/background/lvl1,white)] content-stretch flex items-start min-w-[180px] overflow-clip relative rounded-[var(--radius\/25,2px)] shadow-[0px_1px_4px_0px_var(--shadow/lvl8,rgba(113,113,128,0.08)),0px_8px_16px_0px_var(--shadow/lvl4,rgba(113,113,128,0.04))] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611" data-name="Smart Card">
+                <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41404:32386" data-name="Master Card">
+                  <div className="content-start flex flex-wrap gap-[var(--spacing\/margin\/0,0px)] items-start p-[var(--spacing\/0,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41404:32387" data-name="Header">
+                    <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41404:32387;41404:28243" data-name="header content">
+                      <div className="content-stretch flex gap-[8px] items-center p-[var(--spacing\/200,16px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41404:32387;41404:28242" data-name="container">
+                        <div className="content-stretch flex flex-[1_0_0] gap-[var(--spacing\/100,8px)] items-center min-w-px pr-[var(--odd_numbers\/10,10px)] py-[var(--numbers\/none,0px)] relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41404:32387;41353:14078" data-name="Text">
+                          <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[24px] not-italic relative shrink-0 text-[16px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] tracking-[-0.08px] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41404:32387;41353:14079">
+                            Plan your channel mix
+                          </p>
+                        </div>
+                      </div>
+                      <div className="h-0 relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41404:32387;41605:24312" data-name="line container">
+                        <div className="absolute inset-[-1px_0_0_0]">
+                          <img alt="" className="block max-w-none size-full" src={imgLineContainer} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="content-stretch flex flex-col gap-[var(--spacing\/100,8px)] items-start p-[var(--spacing\/200,16px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41466:6699" data-name="Content">
+                    <div className="content-stretch flex flex-col gap-[var(--spacing\/200,16px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41466:6699;41466:6574" data-name="Campaign budget">
+                      <div className="[word-break:break-word] content-stretch flex flex-col gap-[var(--spacing\/100,8px)] items-start not-italic relative shrink-0 w-[276px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41466:6699;41466:6574;67233:325797">
+                        <p className="font-['DM_Sans:Medium'] leading-[20px] relative shrink-0 text-[14px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41466:6699;41466:6574;67233:325798">
+                          Total campaign budget
+                        </p>
+                        <p className="font-['DM_Sans:Regular'] leading-[18px] relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl2,#282833)] w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41466:6699;41466:6574;67233:325799">
+                          Set your total available budget
+                        </p>
+                      </div>
+                      <div className="content-stretch flex gap-[var(--spacing\/200,16px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41466:6699;41466:6574;67233:325846">
+                        <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/100,8px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41466:6699;41466:6574;67037:519010">
+                          <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41466:6699;41466:6574;67037:518997" data-name="Title">
+                            <div className="content-stretch flex flex-[1_0_0] gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41466:6699;41466:6574;67037:518997;15285:8860">
+                              <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41466:6699;41466:6574;67037:518997;15285:8844">
+                                <p className="leading-[18px] overflow-hidden text-ellipsis">Budget (AUD)</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41466:6699;41466:6574;67037:518993" data-name="Input/Standard">
+                            <div className="content-stretch flex gap-[var(--numbers\/8,8px)] items-center px-[var(--numbers\/12,12px)] py-[var(--numbers\/none,0px)] relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41466:6699;41466:6574;67037:518993;5959:11990" data-name="elements-medium">
+                              <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] font-['DM_Sans:Regular'] gap-[var(--numbers\/8,8px)] h-[34px] items-start leading-[0] min-w-px not-italic py-[var(--numbers\/8,8px)] relative text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41466:6699;41466:6574;67037:518993;5959:11991" data-name="Text">
+                                <div className="flex flex-[1_0_0] flex-col h-full justify-center min-w-px overflow-hidden relative text-ellipsis" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41466:6699;41466:6574;67037:518993;5959:11992">
+                                  <p className="leading-[20px] overflow-hidden text-ellipsis">Default</p>
+                                </div>
+                                <div className="flex flex-[1_0_0] flex-col h-full justify-center min-w-px overflow-hidden relative text-ellipsis text-right" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237611;41466:6699;41466:6574;67037:518993;5959:12010">
+                                  <p className="leading-[20px] overflow-hidden text-ellipsis">0% of budget allocated</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-[var(--surface/background/lvl1,white)] content-stretch flex items-start min-w-[180px] overflow-clip relative rounded-[var(--radius\/25,2px)] shadow-[0px_1px_4px_0px_var(--shadow/lvl8,rgba(113,113,128,0.08)),0px_8px_16px_0px_var(--shadow/lvl4,rgba(113,113,128,0.04))] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612" data-name="Smart Card">
+                <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41404:32386" data-name="Master Card">
+                  <div className="content-start flex flex-wrap gap-[var(--spacing\/margin\/0,0px)] items-start p-[var(--spacing\/0,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41404:32387" data-name="Header">
+                    <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41404:32387;41404:28243" data-name="header content">
+                      <div className="content-stretch flex gap-[8px] items-center p-[var(--spacing\/200,16px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41404:32387;41404:28242" data-name="container">
+                        <div className="content-stretch flex flex-[1_0_0] gap-[var(--spacing\/100,8px)] items-center min-w-px pr-[var(--odd_numbers\/10,10px)] py-[var(--numbers\/none,0px)] relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41404:32387;41353:14078" data-name="Text">
+                          <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[24px] not-italic relative shrink-0 text-[16px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] tracking-[-0.08px] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41404:32387;41353:14079">
+                            Auto allocate budget
+                          </p>
+                        </div>
+                      </div>
+                      <div className="h-0 relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41404:32387;41605:24312" data-name="line container">
+                        <div className="absolute inset-[-1px_0_0_0]">
+                          <img alt="" className="block max-w-none size-full" src={imgLineContainer} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="content-stretch flex flex-col gap-[var(--spacing\/100,8px)] items-start p-[var(--spacing\/200,16px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699" data-name="Content">
+                    <div className="content-stretch flex flex-col gap-[var(--spacing\/200,16px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574" data-name="Auto-Allocate Budget">
+                      <div className="content-stretch flex flex-col h-[24px] items-start relative rounded-[var(--radiuses\/small,2px)] shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:556444" data-name="Notification">
+                        <div className="bg-[var(--surface/background/lvl1,white)] border border-[var(--border/static/bold/info,#2360db)] border-solid content-stretch flex gap-[8px] items-start px-[8px] py-[2px] relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:556444;28006:7267" data-name="Content">
+                          <div className="content-stretch flex items-center justify-center relative shrink-0 size-[20px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:556444;28006:7268" data-name="Icon/info">
+                            <div className="relative shrink-0 size-[20px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:556444;28006:7268;20259:29056" data-name="Vector frame">
+                              <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVectorFrame2} />
+                            </div>
+                          </div>
+                          <div className="content-stretch flex flex-col items-start overflow-clip pt-px relative self-stretch shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:556444;28006:7269" data-name="Text">
+                            <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:556444;28006:7270">
+                              Use smart algorithms to automatically distribute your budget across channels
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="content-stretch flex flex-col gap-[var(--spacing\/250,20px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:195107">
+                        <div className="content-stretch flex flex-col gap-[var(--spacing\/150,12px)] items-start justify-center relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:195100">
+                          <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col items-start min-w-[180px] overflow-clip p-[var(--numbers\/16,16px)] relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:557934" data-name="Tile">
+                            <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:557934;31940:28731" data-name="Content">
+                              <div className="content-stretch flex gap-[8px] items-center relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:557934;31955:1565" data-name="Header and actions">
+                                <div className="content-stretch flex flex-[1_0_0] flex-col gap-[10px] items-start justify-center min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:557934;31955:1570" data-name="Title or identifier">
+                                  <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] min-w-full not-italic overflow-hidden relative shrink-0 text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/variation,#13131a)] text-ellipsis w-[min-content] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:557934;31955:1571">
+                                    <p className="leading-[20px] overflow-hidden text-ellipsis">Even split</p>
+                                  </div>
+                                  <div className="content-stretch flex gap-[var(--odd_numbers\/10,10px)] items-center relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:557934;31955:1572" data-name="Badge/Standard">
+                                    <div className="bg-[var(--container/static/warning/subtle/background,#fff7d6)] content-stretch flex gap-[var(--numbers\/2,2px)] h-[18px] items-center justify-center px-[var(--odd_numbers\/3,3px)] py-[var(--numbers\/none,0px)] relative rounded-[var(--radiuses\/small,2px)] shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:557934;31955:1572;46545:37813">
+                                      <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--container/static/warning/subtle/foreground/variation,#483800)] text-center whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:557934;31955:1572;46545:37814">
+                                        Simple
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="content-start flex flex-wrap items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:557934;45333:4476" data-name="Swap Instance">
+                                <div className="content-stretch flex flex-[1_0_0] items-center min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:557934;45333:4476;41350:25155">
+                                  <div className="[word-break:break-word] flex-[1_0_0] font-['DM_Sans:Regular'] leading-[0] min-w-px not-italic relative text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:557934;45333:4476;41350:25134">
+                                    <p className="leading-[20px] mb-0">Divide budget equally across all 10 channels</p>
+                                    <p className="leading-[20px]">​</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col items-start min-w-[180px] overflow-clip p-[var(--numbers\/16,16px)] relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193820" data-name="Tile">
+                            <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193820;31940:28731" data-name="Content">
+                              <div className="content-stretch flex gap-[8px] items-center relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193820;31955:1565" data-name="Header and actions">
+                                <div className="content-stretch flex flex-[1_0_0] flex-col gap-[10px] items-start justify-center min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193820;31955:1570" data-name="Title or identifier">
+                                  <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] min-w-full not-italic overflow-hidden relative shrink-0 text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/variation,#13131a)] text-ellipsis w-[min-content] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193820;31955:1571">
+                                    <p className="leading-[20px] overflow-hidden text-ellipsis">Weighted by reach</p>
+                                  </div>
+                                  <div className="content-stretch flex gap-[var(--odd_numbers\/10,10px)] items-center justify-center relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193820;31955:1572" data-name="Badge/Standard">
+                                    <div className="bg-[var(--container/static/info/subtle/background,#ebf1ff)] content-stretch flex gap-[var(--numbers\/2,2px)] h-[18px] items-center justify-center px-[var(--odd_numbers\/3,3px)] py-[var(--numbers\/none,0px)] relative rounded-[var(--radiuses\/small,2px)] shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193820;31955:1572;46545:37822">
+                                      <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--container/static/info/subtle/foreground/variation,#1344a8)] text-center whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193820;31955:1572;46545:37823">
+                                        Reach
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="content-start flex flex-wrap items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193820;45333:4476" data-name="Swap Instance">
+                                <div className="content-stretch flex flex-[1_0_0] items-center min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193820;45333:4476;41350:25155">
+                                  <div className="[word-break:break-word] flex-[1_0_0] font-['DM_Sans:Regular'] leading-[0] min-w-px not-italic relative text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193820;45333:4476;41350:25134">
+                                    <p className="leading-[20px] mb-0">Allocate more to channels with higher base reach potential</p>
+                                    <p className="leading-[20px]">​</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col items-start min-w-[180px] overflow-clip p-[var(--numbers\/16,16px)] relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193835" data-name="Tile">
+                            <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193835;31940:28731" data-name="Content">
+                              <div className="content-stretch flex gap-[8px] items-center relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193835;31955:1565" data-name="Header and actions">
+                                <div className="content-stretch flex flex-[1_0_0] flex-col gap-[10px] items-start justify-center min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193835;31955:1570" data-name="Title or identifier">
+                                  <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] min-w-full not-italic overflow-hidden relative shrink-0 text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/variation,#13131a)] text-ellipsis w-[min-content] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193835;31955:1571">
+                                    <p className="leading-[20px] overflow-hidden text-ellipsis">Weighted by efficiency</p>
+                                  </div>
+                                  <div className="content-stretch flex gap-[var(--odd_numbers\/10,10px)] items-center justify-center relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193835;31955:1572" data-name="Badge/Standard">
+                                    <div className="bg-[var(--container/static/success/subtle/background,#e7faef)] content-stretch flex gap-[var(--numbers\/2,2px)] h-[18px] items-center justify-center pl-[var(--numbers\/2,2px)] pr-[var(--odd_numbers\/3,3px)] py-[var(--numbers\/none,0px)] relative rounded-[var(--radiuses\/small,2px)] shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193835;31955:1572;46545:37785">
+                                      <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--container/static/success/subtle/foreground/variation,#115639)] text-center whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193835;31955:1572;46545:37787">
+                                        Smart
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="content-start flex flex-wrap items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193835;45333:4476" data-name="Swap Instance">
+                                <div className="content-stretch flex flex-[1_0_0] items-center min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193835;45333:4476;41350:25155">
+                                  <div className="[word-break:break-word] flex-[1_0_0] font-['DM_Sans:Regular'] leading-[0] min-w-px not-italic relative text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193835;45333:4476;41350:25134">
+                                    <p className="leading-[20px] mb-0">Optimize for best reach per dollar</p>
+                                    <p className="leading-[20px]">(lower CPM + higher reach)</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col items-start min-w-[180px] overflow-clip p-[var(--numbers\/16,16px)] relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193852" data-name="Tile">
+                            <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193852;31940:28731" data-name="Content">
+                              <div className="content-stretch flex gap-[8px] items-center relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193852;31955:1565" data-name="Header and actions">
+                                <div className="content-stretch flex flex-[1_0_0] flex-col gap-[10px] items-start justify-center min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193852;31955:1570" data-name="Title or identifier">
+                                  <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] min-w-full not-italic overflow-hidden relative shrink-0 text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/variation,#13131a)] text-ellipsis w-[min-content] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193852;31955:1571">
+                                    <p className="leading-[20px] overflow-hidden text-ellipsis">MMM-based</p>
+                                  </div>
+                                  <div className="border-[length:var(--stroke_weight\/15,1px)] border-[var(--border/dynamic/brand/default,#7c33b5)] border-solid content-stretch flex gap-[var(--numbers\/none,0px)] items-center justify-center px-[var(--spacing\/75,6px)] py-[var(--spacing\/container\/s,2px)] relative rounded-[var(--radius\/25,2px)] shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193852;31955:1572" data-name="Button">
+                                    <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-center justify-center relative rounded-[var(--radiuses\/small,2px)] shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193852;31955:1572;46186:2678" data-name="button-medium">
+                                      <div className="content-stretch flex items-center justify-center px-[3px] py-[2px] relative shrink-0 size-[20px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193852;31955:1572;46186:2679" data-name="Style=Regular,Size=20,State=Default">
+                                        <div className="h-[16.25px] relative shrink-0 w-[15px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193852;31955:1572;46186:2679;28770:2560" data-name="Vector frame">
+                                          <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVectorFrame3} />
+                                        </div>
+                                      </div>
+                                      <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--container/dynamic/Brand/Subtle/foreground/default,#7c33b5)] text-center whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193852;31955:1572;46186:2680">
+                                        MMM channel score
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="content-start flex flex-wrap items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193852;45333:4476" data-name="Swap Instance">
+                                <div className="content-stretch flex flex-[1_0_0] items-center min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193852;45333:4476;41350:25155">
+                                  <p className="[word-break:break-word] flex-[1_0_0] font-['DM_Sans:Regular'] leading-[20px] min-w-px not-italic relative text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67152:193852;45333:4476;41350:25134">
+                                    Use MMM channel scores + optimization algorithm for allocation
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="content-stretch flex flex-col gap-[var(--numbers\/8,8px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:556473" data-name="Notification">
+                          <div className="content-stretch flex flex-col items-start relative rounded-[var(--radiuses\/small,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:556473;28029:1506" data-name="Notification">
+                            <div className="content-stretch flex gap-[8px] items-start py-[5px] relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:556473;28029:1507" data-name="Content">
+                              <div className="content-stretch flex items-center justify-center relative shrink-0 size-[20px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:556473;28029:1508" data-name="Icon/info">
+                                <div className="relative shrink-0 size-[20px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:556473;28029:1508;20259:29056" data-name="Vector frame">
+                                  <img alt="" className="absolute block inset-0 max-w-none size-full" src={imgVectorFrame4} />
+                                </div>
+                              </div>
+                              <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-w-px overflow-clip pt-px relative self-stretch" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:556473;28029:1509" data-name="Text">
+                                <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237612;41466:6699;41466:6574;67037:556473;28029:1510">
+                                  Tip: Click any algorithm to automatically allocate your USD 12,345 budget. You can still manually adjust individual channel budgets afterward.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-[var(--surface/background/lvl1,white)] content-stretch flex items-start min-w-[180px] overflow-clip relative rounded-[var(--radius\/25,2px)] shadow-[0px_1px_4px_0px_var(--shadow/lvl8,rgba(113,113,128,0.08)),0px_8px_16px_0px_var(--shadow/lvl4,rgba(113,113,128,0.04))] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613" data-name="Smart Card">
+                <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41404:32386" data-name="Master Card">
+                  <div className="content-stretch flex flex-col gap-[var(--spacing\/100,8px)] items-start p-[var(--spacing\/200,16px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699" data-name="Content">
+                    <div className="content-stretch flex flex-col gap-[var(--spacing\/250,20px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574" data-name="Channels">
+                      <div className="content-stretch flex flex-col gap-[var(--spacing\/150,12px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194985">
+                        <div className="content-stretch flex gap-[var(--spacing\/100,8px)] items-center relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194794">
+                          <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[24px] not-italic relative shrink-0 text-[16px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] tracking-[-0.08px] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194703">
+                            Linear TV
+                          </p>
+                          <div className="content-stretch flex gap-[var(--odd_numbers\/10,10px)] h-[18px] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194785" data-name="Badge/rounded">
+                            <div className="bg-[var(--container/static/neutral/subtle/background,#ebebf0)] content-stretch flex gap-[var(--numbers\/4,4px)] h-[18px] items-center justify-center px-[var(--numbers\/8,8px)] py-[var(--numbers\/2,2px)] relative rounded-[var(--\[old\]radiuses\/round,100px)] shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194785;9468:21378">
+                              <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--container/static/neutral/subtle/foreground,#4b4b59)] text-center whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194785;9468:21379">
+                                Traditional broadcast
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="content-start flex flex-wrap gap-[var(--spacing\/700,12px_56px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703" data-name="Channels pill">
+                          <div className="[word-break:break-word] content-stretch flex flex-col gap-[var(--spacing\/100,8px)] items-start not-italic relative shrink-0 whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195655">
+                            <div className="flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] min-w-full overflow-hidden relative shrink-0 text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/variation,#13131a)] text-ellipsis w-[min-content]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195656">
+                              <p className="leading-[20px] overflow-hidden text-ellipsis">Linear TV</p>
+                            </div>
+                            <p className="font-['DM_Sans:Regular'] leading-[18px] relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl2,#282833)]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195657">
+                              Base reach: 65% · CPM: USD 28
+                            </p>
+                          </div>
+                          <div className="content-stretch flex flex-[1_0_0] gap-[var(--spacing\/150,12px)] items-center min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195658">
+                            <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195659">
+                              <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195660" data-name="Title">
+                                <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195660;15285:8860">
+                                  <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195660;15285:8844">
+                                    <p className="leading-[18px] overflow-hidden text-ellipsis">CPM</p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195661" data-name="Input/Standard">
+                                <div className="content-stretch flex gap-[var(--numbers\/8,8px)] items-center px-[var(--numbers\/12,12px)] py-[var(--numbers\/none,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195661;5960:11994" data-name="elements-small">
+                                  <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] font-['DM_Sans:Regular'] gap-[var(--numbers\/8,8px)] items-start leading-[0] min-w-px not-italic py-[var(--odd_numbers\/2-5,2.5px)] relative text-[12px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195661;5960:11995" data-name="Text">
+                                    <div className="flex flex-[1_0_0] flex-col justify-center min-w-px overflow-hidden relative text-ellipsis" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195661;5960:11996">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">12</p>
+                                    </div>
+                                    <div className="flex flex-[1_0_0] flex-col h-[19px] justify-center min-w-px overflow-hidden relative text-ellipsis text-right" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195661;5960:12018">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">USD</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195662">
+                              <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195663" data-name="Title">
+                                <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195663;15285:8860">
+                                  <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195663;15285:8844">
+                                    <p className="leading-[18px] overflow-hidden text-ellipsis">Allocation</p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195664" data-name="Input/Standard">
+                                <div className="content-stretch flex gap-[var(--numbers\/8,8px)] items-center px-[var(--numbers\/12,12px)] py-[var(--numbers\/none,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195664;5960:11994" data-name="elements-small">
+                                  <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] font-['DM_Sans:Regular'] gap-[var(--numbers\/8,8px)] items-start leading-[0] min-w-px not-italic py-[var(--odd_numbers\/2-5,2.5px)] relative text-[12px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195664;5960:11995" data-name="Text">
+                                    <div className="flex flex-[1_0_0] flex-col justify-center min-w-px overflow-hidden relative text-ellipsis" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195664;5960:11996">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">20</p>
+                                    </div>
+                                    <div className="flex flex-[1_0_0] flex-col h-[19px] justify-center min-w-px overflow-hidden relative text-ellipsis text-right" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195703;67169:195664;5960:12018">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">%</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <Separator className="content-stretch flex items-center relative shrink-0 w-full" />
+                      <div className="content-stretch flex flex-col gap-[var(--spacing\/150,12px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194989">
+                        <div className="content-stretch flex gap-[var(--spacing\/100,8px)] items-center relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194795">
+                          <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[24px] not-italic relative shrink-0 text-[16px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] tracking-[-0.08px] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194796">
+                            BVOD
+                          </p>
+                          <div className="content-stretch flex gap-[var(--odd_numbers\/10,10px)] h-[18px] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194797" data-name="Badge/rounded">
+                            <div className="bg-[var(--container/static/neutral/subtle/background,#ebebf0)] content-stretch flex gap-[var(--numbers\/4,4px)] h-[18px] items-center justify-center px-[var(--numbers\/8,8px)] py-[var(--numbers\/2,2px)] relative rounded-[var(--\[old\]radiuses\/round,100px)] shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194797;9468:21378">
+                              <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--container/static/neutral/subtle/foreground,#4b4b59)] text-center whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194797;9468:21379">
+                                Broadcaster on demand
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="content-stretch flex flex-col gap-[var(--spacing\/150,12px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194988">
+                          <div className="content-start flex flex-wrap gap-[var(--spacing\/700,12px_56px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788" data-name="Channels pill">
+                            <div className="[word-break:break-word] content-stretch flex flex-col gap-[var(--spacing\/100,8px)] items-start not-italic relative shrink-0 whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195655">
+                              <div className="flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] min-w-full overflow-hidden relative shrink-0 text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/variation,#13131a)] text-ellipsis w-[min-content]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195656">
+                                <p className="leading-[20px] overflow-hidden text-ellipsis">7plus</p>
+                              </div>
+                              <p className="font-['DM_Sans:Regular'] leading-[18px] relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl2,#282833)]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195657">
+                                Base reach: 18% · CPM: USD 12
+                              </p>
+                            </div>
+                            <div className="content-stretch flex flex-[1_0_0] gap-[var(--spacing\/150,12px)] items-center min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195658">
+                              <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195659">
+                                <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195660" data-name="Title">
+                                  <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195660;15285:8860">
+                                    <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195660;15285:8844">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">CPM</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195661" data-name="Input/Standard">
+                                  <div className="content-stretch flex gap-[var(--numbers\/8,8px)] items-center px-[var(--numbers\/12,12px)] py-[var(--numbers\/none,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195661;5960:11994" data-name="elements-small">
+                                    <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] font-['DM_Sans:Regular'] gap-[var(--numbers\/8,8px)] items-start leading-[0] min-w-px not-italic py-[var(--odd_numbers\/2-5,2.5px)] relative text-[12px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195661;5960:11995" data-name="Text">
+                                      <div className="flex flex-[1_0_0] flex-col justify-center min-w-px overflow-hidden relative text-ellipsis" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195661;5960:11996">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">12</p>
+                                      </div>
+                                      <div className="flex flex-[1_0_0] flex-col h-[19px] justify-center min-w-px overflow-hidden relative text-ellipsis text-right" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195661;5960:12018">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">USD</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195662">
+                                <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195663" data-name="Title">
+                                  <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195663;15285:8860">
+                                    <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195663;15285:8844">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">Allocation</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195664" data-name="Input/Standard">
+                                  <div className="content-stretch flex gap-[var(--numbers\/8,8px)] items-center px-[var(--numbers\/12,12px)] py-[var(--numbers\/none,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195664;5960:11994" data-name="elements-small">
+                                    <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] font-['DM_Sans:Regular'] gap-[var(--numbers\/8,8px)] items-start leading-[0] min-w-px not-italic py-[var(--odd_numbers\/2-5,2.5px)] relative text-[12px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195664;5960:11995" data-name="Text">
+                                      <div className="flex flex-[1_0_0] flex-col justify-center min-w-px overflow-hidden relative text-ellipsis" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195664;5960:11996">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">20</p>
+                                      </div>
+                                      <div className="flex flex-[1_0_0] flex-col h-[19px] justify-center min-w-px overflow-hidden relative text-ellipsis text-right" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195788;67169:195664;5960:12018">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">%</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="content-start flex flex-wrap gap-[var(--spacing\/700,12px_56px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845" data-name="Channels pill">
+                            <div className="[word-break:break-word] content-stretch flex flex-col gap-[var(--spacing\/100,8px)] items-start not-italic relative shrink-0 whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195655">
+                              <div className="flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] min-w-full overflow-hidden relative shrink-0 text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/variation,#13131a)] text-ellipsis w-[min-content]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195656">
+                                <p className="leading-[20px] overflow-hidden text-ellipsis">9 now</p>
+                              </div>
+                              <p className="font-['DM_Sans:Regular'] leading-[18px] relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl2,#282833)]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195657">
+                                Base reach: 18% · CPM: USD 12
+                              </p>
+                            </div>
+                            <div className="content-stretch flex flex-[1_0_0] gap-[var(--spacing\/150,12px)] items-center min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195658">
+                              <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195659">
+                                <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195660" data-name="Title">
+                                  <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195660;15285:8860">
+                                    <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195660;15285:8844">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">CPM</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195661" data-name="Input/Standard">
+                                  <div className="content-stretch flex gap-[var(--numbers\/8,8px)] items-center px-[var(--numbers\/12,12px)] py-[var(--numbers\/none,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195661;5960:11994" data-name="elements-small">
+                                    <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] font-['DM_Sans:Regular'] gap-[var(--numbers\/8,8px)] items-start leading-[0] min-w-px not-italic py-[var(--odd_numbers\/2-5,2.5px)] relative text-[12px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195661;5960:11995" data-name="Text">
+                                      <div className="flex flex-[1_0_0] flex-col justify-center min-w-px overflow-hidden relative text-ellipsis" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195661;5960:11996">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">12</p>
+                                      </div>
+                                      <div className="flex flex-[1_0_0] flex-col h-[19px] justify-center min-w-px overflow-hidden relative text-ellipsis text-right" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195661;5960:12018">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">USD</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195662">
+                                <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195663" data-name="Title">
+                                  <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195663;15285:8860">
+                                    <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195663;15285:8844">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">Allocation</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195664" data-name="Input/Standard">
+                                  <div className="content-stretch flex gap-[var(--numbers\/8,8px)] items-center px-[var(--numbers\/12,12px)] py-[var(--numbers\/none,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195664;5960:11994" data-name="elements-small">
+                                    <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] font-['DM_Sans:Regular'] gap-[var(--numbers\/8,8px)] items-start leading-[0] min-w-px not-italic py-[var(--odd_numbers\/2-5,2.5px)] relative text-[12px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195664;5960:11995" data-name="Text">
+                                      <div className="flex flex-[1_0_0] flex-col justify-center min-w-px overflow-hidden relative text-ellipsis" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195664;5960:11996">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">20</p>
+                                      </div>
+                                      <div className="flex flex-[1_0_0] flex-col h-[19px] justify-center min-w-px overflow-hidden relative text-ellipsis text-right" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195845;67169:195664;5960:12018">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">%</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="content-start flex flex-wrap gap-[var(--spacing\/700,12px_56px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901" data-name="Channels pill">
+                            <div className="[word-break:break-word] content-stretch flex flex-col gap-[var(--spacing\/100,8px)] items-start not-italic relative shrink-0 whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195655">
+                              <div className="flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] min-w-full overflow-hidden relative shrink-0 text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/variation,#13131a)] text-ellipsis w-[min-content]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195656">
+                                <p className="leading-[20px] overflow-hidden text-ellipsis">10 play</p>
+                              </div>
+                              <p className="font-['DM_Sans:Regular'] leading-[18px] relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl2,#282833)]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195657">
+                                Base reach: 18% · CPM: USD 12
+                              </p>
+                            </div>
+                            <div className="content-stretch flex flex-[1_0_0] gap-[var(--spacing\/150,12px)] items-center min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195658">
+                              <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195659">
+                                <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195660" data-name="Title">
+                                  <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195660;15285:8860">
+                                    <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195660;15285:8844">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">CPM</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195661" data-name="Input/Standard">
+                                  <div className="content-stretch flex gap-[var(--numbers\/8,8px)] items-center px-[var(--numbers\/12,12px)] py-[var(--numbers\/none,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195661;5960:11994" data-name="elements-small">
+                                    <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] font-['DM_Sans:Regular'] gap-[var(--numbers\/8,8px)] items-start leading-[0] min-w-px not-italic py-[var(--odd_numbers\/2-5,2.5px)] relative text-[12px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195661;5960:11995" data-name="Text">
+                                      <div className="flex flex-[1_0_0] flex-col justify-center min-w-px overflow-hidden relative text-ellipsis" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195661;5960:11996">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">12</p>
+                                      </div>
+                                      <div className="flex flex-[1_0_0] flex-col h-[19px] justify-center min-w-px overflow-hidden relative text-ellipsis text-right" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195661;5960:12018">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">USD</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195662">
+                                <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195663" data-name="Title">
+                                  <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195663;15285:8860">
+                                    <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195663;15285:8844">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">Allocation</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195664" data-name="Input/Standard">
+                                  <div className="content-stretch flex gap-[var(--numbers\/8,8px)] items-center px-[var(--numbers\/12,12px)] py-[var(--numbers\/none,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195664;5960:11994" data-name="elements-small">
+                                    <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] font-['DM_Sans:Regular'] gap-[var(--numbers\/8,8px)] items-start leading-[0] min-w-px not-italic py-[var(--odd_numbers\/2-5,2.5px)] relative text-[12px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195664;5960:11995" data-name="Text">
+                                      <div className="flex flex-[1_0_0] flex-col justify-center min-w-px overflow-hidden relative text-ellipsis" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195664;5960:11996">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">20</p>
+                                      </div>
+                                      <div className="flex flex-[1_0_0] flex-col h-[19px] justify-center min-w-px overflow-hidden relative text-ellipsis text-right" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195901;67169:195664;5960:12018">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">%</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="content-start flex flex-wrap gap-[var(--spacing\/700,12px_56px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957" data-name="Channels pill">
+                            <div className="[word-break:break-word] content-stretch flex flex-col gap-[var(--spacing\/100,8px)] items-start not-italic relative shrink-0 whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195655">
+                              <div className="flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] min-w-full overflow-hidden relative shrink-0 text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/variation,#13131a)] text-ellipsis w-[min-content]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195656">
+                                <p className="leading-[20px] overflow-hidden text-ellipsis">SBS on demand</p>
+                              </div>
+                              <p className="font-['DM_Sans:Regular'] leading-[18px] relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl2,#282833)]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195657">
+                                Base reach: 18% · CPM: USD 12
+                              </p>
+                            </div>
+                            <div className="content-stretch flex flex-[1_0_0] gap-[var(--spacing\/150,12px)] items-center min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195658">
+                              <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195659">
+                                <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195660" data-name="Title">
+                                  <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195660;15285:8860">
+                                    <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195660;15285:8844">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">CPM</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195661" data-name="Input/Standard">
+                                  <div className="content-stretch flex gap-[var(--numbers\/8,8px)] items-center px-[var(--numbers\/12,12px)] py-[var(--numbers\/none,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195661;5960:11994" data-name="elements-small">
+                                    <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] font-['DM_Sans:Regular'] gap-[var(--numbers\/8,8px)] items-start leading-[0] min-w-px not-italic py-[var(--odd_numbers\/2-5,2.5px)] relative text-[12px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195661;5960:11995" data-name="Text">
+                                      <div className="flex flex-[1_0_0] flex-col justify-center min-w-px overflow-hidden relative text-ellipsis" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195661;5960:11996">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">12</p>
+                                      </div>
+                                      <div className="flex flex-[1_0_0] flex-col h-[19px] justify-center min-w-px overflow-hidden relative text-ellipsis text-right" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195661;5960:12018">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">USD</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195662">
+                                <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195663" data-name="Title">
+                                  <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195663;15285:8860">
+                                    <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195663;15285:8844">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">Allocation</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195664" data-name="Input/Standard">
+                                  <div className="content-stretch flex gap-[var(--numbers\/8,8px)] items-center px-[var(--numbers\/12,12px)] py-[var(--numbers\/none,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195664;5960:11994" data-name="elements-small">
+                                    <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] font-['DM_Sans:Regular'] gap-[var(--numbers\/8,8px)] items-start leading-[0] min-w-px not-italic py-[var(--odd_numbers\/2-5,2.5px)] relative text-[12px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195664;5960:11995" data-name="Text">
+                                      <div className="flex flex-[1_0_0] flex-col justify-center min-w-px overflow-hidden relative text-ellipsis" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195664;5960:11996">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">20</p>
+                                      </div>
+                                      <div className="flex flex-[1_0_0] flex-col h-[19px] justify-center min-w-px overflow-hidden relative text-ellipsis text-right" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:195957;67169:195664;5960:12018">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">%</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <Separator className="content-stretch flex items-center relative shrink-0 w-full" />
+                      <div className="content-stretch flex flex-col gap-[var(--spacing\/200,16px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194994">
+                        <div className="content-stretch flex gap-[var(--spacing\/100,8px)] items-center relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194800">
+                          <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[24px] not-italic relative shrink-0 text-[16px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] tracking-[-0.08px] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194801">
+                            SVOD
+                          </p>
+                          <div className="content-stretch flex gap-[var(--odd_numbers\/10,10px)] h-[18px] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194802" data-name="Badge/rounded">
+                            <div className="bg-[var(--container/static/neutral/subtle/background,#ebebf0)] content-stretch flex gap-[var(--numbers\/4,4px)] h-[18px] items-center justify-center px-[var(--numbers\/8,8px)] py-[var(--numbers\/2,2px)] relative rounded-[var(--\[old\]radiuses\/round,100px)] shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194802;9468:21378">
+                              <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--container/static/neutral/subtle/foreground,#4b4b59)] text-center whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194802;9468:21379">
+                                Streaming services
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="content-stretch flex flex-col gap-[var(--spacing\/150,12px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:194993">
+                          <div className="content-start flex flex-wrap gap-[var(--spacing\/700,12px_56px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115" data-name="Channels pill">
+                            <div className="[word-break:break-word] content-stretch flex flex-col gap-[var(--spacing\/100,8px)] items-start not-italic relative shrink-0 whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195655">
+                              <div className="flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] min-w-full overflow-hidden relative shrink-0 text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/variation,#13131a)] text-ellipsis w-[min-content]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195656">
+                                <p className="leading-[20px] overflow-hidden text-ellipsis">Netflix Ads</p>
+                              </div>
+                              <p className="font-['DM_Sans:Regular'] leading-[18px] relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl2,#282833)]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195657">
+                                Base reach: 18% · CPM: USD 12
+                              </p>
+                            </div>
+                            <div className="content-stretch flex flex-[1_0_0] gap-[var(--spacing\/150,12px)] items-center min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195658">
+                              <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195659">
+                                <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195660" data-name="Title">
+                                  <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195660;15285:8860">
+                                    <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195660;15285:8844">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">CPM</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195661" data-name="Input/Standard">
+                                  <div className="content-stretch flex gap-[var(--numbers\/8,8px)] items-center px-[var(--numbers\/12,12px)] py-[var(--numbers\/none,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195661;5960:11994" data-name="elements-small">
+                                    <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] font-['DM_Sans:Regular'] gap-[var(--numbers\/8,8px)] items-start leading-[0] min-w-px not-italic py-[var(--odd_numbers\/2-5,2.5px)] relative text-[12px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195661;5960:11995" data-name="Text">
+                                      <div className="flex flex-[1_0_0] flex-col justify-center min-w-px overflow-hidden relative text-ellipsis" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195661;5960:11996">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">12</p>
+                                      </div>
+                                      <div className="flex flex-[1_0_0] flex-col h-[19px] justify-center min-w-px overflow-hidden relative text-ellipsis text-right" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195661;5960:12018">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">USD</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195662">
+                                <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195663" data-name="Title">
+                                  <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195663;15285:8860">
+                                    <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195663;15285:8844">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">Allocation</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195664" data-name="Input/Standard">
+                                  <div className="content-stretch flex gap-[var(--numbers\/8,8px)] items-center px-[var(--numbers\/12,12px)] py-[var(--numbers\/none,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195664;5960:11994" data-name="elements-small">
+                                    <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] font-['DM_Sans:Regular'] gap-[var(--numbers\/8,8px)] items-start leading-[0] min-w-px not-italic py-[var(--odd_numbers\/2-5,2.5px)] relative text-[12px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195664;5960:11995" data-name="Text">
+                                      <div className="flex flex-[1_0_0] flex-col justify-center min-w-px overflow-hidden relative text-ellipsis" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195664;5960:11996">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">20</p>
+                                      </div>
+                                      <div className="flex flex-[1_0_0] flex-col h-[19px] justify-center min-w-px overflow-hidden relative text-ellipsis text-right" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196115;67169:195664;5960:12018">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">%</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="content-start flex flex-wrap gap-[var(--spacing\/700,12px_56px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172" data-name="Channels pill">
+                            <div className="[word-break:break-word] content-stretch flex flex-col gap-[var(--spacing\/100,8px)] items-start not-italic relative shrink-0 whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195655">
+                              <div className="flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] min-w-full overflow-hidden relative shrink-0 text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/variation,#13131a)] text-ellipsis w-[min-content]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195656">
+                                <p className="leading-[20px] overflow-hidden text-ellipsis">Prime video</p>
+                              </div>
+                              <p className="font-['DM_Sans:Regular'] leading-[18px] relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl2,#282833)]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195657">
+                                Base reach: 18% · CPM: USD 12
+                              </p>
+                            </div>
+                            <div className="content-stretch flex flex-[1_0_0] gap-[var(--spacing\/150,12px)] items-center min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195658">
+                              <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195659">
+                                <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195660" data-name="Title">
+                                  <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195660;15285:8860">
+                                    <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195660;15285:8844">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">CPM</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195661" data-name="Input/Standard">
+                                  <div className="content-stretch flex gap-[var(--numbers\/8,8px)] items-center px-[var(--numbers\/12,12px)] py-[var(--numbers\/none,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195661;5960:11994" data-name="elements-small">
+                                    <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] font-['DM_Sans:Regular'] gap-[var(--numbers\/8,8px)] items-start leading-[0] min-w-px not-italic py-[var(--odd_numbers\/2-5,2.5px)] relative text-[12px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195661;5960:11995" data-name="Text">
+                                      <div className="flex flex-[1_0_0] flex-col justify-center min-w-px overflow-hidden relative text-ellipsis" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195661;5960:11996">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">12</p>
+                                      </div>
+                                      <div className="flex flex-[1_0_0] flex-col h-[19px] justify-center min-w-px overflow-hidden relative text-ellipsis text-right" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195661;5960:12018">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">USD</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195662">
+                                <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195663" data-name="Title">
+                                  <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195663;15285:8860">
+                                    <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195663;15285:8844">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">Allocation</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195664" data-name="Input/Standard">
+                                  <div className="content-stretch flex gap-[var(--numbers\/8,8px)] items-center px-[var(--numbers\/12,12px)] py-[var(--numbers\/none,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195664;5960:11994" data-name="elements-small">
+                                    <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] font-['DM_Sans:Regular'] gap-[var(--numbers\/8,8px)] items-start leading-[0] min-w-px not-italic py-[var(--odd_numbers\/2-5,2.5px)] relative text-[12px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195664;5960:11995" data-name="Text">
+                                      <div className="flex flex-[1_0_0] flex-col justify-center min-w-px overflow-hidden relative text-ellipsis" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195664;5960:11996">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">20</p>
+                                      </div>
+                                      <div className="flex flex-[1_0_0] flex-col h-[19px] justify-center min-w-px overflow-hidden relative text-ellipsis text-right" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196172;67169:195664;5960:12018">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">%</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="content-start flex flex-wrap gap-[var(--spacing\/700,12px_56px)] items-start relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228" data-name="Channels pill">
+                            <div className="[word-break:break-word] content-stretch flex flex-col gap-[var(--spacing\/100,8px)] items-start not-italic relative shrink-0 whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195655">
+                              <div className="flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] min-w-full overflow-hidden relative shrink-0 text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/variation,#13131a)] text-ellipsis w-[min-content]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195656">
+                                <p className="leading-[20px] overflow-hidden text-ellipsis">Disney+</p>
+                              </div>
+                              <p className="font-['DM_Sans:Regular'] leading-[18px] relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl2,#282833)]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195657">
+                                Base reach: 18% · CPM: USD 12
+                              </p>
+                            </div>
+                            <div className="content-stretch flex flex-[1_0_0] gap-[var(--spacing\/150,12px)] items-center min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195658">
+                              <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195659">
+                                <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195660" data-name="Title">
+                                  <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195660;15285:8860">
+                                    <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195660;15285:8844">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">CPM</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195661" data-name="Input/Standard">
+                                  <div className="content-stretch flex gap-[var(--numbers\/8,8px)] items-center px-[var(--numbers\/12,12px)] py-[var(--numbers\/none,0px)] relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195661;5960:11994" data-name="elements-small">
+                                    <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] font-['DM_Sans:Regular'] gap-[var(--numbers\/8,8px)] items-start leading-[0] min-w-px not-italic py-[var(--odd_numbers\/2-5,2.5px)] relative text-[12px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195661;5960:11995" data-name="Text">
+                                      <div className="flex flex-[1_0_0] flex-col justify-center min-w-px overflow-hidden relative text-ellipsis" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195661;5960:11996">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">12</p>
+                                      </div>
+                                      <div className="flex flex-[1_0_0] flex-col h-[19px] justify-center min-w-px overflow-hidden relative text-ellipsis text-right" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195661;5960:12018">
+                                        <p className="leading-[18px] overflow-hidden text-ellipsis">USD</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="content-stretch flex flex-[1_0_0] flex-col gap-[var(--spacing\/50,4px)] items-start min-w-px relative" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195662">
+                                <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195663" data-name="Title">
+                                  <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195663;15285:8860">
+                                    <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;67169:195663;15285:8844">
+                                      <p className="leading-[18px] overflow-hidden text-ellipsis">Allocation</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="bg-[var(--container/dynamic/neutral/subtle/background/default/regular,white)] border-[length:var(--\[old\]stroke-thickness\/1,1px)] border-[var(--border/dynamic/neutral/subtle/default,#c6c6cc)] border-solid content-stretch flex flex-col gap-[var(--numbers\/none,0px)] items-start relative rounded-[var(--\[old\]radiuses\/2,2px)] shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237613;41466:6699;41466:6574;67169:196228;6716
+...[content elided for security scan]...
+espace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516682;15285:8829">
+                                <p className="leading-[20px] overflow-hidden text-ellipsis">Netflix Ads</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="content-stretch flex flex-col gap-[var(--spacing\/50,4px)] items-end relative shrink-0 w-[71px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516683">
+                            <div className="content-stretch flex items-center relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516684" data-name="Metrics Value">
+                              <p className="[word-break:break-word] font-['DM_Sans:SemiBold'] leading-[28px] not-italic relative shrink-0 text-[20px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-right tracking-[-0.2px] w-[68px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516684;45829:261">
+                                +0.2%
+                              </p>
+                            </div>
+                            <p className="[word-break:break-word] font-['DM_Sans:Regular'] leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl2,#282833)] text-right w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516685">
+                              $1,234
+                            </p>
+                          </div>
+                        </div>
+                        <Separator className="content-stretch flex items-center relative shrink-0 w-full" />
+                        <div className="content-stretch flex items-start justify-between relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516690">
+                          <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516691" data-name="Title">
+                            <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0 w-[34px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516691;15285:8847">
+                              <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[14px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516691;15285:8829">
+                                <p className="leading-[20px] overflow-hidden text-ellipsis">Prime video</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="content-stretch flex flex-col gap-[var(--spacing\/50,4px)] items-end relative shrink-0 w-[71px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516692">
+                            <div className="content-stretch flex items-center relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516693" data-name="Metrics Value">
+                              <p className="[word-break:break-word] font-['DM_Sans:SemiBold'] leading-[28px] not-italic relative shrink-0 text-[20px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-right tracking-[-0.2px] w-[68px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516693;45829:261">
+                                +0.2%
+                              </p>
+                            </div>
+                            <p className="[word-break:break-word] font-['DM_Sans:Regular'] leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl2,#282833)] text-right w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516694">
+                              $1,234
+                            </p>
+                          </div>
+                        </div>
+                        <Separator className="content-stretch flex items-center relative shrink-0 w-full" />
+                        <div className="content-stretch flex items-start justify-between relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516699">
+                          <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516700" data-name="Title">
+                            <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0 w-[34px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516700;15285:8847">
+                              <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[14px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516700;15285:8829">
+                                <p className="leading-[20px] overflow-hidden text-ellipsis">Disney+</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="content-stretch flex flex-col gap-[var(--spacing\/50,4px)] items-end relative shrink-0 w-[71px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516701">
+                            <div className="content-stretch flex items-center relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516702" data-name="Metrics Value">
+                              <p className="[word-break:break-word] font-['DM_Sans:SemiBold'] leading-[28px] not-italic relative shrink-0 text-[20px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-right tracking-[-0.2px] w-[68px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516702;45829:261">
+                                +0.0%
+                              </p>
+                            </div>
+                            <p className="[word-break:break-word] font-['DM_Sans:Regular'] leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl2,#282833)] text-right w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516703">
+                              $122
+                            </p>
+                          </div>
+                        </div>
+                        <Separator className="content-stretch flex items-center relative shrink-0 w-full" />
+                        <div className="content-stretch flex items-start justify-between relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516708">
+                          <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516709" data-name="Title">
+                            <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0 w-[34px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516709;15285:8847">
+                              <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[14px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516709;15285:8829">
+                                <p className="leading-[20px] overflow-hidden text-ellipsis">YouTube</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="content-stretch flex flex-col gap-[var(--spacing\/50,4px)] items-end relative shrink-0 w-[71px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516710">
+                            <div className="content-stretch flex items-center relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516711" data-name="Metrics Value">
+                              <p className="[word-break:break-word] font-['DM_Sans:SemiBold'] leading-[28px] not-italic relative shrink-0 text-[20px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-right tracking-[-0.2px] w-[68px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516711;45829:261">
+                                +0.1%
+                              </p>
+                            </div>
+                            <p className="[word-break:break-word] font-['DM_Sans:Regular'] leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl2,#282833)] text-right w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516712">
+                              $123
+                            </p>
+                          </div>
+                        </div>
+                        <Separator className="content-stretch flex items-center relative shrink-0 w-full" />
+                        <div className="content-stretch flex items-start justify-between relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516717">
+                          <div className="content-stretch flex items-start relative shrink-0" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516718" data-name="Title">
+                            <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-start relative shrink-0 w-[34px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516718;15285:8847">
+                              <div className="[word-break:break-word] flex flex-col font-['DM_Sans:Medium'] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[14px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-ellipsis whitespace-nowrap" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516718;15285:8829">
+                                <p className="leading-[20px] overflow-hidden text-ellipsis">Online video</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="content-stretch flex flex-col gap-[var(--spacing\/50,4px)] items-end relative shrink-0 w-[71px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516719">
+                            <div className="content-stretch flex items-center relative shrink-0 w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516720" data-name="Metrics Value">
+                              <p className="[word-break:break-word] font-['DM_Sans:SemiBold'] leading-[28px] not-italic relative shrink-0 text-[20px] text-[color:var(--surface/foreground/static/neutral/lvl1,#13131a)] text-right tracking-[-0.2px] w-[68px]" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516720;45829:261">
+                                +0.1%
+                              </p>
+                            </div>
+                            <p className="[word-break:break-word] font-['DM_Sans:Regular'] leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--surface/foreground/static/neutral/lvl2,#282833)] text-right w-full" data-node-id="I67205:212808;49504:16674;67196:239904;67196:237617;41466:6699;41466:6574;67037:516721">
+                              $123
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="absolute bottom-0 content-stretch flex flex-col h-[66px] items-start justify-end left-0 right-0" data-node-id="I67205:212808;53009:4989">
+        <div className="bg-[var(--surface/background/lvl1,white)] content-center drop-shadow-[0px_-1px_2px_var(--shadow/lvl12,rgba(113,113,128,0.12)),0px_-8px_8px_var(--shadow/lvl8,rgba(113,113,128,0.08))] flex flex-wrap gap-[0px_16px] h-[66px] items-center justify-center relative shrink-0 w-full" data-node-id="I67205:212808;53009:4485" data-name="Footer - Page">
+          <div className="content-stretch flex flex-[1_0_0] gap-[var(--spacing\/200,16px)] items-center justify-end min-w-px px-[var(--screen\/margin,64px)] py-[var(--spacing\/200,16px)] relative" data-node-id="I67205:212808;53009:4485;53009:3712" data-name="ActionsRight">
+            <div className="border-[length:var(--stroke_weight\/15,1px)] border-[var(--border/dynamic/neutral/bold/default,#4b4b59)] border-solid content-stretch flex gap-[var(--numbers\/none,0px)] items-center justify-end px-[var(--spacing\/150,12px)] py-[var(--spacing\/container\/m,7px)] relative rounded-[var(--radius\/25,2px)] shrink-0" data-node-id="I67205:212808;53009:4485;53009:3714" data-name="Button">
+              <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-center justify-center relative rounded-[var(--radiuses\/small,2px)] shrink-0" data-node-id="I67205:212808;53009:4485;53009:3714;45750:1617" data-name="button-medium">
+                <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--container/dynamic/neutral/subtle/foreground/default/regular,#4b4b59)] text-center whitespace-nowrap" data-node-id="I67205:212808;53009:4485;53009:3714;45750:1619">
+                  Cancel
+                </p>
+              </div>
+            </div>
+            <div className="bg-[var(--container/dynamic/brand/bold/background/default,#7c33b5)] content-stretch flex gap-[var(--numbers\/none,0px)] items-center justify-end px-[var(--spacing\/150,12px)] py-[var(--spacing\/container\/m,7px)] relative rounded-[var(--radius\/25,2px)] shrink-0" data-node-id="I67205:212808;53009:4485;53009:3715" data-name="Button">
+              <div className="content-stretch flex gap-[var(--spacing\/50,4px)] items-center justify-center relative rounded-[var(--radiuses\/small,2px)] shrink-0" data-node-id="I67205:212808;53009:4485;53009:3715;45750:1539" data-name="button-medium">
+                <p className="[word-break:break-word] font-['DM_Sans:Medium'] leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--container/dynamic/brand/bold/foreground/default,white)] text-center whitespace-nowrap" data-node-id="I67205:212808;53009:4485;53009:3715;45750:1541">
+                  Continue to channel planning
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+SUPER CRITICAL: The generated React+Tailwind code MUST be converted to match the target project's technology stack and styling system.
+1. Analyze the target codebase to identify: technology stack, styling approach, component patterns, and design tokens
+2. Convert React syntax to the target framework/library
+3. Transform all Tailwind classes to the target styling system while preserving exact visual design
+4. Follow the project's existing patterns and conventions
+DO NOT install any Tailwind as a dependency unless the user instructs you to do so.
+
+Node ids have been added to the code as data attributes, e.g. `data-node-id="1:2"`.
+These styles are contained in the design: Body Lg/Medium: Font(family: "DM Sans", style: Medium, size: 16, weight: 500, lineHeight: 24, letterSpacing: 0), sigma_gradient: , Body Md/Regular: Font(family: "DM Sans", style: Regular, size: 14, weight: 400, lineHeight: 20, letterSpacing: 0), Brand Gradient: , Body Md/Semibold: Font(family: "DM Sans", style: SemiBold, size: 14, weight: 600, lineHeight: 20, letterSpacing: 0), Elevation Regular: Effect(type: DROP_SHADOW, color: shadow/lvl4, offset: (0, 8), radius: 16, spread: 0); Effect(type: DROP_SHADOW, color: shadow/lvl8, offset: (0, 1), radius: 4, spread: 0), Headline Xl/Semibold: Font(family: "DM Sans", style: SemiBold, size: 32, weight: 600, lineHeight: 40, letterSpacing: -2), Body Md/Medium: Font(family: "DM Sans", style: Medium, size: 14, weight: 500, lineHeight: 20, letterSpacing: 0), Headline Xs/Medium: Font(family: "DM Sans", style: Medium, size: 16, weight: 500, lineHeight: 24, letterSpacing: -0.5), Body Sm/Regular: Font(family: "DM Sans", style: Regular, size: 12, weight: 400, lineHeight: 18, letterSpacing: 0), Body Sm/Medium: Font(family: "DM Sans", style: Medium, size: 12, weight: 500, lineHeight: 18, letterSpacing: 0), Headline Sm/Semibold: Font(family: "DM Sans", style: SemiBold, size: 20, weight: 600, lineHeight: 28, letterSpacing: -1), Headline Md/Semibold: Font(family: "DM Sans", style: SemiBold, size: 24, weight: 600, lineHeight: 32, letterSpacing: -1.5), Elevation Bottom Bar: Effect(type: DROP_SHADOW, color: shadow/lvl8, offset: (0, -8), radius: 16, spread: 0); Effect(type: DROP_SHADOW, color: shadow/lvl12, offset: (0, -1), radius: 4, spread: 0).
+Component descriptions: The following components have usage descriptions or documentation links defined in Figma. These descriptions provide important context about the intended usage, best practices, and any constraints for each component. Follow these guidelines when implementing or using these components.
+
+## Icon/caret
+**Node ID:** 67037:519362
+
+To find those carets, simply add the direction they are pointing to.
+
+  
+
+  
+
+  
+
+caret-right, caret-left (for regular)
+
+  
+
+caret-fill-right (for fill) and so on
+
+## Smart Card
+**Node ID:** 67037:520224
+
+Title and footer are multiple options, for exploring them: Step1: Click on their component itself, Step2: There are toggles for choosing different options
+
+## Border=Yes, State=Info, Compact=Yes, Description=No
+**Node ID:** 57521:29686
+
+Push Notification with an icon - Dismissable
+
+## Check/s
+**Node ID:** 65236:268396
+
+**Usage:** To use the checkbox without a label, simply hid the Label layer.
+
+## Smart Card
+**Node ID:** 66740:184527
+
+Title and footer are multiple options, for exploring them: Step1: Click on their component itself, Step2: There are toggles for choosing different options
+Images and SVGs will be stored as constants, e.g. const image = 'https://www.figma.com/api/mcp/asset/550e8400-e29b-41d4-a716-446655440000.png'. These constants will be used in the code as the source for the image, ex: <img src={image} />. Image assets are stored on a remote server for 7 days and can be fetched using the provided URLs until they expire.

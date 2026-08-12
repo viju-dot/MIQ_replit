@@ -57,11 +57,6 @@ export interface ScreenTemplate {
   name: string;
   /** What the screen is and why it is a good reference. */
   description: string;
-  /**
-   * Preview image path, relative to the app base. Resolve with
-   * `import.meta.env.BASE_URL` before use (see `previewUrl`).
-   */
-  preview: string;
   /** Source Figma frame size. */
   canvasSize: CanvasSize;
   /** Direct link to the source frame in Figma. */
@@ -77,15 +72,6 @@ export interface ScreenTemplate {
 }
 
 const STORAGE_KEY = "fiber:screen-templates:templates:v1";
-
-/* ---------------------------------------------------------------------- */
-/* Helpers                                                                 */
-/* ---------------------------------------------------------------------- */
-
-/** Resolve a template preview path against the app base URL. */
-export function previewUrl(template: Pick<ScreenTemplate, "preview">): string {
-  return `${import.meta.env.BASE_URL}${template.preview.replace(/^\/+/, "")}`;
-}
 
 /* ---------------------------------------------------------------------- */
 /* Static seed (the 8 harvested Fiber templates)                           */
@@ -158,7 +144,6 @@ const SEED: ScreenTemplate[] = [
     name: "OMC Activation — Step 1",
     description:
       "The opening step of the OMC activation flow. A clean full-width entry screen that establishes the multi-step activation pattern beneath the standard Fiber navigation.",
-    preview: "figmaAssets/screen-templates/60141-191669.png",
     canvasSize: { width: 1280, height: 793 },
     figmaUrl:
       "https://www.figma.com/design/cRnPCxZX2PHu3DCNT2RWfy/branch/Dmze2bKgXnIf8qQ3lqPjlK/Sigma---CRAC?node-id=60141-191669",
@@ -179,7 +164,6 @@ const SEED: ScreenTemplate[] = [
     name: "OMC Activation — Competitive Conquesting",
     description:
       "A later OMC activation step focused on competitive conquesting. A taller full-width screen showing how a data-dense activation step is composed within the standard page shell.",
-    preview: "figmaAssets/screen-templates/60948-294415.png",
     canvasSize: { width: 1280, height: 1469 },
     figmaUrl:
       "https://www.figma.com/design/cRnPCxZX2PHu3DCNT2RWfy/branch/Dmze2bKgXnIf8qQ3lqPjlK/Sigma---CRAC?node-id=60948-294415",
@@ -200,7 +184,6 @@ const SEED: ScreenTemplate[] = [
     name: "OMC Activation — Reach & Frequency Optimization",
     description:
       "A long-form OMC activation step for reach & frequency optimization. Demonstrates how an extended, scroll-heavy analytical step is organized within the Fiber page shell.",
-    preview: "figmaAssets/screen-templates/60948-858701.png",
     canvasSize: { width: 1280, height: 2435 },
     figmaUrl:
       "https://www.figma.com/design/cRnPCxZX2PHu3DCNT2RWfy/branch/Dmze2bKgXnIf8qQ3lqPjlK/Sigma---CRAC?node-id=60948-858701",
@@ -221,7 +204,6 @@ const SEED: ScreenTemplate[] = [
     name: "Activation Strategy Review",
     description:
       "A review screen summarizing the activation strategy. A padded, content-centered layout that shows how a summary/review step is framed within consistent side gutters.",
-    preview: "figmaAssets/screen-templates/61689-177110.png",
     canvasSize: { width: 1280, height: 1614 },
     figmaUrl:
       "https://www.figma.com/design/cRnPCxZX2PHu3DCNT2RWfy/branch/Dmze2bKgXnIf8qQ3lqPjlK/Sigma---CRAC?node-id=61689-177110",
@@ -242,7 +224,6 @@ const SEED: ScreenTemplate[] = [
     name: "Intelligence Patient Hub",
     description:
       "A comprehensive intelligence hub for patient data. An extensive dashboard-style screen showing how a large amount of analytical content is organized inside a padded content column.",
-    preview: "figmaAssets/screen-templates/62298-272589.png",
     canvasSize: { width: 1280, height: 4396 },
     figmaUrl:
       "https://www.figma.com/design/cRnPCxZX2PHu3DCNT2RWfy/branch/Dmze2bKgXnIf8qQ3lqPjlK/Sigma---CRAC?node-id=62298-272589",
@@ -263,7 +244,6 @@ const SEED: ScreenTemplate[] = [
     name: "Campaign Planning — Stage 1",
     description:
       "The first stage of campaign planning on a narrower 1024px canvas. Shows how the page shell adapts to a tighter viewport with reduced 32px side gutters.",
-    preview: "figmaAssets/screen-templates/66895-318383.png",
     canvasSize: { width: 1024, height: 2403 },
     figmaUrl:
       "https://www.figma.com/design/cRnPCxZX2PHu3DCNT2RWfy/branch/Dmze2bKgXnIf8qQ3lqPjlK/Sigma---CRAC?node-id=66895-318383",
@@ -284,7 +264,6 @@ const SEED: ScreenTemplate[] = [
     name: "Plan Channel",
     description:
       "A channel planning screen for building out media plans. A long padded layout demonstrating how channel-level planning content is composed within the standard page shell.",
-    preview: "figmaAssets/screen-templates/67205-212808.png",
     canvasSize: { width: 1280, height: 4302 },
     figmaUrl:
       "https://www.figma.com/design/cRnPCxZX2PHu3DCNT2RWfy/branch/Dmze2bKgXnIf8qQ3lqPjlK/Sigma---CRAC?node-id=67205-212808",
@@ -305,7 +284,6 @@ const SEED: ScreenTemplate[] = [
     name: "Campaign Planning — Step 4",
     description:
       "The fourth step of campaign planning. A padded, wizard-style screen showing a later step in the planning flow within consistent side gutters.",
-    preview: "figmaAssets/screen-templates/68993-615950.png",
     canvasSize: { width: 1280, height: 1960 },
     figmaUrl:
       "https://www.figma.com/design/cRnPCxZX2PHu3DCNT2RWfy/branch/Dmze2bKgXnIf8qQ3lqPjlK/Sigma---CRAC?node-id=68993-615950",
@@ -367,7 +345,6 @@ function coerceTemplate(raw: unknown): ScreenTemplate | null {
   const r = raw as Record<string, unknown>;
   if (typeof r.id !== "string" || r.id.length === 0) return null;
   if (typeof r.name !== "string" || r.name.length === 0) return null;
-  if (typeof r.preview !== "string" || r.preview.length === 0) return null;
 
   const hierarchy = Array.isArray(r.autoLayoutHierarchy)
     ? r.autoLayoutHierarchy
@@ -380,7 +357,6 @@ function coerceTemplate(raw: unknown): ScreenTemplate | null {
     nodeId: str(r.nodeId, r.id),
     name: r.name,
     description: str(r.description),
-    preview: r.preview,
     canvasSize: coerceCanvasSize(r.canvasSize),
     figmaUrl: str(r.figmaUrl),
     associatedComponents: coerceStringArray(r.associatedComponents),
@@ -460,6 +436,13 @@ export interface AiScreenTemplateContext {
   layoutStructure: string;
   autoLayoutHierarchy: AutoLayoutNode[];
   designNotes?: string;
+  /**
+   * Path (relative to client/src) of the LIVE front-end implementation of this
+   * screen — a real Fiber-component composition the AI can reference for layout
+   * patterns, spacing and component composition. The registry that resolves
+   * these lazily lives at templates/registry.tsx.
+   */
+  liveImplementationPath: string;
 }
 
 /**
@@ -473,6 +456,11 @@ export interface AiScreenTemplateContext {
  * is the structural seam the AI generation pipeline will consume later. Preview
  * images and Figma URLs are intentionally omitted from the projection because
  * they are not useful as text grounding context.
+ *
+ * Each entry now also points at a LIVE front-end implementation
+ * (`liveImplementationPath`, resolved lazily via templates/registry.tsx): the
+ * real Fiber-component composition of the screen, which is the richest grounding
+ * signal for future AI generation.
  */
 export function listTemplatesForAiContext(): AiScreenTemplateContext[] {
   return screenTemplateRepository.list().map((t) => ({
@@ -484,5 +472,6 @@ export function listTemplatesForAiContext(): AiScreenTemplateContext[] {
     layoutStructure: t.layoutStructure,
     autoLayoutHierarchy: t.autoLayoutHierarchy,
     designNotes: t.designNotes,
+    liveImplementationPath: `templates/screens/screen-${t.id}.tsx`,
   }));
 }

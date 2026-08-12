@@ -1,0 +1,104 @@
+# Task: Rework the Screen Templates Module
+
+## Description
+
+The current implementation misunderstands the purpose of the **Screen Templates** module.
+
+I do **not** want a gallery of images, screenshots, or Auto Layout diagrams. That doesn't help the AI understand how our Design System is actually used.
+
+Instead, I want every template to be built as a **real front-end implementation** using the same Fiber Design System components imported from Figma.
+
+The template should be a live screen, not a static reference.
+
+---
+
+## Objective
+
+When I provide a Figma screen, convert it into a **fully functional front-end screen** using the imported Fiber Design System components.
+
+The goal is to reproduce the screen exactly as it appears in Figma while preserving the original component structure.
+
+---
+
+## Requirements
+
+For every template that I provide:
+
+- Read the Figma screen.
+- Build the screen using the existing Fiber Design System components.
+- Do not use screenshots or images as the reference.
+- Do not create static mockups.
+- Render actual reusable components.
+
+Every button, input, table, card, navigation, dialog, and layout should come from the Fiber Design System components already available in the application.
+
+---
+
+## Design Fidelity
+
+The generated screen should match the Figma design as closely as possible.
+
+Preserve:
+
+- Layout
+- Auto Layout behavior
+- Spacing
+- Typography
+- Colors
+- Component hierarchy
+- Component properties
+- Variants
+- Tokens
+- Variables
+
+Do not approximate or redesign the screen.
+
+---
+
+## Component Usage
+
+The purpose of these templates is to teach the system **how components are actually composed together**.
+
+For example, the AI should understand:
+
+- Which components are commonly used together.
+- How layouts are structured.
+- How spacing is applied.
+- How components are nested.
+- How real product screens are assembled.
+
+This understanding is much more valuable than simply viewing a screenshot.
+
+---
+
+## Screen Viewer
+
+Each template should open as a live page.
+
+The screen should behave like a real application screen built with front-end components.
+
+This allows us to inspect and understand how the Design System is used in practice.
+
+---
+
+## Future Purpose
+
+These templates will become reference implementations for future AI-generated prototypes.
+
+Instead of generating generic layouts, the AI should learn from these real screens and understand:
+
+- Design patterns
+- Component composition
+- Layout consistency
+- Reusable UI structures
+- Product design standards
+
+---
+
+## Focus
+
+The Screen Templates module is **not** an image library.
+
+It is a **library of real, front-end implementations** built from Figma using the existing Fiber Design System components.
+
+The goal is for the AI to understand both the visual design and the implementation of our Design System by studying complete, production-like screens.

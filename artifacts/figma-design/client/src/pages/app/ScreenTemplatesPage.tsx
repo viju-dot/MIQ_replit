@@ -2,38 +2,39 @@
  * Fiber Workspace — Screen Templates (/screen-templates)
  *
  * A READ-ONLY reference library of best-practice Fiber Design System screens.
- * Component pages and Component Rules teach the AI about individual components;
- * Screen Templates teach it how those components are *composed* into complete
- * product screens (layout patterns, Auto Layout usage, spacing, hierarchy).
- * There is NO editing here — these are references that will ground future
- * AI-generated prototypes.
+ * Each template is now a LIVE front-end screen built from real Fiber components
+ * (registered in templates/registry.tsx), NOT a screenshot. Component pages and
+ * Component Rules teach the AI about individual components; Screen Templates
+ * teach it how those components are *composed* into complete product screens.
  *
  * ROUTES (registered in App.tsx):
- *   /screen-templates      → gallery of template cards (this default export)
- *   /screen-templates/:id  → read-only detail page (ScreenTemplateDetailPage)
+ *   /screen-templates      → gallery of cards with LIVE miniatures
+ *   /screen-templates/:id  → detail page: the LIVE screen in a viewer region
+ *
+ * The live template screens are designed light-mode at fixed widths
+ * (canvasSize.width). The gallery miniature scales the real component down via
+ * CSS transform; the detail viewer renders it at natural width, horizontally
+ * centered, with horizontal scroll when the viewport is narrower. Both wrap the
+ * render region in a light surface so it stays correct in app dark mode.
  *
  * COLOR CONVENTION: token-driven colors use inline style objects
  * (var(--token, fallbackHex)); layout / spacing / typography-size stay classes.
  * ========================================================================= */
 
-import { useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "wouter";
 import {
   SquaresFour,
-  Stack,
   ArrowLeft,
   ArrowSquareOut,
   Cube,
   Browsers,
-  Layout,
-  type IconProps,
 } from "@phosphor-icons/react";
 import {
   screenTemplateRepository,
-  previewUrl,
   type ScreenTemplate,
-  type AutoLayoutNode,
 } from "@/lib/screenTemplateStore";
+import { getTemplateComponent } from "@/templates/registry";
 
 const C = {
   surface: "var(--surface-background-lvl1,#ffffff)",
@@ -45,11 +46,22 @@ const C = {
   brandSubtle: "var(--container-dynamic-brand-subtle-background-default,#f6ebff)",
   brandFg: "var(--surface-foreground-dynamic-brand-default,#7c33b5)",
   hoverBg: "var(--container-dynamic-neutral-subtle-background-hover,#71718014)",
+  // A fixed light backdrop for the live render region (screens are light-mode).
+  viewerBg: "#f7f7fa",
 };
 
 /* ---------------------------------------------------------------------- */
 /* Shared bits                                                             */
 /* ---------------------------------------------------------------------- */
+
+/**
+ * The HTML `inert` attribute makes a subtree non-interactive AND removes every
+ * descendant from the tab order (unlike pointer-events:none + aria-hidden,
+ * which leaves focusable controls tabbable). React 18's types don't include
+ * `inert`, so spread it via `any`. Presence of the attribute (even "") is what
+ * activates it in the DOM.
+ */
+const INERT_PROPS = { inert: "" } as unknown as Record<string, unknown>;
 
 /** A small component tag pill. */
 function ComponentTag({ label }: { label: string }) {
@@ -60,6 +72,170 @@ function ComponentTag({ label }: { label: string }) {
     >
       {label}
     </span>
+  );
+}
+
+/** Loading placeholder used while a live screen lazily loads. */
+function ScreenLoading() {
+  return (
+    <div className="flex h-[240px] w-full items-center justify-center">
+      <span className="text-[13px]" style={{ color: C.textMuted }}>
+        Loading live screen…
+      </span>
+    </div>
+  );
+}
+
+/** Fallback shown when a template id has no registered live component. */
+function NoLiveImplementation() {
+  return (
+    <div
+      className="flex h-[240px] w-full flex-col items-center justify-center gap-1 p-6 text-center"
+      style={{ backgroundColor: C.canvasBg }}
+    >
+      <p className="text-[14px] font-medium" style={{ color: C.textPrimary }}>
+        No live implementation
+      </p>
+      <p className="text-[12px]" style={{ color: C.textMuted }}>
+        A live screen has not been registered for this template yet.
+      </p>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------------- */
+/* Live miniature (gallery thumbnail)                                      */
+/* ---------------------------------------------------------------------- */
+
+const MINI_HEIGHT = 200; // px — fixed card preview height
+
+/**
+ * A lightweight neutral placeholder shown before a miniature enters the
+ * viewport — a subtle animated skeleton the size of the preview box. It keeps
+ * the gallery cheap: full screen components are NOT mounted until near-view.
+ */
+function MiniatureSkeleton() {
+  return (
+    <div
+      aria-hidden="true"
+      className="flex h-full w-full items-end"
+      style={{ backgroundColor: C.viewerBg }}
+    >
+      <div className="w-full animate-pulse p-4">
+        <div className="mb-3 h-10 w-full rounded" style={{ backgroundColor: C.hoverBg }} />
+        <div className="mb-2 h-4 w-2/3 rounded" style={{ backgroundColor: C.hoverBg }} />
+        <div className="h-4 w-1/2 rounded" style={{ backgroundColor: C.hoverBg }} />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * True once the referenced element has come within `rootMargin` of the
+ * viewport at least once. Latches to true (once visible we keep it mounted).
+ */
+function useNearViewport(
+  ref: React.RefObject<Element>,
+  rootMargin = "200px",
+): boolean {
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    if (near) return; // already latched
+    const el = ref.current;
+    if (!el) return;
+    // No IntersectionObserver (SSR / very old env) → mount immediately.
+    if (typeof IntersectionObserver === "undefined") {
+      setNear(true);
+      return;
+    }
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setNear(true);
+          obs.disconnect();
+        }
+      },
+      { rootMargin },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [ref, rootMargin, near]);
+  return near;
+}
+
+/**
+ * Renders the ACTUAL template component scaled down to fit a fixed-height,
+ * clipped container — but only once the card is near the viewport
+ * (IntersectionObserver-gated) so the gallery doesn't eagerly mount all 8 full
+ * screens. Once mounted it stays mounted.
+ *
+ * The render subtree is marked `inert` (removes tab stops + blocks interaction)
+ * and aria-hidden, so the surrounding card <Link> owns all interaction and no
+ * hidden control is keyboard-reachable.
+ */
+function LiveMiniature({ template }: { template: ScreenTemplate }) {
+  const Comp = getTemplateComponent(template.id);
+  const width = template.canvasSize.width || 1280;
+  const boxRef = useRef<HTMLDivElement>(null);
+  const near = useNearViewport(boxRef, "200px");
+
+  return (
+    <div
+      ref={boxRef}
+      aria-hidden="true"
+      {...INERT_PROPS}
+      className="relative h-[200px] w-full overflow-hidden border-b"
+      style={{ backgroundColor: C.viewerBg, borderColor: C.border }}
+    >
+      {!near ? (
+        <MiniatureSkeleton />
+      ) : Comp ? (
+        <MiniatureScale width={width}>
+          <Suspense fallback={<MiniatureSkeleton />}>
+            <Comp />
+          </Suspense>
+        </MiniatureScale>
+      ) : (
+        <NoLiveImplementation />
+      )}
+    </div>
+  );
+}
+
+/**
+ * Scales its children (a natural-width screen) down so the screen's width fits
+ * the card. Uses a probe container to size the scaled block; the screen is
+ * top-anchored and clipped to MINI_HEIGHT by the parent.
+ */
+function MiniatureScale({
+  width,
+  children,
+}: {
+  width: number;
+  children: React.ReactNode;
+}) {
+  // We don't know the intrinsic height, so scale purely by width and clip.
+  // Measure the card width via a ref-less CSS trick: the outer container is
+  // full-width; we scale by (containerWidth / screenWidth). Since we can't read
+  // the container synchronously here, we scale to a nominal card width and let
+  // overflow clip. Use a CSS custom approach: place the screen at natural width
+  // and scale via transform with transform-origin top-left, sizing the wrapper
+  // to 100% and letting the transform map screenWidth → 100%.
+  return (
+    <div
+      className="pointer-events-none absolute left-0 top-0"
+      style={{
+        width,
+        transform: `scale(var(--mini-scale))`,
+        transformOrigin: "top left",
+        // Fallback scale if the CSS var isn't set (roughly 360/width).
+        // The container query below sets --mini-scale to containerWidth/width.
+        // @ts-expect-error custom property
+        "--mini-scale": `calc(100cqw / ${width})`,
+      }}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -83,17 +259,10 @@ function TemplateCard({ template }: { template: ScreenTemplate }) {
         borderColor: hover ? C.brandFg : C.border,
       }}
     >
-      {/* Thumbnail — top-anchored crop of the tall screen preview. */}
-      <div
-        className="relative h-[200px] w-full overflow-hidden border-b"
-        style={{ backgroundColor: C.canvasBg, borderColor: C.border }}
-      >
-        <img
-          src={previewUrl(template)}
-          alt={`Preview of ${template.name}`}
-          loading="lazy"
-          className="absolute left-0 top-0 w-full object-cover object-top"
-        />
+      {/* Live miniature — a real, scaled-down, non-interactive render. The
+          container query context lets the miniature scale to the card width. */}
+      <div style={{ containerType: "inline-size", height: MINI_HEIGHT }}>
+        <LiveMiniature template={template} />
       </div>
 
       {/* Body */}
@@ -147,10 +316,10 @@ export default function ScreenTemplatesPage(): JSX.Element {
           className="max-w-[680px] text-[length:var(--body-lg-regular-size,16px)]"
           style={{ color: C.textMuted }}
         >
-          A reference library of best-practice Fiber Design System screens. These templates capture
-          how components are composed into complete interfaces — layout patterns, Auto Layout usage,
-          spacing and component hierarchy — and will ground future AI-generated prototypes so they
-          match our real product design language.
+          A reference library of best-practice Fiber Design System screens. Each template is a live
+          front-end screen built from real Fiber components — capturing how components are composed
+          into complete interfaces — and will ground future AI-generated prototypes so they match
+          our real product design language.
         </p>
       </div>
 
@@ -175,82 +344,6 @@ export default function ScreenTemplatesPage(): JSX.Element {
 /* ---------------------------------------------------------------------- */
 /* Detail (/screen-templates/:id)                                          */
 /* ---------------------------------------------------------------------- */
-
-/** A titled section with an icon header. */
-function DetailSection({
-  icon: Icon,
-  title,
-  children,
-}: {
-  icon: React.ComponentType<IconProps>;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section
-      className="flex flex-col gap-[var(--spacing-150,12px)] rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-300,24px)]"
-      style={{ backgroundColor: C.surface, borderColor: C.border }}
-    >
-      <div className="flex items-center gap-[var(--spacing-100,8px)]">
-        <Icon size={18} style={{ color: C.brandFg }} />
-        <h2
-          className="text-[length:var(--headline-xs-medium-size,16px)] font-semibold"
-          style={{ color: C.textPrimary }}
-        >
-          {title}
-        </h2>
-      </div>
-      {children}
-    </section>
-  );
-}
-
-/** Recursively render the Auto Layout hierarchy as an indented tree. */
-function HierarchyTree({ nodes, depth = 0 }: { nodes: AutoLayoutNode[]; depth?: number }) {
-  return (
-    <ul className={depth === 0 ? "flex flex-col gap-[var(--spacing-100,8px)]" : "flex flex-col gap-[var(--spacing-100,8px)]"}>
-      {nodes.map((node, i) => (
-        <li key={`${node.name}-${i}`} className="flex flex-col gap-[var(--spacing-100,8px)]">
-          <div
-            className="flex flex-col gap-0.5 rounded-[var(--radius-50,4px)] border border-solid px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)]"
-            style={{ backgroundColor: C.canvasBg, borderColor: C.border }}
-          >
-            <div className="flex items-center gap-[var(--spacing-100,8px)]">
-              <span
-                className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
-                style={{ backgroundColor: C.brandSubtle, color: C.brandFg }}
-              >
-                {node.kind}
-              </span>
-              <span
-                className="text-[length:var(--body-md-medium-size,14px)] font-medium"
-                style={{ color: C.textPrimary }}
-              >
-                {node.name}
-              </span>
-            </div>
-            {node.note && (
-              <p
-                className="text-[length:var(--body-sm-regular-size,12px)]"
-                style={{ color: C.textMuted }}
-              >
-                {node.note}
-              </p>
-            )}
-          </div>
-          {node.children && node.children.length > 0 && (
-            <div
-              className="ml-[var(--spacing-250,20px)] border-l pl-[var(--spacing-200,16px)]"
-              style={{ borderColor: C.border }}
-            >
-              <HierarchyTree nodes={node.children} depth={depth + 1} />
-            </div>
-          )}
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 /** Back-to-gallery link. */
 function BackLink() {
@@ -279,7 +372,7 @@ function FigmaLink({ href }: { href: string }) {
       rel="noopener noreferrer"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      className="inline-flex items-center gap-1.5 rounded-[var(--radius-50,4px)] border px-3 py-2 text-[13px] font-medium transition-colors"
+      className="inline-flex shrink-0 items-center gap-1.5 rounded-[var(--radius-50,4px)] border px-3 py-2 text-[13px] font-medium transition-colors"
       style={{
         borderColor: C.border,
         backgroundColor: hover ? C.hoverBg : C.surface,
@@ -328,6 +421,43 @@ function TemplateNotFound({ id }: { id: string }) {
   );
 }
 
+/**
+ * The primary live-screen viewer. Renders the real template component at its
+ * natural width (canvasSize.width), horizontally centered, with horizontal
+ * scroll when the viewport is narrower. The surface stays light (screens are
+ * light-mode) so it renders correctly under app dark mode.
+ */
+function LiveScreenViewer({ template }: { template: ScreenTemplate }) {
+  const Comp = getTemplateComponent(template.id);
+  const width = template.canvasSize.width || 1280;
+
+  return (
+    <div
+      className="overflow-x-auto rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-300,24px)]"
+      style={{ backgroundColor: C.viewerBg, borderColor: C.border }}
+    >
+      <div className="mx-auto" style={{ width }}>
+        {/* The rendered template is a static reference implementation: `inert`
+            removes every descendant from the tab order and blocks interaction,
+            so the detail screen is read-only for mouse AND keyboard users. */}
+        <div
+          {...INERT_PROPS}
+          className="overflow-hidden rounded-[var(--radius-50,4px)] shadow-sm"
+          style={{ backgroundColor: C.surface }}
+        >
+          {Comp ? (
+            <Suspense fallback={<ScreenLoading />}>
+              <Comp />
+            </Suspense>
+          ) : (
+            <NoLiveImplementation />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ScreenTemplateDetailPage(): JSX.Element {
   const params = useParams();
   const id = params.id ?? "";
@@ -336,120 +466,52 @@ export function ScreenTemplateDetailPage(): JSX.Element {
   if (!template) return <TemplateNotFound id={id} />;
 
   return (
-    <div className="mx-auto w-full max-w-[1080px] px-6 py-8 md:px-10 md:py-10">
+    <div className="mx-auto w-full max-w-[1280px] px-6 py-8 md:px-10 md:py-10">
       <BackLink />
 
-      {/* Title row */}
-      <div className="mt-[var(--spacing-250,20px)] flex flex-col gap-[var(--spacing-200,16px)] md:flex-row md:items-start md:justify-between">
-        <div className="flex flex-col gap-[var(--spacing-100,8px)]">
+      {/* Compact info bar */}
+      <div
+        className="mt-[var(--spacing-250,20px)] flex flex-col gap-[var(--spacing-150,12px)] rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-300,24px)] md:flex-row md:items-start md:justify-between"
+        style={{ backgroundColor: C.surface, borderColor: C.border }}
+      >
+        <div className="flex min-w-0 flex-col gap-[var(--spacing-100,8px)]">
           <h1
-            className="text-[length:var(--headline-lg-semibold-size,28px)] font-semibold tracking-[-1px]"
+            className="text-[length:var(--headline-md-semibold-size,24px)] font-semibold tracking-[-0.5px]"
             style={{ color: C.textPrimary }}
           >
             {template.name}
           </h1>
           <p
-            className="max-w-[640px] text-[length:var(--body-lg-regular-size,16px)]"
+            className="max-w-[720px] text-[length:var(--body-md-regular-size,14px)]"
             style={{ color: C.textMuted }}
           >
             {template.description}
           </p>
-          <p
-            className="text-[length:var(--body-sm-regular-size,12px)]"
-            style={{ color: C.textMuted }}
-          >
-            Canvas {template.canvasSize.width} × {template.canvasSize.height} px · Reference only
-          </p>
-        </div>
-        {template.figmaUrl && (
-          <div className="shrink-0">
-            <FigmaLink href={template.figmaUrl} />
-          </div>
-        )}
-      </div>
-
-      <div className="mt-[var(--spacing-400,32px)] grid grid-cols-1 gap-[var(--spacing-250,20px)] lg:grid-cols-[minmax(0,1fr)_360px]">
-        {/* Left: full scrollable preview */}
-        <DetailSection icon={Browsers} title="Preview">
-          <p
-            className="text-[length:var(--body-sm-regular-size,12px)]"
-            style={{ color: C.textMuted }}
-          >
-            Full screen preview — scroll to see the complete composition.
-          </p>
-          <div
-            className="max-h-[720px] overflow-auto rounded-[var(--radius-50,4px)] border"
-            style={{ backgroundColor: C.canvasBg, borderColor: C.border }}
-          >
-            <img
-              src={previewUrl(template)}
-              alt={`Full preview of ${template.name}`}
-              className="block w-full"
-            />
-          </div>
-        </DetailSection>
-
-        {/* Right: structured metadata */}
-        <div className="flex flex-col gap-[var(--spacing-250,20px)]">
-          <DetailSection icon={Layout} title="Layout Structure">
-            <p
-              className="text-[length:var(--body-md-regular-size,14px)] leading-relaxed"
-              style={{ color: C.textBody }}
-            >
-              {template.layoutStructure}
-            </p>
-          </DetailSection>
-
-          <DetailSection icon={Cube} title="Associated Components">
-            {template.associatedComponents.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5">
-                {template.associatedComponents.map((c) => (
-                  <ComponentTag key={c} label={c} />
-                ))}
-              </div>
-            ) : (
-              <p
-                className="text-[length:var(--body-md-regular-size,14px)]"
+          {template.associatedComponents.length > 0 && (
+            <div className="mt-[var(--spacing-50,4px)] flex flex-wrap items-center gap-1.5">
+              <span
+                className="mr-1 inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide"
                 style={{ color: C.textMuted }}
               >
-                No components recorded.
-              </p>
-            )}
-          </DetailSection>
-
-          {template.designNotes && (
-            <DetailSection icon={Stack} title="Design Notes">
-              <p
-                className="text-[length:var(--body-md-regular-size,14px)] leading-relaxed"
-                style={{ color: C.textBody }}
-              >
-                {template.designNotes}
-              </p>
-            </DetailSection>
+                <Cube size={13} style={{ color: C.brandFg }} />
+                Components
+              </span>
+              {template.associatedComponents.map((c) => (
+                <ComponentTag key={c} label={c} />
+              ))}
+            </div>
           )}
+          <p className="text-[11px]" style={{ color: C.textMuted }}>
+            Live screen · {template.canvasSize.width} × {template.canvasSize.height} px · Reference
+            implementation — interactions disabled
+          </p>
         </div>
+        {template.figmaUrl && <FigmaLink href={template.figmaUrl} />}
       </div>
 
-      {/* Auto Layout hierarchy — full width below */}
+      {/* Primary content: the LIVE screen */}
       <div className="mt-[var(--spacing-250,20px)]">
-        <DetailSection icon={Stack} title="Auto Layout Hierarchy">
-          <p
-            className="text-[length:var(--body-sm-regular-size,12px)]"
-            style={{ color: C.textMuted }}
-          >
-            The vertical page flow captured from the source Figma frame.
-          </p>
-          {template.autoLayoutHierarchy.length > 0 ? (
-            <HierarchyTree nodes={template.autoLayoutHierarchy} />
-          ) : (
-            <p
-              className="text-[length:var(--body-md-regular-size,14px)]"
-              style={{ color: C.textMuted }}
-            >
-              No hierarchy recorded.
-            </p>
-          )}
-        </DetailSection>
+        <LiveScreenViewer template={template} />
       </div>
     </div>
   );
