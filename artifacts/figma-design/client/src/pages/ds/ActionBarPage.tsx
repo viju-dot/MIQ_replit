@@ -143,6 +143,7 @@ function ActionBar({
 
 const config: PlaygroundConfig = {
   name: "Action Bar",
+  scopeId: "action-bar/action-bar",
   description:
     "Contextual bulk-action bar shown when rows are selected — Brand and White types.",
   controls: [

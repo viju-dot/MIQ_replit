@@ -163,6 +163,7 @@ function SingleRadioPreview({
 
 const radioConfig: PlaygroundConfig = {
   name: "Radio",
+  scopeId: "radio/radio",
   description:
     "Single-select control — Selected / Unselected states, optional label with editable text, and disabled variants.",
   controls: [
@@ -280,6 +281,7 @@ let groupSelected = 0;
 
 const groupConfig: PlaygroundConfig = {
   name: "Radio group",
+  scopeId: "radio/radio-group",
   description: "A titled set of radios where only one option can be selected at a time.",
   controls: [
     {

@@ -609,6 +609,7 @@ const standardStates: StandardState[] = [
 
 const standardConfig: PlaygroundConfig = {
   name: "Search / Standard",
+  scopeId: "search/search-standard",
   description:
     "Compact search input — interactive states, optional Background surface, and trailing action icon.",
   controls: [
@@ -662,6 +663,7 @@ const standardConfig: PlaygroundConfig = {
 
 const universalConfig: PlaygroundConfig = {
   name: "Universal Search",
+  scopeId: "search/universal-search",
   description:
     "Full command-palette overlay — Zero (recent), Filled (results), and AI-assisted states.",
   controls: [

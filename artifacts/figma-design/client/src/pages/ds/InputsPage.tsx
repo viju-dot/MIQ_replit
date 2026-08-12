@@ -665,6 +665,7 @@ const sharedTokens = {
 
 const standardConfig: PlaygroundConfig = {
   name: "Input / Standard",
+  scopeId: "inputs/input-standard",
   description:
     "Text field with State, optional Title, right info icon, and metadata badge (left/right).",
   controls: [
@@ -712,6 +713,7 @@ const standardConfig: PlaygroundConfig = {
 
 const passwordConfig: PlaygroundConfig = {
   name: "Input / Password",
+  scopeId: "inputs/input-password",
   description: "Password field with State, optional Title, and toggle to show/hide the value.",
   controls: [
     {
@@ -746,6 +748,7 @@ const passwordConfig: PlaygroundConfig = {
 
 const rangeConfig: PlaygroundConfig = {
   name: "Input / Range",
+  scopeId: "inputs/input-range",
   description: "Date range field with per-state appearance and a compact size.",
   controls: [
     {

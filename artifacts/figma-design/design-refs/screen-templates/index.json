@@ -1,0 +1,90 @@
+[
+  {
+    "nodeId": "60141-191669",
+    "name": "OMC Activation — Step 1",
+    "preview": "figmaAssets/screen-templates/60141-191669.png",
+    "canvasSize": {
+      "width": 1280,
+      "height": 793
+    },
+    "figmaUrl": "https://www.figma.com/design/cRnPCxZX2PHu3DCNT2RWfy/branch/Dmze2bKgXnIf8qQ3lqPjlK/Sigma---CRAC?node-id=60141-191669",
+    "metadataXml": "design-refs/screen-templates/60141-191669.xml"
+  },
+  {
+    "nodeId": "60948-294415",
+    "name": "OMC Activation — Competitive Conquesting",
+    "preview": "figmaAssets/screen-templates/60948-294415.png",
+    "canvasSize": {
+      "width": 1280,
+      "height": 1469
+    },
+    "figmaUrl": "https://www.figma.com/design/cRnPCxZX2PHu3DCNT2RWfy/branch/Dmze2bKgXnIf8qQ3lqPjlK/Sigma---CRAC?node-id=60948-294415",
+    "metadataXml": "design-refs/screen-templates/60948-294415.xml"
+  },
+  {
+    "nodeId": "60948-858701",
+    "name": "OMC Activation — Reach & Frequency Optimization",
+    "preview": "figmaAssets/screen-templates/60948-858701.png",
+    "canvasSize": {
+      "width": 1280,
+      "height": 2435
+    },
+    "figmaUrl": "https://www.figma.com/design/cRnPCxZX2PHu3DCNT2RWfy/branch/Dmze2bKgXnIf8qQ3lqPjlK/Sigma---CRAC?node-id=60948-858701",
+    "metadataXml": "design-refs/screen-templates/60948-858701.xml"
+  },
+  {
+    "nodeId": "61689-177110",
+    "name": "Activation Strategy Review",
+    "preview": "figmaAssets/screen-templates/61689-177110.png",
+    "canvasSize": {
+      "width": 1280,
+      "height": 1614
+    },
+    "figmaUrl": "https://www.figma.com/design/cRnPCxZX2PHu3DCNT2RWfy/branch/Dmze2bKgXnIf8qQ3lqPjlK/Sigma---CRAC?node-id=61689-177110",
+    "metadataXml": "design-refs/screen-templates/61689-177110.xml"
+  },
+  {
+    "nodeId": "62298-272589",
+    "name": "Intelligence Patient Hub",
+    "preview": "figmaAssets/screen-templates/62298-272589.png",
+    "canvasSize": {
+      "width": 1280,
+      "height": 4396
+    },
+    "figmaUrl": "https://www.figma.com/design/cRnPCxZX2PHu3DCNT2RWfy/branch/Dmze2bKgXnIf8qQ3lqPjlK/Sigma---CRAC?node-id=62298-272589",
+    "metadataXml": "design-refs/screen-templates/62298-272589.xml"
+  },
+  {
+    "nodeId": "66895-318383",
+    "name": "Campaign Planning — Stage 1",
+    "preview": "figmaAssets/screen-templates/66895-318383.png",
+    "canvasSize": {
+      "width": 1024,
+      "height": 2403
+    },
+    "figmaUrl": "https://www.figma.com/design/cRnPCxZX2PHu3DCNT2RWfy/branch/Dmze2bKgXnIf8qQ3lqPjlK/Sigma---CRAC?node-id=66895-318383",
+    "metadataXml": "design-refs/screen-templates/66895-318383.xml"
+  },
+  {
+    "nodeId": "67205-212808",
+    "name": "Plan Channel",
+    "preview": "figmaAssets/screen-templates/67205-212808.png",
+    "canvasSize": {
+      "width": 1280,
+      "height": 4302
+    },
+    "figmaUrl": "https://www.figma.com/design/cRnPCxZX2PHu3DCNT2RWfy/branch/Dmze2bKgXnIf8qQ3lqPjlK/Sigma---CRAC?node-id=67205-212808",
+    "metadataXml": "design-refs/screen-templates/67205-212808.xml"
+  },
+  {
+    "nodeId": "68993-615950",
+    "name": "Campaign Planning — Step 4",
+    "preview": "figmaAssets/screen-templates/68993-615950.png",
+    "canvasSize": {
+      "width": 1280,
+      "height": 1960
+    },
+    "figmaUrl": "https://www.figma.com/design/cRnPCxZX2PHu3DCNT2RWfy/branch/Dmze2bKgXnIf8qQ3lqPjlK/Sigma---CRAC?node-id=68993-615950",
+    "metadataXml": "design-refs/screen-templates/68993-615950.xml"
+  }
+]

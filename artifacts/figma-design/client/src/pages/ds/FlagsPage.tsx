@@ -135,6 +135,7 @@ function FlagsGallery({
 
 const config: PlaygroundConfig = {
   name: "Flags",
+  scopeId: "flags/flags",
   description:
     "Country flag assets at the three documented sizes. Filter by name to browse.",
   controls: [

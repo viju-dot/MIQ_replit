@@ -254,6 +254,7 @@ function AtomicCategoryGroup({ active }: { active: string }) {
 
 const pageConfig: PlaygroundConfig = {
   name: "Page",
+  scopeId: "page/page",
   description:
     "Responsive layout template: navigation + swap instance body, with an optional page footer.",
   controls: [
@@ -280,6 +281,7 @@ const pageConfig: PlaygroundConfig = {
 
 const navigationConfig: PlaygroundConfig = {
   name: "Navigation",
+  scopeId: "page/navigation",
   description:
     "Primary navigation bar (brand, menu, language, avatar) plus the secondary navigation strip.",
   controls: [],
@@ -304,6 +306,7 @@ const navigationConfig: PlaygroundConfig = {
 
 const categoryConfig: PlaygroundConfig = {
   name: "Atomic design category",
+  scopeId: "page/atomic-design-category",
   description:
     "The atomic-design hierarchy group. Select which category is highlighted as the current level.",
   controls: [

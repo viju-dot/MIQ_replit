@@ -698,6 +698,7 @@ function SigmaFrame({ type }: { type: SigmaType }) {
 
 const sigmaConfig: PlaygroundConfig = {
   name: "Sigma Logo",
+  scopeId: "logos/sigma-logo",
   description: "The Sigma product mark — Linear wordmark, IconLight, Full lockup, and Favicon.",
   controls: [
     {
@@ -722,6 +723,7 @@ const sigmaConfig: PlaygroundConfig = {
 
 const miqConfig: PlaygroundConfig = {
   name: "MiQ",
+  scopeId: "logos/miq",
   description: "The MiQ master logo and the compact “Powered by MiQ” footer mark.",
   controls: [
     {
@@ -751,6 +753,7 @@ const miqConfig: PlaygroundConfig = {
 
 const faviconConfig: PlaygroundConfig = {
   name: "Favicon & i-Dot",
+  scopeId: "logos/favicon-and-i-dot",
   description: "The gradient favicon tile and the standalone i-Dot mark.",
   controls: [
     {
@@ -782,6 +785,7 @@ const faviconConfig: PlaygroundConfig = {
 
 const loadingConfig: PlaygroundConfig = {
   name: "Loading",
+  scopeId: "logos/loading",
   description: "Loader spinner — four rotational variants over the UP gradient ring.",
   controls: [
     {

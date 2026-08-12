@@ -220,6 +220,7 @@ const stateLabelToKey: Record<string, IndicatorState> = {
 
 const indicatorConfig: PlaygroundConfig = {
   name: "Stepper Indicator",
+  scopeId: "stepper/stepper-indicator",
   description: "The 24px indicator dot — explore each State × Status combination.",
   controls: [
     {
@@ -248,6 +249,7 @@ const indicatorConfig: PlaygroundConfig = {
 
 const stageConfig: PlaygroundConfig = {
   name: "Stage & Metadata",
+  scopeId: "stepper/stage-and-metadata",
   description: "Step label with optional metadata line beside an indicator.",
   controls: [
     { kind: "boolean", name: "active", label: "Active", defaultValue: true },
@@ -285,6 +287,7 @@ const stageConfig: PlaygroundConfig = {
 
 const horizontalConfig: PlaygroundConfig = {
   name: "Stepper — Horizontal",
+  scopeId: "stepper/stepper-horizontal",
   description: "Horizontal progress stepper with a configurable number of steps.",
   controls: [
     {
@@ -311,6 +314,7 @@ const horizontalConfig: PlaygroundConfig = {
 
 const verticalConfig: PlaygroundConfig = {
   name: "Stepper — Vertical",
+  scopeId: "stepper/stepper-vertical",
   description: "Vertical progress stepper with a configurable number of steps.",
   controls: [
     {

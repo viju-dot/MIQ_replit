@@ -1,0 +1,10 @@
+<instance id="67205:212808" name="Page" x="2841" y="11030" width="1280" height="4302">
+  <instance id="0:3458" name="Navigation" x="0" y="0" width="1280" height="120" />
+  <frame id="0:3784" name="body" x="0" y="152" width="1280" height="4021">
+    <instance id="0:3785" name="Plan channel" x="64" y="0" width="1152" height="3989" />
+  </frame>
+  <frame id="0:4999" name="Frame 3386" x="0" y="4236" width="1280" height="66">
+    <instance id="0:5000" name="Footer - Page" x="0" y="0" width="1280" height="66" />
+  </frame>
+</instance>
+IMPORTANT: After you call this tool, you MUST call get_design_context if trying to implement the design, since this tool only returns metadata. If you do not call get_design_context, the agent will not be able to implement the design.

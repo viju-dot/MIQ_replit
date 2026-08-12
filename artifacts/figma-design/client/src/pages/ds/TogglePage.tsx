@@ -69,6 +69,7 @@ function FiberToggle({
 
 const config: PlaygroundConfig = {
   name: "Toggle",
+  scopeId: "toggle/toggle",
   description: "Switch control — Compact and Large sizes, with disabled states.",
   controls: [
     {

@@ -145,6 +145,7 @@ function GlobalBanner({
 
 const bannerConfig: PlaygroundConfig = {
   name: "Notification Global Banner",
+  scopeId: "notification/notification-global-banner",
   description:
     "Full-width page-level banner — Good News / Informative / Bad News / Celebratory, Standard or Paragraph.",
   controls: [
@@ -336,6 +337,7 @@ function Alert({
 
 const alertConfig: PlaygroundConfig = {
   name: "Alert",
+  scopeId: "notification/alert",
   description:
     "Inline alert — Danger / Info / Success / Warning, with optional border, compact size, description and close.",
   controls: [
@@ -520,6 +522,7 @@ function NotificationCard({
 
 const cardConfig: PlaygroundConfig = {
   name: "Notification Card",
+  scopeId: "notification/notification-card",
   description:
     "Single notification card — new (bold, unread dot) or read, with an optional hover background.",
   controls: [
@@ -726,6 +729,7 @@ function NotificationDropdown({ empty }: { empty: boolean }) {
 
 const dropdownConfig: PlaygroundConfig = {
   name: "Notification Dropdown",
+  scopeId: "notification/notification-dropdown",
   description:
     "Notifications panel — default list of items or the empty state.",
   controls: [

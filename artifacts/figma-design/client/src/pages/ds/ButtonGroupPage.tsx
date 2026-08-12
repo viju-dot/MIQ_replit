@@ -299,6 +299,7 @@ const AMOUNT_OPTIONS = ["2", "3", "4", "5"];
 
 const textGroupConfig: PlaygroundConfig = {
   name: "Button Group",
+  scopeId: "button-group/button-group",
   description: "Segmented text buttons — first segment selected, remaining unselected.",
   controls: [
     {
@@ -336,6 +337,7 @@ const textGroupConfig: PlaygroundConfig = {
 
 const iconGroupConfig: PlaygroundConfig = {
   name: "Button Icon Group",
+  scopeId: "button-group/button-icon-group",
   description: "Segmented icon buttons — first segment selected, remaining unselected.",
   controls: [
     {
@@ -365,6 +367,7 @@ const iconGroupConfig: PlaygroundConfig = {
 
 const textSegmentConfig: PlaygroundConfig = {
   name: "Button Group [individuals]",
+  scopeId: "button-group/button-group-individuals",
   description: "A single text segment — explore each side, state and size.",
   controls: [
     {
@@ -406,6 +409,7 @@ const textSegmentConfig: PlaygroundConfig = {
 
 const iconSegmentConfig: PlaygroundConfig = {
   name: "Button Group Icon [individuals]",
+  scopeId: "button-group/button-group-icon-individuals",
   description: "A single icon segment — explore each side, state and size.",
   controls: [
     {

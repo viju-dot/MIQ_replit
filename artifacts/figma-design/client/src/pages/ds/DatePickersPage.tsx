@@ -115,6 +115,7 @@ function RangeInput({
 
 const rangeConfig: PlaygroundConfig = {
   name: "Range input field",
+  scopeId: "date-pickers/range-input-field",
   description: "Date range field — with Date + Time badges or a single date badge.",
   controls: [
     {
@@ -231,6 +232,7 @@ function TimeOnlyPicker(): JSX.Element {
 
 const timeConfig: PlaygroundConfig = {
   name: "Time Only picker",
+  scopeId: "date-pickers/time-only-picker",
   description: "Compact time selector with hours, minutes and AM/PM steppers.",
   controls: [],
   render: () => <TimeOnlyPicker />,
@@ -497,6 +499,7 @@ function DateTimePicker({ month }: { month: string }): JSX.Element {
 
 const dateTimeConfig: PlaygroundConfig = {
   name: "Date + Time picker",
+  scopeId: "date-pickers/date-time-picker",
   description: "Standard calendar with a selected week highlight and a time footer.",
   controls: [
     { kind: "text", name: "month", label: "Header label", defaultValue: "FEBRUARY 2020" },

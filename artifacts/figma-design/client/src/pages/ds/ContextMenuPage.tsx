@@ -336,6 +336,7 @@ function Alert() {
 
 const menuItemConfig: PlaygroundConfig = {
   name: "Menu Item",
+  scopeId: "context-menu/menu-item",
   description:
     "Single menu row — explore each interaction State, optional right caret icon, and the label text.",
   controls: [
@@ -399,6 +400,7 @@ const menuItemConfig: PlaygroundConfig = {
 
 const contextMenusConfig: PlaygroundConfig = {
   name: "Context Menu",
+  scopeId: "context-menu/context-menu",
   description: "Stacked menu rows — set how many items appear and their label.",
   controls: [
     {
@@ -441,6 +443,7 @@ const contextMenusConfig: PlaygroundConfig = {
 
 const contextMenuCheckboxConfig: PlaygroundConfig = {
   name: "Context Menu — Checkbox",
+  scopeId: "context-menu/context-menu-checkbox",
   description:
     "Stacked checkbox rows — set how many options appear and their label.",
   controls: [
@@ -489,6 +492,7 @@ const contextMenuCheckboxConfig: PlaygroundConfig = {
 
 const alertConfig: PlaygroundConfig = {
   name: "Implementation Note",
+  scopeId: "context-menu/implementation-note",
   description:
     "Info alert documenting that the context menu does not yet reuse the menu item component.",
   controls: [],

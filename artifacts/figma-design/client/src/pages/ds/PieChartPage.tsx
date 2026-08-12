@@ -259,6 +259,7 @@ function SmartCard({
 
 const config: PlaygroundConfig = {
   name: "Pie chart",
+  scopeId: "pie-chart/pie-chart",
   description:
     "Plot container + legend inside a Smart Card. Supports 2–7 slices (the 7th being “Others”), with auto light & dark mode.",
   controls: [

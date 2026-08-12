@@ -372,6 +372,7 @@ function renderLeftItem(leftItem: string): React.ReactNode | undefined {
 
 const listItemConfig: PlaygroundConfig = {
   name: "List item",
+  scopeId: "list/list-item",
   description:
     "A single row of the List component — configure its state, slots and text.",
   controls: [
@@ -463,6 +464,7 @@ const listItemConfig: PlaygroundConfig = {
  * ------------------------------------------------------------------------- */
 const listConfig: PlaygroundConfig = {
   name: "List",
+  scopeId: "list/list",
   description: "Wrapper that stacks List items, with an optional scrollbar.",
   controls: [
     {

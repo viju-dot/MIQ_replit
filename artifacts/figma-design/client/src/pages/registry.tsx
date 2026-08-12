@@ -22,7 +22,7 @@ export interface DsPage {
 export const dsPages: DsPage[] = [
   {
     slug: "component-rules",
-    title: "Component Rules",
+    title: "Global Rules Library",
     component: lazy(() => import("@/pages/ds/ComponentRulesPage")),
     workspace: true,
     group: "System",

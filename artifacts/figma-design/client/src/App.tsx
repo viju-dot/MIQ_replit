@@ -35,6 +35,12 @@ import { getPage } from "@/pages/registry";
 const LoginPage = lazy(() => import("@/pages/app/LoginPage"));
 const DashboardPage = lazy(() => import("@/pages/app/DashboardPage"));
 const AiPrototypePage = lazy(() => import("@/pages/app/AiPrototypePage"));
+const ScreenTemplatesPage = lazy(() => import("@/pages/app/ScreenTemplatesPage"));
+const ScreenTemplateDetailPage = lazy(() =>
+  import("@/pages/app/ScreenTemplatesPage").then((m) => ({
+    default: m.ScreenTemplateDetailPage,
+  })),
+);
 const FlowChartPage = lazy(() => import("@/pages/app/FlowChartPage"));
 const UsabilityTestingPage = lazy(() => import("@/pages/app/UsabilityTestingPage"));
 const FlowChartContextPage = lazy(() => import("@/pages/app/FlowChartContextPage"));
@@ -127,6 +133,11 @@ function Router() {
 
       {/* AI Prototype — the central workspace. */}
       <Route path="/ai-prototype">{shell(AiPrototypePage)}</Route>
+
+      {/* Screen Templates — read-only reference library. The detail route is
+          registered BEFORE the gallery landing so it always matches first. */}
+      <Route path="/screen-templates/:id">{shell(ScreenTemplateDetailPage)}</Route>
+      <Route path="/screen-templates">{shell(ScreenTemplatesPage)}</Route>
 
       {/* Prototype-scoped context views — registered BEFORE the bare module
           landings and the /:slug catch-all so they always match first. */}

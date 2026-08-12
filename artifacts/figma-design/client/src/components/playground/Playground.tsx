@@ -1,7 +1,10 @@
 import { useMemo, useState } from "react";
-import { ChevronDown, ChevronLeft, Code2, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, ChevronLeft, Code2, ScrollText, SlidersHorizontal } from "lucide-react";
 import { useTheme } from "@/lib/theme";
 import type { Control, PlaygroundConfig, PropValues } from "./types";
+import { SidePanel } from "@/pages/app/SidePanel";
+import { ComponentRulesPanelBody } from "@/components/ComponentRulesPanel";
+import { extractComponentMeta } from "@/lib/componentMeta";
 
 /*
  * Playground chrome is token-driven: colors reference Figma variables from
@@ -103,6 +106,11 @@ export function Playground({ config }: { config: PlaygroundConfig }) {
   const [values, setValues] = useState<PropValues>(() => defaultsOf(config.controls));
   const [propsOpen, setPropsOpen] = useState(true);
   const [devMode, setDevMode] = useState(false);
+  const [rulesOpen, setRulesOpen] = useState(false);
+
+  // Component metadata for the Component Rules panel is derived from this same
+  // config, so the panel only ever shows properties that actually exist here.
+  const componentMeta = useMemo(() => extractComponentMeta(config), [config]);
 
   const tabControls = config.controls.filter((c) => c.kind === "select" && c.asTabs) as Extract<
     Control,
@@ -144,6 +152,20 @@ export function Playground({ config }: { config: PlaygroundConfig }) {
           >
             <Code2 className="h-3.5 w-3.5" />
             Developer Mode
+          </button>
+          <button
+            type="button"
+            onClick={() => setRulesOpen(true)}
+            aria-haspopup="dialog"
+            className="flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[12px] font-medium transition-colors"
+            style={{
+              borderColor: "var(--border-dynamic-neutral-subtle-default,#c6c6cc)",
+              color: "var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)",
+              background: "transparent",
+            }}
+          >
+            <ScrollText className="h-3.5 w-3.5" />
+            Component Rules
           </button>
           {panelControls.length > 0 && (
             <button
@@ -273,6 +295,18 @@ export function Playground({ config }: { config: PlaygroundConfig }) {
           )}
         </div>
       </div>
+
+      {/* Component Rules — opens the reusable Fiber Side Panel drawer over the
+          current component so rules can be authored while inspecting it. */}
+      <SidePanel
+        open={rulesOpen}
+        onClose={() => setRulesOpen(false)}
+        title={`Component Rules — ${config.name}`}
+        subtitle="Teach this component how to behave · saved to this component only"
+        size="800"
+      >
+        <ComponentRulesPanelBody meta={componentMeta} />
+      </SidePanel>
     </div>
   );
 }

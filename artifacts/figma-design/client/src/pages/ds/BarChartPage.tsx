@@ -337,6 +337,7 @@ function renderChart(props: PropValues, theme: "light" | "dark") {
 
 const config: PlaygroundConfig = {
   name: "Column chart",
+  scopeId: "bar-chart/column-chart",
   description:
     "Data-vis column chart inside the Smart Card. Explore the 4 nested variants — 1 series, 2 series, stacked, and column + line combo.",
   controls: [

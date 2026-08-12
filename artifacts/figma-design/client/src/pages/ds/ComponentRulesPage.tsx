@@ -410,13 +410,19 @@ function LeftPanel({
       style={{ background: T.surface }}
     >
       <div className="shrink-0 border-b p-4" style={{ borderColor: T.border }}>
-        <div className="flex items-center justify-between gap-2">
-          <h2
-            className="min-w-0 truncate text-[15px] font-semibold"
-            style={{ fontFamily: FONT, color: T.textPrimary }}
-          >
-            Rules library
-          </h2>
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <h2
+              className="min-w-0 truncate text-[15px] font-semibold"
+              style={{ fontFamily: FONT, color: T.textPrimary }}
+            >
+              Global Rules Library
+            </h2>
+            <p className="mt-0.5 text-[12px]" style={{ fontFamily: FONT, color: T.textMuted }}>
+              Reusable rules shared across components. Component-specific rules live in each
+              component's side panel.
+            </p>
+          </div>
           <PrimaryButton onClick={onNew}>
             <Plus size={16} weight="bold" /> New rule
           </PrimaryButton>
@@ -473,11 +479,11 @@ function LeftPanel({
           <div className="flex h-full flex-col items-center justify-center px-6 text-center">
             <Sparkle size={28} style={{ color: T.textMuted }} />
             <p className="mt-3 text-[14px] font-medium" style={{ fontFamily: FONT, color: T.textPrimary }}>
-              {rules.length === 0 ? "No rules yet" : "No rules match your filters"}
+              {rules.length === 0 ? "No global rules yet" : "No rules match your filters"}
             </p>
             <p className="mt-1 text-[12px]" style={{ fontFamily: FONT, color: T.textBody }}>
               {rules.length === 0
-                ? "Describe a behaviour on the right to teach the design system its first rule."
+                ? "Describe a behaviour on the right to define a reusable rule shared across components."
                 : "Try a different search term or clear the category filters."}
             </p>
           </div>
@@ -1002,10 +1008,13 @@ export default function ComponentRulesPage() {
   const [builderKey, setBuilderKey] = useState(0);
 
   useEffect(() => {
-    setRules(ensureSeeded());
+    // Seed on first run, then show ONLY global rules — component-specific rules
+    // are authored + shown in each component's side panel, not here.
+    ensureSeeded();
+    setRules(ruleRepository.listGlobal());
   }, []);
 
-  const refresh = () => setRules(ruleRepository.list());
+  const refresh = () => setRules(ruleRepository.listGlobal());
   const selectedRule = rules.find((r) => r.id === selectedId);
 
   const handleNew = () => {

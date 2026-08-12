@@ -293,6 +293,7 @@ function MetricsTileCompact({
 
 const metricsValueConfig: PlaygroundConfig = {
   name: "Metrics Value",
+  scopeId: "metrics/metrics-value",
   description: "The numeric metric display — Small, Regular and Large sizes.",
   controls: [
     {
@@ -328,6 +329,7 @@ const metricsValueConfig: PlaygroundConfig = {
 
 const metricsCardContentConfig: PlaygroundConfig = {
   name: "Metrics Card Content",
+  scopeId: "metrics/metrics-card-content",
   description:
     "The inner content block of a metrics tile: icon, description, value, name and delta badge.",
   controls: [
@@ -393,6 +395,7 @@ const metricsCardContentConfig: PlaygroundConfig = {
 
 const metricsTileConfig: PlaygroundConfig = {
   name: "Metrics Tile",
+  scopeId: "metrics/metrics-tile",
   description:
     "Selectable metrics card with Default, Hover, Selected and Disabled states.",
   controls: [
@@ -469,6 +472,7 @@ const metricsTileConfig: PlaygroundConfig = {
 
 const metricsTileCompactConfig: PlaygroundConfig = {
   name: "Metrics Tile (Compact)",
+  scopeId: "metrics/metrics-tile-compact",
   description: "Condensed metrics tile showing only value and a description.",
   controls: [
     {

@@ -214,6 +214,7 @@ function DropZone({
 
 const dropZoneConfig: PlaygroundConfig = {
   name: "Drop Zone",
+  scopeId: "drop-zone/drop-zone",
   description:
     "File upload drop zone — supports empty, file-listing, and hover states.",
   controls: [
@@ -252,6 +253,7 @@ const dropZoneConfig: PlaygroundConfig = {
 
 const uploadedFileConfig: PlaygroundConfig = {
   name: "Uploaded files",
+  scopeId: "drop-zone/uploaded-files",
   description:
     "File row shown inside the drop zone — uploading (progress) and uploaded (done) states.",
   controls: [

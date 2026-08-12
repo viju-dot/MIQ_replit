@@ -337,6 +337,7 @@ function SliderTrack({
 
 const sliderConfig: PlaygroundConfig = {
   name: "Slider",
+  scopeId: "slider/slider",
   description:
     "Track with fill and one or two knobs. Discrete (stepped) or Continuous, in Active and Disabled states.",
   controls: [
@@ -384,6 +385,7 @@ const sliderConfig: PlaygroundConfig = {
 
 const indicatorConfig: PlaygroundConfig = {
   name: "Indicator (Knob)",
+  scopeId: "slider/indicator-knob",
   description:
     "The draggable thumb. Discrete or Continuous, in Default, Active and Disabled states, with an optional value tooltip.",
   controls: [

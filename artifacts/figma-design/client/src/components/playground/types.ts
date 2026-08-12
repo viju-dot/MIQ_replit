@@ -17,6 +17,16 @@ export type Control =
 export type PropValues = Record<string, string | boolean>;
 
 export interface PlaygroundConfig {
+  /**
+   * Stable, immutable scope id for Component Rules persistence. Unlike `name`
+   * (a mutable display label that can collide across pages, e.g. two different
+   * "Swap Instance" playgrounds), this uniquely identifies the playground so
+   * component-scoped rules are keyed reliably and survive display renames.
+   *
+   * Convention: "<registry-slug>/<playground-purpose>", e.g. "button/button",
+   * "modals/swap-instance", "cards/swap-instance". Must be unique app-wide.
+   */
+  scopeId: string;
   /** Component name, e.g. "Button" */
   name: string;
   /** Optional short description shown under the name. */

@@ -253,6 +253,7 @@ function CheckboxPreview({ props }: { props: PropValues }): JSX.Element {
 
 const checkboxConfig: PlaygroundConfig = {
   name: "Checkbox",
+  scopeId: "check/checkbox",
   description:
     "Selection control — Unchecked / Checked / Partial, with error, hover, disabled and compact axes.",
   controls: [

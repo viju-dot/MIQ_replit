@@ -280,6 +280,7 @@ function DraggablePill({
 
 const removableConfig: PlaygroundConfig = {
   name: "Pill / Removable",
+  scopeId: "pill/pill-removable",
   description:
     "Dismissible tag with a close affordance. Style, fill and state axes with Compact & Standard sizes.",
   controls: [
@@ -352,6 +353,7 @@ const removableConfig: PlaygroundConfig = {
 
 const draggableConfig: PlaygroundConfig = {
   name: "Pill / Draggable",
+  scopeId: "pill/pill-draggable",
   description:
     "Draggable tag with drag handle + close affordance. Brand (Bold) fill and state axes with Compact & Standard sizes.",
   controls: [

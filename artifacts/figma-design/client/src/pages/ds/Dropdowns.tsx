@@ -166,6 +166,7 @@ function FiberDropdownRow({
 
 const config: PlaygroundConfig = {
   name: "Dropdown Row",
+  scopeId: "dropdowns/dropdown-row",
   description:
     "Selectable list-field row — supports checkbox, caret affordance and Default / Hover / Selected / Disabled / Loading states.",
   controls: [

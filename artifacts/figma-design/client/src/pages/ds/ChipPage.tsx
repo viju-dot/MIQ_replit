@@ -229,6 +229,7 @@ const CHIP_STATUSES: ChipStatus[] = [
 
 const chipConfig: PlaygroundConfig = {
   name: "Chip",
+  scopeId: "chip/chip",
   description:
     "Chips let users make single or multiple selections from a set of items. Explore size, status, state, editable label and the optional menu affordance.",
   controls: [

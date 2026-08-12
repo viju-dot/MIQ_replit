@@ -386,6 +386,7 @@ const commonTokens = {
 
 const staticCompactConfig: PlaygroundConfig = {
   name: "Tile — Static / Compact",
+  scopeId: "tile/tile-static-compact",
   description: "Compact static tile with leading icon, info + action button, and optional description row.",
   controls: [
     { kind: "text", name: "heading", label: "Heading", defaultValue: "Place holder", placeholder: "Heading" },
@@ -420,6 +421,7 @@ const staticCompactConfig: PlaygroundConfig = {
 
 const dynamicStandardConfig: PlaygroundConfig = {
   name: "Tile — Dynamic / Standard",
+  scopeId: "tile/tile-dynamic-standard",
   description: "Selectable tile with checkbox, title and description across interaction states.",
   controls: [
     {
@@ -457,6 +459,7 @@ const dynamicStandardConfig: PlaygroundConfig = {
 
 const dynamicCompactConfig: PlaygroundConfig = {
   name: "Tile — Dynamic / Compact",
+  scopeId: "tile/tile-dynamic-compact",
   description: "Selectable compact tile with icon and label across interaction states.",
   controls: [
     {
@@ -475,6 +478,7 @@ const dynamicCompactConfig: PlaygroundConfig = {
 
 const dynamicMiniConfig: PlaygroundConfig = {
   name: "Tile — Dynamic / Mini",
+  scopeId: "tile/tile-dynamic-mini",
   description: "Selectable icon-only tile across interaction states.",
   controls: [
     {

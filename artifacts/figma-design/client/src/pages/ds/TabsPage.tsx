@@ -224,6 +224,7 @@ function InteractiveRoundedTabs({
 
 const tabItemConfig: PlaygroundConfig = {
   name: "Tab Item — underline",
+  scopeId: "tabs/tab-item-underline",
   description:
     "Single underline-style tab. Explore each Figma state and edit the label.",
   controls: [
@@ -265,6 +266,7 @@ const tabItemConfig: PlaygroundConfig = {
 
 const tabPillConfig: PlaygroundConfig = {
   name: "Tab — rounded / pill",
+  scopeId: "tabs/tab-rounded-pill",
   description:
     "Single rounded pill-style tab. Explore each Figma state and edit the label.",
   controls: [
@@ -304,6 +306,7 @@ const tabPillConfig: PlaygroundConfig = {
 
 const underlineBarConfig: PlaygroundConfig = {
   name: "Tabs Bar — underline",
+  scopeId: "tabs/tabs-bar-underline",
   description:
     "Composed underline tabs. Choose the item count; click to select, hover to preview.",
   controls: [
@@ -338,6 +341,7 @@ const underlineBarConfig: PlaygroundConfig = {
 
 const roundedBarConfig: PlaygroundConfig = {
   name: "Tabs Bar — rounded",
+  scopeId: "tabs/tabs-bar-rounded",
   description:
     "Composed rounded tabs. Choose the item count; click to select, hover to preview.",
   controls: [

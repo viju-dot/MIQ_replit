@@ -50,6 +50,11 @@ export const HEADER_NAV: HeaderNavItem[] = [
     match: (p) => p === "/ai-prototype" || p.startsWith("/ai-prototype/"),
   },
   {
+    href: "/screen-templates",
+    label: "Screen Templates",
+    match: (p) => p === "/screen-templates" || p.startsWith("/screen-templates/"),
+  },
+  {
     href: "/flow-chart",
     label: "Flow Chart",
     match: (p) => p === "/flow-chart" || p.startsWith("/flow-chart/"),

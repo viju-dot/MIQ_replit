@@ -1,0 +1,14 @@
+Currently selected nodes:
+- 66895:318383: Page
+
+
+<instance id="66895:318383" name="Page" x="1654" y="4001" width="1024" height="2403">
+  <instance id="0:1648" name="Navigation" x="0" y="0" width="1024" height="120" />
+  <frame id="0:1974" name="body" x="0" y="152" width="1024" height="1866">
+    <instance id="0:1975" name="campaign planning stage 1" x="32" y="0" width="960" height="1834" />
+  </frame>
+  <frame id="0:2742" name="Frame 3386" x="0" y="2337" width="1024" height="66">
+    <instance id="0:2743" name="Footer - Page" x="0" y="0" width="1024" height="66" />
+  </frame>
+</instance>
+IMPORTANT: After you call this tool, you MUST call get_design_context if trying to implement the design, since this tool only returns metadata. If you do not call get_design_context, the agent will not be able to implement the design.

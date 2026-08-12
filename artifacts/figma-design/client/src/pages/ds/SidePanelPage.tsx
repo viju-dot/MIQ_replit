@@ -276,6 +276,7 @@ function SidePanel({
 
 const sidePanelConfig: PlaygroundConfig = {
   name: "Side Panel",
+  scopeId: "side-panel/side-panel",
   description:
     "Slide-over panel — Size (400/600/800) with optional sub-navigation, subtitle, and title icon.",
   controls: [
@@ -318,6 +319,7 @@ const sidePanelConfig: PlaygroundConfig = {
 
 const headerActionConfig: PlaygroundConfig = {
   name: "Header Action",
+  scopeId: "side-panel/header-action",
   description: "Trailing header controls — Pagination (caret prev/next) or Close.",
   controls: [
     {
@@ -343,6 +345,7 @@ const headerActionConfig: PlaygroundConfig = {
 
 const footerConfig: PlaygroundConfig = {
   name: "Side Panel Footer",
+  scopeId: "side-panel/side-panel-footer",
   description: "Actions-right footer — Link, Default outline button, and Default filled button.",
   controls: [],
   render: () => (

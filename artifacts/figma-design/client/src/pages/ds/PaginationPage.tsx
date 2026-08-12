@@ -90,6 +90,7 @@ function Pagination({ total }: { total: number }) {
 
 const paginationConfig: PlaygroundConfig = {
   name: "Pagination",
+  scopeId: "pagination/pagination",
   description:
     "Molecule — page label with previous/next icon buttons. Fully interactive.",
   controls: [
@@ -122,6 +123,7 @@ const paginationConfig: PlaygroundConfig = {
 
 const labelConfig: PlaygroundConfig = {
   name: "Pagination Label",
+  scopeId: "pagination/pagination-label",
   description:
     "Text label showing current/total pages. Axes: isDisabled, isInverted.",
   controls: [

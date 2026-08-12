@@ -1,0 +1,10 @@
+<instance id="60141:191669" name="Page" x="2688" y="305" width="1280" height="793">
+  <instance id="0:3" name="Navigation" x="0" y="0" width="1280" height="120" />
+  <frame id="0:329" name="body" x="0" y="152" width="1280" height="641">
+    <instance id="0:330" name="OMC Activation - Step 1" x="0" y="0" width="1280" height="700" />
+  </frame>
+  <frame id="0:752" name="Frame 3386" x="0" y="727" width="1280" height="66">
+    <instance id="0:753" name="Footer - Page" x="0" y="0" width="767" height="66" hidden="true" />
+  </frame>
+</instance>
+IMPORTANT: After you call this tool, you MUST call get_design_context if trying to implement the design, since this tool only returns metadata. If you do not call get_design_context, the agent will not be able to implement the design.

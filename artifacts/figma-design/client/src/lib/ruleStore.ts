@@ -18,6 +18,9 @@
  *    apply-to-components, conflict detection. None are wired here.
  */
 
+import { slugifyComponentName } from "@/lib/componentMeta";
+import { COMPONENT_SCOPES } from "@/lib/componentScopes";
+
 export const RULE_CATEGORIES = [
   "States",
   "Content",
@@ -57,6 +60,11 @@ export interface RuleDraft {
   restrictions?: string[];
   defaultBehavior?: string;
   notes?: string;
+  /**
+   * When set, scopes the draft (and resulting rule) to a single component by
+   * its slug. Undefined / empty means GLOBAL (Global Rules Library).
+   */
+  componentSlug?: string;
 }
 
 /** A persisted, fully-formed rule. */
@@ -80,6 +88,17 @@ export interface Rule {
   version: number;
   /** The conversation that authored this rule (AI re-gen / audit seam). */
   sourceConversation: RuleMessage[];
+  /**
+   * Component scope. When set, the rule belongs ONLY to that component (authored
+   * from its side panel). Empty string means a global rule. Persisted so the
+   * Global Rules Library and per-component panels stay cleanly separated.
+   */
+  componentSlug: string;
+}
+
+/** A global rule has no component scope. */
+export function isGlobalRule(rule: Rule): boolean {
+  return !rule.componentSlug;
 }
 
 const STORAGE_KEY = "fiber:design-system:component-rules:v1";
@@ -124,6 +143,8 @@ export function draftToRule(
     updatedAt: ts,
     version: base ? base.version + 1 : 1,
     sourceConversation: conversation,
+    // Scope precedence: explicit draft scope → existing base scope → global "".
+    componentSlug: draft.componentSlug ?? base?.componentSlug ?? "",
   };
 }
 
@@ -133,6 +154,10 @@ export function draftToRule(
 
 export interface RuleRepository {
   list(): Rule[];
+  /** Only global rules (no component scope) — powers the Global Rules Library. */
+  listGlobal(): Rule[];
+  /** Only rules scoped to the given component slug — powers the side panel. */
+  listByComponent(slug: string): Rule[];
   get(id: string): Rule | undefined;
   create(rule: Rule): Rule;
   update(rule: Rule): Rule;
@@ -200,7 +225,53 @@ function coerceRule(raw: unknown): Rule | null {
     updatedAt,
     version,
     sourceConversation: conversation,
+    // Coerce scope: any non-string becomes "" (global) so filtering is safe.
+    componentSlug: typeof r.componentSlug === "string" ? r.componentSlug : "",
   };
+}
+
+/* ---------------------------------------------------------------------- */
+/* Legacy scope migration                                                  */
+/*                                                                         */
+/* Early builds keyed component-scoped rules on a slug derived from the    */
+/* mutable Playground display name (e.g. "swap-instance"), which collided  */
+/* across pages. Rules are now keyed on the stable `scopeId`. This migrates */
+/* legacy records to their scopeId where the owner is unambiguous, and     */
+/* drops ambiguous colliding ones (feature is new — acceptable).           */
+/* ---------------------------------------------------------------------- */
+
+let legacyToScope: Map<string, string[]> | null = null;
+let validScopeIds: Set<string> | null = null;
+
+function buildScopeMaps(): void {
+  if (legacyToScope && validScopeIds) return;
+  legacyToScope = new Map();
+  validScopeIds = new Set();
+  for (const { scopeId, name } of COMPONENT_SCOPES) {
+    validScopeIds.add(scopeId);
+    const legacy = slugifyComponentName(name);
+    const owners = legacyToScope.get(legacy) ?? [];
+    owners.push(scopeId);
+    legacyToScope.set(legacy, owners);
+  }
+}
+
+/**
+ * Resolve a persisted componentSlug to the current scheme.
+ * Returns null when the record should be DROPPED (ambiguous legacy collision).
+ */
+function migrateSlug(slug: string): string | null {
+  if (!slug) return ""; // global — untouched
+  buildScopeMaps();
+  if (validScopeIds!.has(slug)) return slug; // already a stable scopeId
+  const owners = legacyToScope!.get(slug);
+  if (!owners || owners.length === 0) return slug; // unknown legacy slug — leave as-is
+  if (owners.length === 1) return owners[0]; // unambiguous → remap
+  console.warn(
+    `[componentRules] Dropping rule with ambiguous legacy scope "${slug}" ` +
+      `(owned by ${owners.join(", ")}). Re-create it from the component's side panel.`,
+  );
+  return null; // ambiguous → drop
 }
 
 function readAll(): Rule[] {
@@ -211,9 +282,28 @@ function readAll(): Rule[] {
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
     // Coerce/skip invalid entries so downstream code only ever sees valid Rules.
-    return parsed
-      .map(coerceRule)
-      .filter((r): r is Rule => r !== null);
+    const coerced = parsed.map(coerceRule).filter((r): r is Rule => r !== null);
+
+    // One-time legacy scope migration: remap unambiguous legacy slugs to their
+    // stable scopeId; drop ambiguous collisions. Persist back if anything moved
+    // so the migration only pays its cost once.
+    let changed = false;
+    const migrated: Rule[] = [];
+    for (const r of coerced) {
+      const next = migrateSlug(r.componentSlug);
+      if (next === null) {
+        changed = true; // dropped
+        continue;
+      }
+      if (next !== r.componentSlug) {
+        changed = true;
+        migrated.push({ ...r, componentSlug: next });
+      } else {
+        migrated.push(r);
+      }
+    }
+    if (changed) writeAll(migrated);
+    return migrated;
   } catch {
     return [];
   }
@@ -228,9 +318,21 @@ function writeAll(rules: Rule[]): void {
   }
 }
 
+const byRecent = (a: Rule, b: Rule) => b.updatedAt.localeCompare(a.updatedAt);
+
 export const localStorageRepository: RuleRepository = {
   list() {
-    return readAll().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+    return readAll().sort(byRecent);
+  },
+  listGlobal() {
+    return readAll()
+      .filter((r) => !r.componentSlug)
+      .sort(byRecent);
+  },
+  listByComponent(slug) {
+    return readAll()
+      .filter((r) => r.componentSlug === slug)
+      .sort(byRecent);
   },
   get(id) {
     return readAll().find((r) => r.id === id);
@@ -266,7 +368,10 @@ function seedMessage(text: string, role: RuleMessage["role"] = "user"): RuleMess
 }
 
 function makeSeed(
-  partial: Omit<Rule, "id" | "createdAt" | "updatedAt" | "version" | "sourceConversation"> & {
+  partial: Omit<
+    Rule,
+    "id" | "createdAt" | "updatedAt" | "version" | "sourceConversation" | "componentSlug"
+  > & {
     conversation: string;
   },
 ): Rule {
@@ -279,6 +384,8 @@ function makeSeed(
     updatedAt: ts,
     version: 1,
     sourceConversation: [seedMessage(conversation)],
+    // Seeds are cross-component defaults → global (Global Rules Library).
+    componentSlug: "",
   };
 }
 

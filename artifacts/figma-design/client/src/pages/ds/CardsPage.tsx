@@ -641,6 +641,7 @@ function TermsPolicyCard() {
 
 const smartCardConfig: PlaygroundConfig = {
   name: "Smart Card",
+  scopeId: "cards/smart-card",
   description: "Container card with header, content and footer slots.",
   controls: [
     {
@@ -691,6 +692,7 @@ const smartCardConfig: PlaygroundConfig = {
 
 const smartWideCardConfig: PlaygroundConfig = {
   name: "Smart Wide Card",
+  scopeId: "cards/smart-wide-card",
   description: "Full-width card with multiple layout styles.",
   controls: [
     {
@@ -732,6 +734,7 @@ const smartWideCardConfig: PlaygroundConfig = {
 
 const headerConfig: PlaygroundConfig = {
   name: "Header",
+  scopeId: "cards/header",
   description: "Card header — with optional right-aligned tabs.",
   controls: [
     { kind: "boolean", name: "rightTab", label: "Right tabs", defaultValue: false },
@@ -758,6 +761,7 @@ const headerConfig: PlaygroundConfig = {
 
 const footerConfig: PlaygroundConfig = {
   name: "Footer",
+  scopeId: "cards/footer",
   description: "Card footer — left and right action groups toggle independently.",
   controls: [
     { kind: "boolean", name: "leftFooter", label: "Left group", defaultValue: true },
@@ -782,6 +786,7 @@ const footerConfig: PlaygroundConfig = {
 
 const contentConfig: PlaygroundConfig = {
   name: "Content",
+  scopeId: "cards/content",
   description: "Card content area — three layout types.",
   controls: [
     {
@@ -809,6 +814,7 @@ const contentConfig: PlaygroundConfig = {
 
 const swapInstanceConfig: PlaygroundConfig = {
   name: "Swap Instance",
+  scopeId: "cards/swap-instance",
   description: "Swappable content slot — dashed container or text.",
   controls: [
     {
@@ -832,6 +838,7 @@ const swapInstanceConfig: PlaygroundConfig = {
 
 const termsPolicyConfig: PlaygroundConfig = {
   name: "Terms & Policy Card",
+  scopeId: "cards/terms-and-policy-card",
   description: "Long-form policy content card with a titled header band.",
   controls: [],
   render: () => (

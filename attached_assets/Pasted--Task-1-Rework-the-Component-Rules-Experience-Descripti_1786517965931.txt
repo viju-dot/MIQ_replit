@@ -1,0 +1,210 @@
+# Task 1: Rework the Component Rules Experience
+
+## Description
+
+I reviewed the current Component Rules implementation and it's heading in the right direction. However, creating rules from a dedicated page feels disconnected from the actual component. It makes it difficult to define behavior because I have to constantly switch between the component and the rules page.
+
+Instead, I want the rule creation experience to happen directly from the component I'm working on.
+
+---
+
+## New Interaction
+
+Inside every component page, next to **Developer Mode**, add a new option called:
+
+**Component Rules**
+
+When I select **Component Rules**, open the existing **Fiber Design System Side Panel (Drawer)**.
+
+Do not navigate away from the current component.
+
+The goal is to let me define rules while looking at the actual component preview.
+
+---
+
+## Component Rules Side Panel
+
+The side panel should automatically understand the selected component.
+
+Read the component metadata from Figma and display all available information for that component.
+
+Examples include:
+
+- Component Properties
+- Variants
+- Slots
+- Preferred Instances
+- Swap Properties
+- Icon Properties
+- Boolean Properties
+- Text Properties
+- States
+- Size Variants
+- Theme Variants
+
+Only show properties that actually exist for that component.
+
+---
+
+## Property Assistant
+
+Instead of manually typing property names, display them as selectable keywords or chips.
+
+For example:
+
+- Variant
+- Size
+- State
+- Leading Icon
+- Trailing Icon
+- Slot
+- Swap Instance
+- Label
+- Disabled
+
+I should be able to click or drag these keywords directly into the rule editor instead of remembering property names.
+
+This makes rule creation faster and less error-prone.
+
+---
+
+## Rule Editor
+
+The rule editor should remain conversational.
+
+I should be able to write natural language instructions while inserting component properties where needed.
+
+For example:
+
+"When **{State}** is Disabled, prevent all Hover interactions."
+
+"If **{Leading Icon}** exists, automatically apply the correct spacing."
+
+"If **{Slot}** contains an Avatar component, align it using the predefined layout."
+
+The property keywords should behave like smart placeholders that reference the selected component.
+
+---
+
+## Rule Scope
+
+These rules are specific to the currently selected component.
+
+Do not save them as global rules.
+
+They belong only to that component.
+
+---
+
+## Global Rules
+
+Keep the existing **Component Rules** page.
+
+That page will later become our **Global Rules Library**, where we define reusable rules shared across multiple components.
+
+For now:
+
+- Component Rules (Side Panel) = Individual Component Rules
+- Component Rules Page = Global Rules Library
+
+These are different purposes and should remain separate.
+
+---
+
+## Goal
+
+The experience should feel like I'm teaching a component how to behave while I'm inspecting it, rather than switching to a completely different workspace.
+
+This should make rule creation much more intuitive and contextual.
+
+---
+
+# Task 2: Create a Screen Template Module
+
+## Description
+
+At the moment, our AI-generated prototypes follow the Fiber Design System reasonably well, but they're still only around **60% aligned** with how we actually design products.
+
+Although the Component Rules engine will improve behavior consistency, the AI also needs to understand **how components are composed into complete screens**.
+
+A component alone doesn't provide enough context.
+
+The AI also needs to learn:
+
+- Layout patterns
+- Auto Layout usage
+- Spacing relationships
+- Component hierarchy
+- Content structure
+- Real design composition
+
+To achieve this, I want to introduce a new module called **Screen Templates**.
+
+---
+
+## Purpose
+
+This module will become a reference library of real product screens created using the Fiber Design System.
+
+I will provide high-quality template screens from our Design System.
+
+These templates should help the AI understand how components are assembled into complete interfaces rather than treating them as isolated elements.
+
+---
+
+## Screen Template Module
+
+Create a new module called:
+
+**Screen Templates**
+
+This module should allow me to organize reference screens that represent best-practice Fiber Design System implementations.
+
+---
+
+## Expected Experience
+
+Each template should contain information such as:
+
+- Screen Name
+- Description
+- Preview
+- Associated Components
+- Layout Structure
+- Auto Layout Hierarchy
+- Design Notes (optional)
+
+The goal is not to edit these screens.
+
+They should serve as high-quality references for future AI-generated prototypes.
+
+---
+
+## Future Purpose (Architecture Only)
+
+In future iterations, the AI should be able to reference these templates when generating new designs.
+
+For example:
+
+- Follow layout patterns.
+- Reuse spacing principles.
+- Maintain consistent component composition.
+- Apply Design System rules correctly.
+- Generate screens that better match our existing design language.
+
+Do not implement this intelligence yet.
+
+Simply create the module and structure so we can populate it with template screens later.
+
+---
+
+## Goal
+
+The combination of:
+
+- Fiber Design System
+- Global Component Rules
+- Component-Specific Rules
+- Screen Templates
+
+will provide the AI with enough context to generate prototypes that are significantly closer to our actual product design standards instead of producing only generic Design System layouts.

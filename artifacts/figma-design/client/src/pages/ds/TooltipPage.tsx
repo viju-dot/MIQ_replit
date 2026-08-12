@@ -581,6 +581,7 @@ const tooltipTokens = {
 
 const standardConfig: PlaygroundConfig = {
   name: "Standard Tooltip",
+  scopeId: "tooltip/standard-tooltip",
   description:
     "Compact label tooltip with a directional arrow. Dark and Light colours.",
   controls: [
@@ -619,6 +620,7 @@ const standardConfig: PlaygroundConfig = {
 
 const descriptiveConfig: PlaygroundConfig = {
   name: "Descriptive Tooltip",
+  scopeId: "tooltip/descriptive-tooltip",
   description:
     "Multi-line explanatory tooltip. Arrow can attach from any edge; Dark and Light colours.",
   controls: [
@@ -658,6 +660,7 @@ const descriptiveConfig: PlaygroundConfig = {
 
 const interactiveConfig: PlaygroundConfig = {
   name: "Interactive Tooltip",
+  scopeId: "tooltip/interactive-tooltip",
   description:
     "Rich tooltip with an optional title, body copy, and action buttons.",
   controls: [
@@ -698,6 +701,7 @@ const interactiveConfig: PlaygroundConfig = {
 
 const numberConfig: PlaygroundConfig = {
   name: "Number Tooltip",
+  scopeId: "tooltip/number-tooltip",
   description:
     "Small numeric badge with a pointer triangle. Four colour variants.",
   controls: [

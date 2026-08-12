@@ -197,6 +197,7 @@ function renderClosedField(props: PropValues): JSX.Element {
 
 const closedConfig: PlaygroundConfig = {
   name: "Multiselect — Dropdown (closed)",
+  scopeId: "multiselect/multiselect-dropdown-closed",
   description:
     "Closed field showing selected values as pills, with overflow count and disabled state.",
   controls: [
@@ -316,6 +317,7 @@ function OpenDropdown({ props }: { props: PropValues }): JSX.Element {
 
 const openConfig: PlaygroundConfig = {
   name: "Multiselect — Dropdown (open)",
+  scopeId: "multiselect/multiselect-dropdown-open",
   description:
     "Open menu states: live search, suggestions, interactive selection, all-selected and disabled.",
   controls: [

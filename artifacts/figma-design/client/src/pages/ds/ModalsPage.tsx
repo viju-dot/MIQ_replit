@@ -201,6 +201,7 @@ function Modal({
 
 const modalConfig: PlaygroundConfig = {
   name: "Modal",
+  scopeId: "modals/modal",
   description:
     "Dialog surface with header, swappable content area, and action footer. Explore sizes and content types.",
   controls: [
@@ -256,6 +257,7 @@ const modalConfig: PlaygroundConfig = {
 
 const swapConfig: PlaygroundConfig = {
   name: "Swap Instance",
+  scopeId: "modals/swap-instance",
   description:
     "The swappable content slot inside a modal — Text, Notification, or a Custom component placeholder.",
   controls: [

@@ -146,6 +146,7 @@ const clampCount = (v: string | boolean): number => {
 
 const carouselConfig: PlaygroundConfig = {
   name: "Carousel Component",
+  scopeId: "carousel/carousel-component",
   description: "Slot area with navigation — swap the slot for any component.",
   controls: [
     {
@@ -180,6 +181,7 @@ const carouselConfig: PlaygroundConfig = {
 
 const navigationConfig: PlaygroundConfig = {
   name: "Carousel Navigation",
+  scopeId: "carousel/carousel-navigation",
   description: "Standalone navigation control — carets with pagination dots.",
   controls: [
     {

@@ -849,6 +849,7 @@ const MODULES: Module[] = [
 
 const primaryNavConfig: PlaygroundConfig = {
   name: "Primary Navigation",
+  scopeId: "navigation/primary-navigation",
   description:
     "State=Default, Menu=False (1440×64). Top-level app bar — active module, centered Sigma logo, language selector and Pro+ avatar.",
   controls: [
@@ -899,6 +900,7 @@ const primaryNavConfig: PlaygroundConfig = {
 
 const secondaryNavConfig: PlaygroundConfig = {
   name: "Secondary Navigation",
+  scopeId: "navigation/secondary-navigation",
   description:
     "Module sub-navigation bar (1440×56). Module=Audiences | Intelligence | Campaigns | Reports | Creatives. Toggle the Dark surface variant.",
   controls: [
@@ -937,6 +939,7 @@ const secondaryNavConfig: PlaygroundConfig = {
 
 const compositeConfig: PlaygroundConfig = {
   name: "Navigation",
+  scopeId: "navigation/navigation",
   description:
     "Composite (1440×120) — Primary Navigation stacked over Secondary Navigation. Toggle the secondary bar and pick its module.",
   controls: [
@@ -998,6 +1001,7 @@ const compositeConfig: PlaygroundConfig = {
 
 const userMenuConfig: PlaygroundConfig = {
   name: "User Menu",
+  scopeId: "navigation/user-menu",
   description:
     "Profile dropdown component set — Type=MiQer | External × Version=2 | 3. Toggles are interactive.",
   controls: [
@@ -1045,6 +1049,7 @@ const userMenuConfig: PlaygroundConfig = {
 
 const userMenuRowConfig: PlaygroundConfig = {
   name: "User Menu Row",
+  scopeId: "navigation/user-menu-row",
   description: "Single menu row — Default and Hover states, with editable label.",
   controls: [
     {
@@ -1086,6 +1091,7 @@ const userMenuRowConfig: PlaygroundConfig = {
 
 const avatarConfig: PlaygroundConfig = {
   name: "Avatar",
+  scopeId: "navigation/avatar",
   description: "Account avatar — Pro/Standard plan, Picture/Initials state, and two sizes.",
   controls: [
     {

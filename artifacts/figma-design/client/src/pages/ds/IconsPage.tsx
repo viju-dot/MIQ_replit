@@ -452,6 +452,7 @@ function IconsGallery({ props }: { props: PropValues; dark: boolean }): JSX.Elem
 
 const config: PlaygroundConfig = {
   name: "Icons",
+  scopeId: "icons/icons",
   description:
     "Phosphor-based icon catalog — all 109 Fiber icon sets. Browse across Regular / Fill / Duotone styles and four sizes, search by name, and click an icon to inspect its Figma name and variants.",
   controls: [

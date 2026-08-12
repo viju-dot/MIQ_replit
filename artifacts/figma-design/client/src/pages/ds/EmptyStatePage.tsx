@@ -214,6 +214,7 @@ function IllustrationGallery() {
 
 const galleryConfig: PlaygroundConfig = {
   name: "Illustrations",
+  scopeId: "empty-state/illustrations",
   description:
     "All 11 Figma illustration templates used by Empty States. Each is driven by the composite's `Template` property.",
   controls: [],
@@ -230,6 +231,7 @@ const galleryConfig: PlaygroundConfig = {
 
 const config: PlaygroundConfig = {
   name: "Empty State",
+  scopeId: "empty-state/empty-state",
   description:
     "Placeholder layout with illustration, heading, description, and up to three actions.",
   controls: [

@@ -203,6 +203,7 @@ function Accordion({
 
 const config: PlaygroundConfig = {
   name: "Accordion",
+  scopeId: "accordion/accordion",
   description:
     "Collapsible container — Collapse / Expanded types, border style, background, disabled, and an editable left slot.",
   controls: [

@@ -134,6 +134,7 @@ function FooterModal({
 
 const pageConfig: PlaygroundConfig = {
   name: "Footer — Page",
+  scopeId: "footer/footer-page",
   description:
     "Page footer bar (Type=Default). Toggle the left / right action groups.",
   controls: [
@@ -189,6 +190,7 @@ const pageConfig: PlaygroundConfig = {
 
 const modalConfig: PlaygroundConfig = {
   name: "Footer — Modal",
+  scopeId: "footer/footer-modal",
   description:
     "Modal footer. Compact reduces height and shrinks button padding.",
   controls: [

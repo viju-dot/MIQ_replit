@@ -507,6 +507,7 @@ function BadgeDescription({
 
 const standardConfig: PlaygroundConfig = {
   name: "Badge / Standard",
+  scopeId: "badges/badge-standard",
   description:
     "Rectangular status badge — Type, Style, optional icon, and Compact/Standard size.",
   controls: [
@@ -559,6 +560,7 @@ const standardConfig: PlaygroundConfig = {
 
 const roundedConfig: PlaygroundConfig = {
   name: "Badge / Rounded",
+  scopeId: "badges/badge-rounded",
   description:
     "Pill badge — Type, Filled/Outline style, and Standard/Compact size. Pro variants use brand gradients.",
   controls: [
@@ -632,6 +634,7 @@ const roundedConfig: PlaygroundConfig = {
 
 const digitsConfig: PlaygroundConfig = {
   name: "Badge / With digits",
+  scopeId: "badges/badge-with-digits",
   description: "Numeric counter pill — Single, Brand, Disabled, Double, or Max value.",
   controls: [
     {
@@ -657,6 +660,7 @@ const digitsConfig: PlaygroundConfig = {
 
 const circularConfig: PlaygroundConfig = {
   name: "Badge / Circular",
+  scopeId: "badges/badge-circular",
   description: "Circular avatar-style badge — 24, 32, or 40px.",
   controls: [
     {
@@ -681,6 +685,7 @@ const circularConfig: PlaygroundConfig = {
 
 const descriptionConfig: PlaygroundConfig = {
   name: "Badge / Description",
+  scopeId: "badges/badge-description",
   description:
     "Metadata chip with optional checkbox and dismiss — supports Active and Disabled states.",
   controls: [

@@ -340,6 +340,7 @@ function BackToTop() {
 
 const buttonConfig: PlaygroundConfig = {
   name: "Button",
+  scopeId: "button/button",
   description:
     "Core action button — Fill / Outline / Ghost appearances × Primary / Secondary / Destructive, with size, state, icon-only and label controls.",
   controls: [
@@ -415,6 +416,7 @@ const buttonConfig: PlaygroundConfig = {
 
 const inverseConfig: PlaygroundConfig = {
   name: "Button — Inverse",
+  scopeId: "button/button-inverse",
   description: "Buttons placed on a dark surface. Solid inverts to a white fill; outline/ghost use white foreground.",
   previewBackground: { light: "#1b181f", dark: "#1b181f" },
   controls: [
@@ -466,6 +468,7 @@ const inverseConfig: PlaygroundConfig = {
 
 const dropdownConfig: PlaygroundConfig = {
   name: "Dropdown Button",
+  scopeId: "button/dropdown-button",
   description: "Solid primary button with a trailing caret. Toggle the rounded (pill) shape.",
   controls: [{ kind: "boolean", name: "rounded", label: "Rounded (pill)", defaultValue: false }],
   render: (props) => <ButtonDropdown rounded={props.rounded === true} />,
@@ -479,6 +482,7 @@ const dropdownConfig: PlaygroundConfig = {
 
 const backToTopConfig: PlaygroundConfig = {
   name: "Back-to-top",
+  scopeId: "button/back-to-top",
   description: "Collapsed icon button that expands into a labelled button on hover. Hover the preview to try it.",
   controls: [],
   render: () => <BackToTop />,
@@ -492,6 +496,7 @@ const backToTopConfig: PlaygroundConfig = {
 
 const hoverAnimationConfig: PlaygroundConfig = {
   name: "Button hover animation",
+  scopeId: "button/button-hover-animation",
   description: "Primary solid button with the sliding multi-colour reveal on hover. Hover the button in the preview.",
   controls: [
     { kind: "boolean", name: "dark", label: "Dark base", defaultValue: false },

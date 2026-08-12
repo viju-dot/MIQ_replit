@@ -839,6 +839,7 @@ function TableLayout({
 
 const tableLayoutConfig: PlaygroundConfig = {
   name: "Table Layout",
+  scopeId: "tables/table-layout",
   description:
     "Full composed master — Table header + Table Conteiner (Filters, Alert, Table Master, Footer container with Pagination). Toggle parts and row/column config; hover & select individual rows.",
   controls: [
@@ -919,6 +920,7 @@ const tableLayoutConfig: PlaygroundConfig = {
 
 const cellBodyConfig: PlaygroundConfig = {
   name: "Cell Body Content",
+  scopeId: "tables/cell-body-content",
   description: "Table body text — Strong weight and Number (tabular/right-aligned) variants.",
   controls: [
     { kind: "boolean", name: "strong", label: "Strong", defaultValue: false },
@@ -947,6 +949,7 @@ const cellBodyConfig: PlaygroundConfig = {
 
 const cellTextConfig: PlaygroundConfig = {
   name: "Cell / Text",
+  scopeId: "tables/cell-text",
   description: "Primary table cell — interaction states plus checkbox, tree, logo and link options.",
   controls: [
     {
@@ -1010,6 +1013,7 @@ const cellTextConfig: PlaygroundConfig = {
 
 const columnHeaderConfig: PlaygroundConfig = {
   name: "Column Header",
+  scopeId: "tables/column-header",
   description: "Table column header cell — optional selection checkbox.",
   controls: [
     { kind: "boolean", name: "hasCheckbox", label: "Checkbox", defaultValue: false },
@@ -1036,6 +1040,7 @@ const columnHeaderConfig: PlaygroundConfig = {
 
 const cellActionConfig: PlaygroundConfig = {
   name: "Cell / Action",
+  scopeId: "tables/cell-action",
   description: "Row action cell — 1 to 3 icon buttons across interaction states.",
   controls: [
     {

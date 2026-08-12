@@ -156,6 +156,7 @@ function PersonaCard({
 
 const config: PlaygroundConfig = {
   name: "Persona Card",
+  scopeId: "persona-cards/persona-card",
   description:
     "Smart card summarising an audience persona — picture, demographics, and interest badges. Edit the content below.",
   controls: [

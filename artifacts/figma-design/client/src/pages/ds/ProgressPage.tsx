@@ -88,6 +88,7 @@ function FiberProgress({
 
 const config: PlaygroundConfig = {
   name: "Progress bar",
+  scopeId: "progress/progress-bar",
   description:
     "Linear progress indicator — state color, with optional left (status) and right (percentage) labels.",
   controls: [
