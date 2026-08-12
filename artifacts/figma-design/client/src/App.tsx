@@ -46,6 +46,9 @@ const UsabilityTestingContextPage = lazy(
 // OUTSIDE the app shell (it has its own Fiber navigation header).
 const TvAudienceApp = lazy(() => import("@/pages/TvAudienceApp"));
 
+// Public shared-prototype view — NOT auth-gated, no shell/global header.
+const SharePage = lazy(() => import("@/pages/app/SharePage"));
+
 /** Redirect unauthenticated users to /login. */
 function RequireAuth({ children }: { children: ReactNode }) {
   const authed = useAuth();
@@ -91,6 +94,14 @@ function Router() {
     <Switch>
       {/* Login: authenticated users get bounced to the dashboard. */}
       <Route path="/login" component={LoginGate} />
+
+      {/* PUBLIC shared-prototype view — NOT behind RequireAuth. Registered
+          before the /:slug catch-all so it always matches first. */}
+      <Route path="/share/:token">
+        <Suspense fallback={null}>
+          <SharePage />
+        </Suspense>
+      </Route>
 
       {/* Standalone product experience (auth-gated, outside the shell). */}
       <Route path="/tv-audience-intelligence">

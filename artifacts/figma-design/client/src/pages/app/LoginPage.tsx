@@ -16,6 +16,13 @@ import { useLocation } from "wouter";
 import { WarningCircle } from "@phosphor-icons/react";
 import { login } from "./auth";
 
+/**
+ * App logo shown on the login screen. Factored into a single constant so
+ * swapping in a new logo later is a one-line change. (A new asset will be
+ * provided; drop it in figmaAssets and update this path.)
+ */
+const LOGIN_LOGO_SRC = `${import.meta.env.BASE_URL}figmaAssets/miq-sigma-dark.png`;
+
 // Token-driven colors (var(--token, fallbackHex)) — flip with [data-theme].
 const C = {
   surface: "var(--surface-background-lvl1,#ffffff)",
@@ -109,10 +116,10 @@ export default function LoginPage(): JSX.Element {
         {/* Brand / title */}
         <div className="flex flex-col items-center gap-[var(--spacing-150,12px)] text-center">
           <img
-            src={`${import.meta.env.BASE_URL}figmaAssets/miq-lettermark.svg`}
-            alt="MIQ"
+            src={LOGIN_LOGO_SRC}
+            alt="MIQ Sigma"
             className="block w-auto"
-            style={{ height: 44 }}
+            style={{ height: 72 }}
           />
 
           <div className="flex flex-col gap-[var(--spacing-25,2px)]">
@@ -120,7 +127,7 @@ export default function LoginPage(): JSX.Element {
               className="text-[length:var(--headline-sm-semibold-size,20px)] font-semibold tracking-[-0.4px]"
               style={{ color: C.textPrimary }}
             >
-              Fiber Workspace
+              MIQ Design Workspace
             </h1>
             <p
               className="text-[length:var(--body-md-regular-size,14px)]"

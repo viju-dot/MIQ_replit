@@ -1,0 +1,161 @@
+# Task: Enhance the AI Prototype Workspace with Version Management & Sharing
+
+## Description
+
+Now that the core modules are in place, I want to improve the **AI Prototype** experience. Instead of treating each prototype as a simple card, every prototype should have its own dedicated workspace where users can manage versions, preview progress, and securely share individual prototypes.
+
+The goal is to make the AI Prototype module feel like a professional design workspace with built-in version history and collaboration.
+
+---
+
+# Task 1: Prototype Viewer
+
+When a user clicks on an AI Prototype card, do not navigate directly to another page.
+
+Instead, open a **Prototype Viewer** using the existing **Fiber Design System Side Panel (Drawer)** component. Do not create a custom side panel—use the Fiber Design System component exactly as defined.
+
+The side panel should become the workspace for the selected prototype.
+
+---
+
+# Task 2: Version History
+
+Inside the Prototype Viewer, display a complete version history for that prototype.
+
+Each version should include:
+
+- Version Name (V1, V2, V3...)
+- Date Created
+- Last Updated
+- Time
+- Short Description (optional)
+
+The first saved prototype should automatically become **V1**.
+
+Every significant update should create the next version while preserving previous versions.
+
+The version list should clearly show the evolution of the prototype over time.
+Each version should have the either a secured or not secured options to before sharing to someone we have control as well in our end give some options to us 
+- Copy Current Password
+- Change Password
+
+---
+
+# Task 3: Version Navigation
+
+Allow users to switch between versions.
+
+When a version is selected:
+
+- Load only that version.
+- Display its associated data.
+- Preserve all previous versions.
+- Allow users to compare progress over time in future iterations.
+
+---
+
+# Task 4: Prototype Sharing
+
+Each prototype should support secure sharing.
+
+When the user selects **Share**, generate a unique share link for that specific prototype.
+
+Anyone opening the link should see only that prototype.
+
+Do not expose the rest of the workspace or other prototypes.
+
+---
+
+# Task 5: Shared Prototype Authentication
+
+Before opening a shared prototype, display a simple authentication screen.
+
+For this prototype phase, do not require usernames.
+
+Instead, protect the shared prototype with a single access credential.
+
+The authentication screen should support:
+
+- Password Input
+- Show / Hide Password
+
+Once authenticated, the recipient should be able to access only the shared prototype and its version history.
+
+Do not allow access to other modules or prototypes.
+
+---
+
+# Task 6: Prototype Information
+
+The Prototype Viewer should become the central place for managing a prototype.
+
+Include sections for:
+
+- Prototype Details
+- Version History
+- Share Settings
+- Activity Timeline (placeholder)
+- Prototype Metadata (placeholder)
+
+The layout should remain clean and scalable.
+
+---
+
+# UI Requirements
+
+Use the existing **Fiber Design System Side Panel (Drawer)** component.
+
+Do not build a custom drawer.
+
+Follow the Fiber Design System components, spacing, typography, colors, and interaction patterns exactly.
+
+---
+
+# Additional UI Changes
+
+## Login Screen
+
+Update only the Login screen:
+
+- Replace the existing logo with the new logo (I will provide it).
+- Change the application name to:
+
+**MIQ Design Workspace**
+
+Only the Login screen should use the updated logo.
+
+---
+
+## Welcome Screen
+
+Keep the Welcome screen simple.
+
+Remove the top navigation/header from the Welcome screen.
+
+The bottom module navigation is sufficient for selecting a workspace.
+
+This change applies only to the Welcome screen.
+
+---
+
+## Other Pages
+
+All other pages should continue displaying the global header navigation.
+
+Users should always be able to switch between modules from anywhere inside the application.
+
+Do not remove the header from the remaining pages.
+
+---
+
+# Goal
+
+Transform the AI Prototype module from a collection of cards into a structured workspace where each prototype has:
+
+- A dedicated Prototype Viewer
+- Version history
+- Secure sharing
+- Individual access control
+- A scalable foundation for future collaboration
+
+The overall experience should feel like a professional product design workspace while continuing to follow the Fiber Design System components and interaction patterns.

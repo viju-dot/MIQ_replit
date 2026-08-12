@@ -26,8 +26,10 @@ app.use(
   }),
 );
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Modest global body limit (this API only handles small JSON payloads). The
+// shares router additionally rejects >64kb via Content-Length before work.
+app.use(express.json({ limit: "128kb" }));
+app.use(express.urlencoded({ extended: true, limit: "128kb" }));
 
 app.use("/api", router);
 

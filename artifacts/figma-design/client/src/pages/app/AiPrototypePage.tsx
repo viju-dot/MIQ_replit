@@ -2,9 +2,10 @@
  * Fiber Workspace — AI Prototype (/ai-prototype)
  *
  * The central workspace. Lists prototypes from the prototype registry
- * (prototypeStore). Each card exposes THREE sibling actions — Open, Flow Chart,
- * Usability Testing — never nested inside one clickable card, so there are no
- * nested interactive controls.
+ * (prototypeStore). Clicking a card's title/body opens the Prototype Viewer in
+ * the DS Side Panel drawer (it does NOT navigate). The card's other controls —
+ * Open prototype (external), Flow Chart, Usability Testing — remain SIBLING
+ * actions, so no interactive control is nested inside another.
  *
  * COLOR CONVENTION: token-driven colors use inline style objects
  * (var(--token, fallbackHex)); layout / spacing / typography-size stay classes.
@@ -22,6 +23,8 @@ import {
 } from "@phosphor-icons/react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { prototypeRepository, type Prototype } from "@/lib/prototypeStore";
+import { SidePanel } from "./SidePanel";
+import { PrototypeViewer } from "./PrototypeViewer";
 
 const C = {
   surface: "var(--surface-background-lvl1,#ffffff)",
@@ -89,7 +92,13 @@ function QuickAction({
   );
 }
 
-function PrototypeCard({ prototype }: { prototype: Prototype }) {
+function PrototypeCard({
+  prototype,
+  onOpenViewer,
+}: {
+  prototype: Prototype;
+  onOpenViewer: () => void;
+}) {
   const [titleHover, setTitleHover] = useState(false);
   return (
     <div
@@ -107,18 +116,20 @@ function PrototypeCard({ prototype }: { prototype: Prototype }) {
         <StatusPill status={prototype.status} />
       </div>
 
-      {/* Title (opens the prototype) + description — the title link is a sibling
-          of the action buttons, so no interactive control is nested. */}
+      {/* Title opens the Prototype Viewer drawer (a <button>, sibling of the
+          action links below — no nested interactive controls). */}
       <div className="flex flex-col gap-[var(--spacing-50,4px)]">
-        <Link
-          href={prototype.route}
+        <button
+          type="button"
+          data-focus-key={`proto-open-${prototype.id}`}
+          onClick={onOpenViewer}
           onMouseEnter={() => setTitleHover(true)}
           onMouseLeave={() => setTitleHover(false)}
-          className="text-[length:var(--headline-xs-medium-size,16px)] font-semibold transition-colors"
+          className="text-left text-[length:var(--headline-xs-medium-size,16px)] font-semibold transition-colors"
           style={{ color: titleHover ? C.brandFg : C.textPrimary }}
         >
           {prototype.name}
-        </Link>
+        </button>
         <p
           className="text-[length:var(--body-md-regular-size,14px)]"
           style={{ color: C.textMuted }}
@@ -167,7 +178,13 @@ function OpenLink({ href }: { href: string }) {
 }
 
 export default function AiPrototypePage(): JSX.Element {
+  // A refresh tick re-reads the repo after viewer edits (versions / share).
+  const [tick, setTick] = useState(0);
   const prototypes = prototypeRepository.list();
+
+  // Which prototype's viewer drawer is open (by id), if any.
+  const [openId, setOpenId] = useState<string | null>(null);
+  const active = openId ? prototypes.find((p) => p.id === openId) : undefined;
 
   return (
     <div className="mx-auto w-full max-w-[1080px] px-6 py-8 md:px-10 md:py-10">
@@ -198,7 +215,11 @@ export default function AiPrototypePage(): JSX.Element {
         </p>
         <div className="grid grid-cols-1 gap-[var(--spacing-200,16px)] sm:grid-cols-2 lg:grid-cols-3">
           {prototypes.map((p) => (
-            <PrototypeCard key={p.id} prototype={p} />
+            <PrototypeCard
+              key={p.id}
+              prototype={p}
+              onOpenViewer={() => setOpenId(p.id)}
+            />
           ))}
 
           {/* Empty-state placeholder (non-functional). */}
@@ -227,6 +248,23 @@ export default function AiPrototypePage(): JSX.Element {
           </div>
         </div>
       </div>
+
+      {/* Prototype Viewer — DS Side Panel drawer (large / 800 size). */}
+      <SidePanel
+        open={active != null}
+        onClose={() => setOpenId(null)}
+        title={active ? active.name : "Prototype"}
+        subtitle="Prototype viewer"
+        size="800"
+      >
+        {active && (
+          <PrototypeViewer
+            key={`${active.id}-${tick}`}
+            prototype={active}
+            onChanged={() => setTick((t) => t + 1)}
+          />
+        )}
+      </SidePanel>
     </div>
   );
 }

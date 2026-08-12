@@ -1,9 +1,9 @@
 /* =========================================================================
  * Fiber Workspace — Welcome / Module Selection (/)
  *
- * Standalone entry point rendered WITHOUT the left sidebar: a slim shared
- * header (reused by the sidebar AppShell) over a centered welcome heading and
- * the four module tiles. Selecting a module routes into the sidebar workspace.
+ * Standalone entry point with NO global header — the module tiles ARE the
+ * navigation. A discreet floating top-right cluster (theme toggle + logout)
+ * keeps users from being trapped. All OTHER pages keep the global header.
  *
  * Each tile is a SINGLE clickable <Link> — no nested interactive controls (the
  * arrow is a decorative icon only).
@@ -17,17 +17,18 @@
  * ========================================================================= */
 
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import {
   Palette,
   Sparkle,
   FlowArrow,
   TestTube,
   ArrowRight,
+  SignOut,
   type IconProps,
 } from "@phosphor-icons/react";
-import { WorkspaceHeader } from "./WorkspaceHeader";
-import { CURRENT_USER } from "./auth";
+import { ThemeToggle } from "./WorkspaceHeader";
+import { CURRENT_USER, logout } from "./auth";
 
 // Token-driven colors (var(--token, fallbackHex)) — flip with [data-theme].
 const C = {
@@ -36,10 +37,43 @@ const C = {
   border: "var(--border-static-subtle-neutral,#e1e1e8)",
   textPrimary: "var(--surface-foreground-static-neutral-lvl1,#13131a)",
   textMuted: "var(--surface-foreground-static-neutral-lvl3,#717180)",
+  textBody: "var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)",
   brandSubtle: "var(--container-dynamic-brand-subtle-background-default,#f6ebff)",
   brandFg: "var(--surface-foreground-dynamic-brand-default,#7c33b5)",
   arrow: "var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)",
+  hoverBg: "var(--container-dynamic-neutral-subtle-background-hover,#71718014)",
 };
+
+/** Discreet floating cluster: theme toggle + logout (Welcome has no header). */
+function FloatingControls() {
+  const [, navigate] = useLocation();
+  const [hover, setHover] = useState(false);
+  const onLogout = () => {
+    logout();
+    navigate("/login");
+  };
+  return (
+    <div className="fixed right-4 top-4 z-30 flex items-center gap-2 md:right-6 md:top-6">
+      <ThemeToggle />
+      <button
+        type="button"
+        onClick={onLogout}
+        aria-label="Log out"
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        className="flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-[12px] font-medium transition-colors"
+        style={{
+          backgroundColor: hover ? C.hoverBg : C.surface,
+          borderColor: C.border,
+          color: C.textBody,
+        }}
+      >
+        <SignOut size={14} />
+        <span className="hidden sm:inline">Logout</span>
+      </button>
+    </div>
+  );
+}
 
 type IconType = React.ComponentType<IconProps>;
 
@@ -126,8 +160,9 @@ export default function DashboardPage(): JSX.Element {
       className="flex min-h-screen flex-col"
       style={{ backgroundColor: C.canvasBg, fontFamily: '"Poppins", "DM Sans", sans-serif' }}
     >
-      {/* Shared slim header — no logo link (already on the Welcome screen). */}
-      <WorkspaceHeader />
+      {/* Welcome has NO global header — the module tiles are the navigation.
+          A discreet floating cluster keeps theme + logout reachable. */}
+      <FloatingControls />
 
       <main className="flex flex-1 items-start justify-center px-6 py-12 md:py-16">
         <div className="flex w-full max-w-[1080px] flex-col">
