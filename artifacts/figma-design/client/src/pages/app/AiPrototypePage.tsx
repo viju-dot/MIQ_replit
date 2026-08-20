@@ -59,35 +59,33 @@ function StatusPill({ status }: { status: string }) {
   );
 }
 
-/** A quick-action icon link (sibling control — never nested inside a card link). */
-function QuickAction({
-  href,
+/**
+ * An inactive quick action ("Coming soon"). Visible but muted, non-clickable
+ * and not focusable — rendered as a plain, non-interactive <span> with
+ * aria-disabled semantics and a tooltip hint. No nested interactive controls.
+ */
+function DisabledQuickAction({
   label,
   icon: Icon,
 }: {
-  href: string;
   label: string;
   icon: React.ComponentType<IconProps>;
 }) {
-  const [hover, setHover] = useState(false);
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Link
-          href={href}
-          aria-label={label}
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
-          className="flex size-[32px] items-center justify-center rounded-[var(--radius-50,4px)] border transition-colors"
-          style={{
-            borderColor: C.border,
-            backgroundColor: hover ? C.hoverBg : C.surface,
-          }}
+        <span
+          role="button"
+          aria-disabled="true"
+          aria-label={`${label} — coming soon`}
+          title="Coming soon"
+          className="flex size-[32px] cursor-not-allowed items-center justify-center rounded-[var(--radius-50,4px)] border"
+          style={{ borderColor: C.border, backgroundColor: C.surface, opacity: 0.5 }}
         >
-          <Icon size={16} color={hover ? C.brandFg : C.textBody} />
-        </Link>
+          <Icon size={16} color={C.disabled} />
+        </span>
       </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
+      <TooltipContent>{label} — coming soon</TooltipContent>
     </Tooltip>
   );
 }
@@ -145,16 +143,10 @@ function PrototypeCard({
       >
         <OpenLink href={prototype.route} />
         <div className="flex items-center gap-1.5">
-          <QuickAction
-            href={`/flow-chart/${prototype.id}`}
-            label="Open in Flow Chart"
-            icon={FlowArrow}
-          />
-          <QuickAction
-            href={`/usability-testing/${prototype.id}`}
-            label="Open in Usability Testing"
-            icon={TestTube}
-          />
+          {/* Flow Chart & Usability Testing are inactive ("Coming soon"):
+              visible but muted, non-clickable and not focusable. */}
+          <DisabledQuickAction label="Flow Chart" icon={FlowArrow} />
+          <DisabledQuickAction label="Usability Testing" icon={TestTube} />
         </div>
       </div>
     </div>

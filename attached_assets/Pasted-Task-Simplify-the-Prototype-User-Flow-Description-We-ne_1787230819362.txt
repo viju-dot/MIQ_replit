@@ -1,0 +1,79 @@
+Task: Simplify the Prototype User Flow
+Description
+
+We need to keep this prototype simple and easy to use. I don't want to introduce unnecessary functionality or additional steps that make the prototype harder to navigate.
+
+Please remove the unnecessary authentication and disable unfinished functionality for now.
+
+1. Remove Login Functionality
+
+Completely remove the login flow from the application.
+
+When the user opens the application:
+
+Open application → Welcome screen
+
+The Welcome screen should become the first/launching screen.
+
+Do not show:
+
+Login screen
+Username
+Password
+Authentication
+Login validation
+Logout
+
+We can add authentication again in a future iteration if required.
+
+2. Disable Flow Chart and Usability Testing
+
+On the Welcome screen, keep the Flow Chart and Usability Testing modules visible so users understand that these modules are part of the overall product.
+
+However, they should be disabled/inactive for now.
+
+Make their cards visually communicate that they are not currently available.
+
+For example:
+
+Reduced visual emphasis
+Disabled interaction
+Clear "Coming Soon" or equivalent indication
+
+Do not allow users to enter these modules.
+
+3. Disable Flow Chart and Usability Testing Actions in AI Prototype
+
+Previously, AI Prototype cards had actions for:
+
+Flow Chart
+Usability Testing
+
+Disable these actions for now as those modules are not ready.
+
+Keep the actions visible if they are useful for communicating the future workflow, but make them clearly inactive and non-clickable.
+
+Do not remove the existing AI Prototype functionality.
+
+Important
+
+Do not redesign the application.
+
+This is primarily a flow simplification task.
+
+Keep:
+
+Welcome screen
+Fiber Design System
+AI Prototype
+Existing Design System functionality
+Existing AI Prototype functionality
+Current visual design
+
+Only remove the login friction and disable the unfinished Flow Chart and Usability Testing functionality.
+
+Final user flow
+
+Open application → Welcome Screen → Select available module → Start working
+
+The prototype should feel simple and immediately usable without unnecessary authentication or unfinished workflows.

@@ -1,10 +1,9 @@
 /* =========================================================================
- * Fiber Workspace — global header (always visible after login)
+ * Fiber Workspace — global header
  *
- * Single header used everywhere post-login: MIQ/app logo + name (→ Welcome),
- * module-switching nav links with a Fiber brand active state, then theme
- * toggle + user chip + Logout. Module switching lives here — there is no
- * module sidebar anymore.
+ * Single header used everywhere: MIQ/app logo + name (→ Welcome),
+ * module-switching nav links with a Fiber brand active state, then a theme
+ * toggle. Module switching lives here — there is no module sidebar anymore.
  *
  * COLOR CONVENTION: token-driven colors are applied via inline style objects
  * (var(--token, fallbackHex)) — Tailwind arbitrary var()/rgba color classes can
@@ -15,9 +14,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Moon, Sun } from "lucide-react";
-import { SignOut, User } from "@phosphor-icons/react";
 import { useTheme } from "@/lib/theme";
-import { logout, CURRENT_USER } from "./auth";
 
 // Token-driven colors (var(--token, fallbackHex)) — flip with [data-theme].
 const C = {
@@ -36,6 +33,8 @@ export interface HeaderNavItem {
   label: string;
   /** Marks the link active for the current path. */
   match: (path: string) => boolean;
+  /** Module not yet available — rendered inert with a "Coming soon" hint. */
+  comingSoon?: boolean;
 }
 
 export const HEADER_NAV: HeaderNavItem[] = [
@@ -58,11 +57,13 @@ export const HEADER_NAV: HeaderNavItem[] = [
     href: "/flow-chart",
     label: "Flow Chart",
     match: (p) => p === "/flow-chart" || p.startsWith("/flow-chart/"),
+    comingSoon: true,
   },
   {
     href: "/usability-testing",
     label: "Usability Testing",
     match: (p) => p === "/usability-testing" || p.startsWith("/usability-testing/"),
+    comingSoon: true,
   },
 ];
 
@@ -81,6 +82,18 @@ export function Lettermark({ height = 24 }: { height?: number }) {
 /** A single header module link with a Fiber brand-pill active state. */
 function ModuleLink({ item, active }: { item: HeaderNavItem; active: boolean }) {
   const [hover, setHover] = useState(false);
+  if (item.comingSoon) {
+    return (
+      <span
+        aria-disabled="true"
+        title="Coming soon"
+        className="flex shrink-0 cursor-default select-none items-center whitespace-nowrap rounded-full px-3 py-1.5 text-[13px]"
+        style={{ color: C.textBody, opacity: 0.5, fontWeight: 500 }}
+      >
+        {item.label}
+      </span>
+    );
+  }
   return (
     <Link
       href={item.href}
@@ -158,36 +171,6 @@ export function ThemeToggle() {
   );
 }
 
-export function UserChip() {
-  const [, navigate] = useLocation();
-  const onLogout = () => {
-    logout();
-    navigate("/login");
-  };
-  return (
-    <div className="flex shrink-0 items-center gap-2">
-      <div
-        className="hidden items-center gap-1.5 rounded-full border px-2 py-1 sm:flex"
-        style={{ backgroundColor: C.surface, borderColor: C.border }}
-      >
-        <span
-          className="flex size-[22px] items-center justify-center rounded-full"
-          style={{ backgroundColor: C.brandSubtle }}
-        >
-          <User size={13} weight="fill" style={{ color: C.brandFg }} />
-        </span>
-        <span className="text-[13px] font-medium" style={{ color: C.textPrimary }}>
-          {CURRENT_USER}
-        </span>
-      </div>
-      <PillButton onClick={onLogout} ariaLabel="Log out">
-        <SignOut size={14} />
-        <span className="hidden sm:inline">Logout</span>
-      </PillButton>
-    </div>
-  );
-}
-
 interface WorkspaceHeaderProps {
   /**
    * Whether to show the module-switching nav. Defaults to true (shown
@@ -216,7 +199,6 @@ export function WorkspaceHeader({ showNav = true }: WorkspaceHeaderProps) {
       {showNav ? <ModuleNav /> : <div className="min-w-0 flex-1" />}
 
       <ThemeToggle />
-      <UserChip />
     </header>
   );
 }
