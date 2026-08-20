@@ -20,6 +20,9 @@ import { Moon, Sun } from "lucide-react";
 import { Translate, CaretDown } from "@phosphor-icons/react";
 import { useTheme } from "@/lib/theme";
 import TvAudienceDashboardPage from "@/pages/ds/TvAudienceDashboardPage";
+import { PrototypeCollabOverlay } from "@/components/PrototypeCollabOverlay";
+import { usePrototypeVersion } from "@/lib/prototypeVersionContext";
+import type { PrototypeVersion, Prototype } from "@/lib/prototypeStore";
 
 const A = "/figmaAssets/navigation";
 const FONT = '"DM Sans", Helvetica';
@@ -357,7 +360,144 @@ function SecondaryNavigation() {
 
 /* ------------------------------------------------------------- Page -------- */
 
-export default function TvAudienceApp() {
+/* ---------------------------------------------------- Version strip -------- */
+/* A version-context strip rendered INSIDE the prototype (under its own nav) so
+ * switching versions visibly changes the prototype itself, not just the
+ * floating chip. Older versions show their FROZEN snapshot values; the newest
+ * version shows the live prototype values. */
+
+function fmtDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+const STATUS_STYLE: Record<string, { bg: string; fg: string }> = {
+  Live: {
+    bg: "var(--container-dynamic-success-subtle-background-default,#e7faef)",
+    fg: "var(--container-dynamic-success-subtle-foreground-default,#1e8158)",
+  },
+  Draft: {
+    bg: "var(--container-dynamic-neutral-subtle-background-hover,#71718014)",
+    fg: "var(--surface-foreground-static-neutral-lvl3,#717180)",
+  },
+  Archived: {
+    bg: "var(--container-dynamic-neutral-subtle-background-hover,#71718014)",
+    fg: "var(--surface-foreground-static-neutral-lvl3,#717180)",
+  },
+};
+
+function VersionContextStrip() {
+  const ctx = usePrototypeVersion();
+  // Rendered version-unaware (e.g. the /share view) → no strip.
+  if (!ctx) return null;
+
+  const { prototype, viewedVersion, isNewest } = ctx;
+  // Newest = live prototype values; older = frozen snapshot values.
+  const description = isNewest
+    ? prototype.description
+    : viewedVersion.snapshot?.description ||
+      viewedVersion.description ||
+      prototype.description;
+  const status = isNewest
+    ? prototype.status
+    : viewedVersion.snapshot?.status || prototype.status;
+  const st = STATUS_STYLE[status] ?? STATUS_STYLE.Draft;
+
+  return (
+    <div
+      className="w-full border-b border-solid"
+      style={{
+        backgroundColor: "var(--surface-background-lvl1,#ffffff)",
+        borderColor: "var(--border-static-subtle-neutral,#e1e1e8)",
+      }}
+      aria-label="Prototype version context"
+    >
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-2 px-6 py-3 md:flex-row md:items-center md:justify-between md:px-10">
+        <div className="flex items-center gap-2">
+          <span
+            className="inline-flex items-center rounded-full px-2 py-0.5 text-[12px] font-semibold"
+            style={{
+              backgroundColor:
+                "var(--container-dynamic-brand-subtle-background-default,#f6ebff)",
+              color: "var(--surface-foreground-dynamic-brand-default,#7c33b5)",
+            }}
+          >
+            {viewedVersion.name}
+          </span>
+          <span
+            className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium"
+            style={{ backgroundColor: st.bg, color: st.fg }}
+          >
+            {status}
+          </span>
+          {isNewest ? (
+            <span
+              className="text-[12px] font-medium"
+              style={{ color: "var(--surface-foreground-static-neutral-lvl3,#717180)" }}
+            >
+              Live · current
+            </span>
+          ) : (
+            <span
+              className="text-[12px] font-medium"
+              style={{ color: "var(--surface-foreground-static-neutral-lvl3,#717180)" }}
+            >
+              Snapshot · {fmtDate(viewedVersion.createdAt)}
+            </span>
+          )}
+        </div>
+        <p
+          className="min-w-0 truncate text-[length:var(--body-md-regular-size,14px)]"
+          style={{
+            color: "var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)",
+          }}
+        >
+          {description}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------ Version → renderer map --------- */
+/* A version-bound renderer registry so future per-version prototype renderers
+ * can plug in (keyed by version id). Unknown versions fall back to the current
+ * dashboard. The version-aware strip above communicates which version's
+ * (frozen or live) values are in effect. */
+
+type VersionRenderer = (args: {
+  prototype: Prototype;
+  version: PrototypeVersion;
+  isNewest: boolean;
+}) => JSX.Element;
+
+const DEFAULT_RENDERER: VersionRenderer = () => <TvAudienceDashboardPage />;
+
+const VERSION_RENDERERS: Record<string, VersionRenderer> = {
+  // e.g. "tvai_v1": () => <TvAudienceDashboardPageV1 />,
+};
+
+/** The prototype body — version-aware. Consumes the version context. */
+function PrototypeBody() {
+  const ctx = usePrototypeVersion();
+  if (!ctx) return <TvAudienceDashboardPage />;
+  const render =
+    VERSION_RENDERERS[ctx.viewedVersion.id] ?? DEFAULT_RENDERER;
+  return render({
+    prototype: ctx.prototype,
+    version: ctx.viewedVersion,
+    isNewest: ctx.isNewest,
+  });
+}
+
+/** The full prototype experience (header + version strip + body). Rendered as
+ *  the overlay's children so it is re-mounted when the viewed version changes. */
+function TvAudienceExperience() {
   return (
     <div
       className="flex min-h-screen flex-col bg-[var(--surface-background-lvl2,#f7f7fa)]"
@@ -367,13 +507,28 @@ export default function TvAudienceApp() {
       <header className="sticky top-0 z-50 w-full">
         <PrimaryNavigation />
         <SecondaryNavigation />
+        {/* Version-context strip lives directly under the prototype's own nav. */}
+        <VersionContextStrip />
       </header>
 
       {/* Dashboard body — imported, not duplicated. The dashboard's own filter
           bar padding uses -mx-6 / -mx-10, so mirror that px-6 / px-10 here. */}
       <main className="mx-auto w-full max-w-[1440px] px-6 py-8 md:px-10">
-        <TvAudienceDashboardPage />
+        <PrototypeBody />
       </main>
     </div>
+  );
+}
+
+export default function TvAudienceApp() {
+  // The overlay both PROVIDES the version context (so the experience below is
+  // version-aware and re-mounts on version switch) AND renders the floating
+  // collaboration controls. It looks the prototype up by route from the
+  // registry; if none matches, it renders the children version-unaware. NOT
+  // used on the public /share/:token view.
+  return (
+    <PrototypeCollabOverlay route="/tv-audience-intelligence">
+      <TvAudienceExperience />
+    </PrototypeCollabOverlay>
   );
 }

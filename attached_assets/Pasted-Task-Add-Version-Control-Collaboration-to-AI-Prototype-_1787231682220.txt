@@ -1,0 +1,190 @@
+Task: Add Version Control & Collaboration to AI Prototype
+Description
+
+We already have AI Prototype cards and a prototype viewer. I want to keep the experience simple and focus on two collaboration capabilities:
+
+Options / Ideation — manage and explore different versions of the prototype.
+Comments — add and review feedback on the prototype.
+
+When a user opens an AI Prototype, they should see the actual prototype full-screen. In the bottom-right corner, add a button group with these two actions:
+
+Options / Ideation
+Comments
+
+Use the existing Fiber Design System button-group components wherever appropriate.
+
+1. Options / Ideation
+
+When the user selects Options / Ideation, open a dedicated version panel or workspace.
+
+The purpose is to show the evolution of the prototype.
+
+Version List
+
+Display all available versions:
+
+V1
+V2
+V3
+V4
+etc.
+
+Each version should show:
+
+Version number
+Created date
+Created time
+Short description or ideation name
+
+The first prototype should automatically be V1.
+
+Switching Versions
+
+If I am currently viewing V1 and select V3, the prototype viewer should immediately change to the UI belonging to V3.
+
+The user should always understand which version they are currently viewing.
+
+For example:
+
+Current version: V3
+
+Changing the selected version should not overwrite the previous version.
+
+Each version must remain independent.
+
+Version Creation
+
+When a new idea or significant change is created, it should become a new version rather than replacing the existing prototype.
+
+Example:
+
+V1 → V2 → V3 → V4
+
+The version history should therefore become the record of how the prototype evolved.
+
+For this iteration, keep the version management simple. Don't build complex branching or Git-like functionality yet.
+
+2. Comments
+
+When the user selects Comments, provide two actions:
+
+Add New Comment
+Show All Comments
+Add New Comment
+
+When selected, open a small modal/popover using the existing Fiber Design System components.
+
+Ask for the commenter's name.
+
+Provide:
+
+Name
+
+The user should be able to:
+
+Select an existing name, or
+Enter a new name
+
+Then provide:
+
+Comment
+
+After submitting, save the comment against the currently viewed prototype/version.
+
+Show All Comments
+
+Open a comments panel showing all comments associated with the prototype.
+
+Each comment should display:
+
+Commenter's name
+Comment text
+Date
+Time
+Version associated with the comment
+
+For example:
+
+Vijay
+"The button placement feels too low."
+V2 · Aug 20, 2026 · 3:42 PM
+
+Comments should remain connected to the version on which they were created.
+
+If I switch from V2 to V3, I should be able to understand which feedback belongs to which version.
+
+Prototype Viewer Layout
+
+Keep the prototype itself as the primary focus.
+
+┌──────────────────────────────────────────────┐
+│                                              │
+│                                              │
+│              AI PROTOTYPE                    │
+│                                              │
+│              Current Version: V2             │
+│                                              │
+│                                              │
+│                                              │
+│                         ┌─────────┬─────────┐ │
+│                         │ Options │ Comments│ │
+│                         └─────────┴─────────┘ │
+└──────────────────────────────────────────────┘
+
+The bottom-right actions should remain easily accessible without covering important prototype content.
+
+Important UX Principle
+
+Don't turn this into a complicated project-management or Git system.
+
+For this prototype, the mental model should be extremely simple:
+
+Prototype
+
+→ Versions
+→ Comments
+
+A user should be able to:
+
+Open a prototype.
+Choose Options / Ideation.
+Select another version.
+See that version immediately.
+Open Comments.
+Add feedback or review existing feedback.
+Understand which version the feedback belongs to.
+Design System Requirement
+
+Use the Fiber Design System components for:
+
+Button Group
+Buttons
+Modal / Dialog
+Side Panel / Drawer
+Input
+Select
+Tabs
+Comments/List components where available
+
+Do not create new UI patterns if an equivalent Fiber component already exists.
+
+Follow the existing Fiber tokens, variables, typography, spacing, states, and interaction rules.
+
+Future Direction — Do Not Build Yet
+
+Keep the architecture flexible for future collaboration features such as:
+
+Comment replies
+Mentions
+Comment resolution
+Comment pins directly on the prototype
+Version comparison
+Version naming
+Version branching
+Shareable prototype versions
+Real-time collaboration
+Activity history
+
+For now, Version History + Version Switching + Add/View Comments is enough.
+
+The goal is to make the AI Prototype feel like a lightweight combination of Figma-style commenting and version exploration, without introducing unnecessary complexity.
