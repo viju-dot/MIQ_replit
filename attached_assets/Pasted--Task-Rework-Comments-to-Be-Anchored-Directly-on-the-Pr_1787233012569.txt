@@ -1,0 +1,72 @@
+# Task: Rework Comments to Be Anchored Directly on the Prototype UI
+
+## Description
+
+The current comment functionality is good, but the interaction is not what I want.
+
+I don't want users to write comments inside a popup. The **prototype UI itself should be the canvas where comments are placed**, similar to how Figma handles comments.
+
+The comment popup should only be used for identifying the person who is creating the comment. The actual comment should be created and viewed directly on the prototype screen.
+
+---
+
+## Expected Comment Experience
+
+When the user selects **Comments** from the bottom-right action group, enable **Comment Mode** on the prototype.
+
+The user should then be able to select a specific location or UI element on the prototype.
+
+For example:
+
+- Button
+- Input
+- Card
+- Navigation
+- Text
+- Image
+- Any other visible UI element
+
+The selected location should become the anchor point for the comment.
+
+---
+
+## Add Comment
+
+After selecting a location on the prototype:
+
+1. Identify the selected UI element/location.
+2. Open a small comment composer close to that location.
+3. Ask/select the commenter's name.
+4. Allow the user to write the actual comment directly in the anchored comment composer.
+5. Submit the comment.
+6. Place a comment marker on the prototype at that exact location.
+
+The name selection should only identify who is making the comment.
+
+---
+
+## Important Change
+
+Do **not** use a generic central popup for writing comments.
+
+The comment should belong to a specific position on the prototype.
+
+For example:
+
+```text
+┌──────────────────────────────────────────────┐
+│                                              │
+│       Prototype UI                           │
+│                                              │
+│             ┌───────────────┐                │
+│             │    Button     │  ●  ← Comment │
+│             └───────────────┘                │
+│                                  ┌─────────┐ │
+│                                  │ Vijay   │ │
+│                                  │---------│ │
+│                                  │ Move    │ │
+│                                  │ this     │ │
+│                                  │ button   │ │
+│                                  │ higher   │ │
+│                                  └─────────┘ │
+└──────────────────────────────────────────────┘

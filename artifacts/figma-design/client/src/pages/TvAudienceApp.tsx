@@ -20,7 +20,10 @@ import { Moon, Sun } from "lucide-react";
 import { Translate, CaretDown } from "@phosphor-icons/react";
 import { useTheme } from "@/lib/theme";
 import TvAudienceDashboardPage from "@/pages/ds/TvAudienceDashboardPage";
-import { PrototypeCollabOverlay } from "@/components/PrototypeCollabOverlay";
+import {
+  PrototypeCollabOverlay,
+  PrototypeCommentLayer,
+} from "@/components/PrototypeCollabOverlay";
 import { usePrototypeVersion } from "@/lib/prototypeVersionContext";
 import type { PrototypeVersion, Prototype } from "@/lib/prototypeStore";
 
@@ -495,6 +498,38 @@ function PrototypeBody() {
   });
 }
 
+/**
+ * The version-bound content region. The centered <main> IS the comment
+ * coordinate root (position: relative, max-w-[1440px]): comment anchors are
+ * measured against — and markers rendered inside — this exact box, so pins
+ * track prototype elements on any viewport, including > 1440px where the
+ * canvas is narrower than the viewport. Older (non-newest) versions render
+ * interaction-disabled; comment-mode clicks still register because the layer's
+ * click-capture overlay sits above the (inert) body content.
+ */
+function PrototypeContentRegion() {
+  const ctx = usePrototypeVersion();
+  const inert = ctx ? !ctx.isNewest : false;
+  return (
+    // <main> is the positioned canvas. The dashboard's own filter bar padding
+    // uses -mx-6 / -mx-10, so mirror that px-6 / px-10 here.
+    <main className="relative mx-auto w-full max-w-[1440px] px-6 py-8 md:px-10">
+      {/* Prototype body — imported, not duplicated. Wrapped so inert styling
+          applies only to the body, never to the comment layer sibling. */}
+      <div
+        aria-hidden={inert || undefined}
+        style={inert ? { pointerEvents: "none" } : undefined}
+      >
+        <PrototypeBody />
+      </div>
+
+      {/* Figma-style comment layer — markers + click-capture, scoped to this
+          canvas. Renders nothing without collab context (e.g. /share). */}
+      <PrototypeCommentLayer />
+    </main>
+  );
+}
+
 /** The full prototype experience (header + version strip + body). Rendered as
  *  the overlay's children so it is re-mounted when the viewed version changes. */
 function TvAudienceExperience() {
@@ -511,11 +546,7 @@ function TvAudienceExperience() {
         <VersionContextStrip />
       </header>
 
-      {/* Dashboard body — imported, not duplicated. The dashboard's own filter
-          bar padding uses -mx-6 / -mx-10, so mirror that px-6 / px-10 here. */}
-      <main className="mx-auto w-full max-w-[1440px] px-6 py-8 md:px-10">
-        <PrototypeBody />
-      </main>
+      <PrototypeContentRegion />
     </div>
   );
 }

@@ -17,6 +17,18 @@
 
 const STORAGE_KEY = "fiber:ai-prototype:comments:v1";
 
+/**
+ * Where a comment is pinned on the prototype UI. Position is stored as
+ * PERCENTAGES relative to the versioned content wrapper so markers stay
+ * correctly placed across resizes. `targetLabel` is a best-effort, human
+ * readable description of the clicked element (e.g. "Button: Apply filters").
+ */
+export interface CommentAnchor {
+  xPct: number;
+  yPct: number;
+  targetLabel: string;
+}
+
 /** A single comment left on a prototype, against a specific version. */
 export interface PrototypeComment {
   id: string;
@@ -30,6 +42,12 @@ export interface PrototypeComment {
   /** Comment body. */
   text: string;
   createdAt: string;
+  /**
+   * Where the comment is pinned on the prototype UI. Optional: legacy records
+   * without an anchor stay valid — they appear in the list panel but render no
+   * marker.
+   */
+  anchor?: CommentAnchor;
   // FUTURE (extensibility seam — do not use yet):
   //   parentId?: string;   // threaded replies
   //   resolved?: boolean;  // resolution state
@@ -71,6 +89,8 @@ export interface NewCommentInput {
   versionName: string;
   author: string;
   text: string;
+  /** Where the comment is pinned on the prototype UI (optional). */
+  anchor?: CommentAnchor;
 }
 
 export interface CommentRepository {
@@ -80,6 +100,8 @@ export interface CommentRepository {
   listAuthors(): string[];
   /** Persist a new comment. Throws on empty author/text. */
   add(input: NewCommentInput): PrototypeComment;
+  /** Delete a comment by id. */
+  remove(id: string): void;
 }
 
 /**
@@ -114,6 +136,28 @@ function coerceComment(raw: unknown): PrototypeComment | null {
     author,
     text,
     createdAt: createdAtRaw,
+    anchor: coerceAnchor(r.anchor),
+  };
+}
+
+/**
+ * Tolerant anchor parsing. Legacy records without a valid anchor return
+ * undefined (they stay valid — they render no marker). Percentages are clamped
+ * to [0, 100].
+ */
+function coerceAnchor(raw: unknown): CommentAnchor | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const a = raw as Record<string, unknown>;
+  const x = a.xPct;
+  const y = a.yPct;
+  if (typeof x !== "number" || !Number.isFinite(x)) return undefined;
+  if (typeof y !== "number" || !Number.isFinite(y)) return undefined;
+  const clamp = (n: number): number => Math.min(100, Math.max(0, n));
+  const label = typeof a.targetLabel === "string" ? a.targetLabel : "";
+  return {
+    xPct: clamp(x),
+    yPct: clamp(y),
+    targetLabel: label.trim() || "Screen",
   };
 }
 
@@ -189,10 +233,14 @@ export const localStorageRepository: CommentRepository = {
       author,
       text,
       createdAt: nowIso(),
+      anchor: coerceAnchor(input.anchor),
     };
     all.push(comment);
     writeAll(all);
     return comment;
+  },
+  remove(id) {
+    writeAll(readAll().filter((c) => c.id !== id));
   },
 };
 

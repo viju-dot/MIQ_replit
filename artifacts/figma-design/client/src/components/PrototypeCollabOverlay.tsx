@@ -4,35 +4,40 @@
  * A reusable, self-contained overlay mounted ON TOP of an ACTUAL rendered
  * prototype experience (e.g. the standalone TV Audience Intelligence app at
  * /tv-audience-intelligence). It adds lightweight, deliberately-simple version
- * control & collaboration WITHOUT any Git-like branching:
+ * control & Figma-style commenting WITHOUT any Git-like branching:
  *
  *   1. A bottom-right floating segmented button group (styled after the DS
- *      Button Group — replicated locally, not imported) with two segments:
+ *      Button Group — replicated locally, not imported):
  *        [ Options / Ideation | Comments ]
  *      plus a subtle always-visible "Current version: Vn" chip.
- *   2. Options / Ideation → a Side Panel listing ALL versions (newest-first).
- *      Selecting a version switches the CURRENTLY VIEWED version (view-state
- *      only — it never mutates the stored versions). The chip + selected-row
- *      highlight update immediately.
- *   3. Comments → a small DS popover anchored to the button group with two
- *      actions: "Add new comment" (DS Dialog, combobox-lite name + textarea)
- *      and "Show all comments" (Side Panel, newest-first, badged/filterable by
- *      version). Comments are saved against the prototype + CURRENTLY VIEWED
- *      version.
+ *   2. Options / Ideation → a Side Panel listing ALL versions (newest-first);
+ *      selecting one switches the CURRENTLY VIEWED version (view-state only).
+ *      It also hosts the "Show all comments" secondary list view.
+ *   3. Comments → toggles COMMENT MODE on the prototype (no popover menu, no
+ *      central dialog). In comment mode, clicking anywhere on the prototype
+ *      drops a pin + inline composer. Comments are pinned via <PrototypeCommentLayer>
+ *      rendered INSIDE the prototype's scrollable content wrapper so pins scroll
+ *      with the content.
  *
- * Mounting: rendered by the prototype route page (TvAudienceApp). It looks the
- * prototype up from prototypeRepository by matching `route` (or an explicit
- * prototypeId), and renders nothing if none is found. NOT used on the public
- * read-only /share/:token view.
+ * Mounting: rendered by the prototype route page (TvAudienceApp) which wraps its
+ * experience as children and mounts <PrototypeCommentLayer> inside its content
+ * wrapper. The overlay looks the prototype up from prototypeRepository by
+ * matching `route` (or explicit prototypeId); renders children version-unaware
+ * when none is found. NOT used on the public read-only /share/:token view.
  *
  * COLOR CONVENTION: token-driven colors via inline style objects
  * (var(--token, fallbackHex)); layout / spacing / typography-size stay classes.
- * The overlay's own chrome sits above the prototype UI (z-40) but BELOW any app
- * modals it opens (SidePanel z-50 / DS Dialog z-50 portal).
  * ========================================================================= */
 
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import { ChatCircle, GitBranch } from "@phosphor-icons/react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { ChatCircle, GitBranch, ListBullets, Trash } from "@phosphor-icons/react";
 import {
   prototypeRepository,
   type Prototype,
@@ -41,21 +46,15 @@ import {
 import {
   commentRepository,
   type PrototypeComment,
+  type CommentAnchor,
 } from "@/lib/commentStore";
+import { deriveTargetLabel } from "@/lib/commentTarget";
 import { PrototypeVersionProvider } from "@/lib/prototypeVersionContext";
+import {
+  PrototypeCollabProvider,
+  usePrototypeCollab,
+} from "@/lib/prototypeCollabContext";
 import { SidePanel } from "@/pages/app/SidePanel";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import {
   Select,
   SelectTrigger,
@@ -136,6 +135,8 @@ function versionDescription(v: PrototypeVersion, proto: Prototype): string {
 
 const SESSION_KEY = (id: string) => `fiber:ai-prototype:viewed-version:${id}`;
 
+const NEW_NAME = "__new__";
+
 /* ------------------------------------------------------------------ */
 /* Local DS-style segmented button group                              */
 /* ------------------------------------------------------------------ */
@@ -157,9 +158,7 @@ function Segment({
   icon,
   label,
   onClick,
-  ariaExpanded,
-  ariaHaspopup,
-  buttonRef,
+  ariaPressed,
 }: {
   side: Side;
   selected: boolean;
@@ -167,9 +166,7 @@ function Segment({
   icon: React.ReactNode;
   label: string;
   onClick: () => void;
-  ariaExpanded?: boolean;
-  ariaHaspopup?: boolean;
-  buttonRef?: React.Ref<HTMLButtonElement>;
+  ariaPressed?: boolean;
 }) {
   const [hover, setHover] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -177,11 +174,8 @@ function Segment({
   const fg = selected ? SEG.selectedFg : hover ? SEG.hoverFg : SEG.unselectedFg;
   return (
     <button
-      ref={buttonRef}
       type="button"
-      aria-pressed={selected}
-      aria-expanded={ariaExpanded}
-      aria-haspopup={ariaHaspopup ? "dialog" : undefined}
+      aria-pressed={ariaPressed ?? selected}
       onClick={onClick}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
@@ -270,154 +264,7 @@ function VersionRow({
 }
 
 /* ------------------------------------------------------------------ */
-/* Add-comment dialog                                                  */
-/* ------------------------------------------------------------------ */
-
-const NEW_NAME = "__new__";
-
-function AddCommentDialog({
-  open,
-  onOpenChange,
-  authors,
-  onSubmit,
-}: {
-  open: boolean;
-  onOpenChange: (v: boolean) => void;
-  authors: string[];
-  onSubmit: (author: string, text: string) => void;
-}) {
-  const [nameChoice, setNameChoice] = useState<string>(NEW_NAME);
-  const [newName, setNewName] = useState("");
-  const [text, setText] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
-  // Reset local state whenever the dialog is (re)opened.
-  function handleOpenChange(v: boolean) {
-    if (v) {
-      setNameChoice(authors.length > 0 ? authors[0] : NEW_NAME);
-      setNewName("");
-      setText("");
-      setError(null);
-    }
-    onOpenChange(v);
-  }
-
-  const usingNew = nameChoice === NEW_NAME;
-  const resolvedName = usingNew ? newName.trim() : nameChoice.trim();
-
-  function submit() {
-    if (resolvedName.length === 0) {
-      setError("Please enter a name.");
-      return;
-    }
-    if (text.trim().length === 0) {
-      setError("Please enter a comment.");
-      return;
-    }
-    onSubmit(resolvedName, text.trim());
-    onOpenChange(false);
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent
-        className="max-w-md"
-        style={{ backgroundColor: C.surface, borderColor: C.border }}
-      >
-        <DialogHeader>
-          <DialogTitle style={{ color: C.textPrimary }}>Add new comment</DialogTitle>
-          <DialogDescription style={{ color: C.textMuted }}>
-            Your feedback is saved against the version you are currently viewing.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="flex flex-col gap-[var(--spacing-200,16px)]">
-          {/* Name — combobox-lite: pick an existing commenter or add a new name. */}
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="collab-comment-name" style={{ color: C.textBody }}>
-              Name
-            </Label>
-            <Select
-              value={nameChoice}
-              onValueChange={(v) => {
-                setNameChoice(v);
-                setError(null);
-              }}
-            >
-              <SelectTrigger id="collab-comment-name" aria-label="Commenter name">
-                <SelectValue placeholder="Select a name" />
-              </SelectTrigger>
-              <SelectContent>
-                {authors.map((a) => (
-                  <SelectItem key={a} value={a}>
-                    {a}
-                  </SelectItem>
-                ))}
-                <SelectItem value={NEW_NAME}>New name…</SelectItem>
-              </SelectContent>
-            </Select>
-            {usingNew && (
-              <Input
-                aria-label="New commenter name"
-                placeholder="Enter your name"
-                value={newName}
-                onChange={(e) => {
-                  setNewName(e.target.value);
-                  setError(null);
-                }}
-              />
-            )}
-          </div>
-
-          {/* Comment body */}
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="collab-comment-text" style={{ color: C.textBody }}>
-              Comment
-            </Label>
-            <Textarea
-              id="collab-comment-text"
-              rows={4}
-              placeholder="Share your feedback…"
-              value={text}
-              onChange={(e) => {
-                setText(e.target.value);
-                setError(null);
-              }}
-            />
-          </div>
-
-          {error && (
-            <p role="alert" className="text-[12px]" style={{ color: C.errorFg }}>
-              {error}
-            </p>
-          )}
-        </div>
-
-        <div className="mt-2 flex items-center justify-end gap-2">
-          <button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            className="rounded-[var(--radius-100,8px)] border border-solid px-[var(--spacing-200,16px)] py-[var(--spacing-100,8px)] text-[length:var(--body-md-medium-size,14px)] font-medium transition-colors"
-            style={{ borderColor: C.border, color: C.textBody, backgroundColor: C.surface }}
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={submit}
-            className="rounded-[var(--radius-100,8px)] px-[var(--spacing-200,16px)] py-[var(--spacing-100,8px)] text-[length:var(--body-md-medium-size,14px)] font-medium transition-colors"
-            style={{ backgroundColor: C.brandBg, color: C.brandFgOn }}
-          >
-            Submit
-          </button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Comments list (Show all comments panel)                            */
+/* Comments list (Show all comments panel — secondary list view)      */
 /* ------------------------------------------------------------------ */
 
 function CommentsPanelBody({
@@ -471,7 +318,7 @@ function CommentsPanelBody({
           </p>
           <p className="text-[12px]" style={{ color: C.textMuted }}>
             {filter === "All"
-              ? "Be the first to leave feedback on this prototype."
+              ? "Turn on comment mode and click the prototype to leave feedback."
               : `No comments left against ${filter}.`}
           </p>
         </div>
@@ -497,6 +344,10 @@ function CommentsPanelBody({
                   {c.versionName}
                 </span>
               </div>
+              {/* Target label — where on the prototype this comment is pinned. */}
+              <p className="text-[11px] font-medium" style={{ color: C.textMuted }}>
+                {c.anchor ? c.anchor.targetLabel : "Unpinned"}
+              </p>
               <p
                 className="whitespace-pre-wrap text-[length:var(--body-sm-regular-size,12px)]"
                 style={{ color: C.textBody }}
@@ -515,33 +366,457 @@ function CommentsPanelBody({
 }
 
 /* ------------------------------------------------------------------ */
-/* Popover action (inline hover — no Tailwind var() hover classes)     */
+/* Name field (combobox-lite) — shared by the inline composer          */
 /* ------------------------------------------------------------------ */
 
-function PopoverAction({
-  label,
-  onClick,
+function NameField({
+  authors,
+  choice,
+  onChoiceChange,
+  newName,
+  onNewNameChange,
 }: {
-  label: string;
-  onClick: () => void;
+  authors: string[];
+  choice: string;
+  onChoiceChange: (v: string) => void;
+  newName: string;
+  onNewNameChange: (v: string) => void;
 }) {
-  const [hover, setHover] = useState(false);
+  const usingNew = choice === NEW_NAME;
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      className="flex items-center gap-2 rounded-[var(--radius-100,8px)] px-2.5 py-2 text-left text-[length:var(--body-md-regular-size,14px)] transition-colors"
-      style={{ color: C.textBody, backgroundColor: hover ? C.hoverBg : "transparent" }}
-    >
-      {label}
-    </button>
+    <div className="flex flex-col gap-1.5">
+      <Label htmlFor="collab-comment-name" style={{ color: C.textBody }}>
+        Name
+      </Label>
+      <Select value={choice} onValueChange={onChoiceChange}>
+        <SelectTrigger id="collab-comment-name" aria-label="Commenter name">
+          <SelectValue placeholder="Select a name" />
+        </SelectTrigger>
+        <SelectContent>
+          {authors.map((a) => (
+            <SelectItem key={a} value={a}>
+              {a}
+            </SelectItem>
+          ))}
+          <SelectItem value={NEW_NAME}>New name…</SelectItem>
+        </SelectContent>
+      </Select>
+      {usingNew && (
+        <Input
+          aria-label="New commenter name"
+          placeholder="Enter your name"
+          value={newName}
+          onChange={(e) => onNewNameChange(e.target.value)}
+        />
+      )}
+    </div>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/* Overlay + version provider (wraps the prototype content)            */
+/* Inline composer (Figma-style — anchored next to the click point)    */
+/* ------------------------------------------------------------------ */
+
+interface DraftPin {
+  xPct: number;
+  yPct: number;
+  targetLabel: string;
+}
+
+function InlineComposer({
+  draft,
+  authors,
+  onPost,
+  onCancel,
+}: {
+  draft: DraftPin;
+  authors: string[];
+  onPost: (author: string, text: string) => void;
+  onCancel: () => void;
+}) {
+  const [choice, setChoice] = useState<string>(
+    authors.length > 0 ? authors[0] : NEW_NAME,
+  );
+  const [newName, setNewName] = useState("");
+  const [text, setText] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const textRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => textRef.current?.focus(), 0);
+    return () => window.clearTimeout(t);
+  }, []);
+
+  // Flip horizontally / vertically near the wrapper edges so it stays on screen.
+  const flipRight = draft.xPct > 60;
+  const flipUp = draft.yPct > 60;
+
+  const resolvedName = choice === NEW_NAME ? newName.trim() : choice.trim();
+
+  function post() {
+    if (resolvedName.length === 0) {
+      setError("Please enter a name.");
+      return;
+    }
+    if (text.trim().length === 0) {
+      setError("Please enter a comment.");
+      return;
+    }
+    onPost(resolvedName, text.trim());
+  }
+
+  return (
+    <div
+      role="dialog"
+      aria-label="New comment"
+      onClick={(e) => e.stopPropagation()}
+      className="absolute z-[3] w-[280px] rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-200,16px)] shadow-lg"
+      style={{
+        left: `${draft.xPct}%`,
+        top: `${draft.yPct}%`,
+        transform: `translate(${flipRight ? "-100%" : "0"}, ${
+          flipUp ? "-100%" : "0"
+        }) translate(${flipRight ? "-12px" : "12px"}, ${flipUp ? "-12px" : "12px"})`,
+        backgroundColor: C.surface,
+        borderColor: C.border,
+      }}
+    >
+      <div className="flex flex-col gap-[var(--spacing-150,12px)]">
+        <p className="text-[11px] font-medium" style={{ color: C.textMuted }}>
+          {draft.targetLabel}
+        </p>
+        <NameField
+          authors={authors}
+          choice={choice}
+          onChoiceChange={(v) => {
+            setChoice(v);
+            setError(null);
+          }}
+          newName={newName}
+          onNewNameChange={(v) => {
+            setNewName(v);
+            setError(null);
+          }}
+        />
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="collab-comment-text" style={{ color: C.textBody }}>
+            Comment
+          </Label>
+          <Textarea
+            id="collab-comment-text"
+            ref={textRef}
+            rows={3}
+            placeholder="Share your feedback…"
+            value={text}
+            onChange={(e) => {
+              setText(e.target.value);
+              setError(null);
+            }}
+          />
+        </div>
+        {error && (
+          <p role="alert" className="text-[12px]" style={{ color: C.errorFg }}>
+            {error}
+          </p>
+        )}
+        <div className="flex items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-[var(--radius-100,8px)] border border-solid px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)] text-[length:var(--body-sm-medium-size,12px)] font-medium"
+            style={{ borderColor: C.border, color: C.textBody, backgroundColor: C.surface }}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={post}
+            className="rounded-[var(--radius-100,8px)] px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)] text-[length:var(--body-sm-medium-size,12px)] font-medium"
+            style={{ backgroundColor: C.brandBg, color: C.brandFgOn }}
+          >
+            Post
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Marker pin + bubble                                                 */
+/* ------------------------------------------------------------------ */
+
+function MarkerBubble({
+  comment,
+  flipRight,
+  flipUp,
+  onDelete,
+  onClose,
+}: {
+  comment: PrototypeComment;
+  flipRight: boolean;
+  flipUp: boolean;
+  onDelete: () => void;
+  onClose: () => void;
+}) {
+  const [delHover, setDelHover] = useState(false);
+  return (
+    <div
+      role="dialog"
+      aria-label={`Comment by ${comment.author}`}
+      onClick={(e) => e.stopPropagation()}
+      className="pointer-events-auto absolute z-[4] w-[260px] rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-200,16px)] shadow-lg"
+      style={{
+        left: "50%",
+        top: "50%",
+        transform: `translate(${flipRight ? "-100%" : "0"}, ${
+          flipUp ? "-100%" : "0"
+        }) translate(${flipRight ? "-14px" : "14px"}, ${flipUp ? "-14px" : "14px"})`,
+        backgroundColor: C.surface,
+        borderColor: C.border,
+      }}
+    >
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center justify-between gap-2">
+          <span
+            className="text-[length:var(--body-md-medium-size,14px)] font-semibold"
+            style={{ color: C.textPrimary }}
+          >
+            {comment.author}
+          </span>
+          <button
+            type="button"
+            aria-label="Delete comment"
+            onClick={onDelete}
+            onMouseEnter={() => setDelHover(true)}
+            onMouseLeave={() => setDelHover(false)}
+            className="flex size-[24px] items-center justify-center rounded-[var(--radius-50,4px)] transition-colors"
+            style={{ backgroundColor: delHover ? C.hoverBg : "transparent" }}
+          >
+            <Trash size={14} style={{ color: delHover ? C.errorFg : C.textMuted }} />
+          </button>
+        </div>
+        {comment.anchor && (
+          <p className="text-[11px] font-medium" style={{ color: C.textMuted }}>
+            {comment.anchor.targetLabel}
+          </p>
+        )}
+        <p
+          className="whitespace-pre-wrap text-[length:var(--body-sm-regular-size,12px)]"
+          style={{ color: C.textBody }}
+        >
+          {comment.text}
+        </p>
+        <p className="text-[11px]" style={{ color: C.textMuted }}>
+          {comment.versionName} · {fmtDate(comment.createdAt)} · {fmtTime(comment.createdAt)}
+        </p>
+        <div className="mt-1 flex justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-[11px] font-medium underline-offset-2 hover:underline"
+            style={{ color: C.textMuted }}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Marker({
+  comment,
+  index,
+  open,
+  onToggle,
+  onDelete,
+}: {
+  comment: PrototypeComment;
+  index: number;
+  open: boolean;
+  onToggle: () => void;
+  onDelete: () => void;
+}) {
+  const anchor = comment.anchor;
+  if (!anchor) return null;
+  const flipRight = anchor.xPct > 60;
+  const flipUp = anchor.yPct > 60;
+  return (
+    <div
+      className="absolute"
+      style={{ left: `${anchor.xPct}%`, top: `${anchor.yPct}%` }}
+    >
+      {/* The pin is positioned at the anchor point (its bottom-left tip). */}
+      <button
+        type="button"
+        aria-label={`Comment ${index + 1} by ${comment.author}`}
+        aria-expanded={open}
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggle();
+        }}
+        className="pointer-events-auto relative flex size-[26px] -translate-x-1/2 -translate-y-full items-center justify-center rounded-full rounded-bl-none border-2 text-[11px] font-semibold shadow-md outline-none focus-visible:z-[5]"
+        style={{
+          backgroundColor: C.brandBg,
+          borderColor: C.brandFgOn,
+          color: C.brandFgOn,
+          ...(open ? { boxShadow: FOCUS_RING } : null),
+        }}
+      >
+        {index + 1}
+      </button>
+      {open && (
+        <MarkerBubble
+          comment={comment}
+          flipRight={flipRight}
+          flipUp={flipUp}
+          onDelete={onDelete}
+          onClose={onToggle}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Comment layer — mounted INSIDE the prototype's content wrapper      */
+/* so pins scroll with the content.                                    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The in-content comment layer. Mount this as a direct child of the prototype
+ * CANVAS — the positioned box whose geometry exactly matches the visual
+ * prototype (e.g. the centered, max-width <main>), NOT a full-viewport-width
+ * wrapper. Anchors are stored as percentages of this box and markers render
+ * absolutely inside it, so pins track prototype elements on any viewport,
+ * including above the canvas max-width where the canvas is narrower than the
+ * viewport. Renders markers for the viewed version and, in comment mode, a
+ * click-capture overlay (covering the canvas box) that drops pins. Renders
+ * nothing when there is no collaboration context (e.g. /share view).
+ */
+export function PrototypeCommentLayer(): JSX.Element | null {
+  const collab = usePrototypeCollab();
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [draft, setDraft] = useState<DraftPin | null>(null);
+  const [openMarkerId, setOpenMarkerId] = useState<string | null>(null);
+
+  // Exit any open draft when leaving comment mode.
+  const commentMode = collab?.commentMode ?? false;
+  useEffect(() => {
+    if (!commentMode) setDraft(null);
+  }, [commentMode]);
+
+  if (!collab) return null;
+
+  const { markers, authors, addComment, removeComment, viewedVersion } = collab;
+
+  function handleCaptureClick(e: React.MouseEvent<HTMLDivElement>) {
+    // The layer's parent IS the canvas box (centered, max-width). Measure
+    // against it so percentages track prototype elements regardless of the
+    // side gutters that appear when the viewport exceeds the canvas max-width.
+    const host = wrapRef.current?.parentElement;
+    if (!host) return;
+    const rect = host.getBoundingClientRect();
+    // Percentages relative to the FULL scrollable content of the canvas, not
+    // just the visible viewport, so pins stay put when the content scrolls.
+    const xPx = e.clientX - rect.left + host.scrollLeft;
+    const yPx = e.clientY - rect.top + host.scrollTop;
+    const width = host.scrollWidth || rect.width;
+    const height = host.scrollHeight || rect.height;
+    if (width <= 0 || height <= 0) return;
+    const xPct = Math.min(100, Math.max(0, (xPx / width) * 100));
+    const yPct = Math.min(100, Math.max(0, (yPx / height) * 100));
+    // Identify the clicked element BENEATH the capture overlay. Temporarily
+    // ignore pointer events on the capture element itself so elementFromPoint
+    // returns the real prototype node under the cursor, not the overlay.
+    const captureEl = e.currentTarget;
+    const prevPE = captureEl.style.pointerEvents;
+    captureEl.style.pointerEvents = "none";
+    const beneath = document.elementFromPoint(e.clientX, e.clientY);
+    captureEl.style.pointerEvents = prevPE;
+    const targetLabel = deriveTargetLabel(beneath, host);
+    setOpenMarkerId(null);
+    setDraft({ xPct, yPct, targetLabel });
+  }
+
+  function postDraft(author: string, text: string) {
+    if (!draft) return;
+    addComment(author, text, {
+      xPct: draft.xPct,
+      yPct: draft.yPct,
+      targetLabel: draft.targetLabel,
+    });
+    setDraft(null);
+  }
+
+  return (
+    <div
+      ref={wrapRef}
+      className="pointer-events-none absolute inset-0 z-[2]"
+      aria-hidden={!commentMode && markers.length === 0 ? true : undefined}
+    >
+      {/* Click-capture overlay — only in comment mode. Sits ABOVE the (possibly
+          inert) prototype content so clicks always register. */}
+      {commentMode && (
+        <div
+          className="pointer-events-auto absolute inset-0"
+          style={{ cursor: "crosshair" }}
+          onClick={handleCaptureClick}
+          role="presentation"
+        />
+      )}
+
+      {/* Markers for the currently VIEWED version. */}
+      {markers.map((c, i) => (
+        <Marker
+          key={c.id}
+          comment={c}
+          index={i}
+          open={openMarkerId === c.id}
+          onToggle={() =>
+            setOpenMarkerId((cur) => (cur === c.id ? null : c.id))
+          }
+          onDelete={() => {
+            removeComment(c.id);
+            setOpenMarkerId(null);
+          }}
+        />
+      ))}
+
+      {/* Inline composer for a fresh pin. */}
+      {draft && (
+        <div className="pointer-events-auto">
+          {/* A placeholder pin at the draft location. */}
+          <div
+            className="absolute"
+            style={{ left: `${draft.xPct}%`, top: `${draft.yPct}%` }}
+          >
+            <span
+              className="absolute flex size-[26px] -translate-x-1/2 -translate-y-full items-center justify-center rounded-full rounded-bl-none border-2 shadow-md"
+              style={{ backgroundColor: C.brandBg, borderColor: C.brandFgOn }}
+              aria-hidden
+            >
+              <ChatCircle size={13} style={{ color: C.brandFgOn }} />
+            </span>
+          </div>
+          <InlineComposer
+            draft={draft}
+            authors={authors}
+            onPost={postDraft}
+            onCancel={() => setDraft(null)}
+          />
+        </div>
+      )}
+
+      {/* Keep viewedVersion referenced for future per-version marker styling. */}
+      <span hidden aria-hidden data-viewed-version={viewedVersion.id} />
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Overlay + providers (wraps the prototype content)                   */
 /* ------------------------------------------------------------------ */
 
 export interface PrototypeCollabOverlayProps {
@@ -552,8 +827,8 @@ export interface PrototypeCollabOverlayProps {
   /**
    * The prototype experience to render. It is re-mounted (keyed by the viewed
    * version id) whenever the viewed version changes, and can consume the viewed
-   * version via usePrototypeVersion(). When no matching prototype exists, the
-   * children are rendered as-is (version-unaware).
+   * version via usePrototypeVersion() and the collab state via usePrototypeCollab().
+   * When no matching prototype exists, the children are rendered as-is.
    */
   children: ReactNode;
 }
@@ -563,8 +838,7 @@ export function PrototypeCollabOverlay({
   route,
   children,
 }: PrototypeCollabOverlayProps): JSX.Element {
-  // A refresh tick re-reads the repository (prototype + comments). Bumped when a
-  // panel opens (reconcile against store updates) and after adding a comment.
+  // A refresh tick re-reads the repository (prototype + comments).
   const [tick, setTick] = useState(0);
 
   // Re-read the prototype from the repository on every tick so store updates
@@ -582,8 +856,7 @@ export function PrototypeCollabOverlay({
     [proto],
   );
 
-  // View-state ONLY: which version the user is currently looking at. Defaults
-  // to the newest (= current). Persist last-viewed per prototype in session.
+  // View-state ONLY: which version the user is currently looking at.
   const [viewedVersionId, setViewedVersionId] = useState<string>(() => {
     if (!proto || proto.versions.length === 0) return "";
     const newest = proto.versions[proto.versions.length - 1];
@@ -595,9 +868,8 @@ export function PrototypeCollabOverlay({
   });
 
   const [optionsOpen, setOptionsOpen] = useState(false);
-  const [commentsPopoverOpen, setCommentsPopoverOpen] = useState(false);
-  const [addCommentOpen, setAddCommentOpen] = useState(false);
   const [showCommentsOpen, setShowCommentsOpen] = useState(false);
+  const [commentMode, setCommentMode] = useState(false);
 
   // Read comments (re-reads whenever tick / prototype changes).
   const comments = useMemo<PrototypeComment[]>(
@@ -621,17 +893,25 @@ export function PrototypeCollabOverlay({
     [proto],
   );
 
-  // Reconcile the viewed selection whenever the prototype/versions change: if
-  // the current selection points to a version that no longer exists, fall back
-  // to the newest AND repair state + sessionStorage.
+  // Reconcile the viewed selection: fall back to the newest version + repair
+  // state/sessionStorage when the current selection no longer exists.
   useEffect(() => {
     if (!proto || proto.versions.length === 0) return;
     const exists = proto.versions.some((v) => v.id === viewedVersionId);
     if (!exists) {
-      const newestId = proto.versions[proto.versions.length - 1].id;
-      selectVersion(newestId);
+      selectVersion(proto.versions[proto.versions.length - 1].id);
     }
   }, [proto, viewedVersionId, selectVersion]);
+
+  // Escape exits comment mode.
+  useEffect(() => {
+    if (!commentMode) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setCommentMode(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [commentMode]);
 
   // No matching prototype (or no versions) → render children version-unaware.
   if (!proto || proto.versions.length === 0) return <>{children}</>;
@@ -642,10 +922,16 @@ export function PrototypeCollabOverlay({
   const isNewest =
     viewedVersion.id === proto.versions[proto.versions.length - 1].id;
 
-  // Re-reads the store when a panel opens so stale selections/comments repair.
   const reconcile = () => setTick((t) => t + 1);
 
-  function handleAddComment(author: string, text: string) {
+  // Markers = comments for the viewed version WITH a valid anchor.
+  const markers = comments
+    .filter((c) => c.versionId === viewedVersion.id && c.anchor)
+    // Oldest-first so numbered pins read 1..n chronologically.
+    .slice()
+    .reverse();
+
+  function addComment(author: string, text: string, anchor: CommentAnchor) {
     if (!proto) return;
     commentRepository.add({
       prototypeId: proto.id,
@@ -653,10 +939,14 @@ export function PrototypeCollabOverlay({
       versionName: viewedVersion.name,
       author,
       text,
+      anchor,
     });
     setTick((t) => t + 1);
-    // Surface it immediately in the comments list.
-    setShowCommentsOpen(true);
+  }
+
+  function removeComment(id: string) {
+    commentRepository.remove(id);
+    setTick((t) => t + 1);
   }
 
   return (
@@ -668,149 +958,160 @@ export function PrototypeCollabOverlay({
         setViewedVersionId: selectVersion,
       }}
     >
-      {/* Prototype content — re-mounted per viewed version so version switching
-          actually drives the render, not just the chip. */}
-      <div key={viewedVersion.id} className="contents">
-        {children}
-      </div>
-
-      {/* Floating control cluster — bottom-right, ~24px from edges, above the
-          prototype UI (z-40) but below SidePanel / Dialog portals (z-50). */}
-      <div
-        className="fixed bottom-[24px] right-[24px] z-40 flex flex-col items-end gap-2"
-        style={{ fontFamily: '"DM Sans", Helvetica' }}
+      <PrototypeCollabProvider
+        value={{
+          prototype: proto,
+          viewedVersion,
+          commentMode,
+          markers,
+          authors,
+          addComment,
+          removeComment,
+        }}
       >
-        {/* Current version chip — always visible. */}
-        <div
-          className="flex items-center gap-1.5 rounded-full border border-solid px-3 py-1 shadow-sm"
-          style={{ backgroundColor: C.surface, borderColor: C.border }}
-          title={versionDescription(viewedVersion, proto)}
-        >
-          <span
-            className="size-1.5 rounded-full"
-            style={{ backgroundColor: C.brandFg }}
-            aria-hidden
-          />
-          <span className="text-[12px] font-medium" style={{ color: C.textBody }}>
-            Current version:{" "}
-            <span style={{ color: C.brandFg }}>{viewedVersion.name}</span>
-          </span>
+        {/* Prototype content — re-mounted per viewed version so version
+            switching actually drives the render. */}
+        <div key={viewedVersion.id} className="contents">
+          {children}
         </div>
 
-        {/* Segmented button group (DS Button Group style). */}
+        {/* Floating control cluster — bottom-right, ~24px from edges. */}
         <div
-          className="flex items-start rounded-[var(--old-radiuses-2,2px)] shadow-md"
-          role="group"
-          aria-label="Prototype collaboration"
-          style={{ backgroundColor: C.surface }}
+          className="fixed bottom-[24px] right-[24px] z-40 flex flex-col items-end gap-2"
+          style={{ fontFamily: '"DM Sans", Helvetica' }}
         >
-          <Segment
-            side="Left"
-            selected={optionsOpen}
-            overlap
-            icon={<GitBranch size={16} />}
-            label="Options / Ideation"
-            onClick={() => {
-              setCommentsPopoverOpen(false);
-              reconcile();
-              setOptionsOpen(true);
-            }}
-            ariaExpanded={optionsOpen}
-          />
-          <Popover open={commentsPopoverOpen} onOpenChange={setCommentsPopoverOpen}>
-            <PopoverTrigger asChild>
-              <button
-                type="button"
-                aria-pressed={commentsPopoverOpen}
-                aria-expanded={commentsPopoverOpen}
-                className="relative flex h-[34px] shrink-0 items-center gap-1.5 border border-solid px-[var(--spacing-200,16px)] outline-none transition-colors duration-150 focus-visible:z-10"
-                style={{
-                  backgroundColor: commentsPopoverOpen ? SEG.selectedBg : SEG.unselectedBg,
-                  borderColor: SEG.border,
-                  color: commentsPopoverOpen ? SEG.selectedFg : SEG.unselectedFg,
-                  borderTopRightRadius: "var(--old-radiuses-2,2px)",
-                  borderBottomRightRadius: "var(--old-radiuses-2,2px)",
-                }}
-              >
-                <span className="flex items-center" aria-hidden>
-                  <ChatCircle size={16} />
-                </span>
-                <span className="whitespace-nowrap font-['DM_Sans'] text-[length:var(--body-md-medium-size,14px)] font-medium leading-[var(--body-md-medium-line-height,20px)]">
-                  Comments
-                </span>
-              </button>
-            </PopoverTrigger>
-            <PopoverContent
-              side="top"
-              align="end"
-              className="z-40 w-56 p-1.5"
-              style={{ backgroundColor: C.surface, borderColor: C.border }}
-            >
-              <div className="flex flex-col">
-                <PopoverAction
-                  label="Add new comment"
-                  onClick={() => {
-                    setCommentsPopoverOpen(false);
-                    setAddCommentOpen(true);
-                  }}
-                />
-                <PopoverAction
-                  label="Show all comments"
-                  onClick={() => {
-                    setCommentsPopoverOpen(false);
-                    reconcile();
-                    setShowCommentsOpen(true);
-                  }}
-                />
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
-      </div>
-
-      {/* Options / Ideation — Side Panel (version list). */}
-      <SidePanel
-        open={optionsOpen}
-        onClose={() => setOptionsOpen(false)}
-        title="Options / Ideation"
-        subtitle={`${proto.name} · viewing ${viewedVersion.name}`}
-        size="400"
-      >
-        <div className="flex flex-col gap-[var(--spacing-150,12px)] p-[var(--spacing-300,24px)]">
-          <p className="text-[12px]" style={{ color: C.textMuted }}>
-            Select a version to view it. This changes what you are viewing only —
-            it does not modify saved versions.
-          </p>
-          {versionsNewestFirst.map((v) => (
-            <VersionRow
-              key={v.id}
-              version={v}
-              proto={proto}
-              viewing={v.id === viewedVersion.id}
-              onSelect={() => selectVersion(v.id)}
+          {/* Current version chip — always visible. */}
+          <div
+            className="flex items-center gap-1.5 rounded-full border border-solid px-3 py-1 shadow-sm"
+            style={{ backgroundColor: C.surface, borderColor: C.border }}
+            title={versionDescription(viewedVersion, proto)}
+          >
+            <span
+              className="size-1.5 rounded-full"
+              style={{ backgroundColor: C.brandFg }}
+              aria-hidden
             />
-          ))}
+            <span className="text-[12px] font-medium" style={{ color: C.textBody }}>
+              Current version:{" "}
+              <span style={{ color: C.brandFg }}>{viewedVersion.name}</span>
+            </span>
+          </div>
+
+          {/* Comment-mode hint. */}
+          {commentMode && (
+            <div
+              className="rounded-full border border-solid px-3 py-1 shadow-sm"
+              style={{ backgroundColor: C.brandSubtle, borderColor: C.brandFg }}
+              role="status"
+            >
+              <span className="text-[12px] font-medium" style={{ color: C.brandFg }}>
+                Comment mode — click the prototype to pin. Esc to exit.
+              </span>
+            </div>
+          )}
+
+          {/* Segmented button group (DS Button Group style). */}
+          <div
+            className="flex items-start rounded-[var(--old-radiuses-2,2px)] shadow-md"
+            role="group"
+            aria-label="Prototype collaboration"
+            style={{ backgroundColor: C.surface }}
+          >
+            <Segment
+              side="Left"
+              selected={optionsOpen}
+              overlap
+              icon={<GitBranch size={16} />}
+              label="Options / Ideation"
+              onClick={() => {
+                reconcile();
+                setOptionsOpen(true);
+              }}
+            />
+            <Segment
+              side="Right"
+              selected={commentMode}
+              overlap={false}
+              icon={<ChatCircle size={16} />}
+              label="Comments"
+              ariaPressed={commentMode}
+              onClick={() => setCommentMode((v) => !v)}
+            />
+          </div>
         </div>
-      </SidePanel>
 
-      {/* Show all comments — Side Panel. */}
-      <SidePanel
-        open={showCommentsOpen}
-        onClose={() => setShowCommentsOpen(false)}
-        title="Comments"
-        subtitle={`${proto.name} · ${comments.length} total`}
-        size="400"
-      >
-        <CommentsPanelBody comments={comments} versions={proto.versions} />
-      </SidePanel>
+        {/* Options / Ideation — Side Panel (version list + secondary comments). */}
+        <SidePanel
+          open={optionsOpen}
+          onClose={() => setOptionsOpen(false)}
+          title="Options / Ideation"
+          subtitle={`${proto.name} · viewing ${viewedVersion.name}`}
+          size="400"
+        >
+          <div className="flex flex-col gap-[var(--spacing-150,12px)] p-[var(--spacing-300,24px)]">
+            <p className="text-[12px]" style={{ color: C.textMuted }}>
+              Select a version to view it. This changes what you are viewing only —
+              it does not modify saved versions.
+            </p>
+            {versionsNewestFirst.map((v) => (
+              <VersionRow
+                key={v.id}
+                version={v}
+                proto={proto}
+                viewing={v.id === viewedVersion.id}
+                onSelect={() => selectVersion(v.id)}
+              />
+            ))}
 
-      {/* Add new comment — DS Dialog. */}
-      <AddCommentDialog
-        open={addCommentOpen}
-        onOpenChange={setAddCommentOpen}
-        authors={authors}
-        onSubmit={handleAddComment}
-      />
+            {/* Secondary entry point to the full comments list view. */}
+            <ShowAllCommentsButton
+              count={comments.length}
+              onClick={() => {
+                reconcile();
+                setShowCommentsOpen(true);
+              }}
+            />
+          </div>
+        </SidePanel>
+
+        {/* Show all comments — Side Panel (secondary list view). */}
+        <SidePanel
+          open={showCommentsOpen}
+          onClose={() => setShowCommentsOpen(false)}
+          title="Comments"
+          subtitle={`${proto.name} · ${comments.length} total`}
+          size="400"
+        >
+          <CommentsPanelBody comments={comments} versions={proto.versions} />
+        </SidePanel>
+      </PrototypeCollabProvider>
     </PrototypeVersionProvider>
+  );
+}
+
+function ShowAllCommentsButton({
+  count,
+  onClick,
+}: {
+  count: number;
+  onClick: () => void;
+}) {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      className="mt-2 flex w-full items-center justify-center gap-2 rounded-[var(--radius-100,8px)] border border-solid px-[var(--spacing-200,16px)] py-[var(--spacing-150,12px)] text-[length:var(--body-md-medium-size,14px)] font-medium transition-colors"
+      style={{
+        borderColor: C.border,
+        color: C.textBody,
+        backgroundColor: hover ? C.hoverBg : C.surface,
+      }}
+    >
+      <ListBullets size={16} />
+      Show all comments ({count})
+    </button>
   );
 }
