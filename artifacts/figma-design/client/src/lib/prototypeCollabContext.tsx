@@ -38,6 +38,14 @@ export interface PrototypeCollabContextValue {
   selectMode: "elements" | "region";
   /** Switch the active selection tool. */
   setSelectMode: (m: "elements" | "region") => void;
+  /**
+   * Whether all Design Annotation markers/regions/rails are HIDDEN from the
+   * canvas (feedback #3). Hiding never deletes annotations; the preference is
+   * persisted to localStorage. Editing/adding still works while hidden.
+   */
+  hideAnnotations: boolean;
+  /** Toggle annotation visibility on the canvas. */
+  setHideAnnotations: (hidden: boolean) => void;
   /** Enter comment mode at a specific anchor (used by "Comment instead" §15). */
   startCommentAt: (anchor: CommentAnchor) => void;
   /** Design Annotations for the CURRENTLY VIEWED version (chronological). */

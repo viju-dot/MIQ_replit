@@ -41,6 +41,8 @@ import {
   ArrowBendUpLeft,
   ArrowsOut,
   ChatCircle,
+  Eye,
+  EyeSlash,
   GitBranch,
   ListBullets,
   NotePencil,
@@ -277,6 +279,9 @@ function versionDescription(v: PrototypeVersion, proto: Prototype): string {
 const SESSION_KEY = (id: string) => `fiber:ai-prototype:viewed-version:${id}`;
 
 const NEW_NAME = "__new__";
+
+/** localStorage key for the "hide annotations" canvas preference (feedback #3). */
+const HIDE_ANNOTATIONS_KEY = "fiber:ai-prototype:hide-annotations";
 
 /* ------------------------------------------------------------------ */
 /* Local DS-style segmented button group                              */
@@ -1618,6 +1623,23 @@ export function PrototypeCollabOverlay({
   // Active selection tool within annotation mode. "elements" is the PRIMARY
   // hover→click picker (spec §8); "region" is the secondary drag tool.
   const [selectMode, setSelectMode] = useState<"elements" | "region">("elements");
+  // Hide-annotations preference (feedback #3) — persisted so a resolved design
+  // stays uncluttered across reloads. Hiding never deletes annotations.
+  const [hideAnnotations, setHideAnnotationsState] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(HIDE_ANNOTATIONS_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
+  const setHideAnnotations = (hidden: boolean) => {
+    setHideAnnotationsState(hidden);
+    try {
+      localStorage.setItem(HIDE_ANNOTATIONS_KEY, hidden ? "1" : "0");
+    } catch {
+      /* ignore quota / disabled storage */
+    }
+  };
 
   // Read comments (re-reads whenever tick / prototype changes).
   const comments = useMemo<PrototypeComment[]>(
@@ -1868,6 +1890,8 @@ export function PrototypeCollabOverlay({
           annotationMode,
           selectMode,
           setSelectMode,
+          hideAnnotations,
+          setHideAnnotations,
           startCommentAt,
           markers,
           authors: combinedAuthors,
@@ -1996,6 +2020,21 @@ export function PrototypeCollabOverlay({
                 >
                   Page-level annotation
                 </button>
+                {/* Hide / show existing markers on the canvas (feedback #3). */}
+                <button
+                  type="button"
+                  aria-pressed={hideAnnotations}
+                  onClick={() => setHideAnnotations(!hideAnnotations)}
+                  className="flex items-center gap-1 rounded-full border border-solid px-2.5 py-1 text-[11px] font-medium transition-colors"
+                  style={{
+                    borderColor: hideAnnotations ? C.brandFg : C.border,
+                    color: hideAnnotations ? C.brandFg : C.textBody,
+                    backgroundColor: hideAnnotations ? C.brandSubtle : C.surface,
+                  }}
+                >
+                  {hideAnnotations ? <EyeSlash size={12} /> : <Eye size={12} />}
+                  {hideAnnotations ? "Show markers" : "Hide markers"}
+                </button>
               </div>
               <span className="px-1 text-[11px]" style={{ color: C.textMuted }}>
                 {selectMode === "elements"
@@ -2017,7 +2056,7 @@ export function PrototypeCollabOverlay({
               selected={optionsOpen}
               overlap
               icon={<GitBranch size={16} />}
-              label="Options / Ideation"
+              label="Options"
               onClick={() => {
                 reconcile();
                 setOptionsOpen(true);
@@ -2066,7 +2105,7 @@ export function PrototypeCollabOverlay({
         <SidePanel
           open={optionsOpen}
           onClose={() => setOptionsOpen(false)}
-          title="Options / Ideation"
+          title="Options"
           subtitle={`${proto.name} · viewing ${viewedVersion.name}`}
           size="400"
         >
@@ -2107,6 +2146,8 @@ export function PrototypeCollabOverlay({
               </h3>
               <AnnotationsPanelBody
                 annotations={annotations}
+                hideAnnotations={hideAnnotations}
+                onToggleHide={() => setHideAnnotations(!hideAnnotations)}
                 onRowActivate={() => setOptionsOpen(false)}
                 onNewAnnotation={() => {
                   setCommentMode(false);

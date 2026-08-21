@@ -27,6 +27,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowsOutCardinal,
   Check,
+  Eye,
+  EyeSlash,
   NotePencil,
   PencilSimple,
   Trash,
@@ -439,8 +441,8 @@ function AnnotationEditor({
   const impact = scopeImpactNote(values.scope);
 
   return (
-    <div className="flex flex-col gap-[var(--spacing-200,16px)]">
-      <div className="flex items-start justify-between gap-2">
+    <>
+      <PopoverHeader>
         <div className="flex flex-col gap-0.5">
           <h3
             className="text-[length:var(--body-md-medium-size,14px)] font-semibold"
@@ -461,10 +463,11 @@ function AnnotationEditor({
         >
           <X size={16} />
         </button>
-      </div>
+      </PopoverHeader>
 
       {step === "form" ? (
         <>
+          <PopoverBody>
           {/* Selected summary — section + element chips (spec §11/§12). */}
           <div
             className="flex flex-col gap-1.5 rounded-[var(--radius-100,8px)] border border-solid px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)]"
@@ -592,13 +595,14 @@ function AnnotationEditor({
             }}
           />
 
-          {error && (
-            <p role="alert" className="text-[12px]" style={{ color: C.errorFg }}>
-              {error}
-            </p>
-          )}
+            {error && (
+              <p role="alert" className="text-[12px]" style={{ color: C.errorFg }}>
+                {error}
+              </p>
+            )}
+          </PopoverBody>
 
-          <div className="flex items-center justify-between gap-2">
+          <PopoverFooter>
             {showCommentInstead ? (
               <button
                 type="button"
@@ -611,7 +615,7 @@ function AnnotationEditor({
             ) : (
               <span />
             )}
-            <div className="flex items-center gap-2">
+            <div className="ml-auto flex items-center gap-2">
               <button
                 type="button"
                 onClick={onCancel}
@@ -629,15 +633,16 @@ function AnnotationEditor({
                 Review
               </button>
             </div>
-          </div>
+          </PopoverFooter>
         </>
       ) : (
         /* Summary step (spec §11) */
-        <div className="flex flex-col gap-[var(--spacing-150,12px)]">
-          <div
-            className="flex flex-col gap-[var(--spacing-150,12px)] rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-200,16px)]"
-            style={{ borderColor: C.border, backgroundColor: C.surface2 }}
-          >
+        <>
+          <PopoverBody>
+            <div
+              className="flex flex-col gap-[var(--spacing-150,12px)] rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-200,16px)]"
+              style={{ borderColor: C.border, backgroundColor: C.surface2 }}
+            >
             <SummaryRow label="Selected" value={sectionLabel || areaLabel} />
             {elements.length > 0 && (
               <div className="flex flex-col gap-1">
@@ -656,35 +661,38 @@ function AnnotationEditor({
             {values.types.length > 0 && (
               <SummaryRow label="Type" value={values.types.join(", ")} />
             )}
-            <SummaryRow label="Scope" value={scopeLabel(values.scope, selectionKind)} />
-            <SummaryRow label="Author" value={resolvedName} />
-          </div>
-          {error && (
-            <p role="alert" className="text-[12px]" style={{ color: C.errorFg }}>
-              {error}
-            </p>
-          )}
-          <div className="flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => setStep("form")}
-              className="rounded-[var(--radius-100,8px)] border border-solid px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)] text-[length:var(--body-sm-medium-size,12px)] font-medium"
-              style={{ borderColor: C.border, color: C.textBody, backgroundColor: C.surface }}
-            >
-              Back
-            </button>
-            <button
-              type="button"
-              onClick={submit}
-              className="rounded-[var(--radius-100,8px)] px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)] text-[length:var(--body-sm-medium-size,12px)] font-medium"
-              style={{ backgroundColor: C.brandBg, color: C.brandFgOn }}
-            >
-              {submitLabel}
-            </button>
-          </div>
-        </div>
+              <SummaryRow label="Scope" value={scopeLabel(values.scope, selectionKind)} />
+              <SummaryRow label="Author" value={resolvedName} />
+            </div>
+            {error && (
+              <p role="alert" className="text-[12px]" style={{ color: C.errorFg }}>
+                {error}
+              </p>
+            )}
+          </PopoverBody>
+          <PopoverFooter>
+            <div className="ml-auto flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setStep("form")}
+                className="rounded-[var(--radius-100,8px)] border border-solid px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)] text-[length:var(--body-sm-medium-size,12px)] font-medium"
+                style={{ borderColor: C.border, color: C.textBody, backgroundColor: C.surface }}
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                onClick={submit}
+                className="rounded-[var(--radius-100,8px)] px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)] text-[length:var(--body-sm-medium-size,12px)] font-medium"
+                style={{ backgroundColor: C.brandBg, color: C.brandFgOn }}
+              >
+                {submitLabel}
+              </button>
+            </div>
+          </PopoverFooter>
+        </>
       )}
-    </div>
+    </>
   );
 }
 
@@ -740,8 +748,8 @@ function AnnotationDetails({
   const a = annotation;
   const resolved = a.status === "Resolved";
   return (
-    <div className="flex flex-col gap-[var(--spacing-150,12px)]">
-      <div className="flex items-start justify-between gap-2">
+    <>
+      <PopoverHeader>
         <div className="flex flex-col gap-0.5">
           <h3
             className="text-[length:var(--body-md-medium-size,14px)] font-semibold"
@@ -762,8 +770,9 @@ function AnnotationDetails({
         >
           <X size={16} />
         </button>
-      </div>
+      </PopoverHeader>
 
+      <PopoverBody>
       {/* Status editor */}
       <div className="flex flex-col gap-1.5">
         <span className="text-[11px] font-medium uppercase tracking-wide" style={{ color: C.textMuted }}>
@@ -813,31 +822,34 @@ function AnnotationDetails({
       {a.types.length > 0 && <DetailField label="Change type" value={a.types.join(", ")} />}
       <DetailField label="Design system guidance" value={a.dsGuidance} />
       <DetailField label="Scope" value={scopeLabel(a.scope, a.selectionKind)} />
+      </PopoverBody>
 
-      {/* Actions */}
-      <div className="flex flex-wrap items-center gap-2 pt-1">
-        <ActionButton icon={<PencilSimple size={14} />} label="Edit" onClick={onEdit} />
-        {showMove && a.region && (
+      {/* Actions — pinned footer (feedback #1). */}
+      <PopoverFooter>
+        <div className="flex flex-wrap items-center gap-2">
+          <ActionButton icon={<PencilSimple size={14} />} label="Edit" onClick={onEdit} />
+          {showMove && a.region && (
+            <ActionButton
+              icon={<ArrowsOutCardinal size={14} />}
+              label={moveActive ? "Done moving" : "Move / Resize"}
+              active={moveActive}
+              onClick={onToggleMove}
+            />
+          )}
           <ActionButton
-            icon={<ArrowsOutCardinal size={14} />}
-            label={moveActive ? "Done moving" : "Move / Resize"}
-            active={moveActive}
-            onClick={onToggleMove}
+            icon={<Check size={14} />}
+            label={resolved ? "Reopen" : "Resolve"}
+            onClick={() => onStatusChange(resolved ? "Open" : "Resolved")}
           />
-        )}
-        <ActionButton
-          icon={<Check size={14} />}
-          label={resolved ? "Reopen" : "Resolve"}
-          onClick={() => onStatusChange(resolved ? "Open" : "Resolved")}
-        />
-        <ActionButton
-          icon={<Trash size={14} />}
-          label="Delete"
-          danger
-          onClick={onDelete}
-        />
-      </div>
-    </div>
+          <ActionButton
+            icon={<Trash size={14} />}
+            label="Delete"
+            danger
+            onClick={onDelete}
+          />
+        </div>
+      </PopoverFooter>
+    </>
   );
 }
 
@@ -879,33 +891,152 @@ function ActionButton({
 /* Anchored popover (editor / details, positioned near the region)     */
 /* ------------------------------------------------------------------ */
 
+/** Popover geometry, in viewport (fixed) pixels. */
+interface PopoverBox {
+  left: number;
+  top: number;
+  maxHeight: number;
+}
+
+const POPOVER_W = 320;
+const POPOVER_GAP = 12; // gap between anchor point and popover edge
+const POPOVER_MARGIN = 12; // min gap from the viewport edges
+
+/**
+ * Compute the popover box in VIEWPORT pixels so it always fits on screen
+ * (feedback follow-up). The popover is positioned relative to an anchor point
+ * expressed as a percentage of the annotation layer's box; because that layer
+ * lives inside a scrollable page, we translate the percent anchor to on-screen
+ * pixels via the layer's getBoundingClientRect() and clamp against
+ * window.innerWidth/innerHeight. Uses position: fixed so the result is
+ * viewport-relative (re-computed on scroll/resize).
+ */
+function computePopoverBox(
+  layer: HTMLElement | null,
+  anchorXPct: number,
+  anchorYPct: number,
+): PopoverBox {
+  const vw = typeof window !== "undefined" ? window.innerWidth : 1024;
+  const vh = typeof window !== "undefined" ? window.innerHeight : 768;
+  const rect = layer?.getBoundingClientRect();
+  // Anchor point in viewport pixels.
+  const ax = rect ? rect.left + (anchorXPct / 100) * rect.width : (anchorXPct / 100) * vw;
+  const ay = rect ? rect.top + (anchorYPct / 100) * rect.height : (anchorYPct / 100) * vh;
+
+  // Horizontal: prefer to the right of the anchor; flip left if it would clip.
+  let left = ax + POPOVER_GAP;
+  if (left + POPOVER_W + POPOVER_MARGIN > vw) {
+    left = ax - POPOVER_GAP - POPOVER_W;
+  }
+  left = Math.max(POPOVER_MARGIN, Math.min(left, vw - POPOVER_W - POPOVER_MARGIN));
+
+  // Vertical: choose the side (below vs above the anchor) with more room, then
+  // clamp both top and maxHeight so header + footer always stay on screen.
+  const spaceBelow = vh - ay - POPOVER_GAP - POPOVER_MARGIN;
+  const spaceAbove = ay - POPOVER_GAP - POPOVER_MARGIN;
+  let top: number;
+  let maxHeight: number;
+  if (spaceBelow >= spaceAbove) {
+    top = ay + POPOVER_GAP;
+    maxHeight = spaceBelow;
+  } else {
+    // Placing above: cap height to the room above, anchor the bottom edge.
+    maxHeight = spaceAbove;
+    top = Math.max(POPOVER_MARGIN, ay - POPOVER_GAP - maxHeight);
+  }
+  // Never exceed the viewport; keep a sane minimum so tiny slivers don't appear.
+  maxHeight = Math.max(160, Math.min(maxHeight, vh - 2 * POPOVER_MARGIN));
+  top = Math.max(POPOVER_MARGIN, Math.min(top, vh - POPOVER_MARGIN - Math.min(maxHeight, 160)));
+  return { left, top, maxHeight };
+}
+
 function AnchoredPopover({
   anchorXPct,
   anchorYPct,
+  layerRef,
   children,
 }: {
   anchorXPct: number;
   anchorYPct: number;
+  /** The annotation layer root, used to translate percent anchors to pixels. */
+  layerRef: React.RefObject<HTMLDivElement>;
   children: React.ReactNode;
 }) {
-  const flipRight = anchorXPct > 55;
-  const flipUp = anchorYPct > 55;
+  // Optional-chain the ref: during an HMR fast-refresh a stale parent can
+  // momentarily render this component without the layerRef prop.
+  const [box, setBox] = useState<PopoverBox>(() =>
+    computePopoverBox(layerRef?.current ?? null, anchorXPct, anchorYPct),
+  );
+
+  useEffect(() => {
+    const recompute = () =>
+      setBox(computePopoverBox(layerRef?.current ?? null, anchorXPct, anchorYPct));
+    recompute();
+    // Re-clamp on scroll (capture: catches the scrollable page container too)
+    // and on resize so the popover always tracks the anchor within the viewport.
+    window.addEventListener("scroll", recompute, true);
+    window.addEventListener("resize", recompute);
+    return () => {
+      window.removeEventListener("scroll", recompute, true);
+      window.removeEventListener("resize", recompute);
+    };
+  }, [anchorXPct, anchorYPct, layerRef]);
+
   return (
     <div
       role="dialog"
       aria-label="Design annotation"
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
-      className="pointer-events-auto absolute z-[8] max-h-[70vh] w-[320px] overflow-auto rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-200,16px)] shadow-lg"
+      // Flex column shell: the child owns its own header / scroll body / pinned
+      // footer, so the action buttons stay visible at the bottom without
+      // scrolling (feedback #1). Positioned with position:fixed + a
+      // viewport-clamped maxHeight so the WHOLE popover (incl. the footer) is
+      // always on screen; only PopoverBody scrolls. overflow-hidden clips to
+      // the popover radius.
+      className="pointer-events-auto fixed z-[8] flex w-[320px] flex-col overflow-hidden rounded-[var(--radius-100,8px)] border border-solid shadow-lg"
       style={{
-        left: `${anchorXPct}%`,
-        top: `${anchorYPct}%`,
-        transform: `translate(${flipRight ? "-100%" : "0"}, ${
-          flipUp ? "-100%" : "0"
-        }) translate(${flipRight ? "-12px" : "12px"}, ${flipUp ? "-12px" : "12px"})`,
+        left: `${box.left}px`,
+        top: `${box.top}px`,
+        maxHeight: `${box.maxHeight}px`,
         backgroundColor: C.surface,
         borderColor: C.border,
       }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Popover layout helpers — fixed header, scrollable body, sticky      */
+/* footer (so primary actions never require scrolling — feedback #1).  */
+/* ------------------------------------------------------------------ */
+
+function PopoverHeader({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className="flex shrink-0 items-start justify-between gap-2 border-b border-solid px-[var(--spacing-200,16px)] py-[var(--spacing-150,12px)]"
+      style={{ borderColor: C.border }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function PopoverBody({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex min-h-0 flex-1 flex-col gap-[var(--spacing-150,12px)] overflow-auto p-[var(--spacing-200,16px)]">
+      {children}
+    </div>
+  );
+}
+
+function PopoverFooter({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className="flex shrink-0 items-center gap-2 border-t border-solid px-[var(--spacing-200,16px)] py-[var(--spacing-150,12px)]"
+      style={{ borderColor: C.border, backgroundColor: C.surface }}
     >
       {children}
     </div>
@@ -985,23 +1116,29 @@ function RegionShape({
         />
       )}
 
-      {/* Numbered marker at the region's top-right, outside the edge. */}
+      {/* Numbered marker at the region's top-right, outside the edge.
+          Resolved/Applied markers get a green check style (feedback #4). */}
       <button
         type="button"
-        aria-label={`Open design annotation ${pad2(annotation.seq)}`}
+        aria-label={`Open design annotation ${pad2(annotation.seq)}${
+          resolved ? " (resolved)" : ""
+        }`}
         onClick={(e) => {
           e.stopPropagation();
           onMarkerClick();
         }}
-        className="pointer-events-auto absolute flex h-[22px] min-w-[26px] items-center justify-center rounded-full border-2 px-1 text-[11px] font-semibold shadow-md outline-none"
+        className="pointer-events-auto absolute flex h-[22px] min-w-[26px] items-center justify-center gap-0.5 rounded-full border-2 px-1 text-[11px] font-semibold shadow-md outline-none"
         style={{
           top: "-11px",
           right: "-8px",
-          backgroundColor: resolved ? C.surface2 : C.brandBg,
-          borderColor: resolved ? C.textMuted : C.brandFgOn,
-          color: resolved ? C.textMuted : C.brandFgOn,
+          backgroundColor: resolved
+            ? C.successSubtleBg
+            : C.brandBg,
+          borderColor: resolved ? C.successFg : C.brandFgOn,
+          color: resolved ? C.successFg : C.brandFgOn,
         }}
       >
+        {resolved && <Check size={11} weight="bold" />}
         {pad2(annotation.seq)}
       </button>
     </div>
@@ -1089,8 +1226,11 @@ export function DesignAnnotationLayer(): JSX.Element | null {
 
   const annotationMode = collab?.annotationMode ?? false;
   const selectMode = collab?.selectMode ?? "elements";
+  const hideAnnotations = collab?.hideAnnotations ?? false;
 
-  // Leaving annotation mode clears any in-progress draw/draft/hover/selection.
+  // Leaving annotation mode clears any in-progress draw/draft/hover/selection,
+  // AND any open details/edit/move popover (otherwise the popover would linger
+  // after the mode is exited).
   useEffect(() => {
     if (!annotationMode) {
       setDrawing(null);
@@ -1100,9 +1240,57 @@ export function DesignAnnotationLayer(): JSX.Element | null {
       setHoverPath([]);
       setPicks([]);
       setPendingRegion(null);
+      setOpenId(null);
+      setEditingId(null);
+      setMovingId(null);
       hoverElRef.current = null;
     }
   }, [annotationMode]);
+
+  // Layered Escape handling. Each Esc press dismisses the TOPMOST surface only,
+  // in this order: (1) edit → cancel edit (back to details), (2) draft → cancel,
+  // (3) details → close, (4) selection (picks / pending region) → clear. When
+  // one of these is consumed we stopImmediatePropagation so the overlay's
+  // "Esc exits mode" handler doesn't ALSO fire (no double-layer dismissal).
+  // When nothing is open (layer 5), we let the event bubble so the overlay
+  // exits annotation mode as before. Registered in the CAPTURE phase so it runs
+  // ahead of the overlay's bubble-phase listener, and works even while the
+  // capture-phase mouse-swallowing listeners are active (those swallow mouse
+  // events only, not keydown). Esc while typing in an editor field still
+  // cancels the draft/edit — acceptable and consistent.
+  useEffect(() => {
+    if (!annotationMode) return;
+    const onKeyCapture = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      // Layer 1: cancel edit of an existing annotation → return to its details.
+      if (editingId) {
+        setEditingId(null);
+        setMovingId(null);
+      } else if (draft) {
+        // Layer 2: cancel the draft editor and its pending selection.
+        setDraft(null);
+        setPicks([]);
+        setPendingRegion(null);
+      } else if (openId) {
+        // Layer 3: close the details popover.
+        setOpenId(null);
+        setMovingId(null);
+      } else if (picks.length > 0 || pendingRegion) {
+        // Layer 4: clear the current selection pill.
+        setPicks([]);
+        setPendingRegion(null);
+      } else {
+        // Layer 5: nothing open — let the overlay handle "exit mode".
+        return;
+      }
+      // Consumed a layer: prevent the overlay's handler from also firing.
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    };
+    window.addEventListener("keydown", onKeyCapture, true);
+    return () => window.removeEventListener("keydown", onKeyCapture, true);
+  }, [annotationMode, editingId, draft, openId, picks, pendingRegion]);
 
   // Switching tool clears the current hover + region draw + any pending
   // selection so the two tools don't leak into each other.
@@ -1673,8 +1861,9 @@ export function DesignAnnotationLayer(): JSX.Element | null {
         />
       )}
 
-      {/* Submitted regional annotations. */}
-      {regional.map((a) => {
+      {/* Submitted regional annotations (hidden when the Hide toggle is on,
+          feedback #3 — never deleted, just not painted). */}
+      {!hideAnnotations && regional.map((a) => {
         const live = movingId === a.id && gestureRegion ? { ...a, region: gestureRegion } : a;
         return (
           <RegionShape
@@ -1694,7 +1883,7 @@ export function DesignAnnotationLayer(): JSX.Element | null {
       })}
 
       {/* Page-level markers in a fixed rail (top-right of the canvas). */}
-      {pageLevel.length > 0 && (
+      {!hideAnnotations && pageLevel.length > 0 && (
         <div className="pointer-events-auto absolute right-2 top-2 z-[7] flex flex-col items-end gap-1.5">
           {pageLevel.map((a) => {
             const resolved = a.status === "Resolved" || a.status === "Applied";
@@ -1710,12 +1899,14 @@ export function DesignAnnotationLayer(): JSX.Element | null {
                 }}
                 className="flex h-[22px] min-w-[26px] items-center justify-center gap-1 rounded-full border-2 px-1.5 text-[11px] font-semibold shadow-md outline-none"
                 style={{
-                  backgroundColor: resolved ? C.surface2 : C.brandBg,
-                  borderColor: resolved ? C.textMuted : C.brandFgOn,
-                  color: resolved ? C.textMuted : C.brandFgOn,
+                  backgroundColor: resolved
+                    ? C.successSubtleBg
+                    : C.brandBg,
+                  borderColor: resolved ? C.successFg : C.brandFgOn,
+                  color: resolved ? C.successFg : C.brandFgOn,
                 }}
               >
-                <NotePencil size={11} />
+                {resolved ? <Check size={11} weight="bold" /> : <NotePencil size={11} />}
                 {pad2(a.seq)}
               </button>
             );
@@ -1819,6 +2010,7 @@ export function DesignAnnotationLayer(): JSX.Element | null {
       {/* Editor for a fresh draft. */}
       {draft && (
         <AnchoredPopover
+          layerRef={wrapRef}
           anchorXPct={draft.region ? draft.region.xPct : 50}
           anchorYPct={draft.region ? draft.region.yPct : 8}
         >
@@ -1847,6 +2039,7 @@ export function DesignAnnotationLayer(): JSX.Element | null {
       {/* Edit an existing annotation. */}
       {editingAnnotation && (
         <AnchoredPopover
+          layerRef={wrapRef}
           anchorXPct={editingAnnotation.region ? editingAnnotation.region.xPct : 50}
           anchorYPct={editingAnnotation.region ? editingAnnotation.region.yPct : 8}
         >
@@ -1877,6 +2070,7 @@ export function DesignAnnotationLayer(): JSX.Element | null {
       {/* Details for an open annotation (not while editing it). */}
       {openAnnotation && editingId !== openAnnotation.id && (
         <AnchoredPopover
+          layerRef={wrapRef}
           anchorXPct={openAnnotation.region ? openAnnotation.region.xPct : 50}
           anchorYPct={openAnnotation.region ? openAnnotation.region.yPct : 8}
         >
@@ -1944,12 +2138,18 @@ export function AnnotationsPanelBody({
   onNewAnnotation,
   onNewPageLevel,
   onRowActivate,
+  hideAnnotations = false,
+  onToggleHide,
 }: {
   annotations: DesignAnnotation[];
   onNewAnnotation: () => void;
   onNewPageLevel: () => void;
   /** Called when a row is activated (e.g. to close the side panel). */
   onRowActivate?: () => void;
+  /** Whether canvas markers are hidden (feedback #3). */
+  hideAnnotations?: boolean;
+  /** Toggle canvas marker visibility. */
+  onToggleHide?: () => void;
 }) {
   const [filter, setFilter] = useState<PanelFilter>("All");
 
@@ -1960,8 +2160,91 @@ export function AnnotationsPanelBody({
   );
   const rows = ordered.filter((a) => matchesFilter(a, filter));
 
+  // Progress summary + per-status counts (feedback #4).
+  const total = annotations.length;
+  const counts = useMemo(() => {
+    const c: Record<AnnotationStatus, number> = {
+      Open: 0,
+      "In progress": 0,
+      Applied: 0,
+      "Needs review": 0,
+      Resolved: 0,
+    };
+    for (const a of annotations) c[a.status] = (c[a.status] ?? 0) + 1;
+    return c;
+  }, [annotations]);
+  // "Done" = fixed = Resolved + Applied.
+  const done = counts.Resolved + counts.Applied;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
   return (
     <div className="flex flex-col gap-[var(--spacing-200,16px)]">
+      {/* Progress summary + Hide toggle (feedback #3 + #4). */}
+      {total > 0 && (
+        <div
+          className="flex flex-col gap-[var(--spacing-100,8px)] rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-150,12px)]"
+          style={{ borderColor: C.border, backgroundColor: C.surface2 }}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[12px] font-semibold" style={{ color: C.textPrimary }}>
+              {done} of {total} resolved
+            </span>
+            {onToggleHide && (
+              <button
+                type="button"
+                aria-pressed={hideAnnotations}
+                onClick={onToggleHide}
+                className="flex items-center gap-1 rounded-[var(--radius-100,8px)] border border-solid px-2 py-1 text-[11px] font-medium transition-colors"
+                style={{
+                  borderColor: hideAnnotations ? C.brandFg : C.border,
+                  color: hideAnnotations ? C.brandFg : C.textBody,
+                  backgroundColor: hideAnnotations ? C.brandSubtle : C.surface,
+                }}
+              >
+                {hideAnnotations ? <EyeSlash size={13} /> : <Eye size={13} />}
+                {hideAnnotations ? "Show on canvas" : "Hide on canvas"}
+              </button>
+            )}
+          </div>
+          {/* Progress bar. */}
+          <div
+            className="h-1.5 w-full overflow-hidden rounded-full"
+            style={{ backgroundColor: C.border }}
+            role="progressbar"
+            aria-valuenow={pct}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`${done} of ${total} annotations resolved`}
+          >
+            <div
+              className="h-full rounded-full transition-[width] duration-300"
+              style={{ width: `${pct}%`, backgroundColor: C.successFg }}
+            />
+          </div>
+          {/* Per-status counts. */}
+          <div className="flex flex-wrap gap-1.5 pt-0.5">
+            {ANNOTATION_STATUSES.map((s) => {
+              if (counts[s] === 0) return null;
+              const { bg, fg } = statusColors(s);
+              return (
+                <span
+                  key={s}
+                  className="rounded-full border border-solid px-2 py-0.5 text-[11px] font-medium"
+                  style={{ backgroundColor: bg, borderColor: fg, color: fg }}
+                >
+                  {s} {counts[s]}
+                </span>
+              );
+            })}
+          </div>
+          {hideAnnotations && (
+            <p className="text-[11px]" style={{ color: C.textMuted }}>
+              Canvas markers are hidden — annotations are kept. Use “Show on canvas” to bring them back.
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
