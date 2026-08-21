@@ -67,6 +67,7 @@ export function DonutChart({
   data,
   selected,
   onSelect,
+  vertical = false,
 }: {
   data: {
     key: string;
@@ -77,6 +78,9 @@ export function DonutChart({
   }[];
   selected: string | null;
   onSelect: (k: string) => void;
+  /** Force a vertical stack (donut on top, legend below) — used in the narrow
+   *  20% Type column of the merged Consumption & Time-Spent card. */
+  vertical?: boolean;
 }) {
   const [hover, setHover] = useState<string | null>(null);
   const size = 200;
@@ -90,7 +94,13 @@ export function DonutChart({
   const activeSeg = data.find((d) => d.key === active) ?? null;
 
   return (
-    <div className="flex flex-col items-center gap-[var(--spacing-200,16px)] sm:flex-row sm:items-center">
+    <div
+      className={
+        vertical
+          ? "flex flex-col items-center gap-[var(--spacing-200,16px)]"
+          : "flex flex-col items-center gap-[var(--spacing-200,16px)] sm:flex-row sm:items-center"
+      }
+    >
       <div className="relative shrink-0" style={{ width: size, height: size }}>
         <svg
           width={size}

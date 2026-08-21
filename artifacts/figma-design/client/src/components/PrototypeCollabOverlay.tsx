@@ -1637,19 +1637,27 @@ export function PrototypeCollabOverlay({
     () => (proto ? annotationRepository.list(proto.id) : []),
     [proto, tick],
   );
-  // Mirror stored design annotations to the console so feedback left in the
-  // preview is visible to the implementation workflow (logs are collected).
+  // Mirror stored design annotations to the console AND the shared API server
+  // so feedback left in the preview is visible to the implementation workflow
+  // (this browser's localStorage is otherwise unreachable). Best-effort only.
   useEffect(() => {
-    if (allAnnotations.length === 0) return;
+    if (!proto || allAnnotations.length === 0) return;
     try {
-      console.log(
-        "[design-annotations]",
-        JSON.stringify(allAnnotations),
-      );
+      console.log("[design-annotations]", JSON.stringify(allAnnotations));
     } catch {
       // Best-effort only.
     }
-  }, [allAnnotations]);
+    const controller = new AbortController();
+    fetch(`/api/annotation-mirror/${encodeURIComponent(proto.id)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ annotations: allAnnotations }),
+      signal: controller.signal,
+    }).catch(() => {
+      // Best-effort only; never disturb the prototype.
+    });
+    return () => controller.abort();
+  }, [proto, allAnnotations]);
 
   // Authors combobox draws from BOTH comment + annotation authors so a name
   // used in either surface is offered in the other (single collaborator list).

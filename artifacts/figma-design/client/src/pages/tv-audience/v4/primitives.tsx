@@ -22,6 +22,7 @@ import {
   ArrowDown,
   Minus,
   X,
+  Info,
 } from "@phosphor-icons/react";
 
 export const FONT = '"DM Sans", Helvetica';
@@ -444,6 +445,177 @@ export function SegmentedPills({
           </button>
         );
       })}
+    </div>
+  );
+}
+
+/* ------------------------------------------------ Tabs Bar — rounded ------ */
+/* Fiber DS "Tabs Bar — rounded" (pill tabs). Mirrors ds/TabsPage TabPill /
+ * InteractiveRoundedTabs exactly (tokens + geometry). Same value/options API as
+ * SegmentedPills so it is a drop-in for the env / TV-type toggles. */
+
+export function TabsBarRounded({
+  options,
+  value,
+  onChange,
+  ariaLabel,
+}: {
+  options: string[];
+  value: string;
+  onChange: (v: string) => void;
+  ariaLabel: string;
+}) {
+  const [hover, setHover] = useState<string | null>(null);
+  return (
+    <div
+      className="inline-flex flex-wrap items-center gap-1 rounded-[24px] p-0.5"
+      role="group"
+      aria-label={ariaLabel}
+      style={{
+        backgroundColor:
+          "var(--container-dynamic-neutral-subtle-background-hover, rgba(113,113,128,0.08))",
+      }}
+    >
+      {options.map((o) => {
+        const sel = o === value;
+        const hovered = o === hover;
+        const bg = sel
+          ? "var(--container-dynamic-brand-subtle-background-selected, #f6ebff)"
+          : hovered
+            ? "var(--container-dynamic-neutral-subtle-background-hover, rgba(113,113,128,0.08))"
+            : "transparent";
+        const color = sel
+          ? "var(--surface-foreground-dynamic-brand-default, #7c33b5)"
+          : hovered
+            ? "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)"
+            : "var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59)";
+        return (
+          <button
+            key={o}
+            type="button"
+            role="tab"
+            aria-selected={sel}
+            onClick={() => onChange(o)}
+            onMouseEnter={() => setHover(o)}
+            onMouseLeave={() => setHover(null)}
+            className="flex h-[30px] items-center rounded-[20px] px-4 py-[5px] outline-none transition-colors duration-150 focus-visible:ring-2"
+            style={{ backgroundColor: bg }}
+          >
+            <span
+              className="whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] font-normal leading-[var(--body-md-regular-line-height,20px)]"
+              style={{ fontFamily: FONT, color }}
+            >
+              {o}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ------------------------------------------------ Tabs Bar — underline ---- */
+/* Fiber DS "Tabs Bar — underline". Mirrors ds/TabsPage TabItem /
+ * InteractiveUnderlineTabs (tokens + geometry). Same API as SegmentedPills. */
+
+export function TabsBarUnderline({
+  options,
+  value,
+  onChange,
+  ariaLabel,
+}: {
+  options: string[];
+  value: string;
+  onChange: (v: string) => void;
+  ariaLabel: string;
+}) {
+  const [hover, setHover] = useState<string | null>(null);
+  return (
+    <div className="flex flex-wrap" role="group" aria-label={ariaLabel}>
+      {options.map((o) => {
+        const sel = o === value;
+        const hovered = o === hover;
+        const color = sel
+          ? hovered
+            ? "var(--surface-foreground-dynamic-brand-hover, #662994)"
+            : "var(--surface-foreground-dynamic-brand-default, #7c33b5)"
+          : "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)";
+        const line = sel
+          ? hovered
+            ? "var(--border-dynamic-brand-hover, #662994)"
+            : "var(--border-dynamic-brand-selected, #7c33b5)"
+          : "var(--border-static-subtle-neutral, #e1e1e8)";
+        const bg =
+          hovered
+            ? "var(--container-dynamic-neutral-subtle-background-hover, rgba(113,113,128,0.08))"
+            : "transparent";
+        return (
+          <button
+            key={o}
+            type="button"
+            role="tab"
+            aria-selected={sel}
+            onClick={() => onChange(o)}
+            onMouseEnter={() => setHover(o)}
+            onMouseLeave={() => setHover(null)}
+            className="flex flex-col items-start gap-2 bg-transparent p-0 outline-none transition-colors duration-150 focus-visible:ring-2"
+            style={{ backgroundColor: bg }}
+          >
+            <span className="flex items-center gap-2.5 px-4">
+              <span
+                className="whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] font-normal leading-[var(--body-md-regular-line-height,20px)]"
+                style={{ fontFamily: FONT, color }}
+              >
+                {o}
+              </span>
+            </span>
+            <span
+              className="h-0 w-full border-t transition-colors duration-150"
+              style={{ borderColor: line }}
+            />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ------------------------------------------------ Alert (Info state) ------ */
+/* Fiber DS Alert — Info state, title-only variant (no description, no close),
+ * mirrors ds/NotificationPage Alert (bordered, Info tokens). */
+
+export function AlertInfo({ title }: { title: string }) {
+  return (
+    <div
+      role="status"
+      className="flex flex-col items-start px-3 py-[7px]"
+      style={{
+        border:
+          "1px solid var(--border-dynamic-info-selected, #2360db)",
+        borderRadius: "var(--radius-25, 2px)",
+        backgroundColor: "var(--surface-background-lvl1, #ffffff)",
+      }}
+    >
+      <div className="flex w-full items-center gap-2">
+        <span className="flex size-5 shrink-0 items-center justify-center">
+          <Info
+            size={20}
+            weight="fill"
+            color="var(--border-dynamic-info-selected, #2360db)"
+            aria-hidden
+          />
+        </span>
+        <span
+          className="min-w-0 flex-1 font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)]"
+          style={{
+            fontFamily: FONT,
+            color:
+              "var(--surface-foreground-static-neutral-lvl1, #13131a)",
+          }}
+        >
+          {title}
+        </span>
+      </div>
     </div>
   );
 }

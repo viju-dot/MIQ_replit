@@ -43,6 +43,9 @@ import {
   Chip,
   SearchableDropdown,
   SegmentedPills,
+  TabsBarRounded,
+  TabsBarUnderline,
+  AlertInfo,
   SectionHeading,
   fmtInt,
   fmtK,
@@ -132,6 +135,11 @@ function StatTile({
 
 /* ============================================ All / Commercials control ==== */
 
+/* Global All / Commercials control. Uses the Fiber "Tabs Bar — rounded"
+ * component (annotation #2). The underlying global env state is unchanged, so
+ * the Temporal Insights mirror keeps working. */
+const ENV_TABS: string[] = ["All", "Commercials"];
+
 function EnvControl({
   value,
   onChange,
@@ -140,31 +148,13 @@ function EnvControl({
   onChange: (v: "all" | "commercials") => void;
 }) {
   return (
-    <div
-      className="inline-flex items-center gap-[2px] rounded-[var(--radius-50,4px)] p-[2px]"
-      role="group"
-      aria-label="Viewing environment: All or Commercials"
-      data-annotate="Viewing environment control"
-      style={{ backgroundColor: SURFACE2, border: `1px solid ${GRID}` }}
-    >
-      {(["all", "commercials"] as const).map((k) => {
-        const sel = value === k;
-        return (
-          <button
-            key={k}
-            type="button"
-            onClick={() => onChange(k)}
-            aria-pressed={sel}
-            className="rounded-[var(--radius-25,2px)] px-[var(--spacing-150,12px)] py-[4px] text-[length:var(--body-sm-medium-size,12px)] font-medium transition-colors focus:outline-none focus-visible:ring-2"
-            style={{
-              backgroundColor: sel ? "var(--container-dynamic-brand-bold-background-default, #7c33b5)" : "transparent",
-              color: sel ? "var(--container-static-brand-bold-foreground, #ffffff)" : BODY2,
-            }}
-          >
-            {k === "all" ? "All" : "Commercials"}
-          </button>
-        );
-      })}
+    <div data-annotate="Viewing environment control">
+      <TabsBarRounded
+        options={ENV_TABS}
+        value={value === "commercials" ? "Commercials" : "All"}
+        onChange={(v) => onChange(v === "Commercials" ? "commercials" : "all")}
+        ariaLabel="Viewing environment: All or Commercials"
+      />
     </div>
   );
 }
@@ -591,75 +581,102 @@ export default function V4ContentPlanner() {
         </p>
       </div>
 
-      {/* 3 — Executive summary tiles */}
-      <div
-        data-annotate="Executive summary"
-        className="grid grid-cols-2 gap-[var(--spacing-150,12px)] md:grid-cols-3 xl:grid-cols-6"
-      >
-        {summary.map((t) => (
-          <StatTile key={t.label} label={t.label} value={t.value} unit={t.unit} index={t.index} loading={loading} />
-        ))}
-      </div>
-
-      {/* 4 — Global All / Commercials control */}
-      <div className="flex flex-wrap items-center justify-between gap-[var(--spacing-100,8px)]">
-        <div className="flex items-center gap-[var(--spacing-75,6px)]">
-          <span className="text-[length:var(--body-sm-medium-size,12px)] font-medium uppercase tracking-wide" style={{ color: MUTED }}>
-            Viewing environment
-          </span>
-          <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ color: MUTED }}>
-            {commercials ? "· excludes non-commercial environments where no ad opportunity exists" : "· all available environments"}
-          </span>
+      {/* 3 — Executive summary tiles — wrapped in an "Overview" SmartCard
+          (annotation #1). The MetricsTile/StatTile components and the grid
+          inside are unchanged. */}
+      <SmartCard title="Overview" ariaLabel="Overview">
+        <div
+          data-annotate="Executive summary"
+          className="grid grid-cols-2 gap-[var(--spacing-150,12px)] md:grid-cols-3 xl:grid-cols-6"
+        >
+          {summary.map((t) => (
+            <StatTile key={t.label} label={t.label} value={t.value} unit={t.unit} index={t.index} loading={loading} />
+          ))}
         </div>
+      </SmartCard>
+
+      {/* 4 — Global All / Commercials control — left-aligned Tabs Bar (rounded)
+          with the descriptive left label removed (annotation #2). */}
+      <div className="flex flex-wrap items-center justify-start gap-[var(--spacing-100,8px)]">
         <EnvControl value={env} onChange={setEnv} />
       </div>
 
-      {/* 5 — Consumption by Type + Time Spent by Channel/App */}
-      <div className="grid grid-cols-1 gap-[var(--spacing-200,16px)] lg:grid-cols-2">
-        <SmartCard
-          title="Consumption by Type"
-          subtitle="% of viewing minutes per household — click a type to cross-filter downstream"
-          ariaLabel="Consumption by type"
-          right={selectedType ? <Chip label={`Filter: ${selectedTypeName}`} selected onRemove={() => setSelectedType(null)} /> : undefined}
-        >
-          <CardBody loading={loading} empty={empty} height={220}>
-            <DonutChart
-              data={consumption.map((c) => ({ key: c.key, name: c.name, color: c.color, minutes: c.minutes, pct: c.pct }))}
-              selected={selectedType}
-              onSelect={(k) => setSelectedType((cur) => (cur === (k as ConsumptionKey) ? null : (k as ConsumptionKey)))}
-            />
-          </CardBody>
-        </SmartCard>
+      {/* 5 — Consumption by Type & Time Spent — merged into a single SmartCard
+          with a 20% Type column (donut on top, legend/infos below) and an 80%
+          Time-Spent column (underline tabs, left-aligned within the column).
+          An Info Alert educates how the two views work together (annotation #3).
+          Responsive: the 20/80 split stacks on narrow widths. */}
+      <SmartCard
+        title="Consumption by Type & Time Spent"
+        subtitle="% of viewing minutes per household · avg min/week, % of watch time and index vs national by channel/app"
+        ariaLabel="Consumption by type and time spent"
+        right={selectedType ? <Chip label={`Filter: ${selectedTypeName}`} selected onRemove={() => setSelectedType(null)} /> : undefined}
+      >
+        {/* Educational Info alert (title only — no description, no close). */}
+        <div className="mb-[var(--spacing-150,12px)]">
+          <AlertInfo title="Select a type in the donut to cross-filter the time-spent view; the Time Spent tabs sync to that type." />
+        </div>
 
-        <SmartCard
-          title="Time Spent by Channel / App"
-          subtitle={
-            "Avg min/week (bars) · % of total watch time (line) · index vs national" +
-            (selectedTypeName ? ` · tab synced to ${selectedTypeName}` : "")
-          }
-          ariaLabel="Time spent by channel or app"
-          right={<SegmentedPills options={TAB_LABELS} value={channelTab} onChange={setChannelTab} ariaLabel="Channel TV type" />}
-        >
-          <CardBody
-            loading={loading}
-            empty={empty || channels.length === 0}
-            height={300}
-            emptyTitle="No channels match"
-            emptyMessage="Commercials filtering removed all channels here — switch to All or change the tab."
+        <div className="flex flex-col gap-[var(--spacing-200,16px)] lg:flex-row lg:items-stretch">
+          {/* 20% — Type column: donut on top, legend/infos below (vertical). */}
+          <div
+            data-annotate="Consumption by type"
+            className="flex flex-col gap-[var(--spacing-100,8px)] lg:w-1/5 lg:shrink-0"
           >
-            <ComboChart
-              categories={channels.slice(0, 10).map((c) => c.name)}
-              bars={channels.slice(0, 10).map((c) => c.mins)}
-              line={channels.slice(0, 10).map((c) => c.pct)}
-              indices={channels.slice(0, 10).map((c) => c.index)}
-              barLabel="Avg min/week"
-              lineLabel="% of watch time"
-              barUnit=" min"
-              lineUnit="%"
-            />
-          </CardBody>
-        </SmartCard>
-      </div>
+            <span className="text-[length:var(--body-sm-medium-size,12px)] font-medium" style={{ color: BODY2 }}>
+              Consumption by Type
+            </span>
+            <CardBody loading={loading} empty={empty} height={200}>
+              <DonutChart
+                data={consumption.map((c) => ({ key: c.key, name: c.name, color: c.color, minutes: c.minutes, pct: c.pct }))}
+                selected={selectedType}
+                onSelect={(k) => setSelectedType((cur) => (cur === (k as ConsumptionKey) ? null : (k as ConsumptionKey)))}
+                vertical
+              />
+            </CardBody>
+          </div>
+
+          {/* Divider between the two columns (horizontal on stacked layout). */}
+          <div
+            className="h-px w-full shrink-0 lg:h-auto lg:w-px"
+            style={{ backgroundColor: GRID }}
+            aria-hidden
+          />
+
+          {/* 80% — Time Spent column with left-aligned underline tabs. */}
+          <div
+            data-annotate="Time spent by channel or app"
+            className="flex min-w-0 flex-1 flex-col gap-[var(--spacing-100,8px)]"
+          >
+            <span className="text-[length:var(--body-sm-medium-size,12px)] font-medium" style={{ color: BODY2 }}>
+              Time Spent by Channel / App
+              {selectedTypeName ? ` · tab synced to ${selectedTypeName}` : ""}
+            </span>
+            {/* Tabs Bar — underline, left-aligned WITHIN this column. */}
+            <div className="flex justify-start">
+              <TabsBarUnderline options={TAB_LABELS} value={channelTab} onChange={setChannelTab} ariaLabel="Channel TV type" />
+            </div>
+            <CardBody
+              loading={loading}
+              empty={empty || channels.length === 0}
+              height={300}
+              emptyTitle="No channels match"
+              emptyMessage="Commercials filtering removed all channels here — switch to All or change the tab."
+            >
+              <ComboChart
+                categories={channels.slice(0, 10).map((c) => c.name)}
+                bars={channels.slice(0, 10).map((c) => c.mins)}
+                line={channels.slice(0, 10).map((c) => c.pct)}
+                indices={channels.slice(0, 10).map((c) => c.index)}
+                barLabel="Avg min/week"
+                lineLabel="% of watch time"
+                barUnit=" min"
+                lineUnit="%"
+              />
+            </CardBody>
+          </div>
+        </div>
+      </SmartCard>
 
       {/* 6 — Trends */}
       <SmartCard
