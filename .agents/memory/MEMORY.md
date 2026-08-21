@@ -1,4 +1,5 @@
 - [Figma import pipeline](figma-import.md) — Fiber file hides pages from enumeration; fetch per-frame via node IDs, convert Tailwind v4 vars to hex, localize temp asset URLs.
 - [Interactive states](interactive-states.md) — inline styles for state colors (arbitrary var()/rgba classes silently fail); panel-forced state stays forced; never invent states absent from design-refs.
 - [Share backend & api-server quirks](share-backend.md) — figma-design server/ is dead scaffolding; backend work goes in shared api-server (/api, one-shot dev script → restart workflow after changes).
+- [E2E tester staleness](e2e-tester-staleness.md) — reused testers can false-FAIL on stale state; re-verify with a fresh tester + DOM-level assertions before looping fixes.
 - [Figma variable harvesting](figma-variables.md) — getVariableDefs works only on frame-level nodes, returns one resolved mode (no dark collection), and Effect()/Font() values need conversion to valid CSS.

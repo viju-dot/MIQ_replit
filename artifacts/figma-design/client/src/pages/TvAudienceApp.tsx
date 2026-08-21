@@ -21,6 +21,7 @@ import { Translate, CaretDown } from "@phosphor-icons/react";
 import { useTheme } from "@/lib/theme";
 import TvAudienceDashboardPage from "@/pages/ds/TvAudienceDashboardPage";
 import V3ContentPlanner from "@/pages/tv-audience/v3/V3ContentPlanner";
+import V4ContentPlanner from "@/pages/tv-audience/v4/V4ContentPlanner";
 import {
   PrototypeCollabOverlay,
   PrototypeCommentLayer,
@@ -483,9 +484,10 @@ type VersionRenderer = (args: {
 const DEFAULT_RENDERER: VersionRenderer = () => <TvAudienceDashboardPage />;
 
 const VERSION_RENDERERS: Record<string, VersionRenderer> = {
-  // V3 (newest/live) = MiQ TV Audience & Content Planner ideation. V1 & V2 fall
-  // back to the existing dashboard renderer (their frozen snapshots).
+  // V4 (newest/live) = wireframe-faithful Content Planner. V3 = Content Planner
+  // ideation. V1 & V2 fall back to the existing dashboard renderer (frozen).
   tvai_v3: () => <V3ContentPlanner />,
+  tvai_v4: () => <V4ContentPlanner />,
 };
 
 /** The prototype body — version-aware. Consumes the version context. */

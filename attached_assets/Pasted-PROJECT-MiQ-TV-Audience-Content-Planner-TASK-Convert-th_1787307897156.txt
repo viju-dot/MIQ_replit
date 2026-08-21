@@ -1,0 +1,1055 @@
+PROJECT: MiQ TV Audience & Content Planner
+TASK: Convert the provided low-fidelity dashboard wireframe into a functional,
+interactive AI prototype.
+
+IMPORTANT:
+The attached wireframe is the PRIMARY visual and layout reference for this
+prototype.
+
+Do not redesign the information architecture.
+Do not rearrange the sections.
+Do not add unrelated KPIs.
+Do not replace the proposed interactions with generic dashboard patterns.
+
+The goal is to make the wireframe FUNCTIONAL and visually refined while
+preserving its structure.
+
+==================================================
+1. PROJECT CONTEXT
+==================================================
+
+This is a TV audience and content planner dashboard for MiQ.
+
+Primary users:
+- Sales teams
+- Trader teams
+
+Primary goal:
+Help users understand how a selected audience consumes TV content across
+Linear TV, Streaming and FAST environments and identify useful content,
+platform and audience insights.
+
+The dashboard should help answer:
+
+- What does my audience watch?
+- Where do they watch?
+- When do they watch?
+- Which shows/genres are important?
+- Which genres over-index for this audience?
+- Where does the audience move after content ends?
+
+The dashboard is designed as a single-page analytical experience.
+
+==================================================
+2. SOURCE OF TRUTH
+==================================================
+
+Use the sources in this order:
+
+1. The provided wireframe
+2. Confirmed KPI requirements and discussions from the project
+3. KPI-specific requirements supplied separately
+4. Confirmed design-system rules
+5. Clearly labelled assumptions
+
+Never allow the AI prototype to become the source of truth for product
+requirements.
+
+If something is not specified:
+- Do not invent a new KPI.
+- Do not invent a new dashboard section.
+- Do not remove an existing requirement.
+- Mark it as [OPEN QUESTION] or [ASSUMPTION].
+
+==================================================
+3. WIREFRAME STRUCTURE
+==================================================
+
+Reproduce the following page structure.
+
+PAGE ORDER:
+
+1. Page heading
+2. Global filters
+3. Executive summary tiles
+4. Global All / Commercials control
+5. Consumption by Type + Time Spent by Channel/App
+6. Trends
+7. Temporal Insights
+8. Cultural Affinity + Migration Signals
+
+Maintain this exact vertical hierarchy.
+
+Do not turn the dashboard into a card-grid dashboard with a different
+information architecture.
+
+==================================================
+4. HEADER
+==================================================
+
+At the top:
+
+PAGE HEADING
+
+Use:
+"TV Audience & Content Planner"
+
+Supporting description can communicate:
+"Cross-platform content and audience consumption insights"
+
+Keep the header compact.
+
+==================================================
+5. GLOBAL FILTERS
+==================================================
+
+Create a global filter row above the dashboard.
+
+The exact filters should be configurable based on market.
+
+Potential filters include:
+
+- Country
+- Mosaic group
+- Audience / demographic
+- Age
+- Gender
+- Children in household
+- TV consumption
+- Date range
+
+UK:
+Support more granular demographic filters such as Mosaic, age and gender.
+
+Other European markets:
+Support simpler TV consumption classifications such as:
+- Heavy
+- Medium
+- Light
+
+Do not force UK-specific filters onto all markets.
+
+Global filter changes must update the dashboard data.
+
+Use realistic mock data for the prototype.
+
+==================================================
+6. EXECUTIVE SUMMARY TILES
+==================================================
+
+Create a row of executive summary KPI tiles.
+
+The wireframe contains six summary positions.
+
+These tiles should provide high-level context before the detailed
+visualisations.
+
+Use metrics already defined for the project, such as:
+
+- Total households/viewers
+- Total minutes viewed
+- Average weekly TV consumption
+- Average linear TV consumption
+- Average channels/apps viewed
+- Other confirmed summary metric where applicable
+
+Each tile should support:
+
+- Primary value
+- Metric label
+- Supporting unit
+- Optional comparison against national average
+- Optional directional indicator
+
+Do not create new analytical KPIs just to fill all six tiles.
+
+==================================================
+7. GLOBAL VIEWING ENVIRONMENT CONTROL
+==================================================
+
+The wireframe contains:
+
+[ All ] [ Commercials ]
+
+This is a GLOBAL viewing-environment control.
+
+Use the terminology:
+
+All
+Commercials
+
+Do not interpret this as two different KPIs.
+
+ALL:
+Includes available viewing environments.
+
+COMMERCIALS:
+Filters out relevant non-commercial viewing environments where advertising
+opportunity does not exist.
+
+The commercial filter should represent the seller opportunity perspective.
+
+Example:
+If BBC or another environment is considered non-commercial for the
+available market/data source, it can be excluded from Commercials.
+
+IMPORTANT:
+Do not hard-code BBC as universally non-commercial.
+The actual treatment must be market/data-source dependent.
+
+Changing All → Commercials must update all applicable visualisations.
+
+==================================================
+8. FIRST ANALYTICAL SECTION
+==================================================
+
+The wireframe places two visualisations side by side:
+
+LEFT:
+Consumption by Type
+
+RIGHT:
+Time Spent by Channel/App
+
+Keep them visually grouped because they describe where/how the audience
+consumes TV.
+
+--------------------------------------------------
+8A. CONSUMPTION BY TYPE
+--------------------------------------------------
+
+User question:
+
+"How much time does my audience spend watching streaming, FAST, linear
+and homescreen, and which one should I activate on to reach them?"
+
+Primary metric:
+
+% of minutes watched per household
+
+Dimensions:
+
+- Linear TV
+- Streaming
+- FAST
+- Homescreen where data is available
+
+Wireframe visual:
+
+DONUT / RING CHART
+
+The chart should show the proportional share of viewing.
+
+Include a clear legend with:
+- Linear TV
+- Streaming
+- FAST
+
+If Homescreen is available in the underlying requirement/data, support it
+without breaking the layout.
+
+Interaction:
+
+Clicking a consumption type should act as a secondary filter for relevant
+downstream visualisations.
+
+Example:
+
+User selects:
+Streaming
+
+Then applicable visualisations should update to Streaming-related data.
+
+Do not create a separate page.
+
+The global All / Commercials control should also affect this visualisation.
+
+--------------------------------------------------
+8B. TIME SPENT BY CHANNEL / APP
+--------------------------------------------------
+
+User question:
+
+"How much time does my audience spend watching specific apps or channels?"
+
+The wireframe uses tabs:
+
+[ Linear TV ] [ Streaming ] [ Fast ]
+
+These are local tabs for this visualisation.
+
+Do NOT confuse these tabs with the global All / Commercials control.
+
+Metrics:
+
+- Minutes watched per week
+- % of total watch time
+- Index of viewership vs national average
+
+Recommended chart:
+
+COMBINATION CHART
+
+Bars:
+Average minutes watched
+
+Line:
+% of total watch time
+
+Index:
+Can be represented through supporting labels, tooltip or directional
+indicator where appropriate.
+
+Support top apps/channels.
+
+Streaming examples:
+- Netflix
+- Amazon Prime
+- Disney+
+- Paramount+
+- Apple TV
+- YouTube
+
+Linear examples:
+- BBC iPlayer
+- ITVX
+- Channel 4
+- NOW
+- My5
+- U
+
+The exact list should be driven by available data.
+
+Interaction:
+- Switching Linear TV / Streaming / FAST updates the chart.
+- Consumption by Type selection can filter this chart.
+- All / Commercials must be respected.
+
+==================================================
+9. TRENDS SECTION
+==================================================
+
+The wireframe contains a large Trends section.
+
+At the top-right:
+
+[ Shows ] [ Genres ]
+
+Below that are controls:
+
+[ Top 10 ] [ Shows ] [ Weeks ]
+
+These controls must remain visually associated with the Trends chart.
+
+The purpose is to allow the user to explore confirmed trend-related
+information without creating a separate KPI card.
+
+--------------------------------------------------
+9A. SHOWS VIEW
+--------------------------------------------------
+
+Use the confirmed Top Indexing Shows requirement.
+
+User question:
+
+"Which shows are particularly relevant to my audience?"
+
+Metrics:
+
+- Average minutes watched per household
+- % of households watching
+- Index vs national average
+
+Requirements:
+- Top indexing shows
+- Support lookback periods
+- 7/15 day DoY where applicable
+- 30/60 day WoW where applicable
+- Searchable show list where appropriate
+- Top 50 available for exploration
+- Highlight top 10 by default
+
+IMPORTANT:
+
+Do NOT rename this concept to "Top Trending Shows" unless explicitly
+confirmed.
+
+Indexing is important.
+
+--------------------------------------------------
+9B. GENRES VIEW
+--------------------------------------------------
+
+When the user switches from Shows → Genres, show the relevant confirmed
+genre analysis.
+
+Primary concept:
+
+Viewership by Genre
+
+Question:
+
+"What genre is most popular with my audience and on what TV type do they
+most consume this genre?"
+
+Metrics:
+- Minutes watched per week
+- % of total watch time
+- Index vs national average
+
+Use the confirmed IAB taxonomy.
+
+Potential genres:
+- Comedy
+- News
+- Film
+- Sports
+- Drama
+- Reality
+- Action
+- Documentary
+- Kids
+- Travel
+- Food
+- Home improvement
+
+Do not create Cultural Affinity inside this chart.
+
+Cultural Affinity is a separate downstream analytical section.
+
+==================================================
+10. TEMPORAL INSIGHTS
+==================================================
+
+This is a major section in the wireframe.
+
+The section contains:
+
+Title:
+Temporal Insights
+
+Top controls:
+
+[ Linear TV ] [ Streaming ] [ Fast ]
+
+Right side:
+
+[ All ] [ Commercials ]
+
+Additional controls:
+
+[ Channels/apps ] [ Weeks ]
+
+Then a day-of-week × time-of-day heatmap.
+
+User question:
+
+"When does my audience most watch TV, and what type of TV do they watch
+and when?"
+
+Metrics:
+
+- Average minutes watched per household
+- % of households watching
+
+Dimensions:
+
+- Day of week
+- Time of day
+- Linear
+- Streaming
+- FAST
+- Channel/app where applicable
+
+Recommended visual:
+
+HEATMAP
+
+Rows:
+Monday → Sunday
+
+Columns:
+- Early AM
+- Morning
+- Daytime
+- Afternoon
+- Primetime
+- Late Night
+
+Each cell should show:
+- Average minutes watched
+- Supporting % of households watching
+
+Example:
+Monday / Primetime
+44m
+18.5%
+
+Interaction:
+
+Linear TV / Streaming / FAST tabs filter the temporal data.
+
+Channels/apps dropdown should change depending on the selected viewing type.
+
+Example:
+If Streaming is selected:
+show relevant streaming apps.
+
+If Linear is selected:
+show relevant linear channels.
+
+All / Commercials should also affect this section.
+
+IMPORTANT:
+
+All / Commercials should NOT be implemented as a duplicate concept.
+It is the same global viewing-environment logic used elsewhere.
+
+==================================================
+11. CULTURAL AFFINITY
+==================================================
+
+The wireframe places Cultural Affinity below Temporal Insights on the left.
+
+This is NOT the same as Viewership by Genre.
+
+Viewership by Genre answers:
+
+"What does my audience watch most?"
+
+Cultural Affinity answers:
+
+"What genres does my audience unusually over-index on compared with the
+national average?"
+
+Primary metric:
+Index vs national average
+
+The wireframe uses:
+
+RADAR / STAR DIAGRAM
+
+Use the selected genre as the anchor.
+
+Show other high-index genres.
+
+Support:
+- At least top 5 highly indexed genres
+- Index values
+- National average baseline = 100
+
+The wireframe also shows a supporting list below the chart.
+
+The list can contain:
+- Genre
+- Index
+- Directional change / difference from 100
+
+Interaction:
+
+If a user selects a highly indexed genre:
+show its top indexing shows.
+
+Example:
+
+Cultural Affinity
+→ Comedy
+→ Top shows within Comedy
+
+This relationship should be functional.
+
+Do not merge Cultural Affinity into the Trends section.
+
+==================================================
+12. MIGRATION SIGNALS
+==================================================
+
+The wireframe places Migration Signals beside Cultural Affinity.
+
+The current wireframe provides an empty visual area for this section.
+
+Do not replace this with a random chart.
+
+The confirmed requirement is:
+
+User question:
+"After watching content, where does my audience go next?"
+
+Metric:
+Audience transition/event
+
+Dimension:
+Show
+
+Requirements:
+- 1-hour timeframe
+- Next show/content watched
+- Associated network/platform
+- Maximum 3 pathways at each branch
+- Maximum 3 branches
+- Avoid excessive visual complexity
+
+Recommended visual:
+SANKEY DIAGRAM
+
+The Sankey should show:
+
+Current content
+→ next behaviour
+→ next destination/content
+
+Possible outcomes:
+- Stay on same channel
+- Switch channel
+- Move to streaming app
+- Go to homescreen
+- Stop watching
+
+Keep the number of pathways limited.
+
+If the Sankey chart is not available in the Figma design system,
+IMPLEMENT A CUSTOM SANKEY COMPONENT.
+
+Do not remove the KPI simply because the component does not exist.
+
+==================================================
+13. DESIGN SYSTEM RULE
+==================================================
+
+The Figma/Fiber design system is the visual source of truth.
+
+Use the available design system for:
+
+- Typography
+- Font sizes
+- Font weights
+- Colour tokens
+- Spacing
+- Border radius
+- Borders
+- Backgrounds
+- Surface colours
+- Controls
+- Tabs
+- Buttons
+- Dropdowns
+- Cards
+- Tooltips
+- Icons
+- States
+
+IMPORTANT:
+
+Some data visualisation types in this prototype may NOT exist in the
+design system.
+
+This is acceptable.
+
+If the design system does not provide a required chart:
+
+CREATE A CUSTOM DATA-VISUALISATION COMPONENT.
+
+However:
+
+The custom chart MUST inherit the Figma/Fiber design system's:
+
+- Colour tokens
+- Typography
+- Spacing
+- Border treatment
+- Radius
+- Tooltip style
+- Interaction states
+- Overall visual language
+
+Do NOT introduce random chart colours.
+
+Do NOT use default chart-library colours.
+
+Do NOT use a generic dashboard theme.
+
+Do NOT create a separate visual language for charts.
+
+==================================================
+14. CHART COLOUR RULE
+==================================================
+
+Charts may be custom-built.
+
+But their visual identity must come from the design system.
+
+Create a chart token layer.
+
+For example:
+
+chart.primary
+chart.secondary
+chart.tertiary
+chart.neutral
+chart.baseline
+chart.selected
+chart.hover
+chart.positive
+chart.negative
+
+Map these to the actual Figma/Fiber design tokens.
+
+Do not hard-code arbitrary hex colours when an equivalent design-system
+token exists.
+
+For multi-category charts, ensure colours remain distinguishable and
+accessible.
+
+==================================================
+15. INTERACTION MODEL
+==================================================
+
+The dashboard should feel like ONE analytical system.
+
+Important relationships:
+
+GLOBAL FILTERS
+↓
+All / Commercials
+↓
+Consumption by Type
+↓
+Time Spent by Channel/App
+↓
+Trends
+↓
+Temporal Insights
+↓
+Cultural Affinity
+↓
+Migration Signals
+
+Interactions should update relevant data rather than simply changing
+visual decoration.
+
+Examples:
+
+Selecting:
+Streaming
+
+can update:
+- Time Spent by Channel/App
+- Temporal Insights
+- Relevant downstream views
+
+Selecting:
+Sports in Viewership by Genre
+
+can update:
+- Share of Viewing by Platform where applicable
+- Cultural Affinity
+- Top Indexing Shows
+
+Selecting:
+Comedy in Cultural Affinity
+
+can reveal:
+- Top indexing Comedy shows
+
+==================================================
+16. RESPONSIVE BEHAVIOUR
+==================================================
+
+The provided wireframe represents the primary desktop layout.
+
+Desktop should preserve the intended structure.
+
+On smaller screens:
+- Stack sections logically
+- Preserve hierarchy
+- Do not compress charts until they become unreadable
+- Preserve controls
+- Preserve analytical relationships
+
+Do not redesign the desktop layout simply to make it responsive.
+
+==================================================
+17. DATA
+==================================================
+
+Use realistic synthetic data for the prototype.
+
+Synthetic data should behave like real analytical data.
+
+Avoid random values that make relationships meaningless.
+
+For example:
+
+If:
+Sports index = 165
+
+then the supporting data should plausibly indicate higher Sports
+consumption than the national average.
+
+If:
+Commercials is selected
+
+the displayed values should meaningfully differ from All where appropriate.
+
+If:
+Streaming is selected
+
+the app list should contain streaming services rather than linear channels.
+
+The prototype should demonstrate data relationships, not just visual
+placeholders.
+
+==================================================
+18. STATES
+==================================================
+
+Every major interactive component must support:
+
+- Default
+- Hover
+- Selected
+- Loading
+- Empty
+- Error
+- Disabled where applicable
+
+Charts must have meaningful loading states.
+
+Do not use a generic spinner everywhere.
+
+Use skeleton/loading patterns consistent with the design system where
+appropriate.
+
+==================================================
+19. TOOLTIP REQUIREMENTS
+==================================================
+
+Every chart must have useful tooltips.
+
+Tooltips should expose the underlying metric rather than repeating the
+visual label.
+
+Examples:
+
+Time Spent:
+- Channel/app
+- Minutes watched
+- % of total watch time
+- Index vs national average
+
+Temporal:
+- Day
+- Time period
+- Minutes watched
+- % households watching
+
+Genre:
+- Genre
+- Minutes watched
+- Share
+- Index
+
+Cultural Affinity:
+- Genre
+- Index
+- Difference from national average
+
+Migration:
+- Source
+- Destination
+- Percentage of audience
+- Time window
+
+==================================================
+20. INDEX VS NATIONAL AVERAGE
+==================================================
+
+Index must be consistently explained.
+
+Baseline:
+100 = national average
+
+Above 100:
+Audience over-indexes
+
+Below 100:
+Audience under-indexes
+
+Example:
+
+Index 150
+= audience is 50% higher than national average
+
+Index 80
+= audience is 20% lower than national average
+
+Do not make the user calculate this manually.
+
+Use directional indicators where appropriate.
+
+==================================================
+21. DO NOT ADD THESE AS NEW KPI SECTIONS
+==================================================
+
+Do not independently add:
+
+- Incremental Reach Opportunity
+- Competitive Intelligence
+- Budget Allocation
+- AI Recommendation
+- Reach vs Frequency
+- Audience Overlap
+
+These may be future product opportunities, but they are NOT part of this
+wireframe unless explicitly requested.
+
+Do not add them just because they are commercially interesting.
+
+==================================================
+22. DO NOT CHANGE KPI DEFINITIONS
+==================================================
+
+Do not convert:
+
+Top Indexing Shows
+into:
+Top Trending Shows
+
+Do not convert:
+
+Migration Signals
+into:
+generic migration bars
+
+Do not convert:
+
+Temporal Insights
+into:
+session intensity
+
+Do not merge:
+
+Viewership by Genre
+with:
+Cultural Affinity
+
+Do not remove:
+
+FAST
+
+Do not remove:
+
+Commercials
+
+Do not treat:
+
+All / Commercials
+
+as a separate KPI.
+
+==================================================
+23. VISUAL QUALITY
+==================================================
+
+The final prototype should feel like a high-quality enterprise analytics
+product.
+
+Prioritise:
+
+- Clear hierarchy
+- Dense but readable information
+- Strong alignment
+- Consistent spacing
+- Clear chart labels
+- Minimal visual noise
+- Strong selected states
+- Clear filter relationships
+- Accessible contrast
+- Consistent interaction patterns
+
+Avoid:
+- excessive shadows
+- unnecessary gradients
+- decorative illustrations
+- oversized cards
+- excessive rounded containers
+- random colours
+- unnecessary animations
+- dashboard-template aesthetics
+
+The wireframe is analytical and information-dense.
+Preserve that character.
+
+==================================================
+24. PROTOTYPE FUNCTIONALITY
+==================================================
+
+This must be a FUNCTIONAL prototype, not a static screenshot.
+
+Implement:
+
+- Global filters
+- All / Commercials
+- Consumption selection
+- Linear / Streaming / FAST tabs
+- Shows / Genres tabs
+- Trend dropdowns
+- Temporal filters
+- Chart hover
+- Chart selection
+- Cultural Affinity drilldown
+- Migration interaction
+- Dynamic synthetic data
+- Loading states
+
+When a user changes a filter, relevant visualisations must update.
+
+==================================================
+25. FIRST IMPLEMENTATION STEP
+==================================================
+
+Before writing the prototype:
+
+1. Inspect the attached wireframe.
+2. Identify every section.
+3. Identify every control.
+4. Identify every chart.
+5. Identify every interaction.
+6. Map each element to the confirmed KPI requirements.
+7. Identify which chart components exist in the Figma/Fiber design system.
+8. Identify which charts need custom implementation.
+9. Create a component map.
+10. Then implement the prototype.
+
+Do NOT start by styling random cards.
+
+==================================================
+26. FINAL SUCCESS CRITERIA
+==================================================
+
+The prototype is successful only if:
+
+- The layout matches the provided wireframe.
+- The page hierarchy is preserved.
+- The KPI definitions remain unchanged.
+- All / Commercials works consistently.
+- Consumption Type works as a downstream filter.
+- Linear / Streaming / FAST interactions work.
+- Trends supports Shows and Genres.
+- Temporal Insights works as a heatmap.
+- Cultural Affinity supports drilldown.
+- Migration Signals is represented as a meaningful Sankey.
+- Charts use the Figma/Fiber colour system.
+- Custom charts visually belong to the design system.
+- The dashboard uses realistic synthetic data.
+- Interactions produce meaningful data changes.
+- No unsupported KPI is invented.
+- No unrelated visualisation is added.
+
+FINAL PRINCIPLE:
+
+BUILD THE PRODUCT BEHAVIOUR FIRST.
+PRESERVE THE WIREFRAME STRUCTURE.
+USE THE FIGMA/FIBER DESIGN SYSTEM FOR THE VISUAL LANGUAGE.
+CREATE CUSTOM CHARTS WHEN NECESSARY.
+DO NOT INVENT NEW PRODUCT REQUIREMENTS.

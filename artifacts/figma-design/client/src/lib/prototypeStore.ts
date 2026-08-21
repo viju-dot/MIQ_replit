@@ -168,13 +168,26 @@ const SEED: Prototype[] = [
         createdAt: "2024-04-18T11:00:00.000Z",
         updatedAt: "2024-04-18T11:00:00.000Z",
         description: "Content Planner ideation — live.",
-        // Newest/live version: the version-context strip shows the live
-        // prototype description/status (not this snapshot) for the newest.
         snapshot: {
           description:
             "MiQ TV Audience & Content Planner — single-page analytical dashboard with connected cross-filtering and drilldowns.",
           status: "Live",
           notes: "Understand → Discover journey; 8 connected KPI areas; market-aware filters.",
+        },
+      },
+      {
+        id: "tvai_v4",
+        name: "V4",
+        createdAt: "2024-05-20T11:00:00.000Z",
+        updatedAt: "2024-05-20T11:00:00.000Z",
+        description: "Wireframe-faithful Content Planner — live.",
+        // Newest/live version: the version-context strip shows the live
+        // prototype description/status (not this snapshot) for the newest.
+        snapshot: {
+          description:
+            "MiQ TV Audience & Content Planner — high-fidelity build faithful to the delivered wireframe: exec tiles, donut + combo, Trends, temporal heatmap, radar affinity and a custom Sankey.",
+          status: "Live",
+          notes: "Wireframe-faithful layout; global All/Commercials; chart token layer; cross-filter chain.",
         },
       },
     ],
