@@ -1637,6 +1637,20 @@ export function PrototypeCollabOverlay({
     () => (proto ? annotationRepository.list(proto.id) : []),
     [proto, tick],
   );
+  // Mirror stored design annotations to the console so feedback left in the
+  // preview is visible to the implementation workflow (logs are collected).
+  useEffect(() => {
+    if (allAnnotations.length === 0) return;
+    try {
+      console.log(
+        "[design-annotations]",
+        JSON.stringify(allAnnotations),
+      );
+    } catch {
+      // Best-effort only.
+    }
+  }, [allAnnotations]);
+
   // Authors combobox draws from BOTH comment + annotation authors so a name
   // used in either surface is offered in the other (single collaborator list).
   const annotationAuthors = useMemo<string[]>(
