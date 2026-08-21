@@ -1,0 +1,133 @@
+# Task: Improve Comment History, Deletion Tracking & Filtering
+
+## Description
+
+I want to improve the comment management experience.
+
+Currently, when a comment is deleted, it completely disappears from the prototype. I don't want that.
+
+Deleted comments should remain part of the comment history so users can understand what happened and maintain a proper collaboration record.
+
+---
+
+## 1. Deleted Comments
+
+When a user deletes a comment:
+
+- Do not permanently remove it from the comment history.
+- Mark it as **Deleted**.
+- Keep the original commenter, date/time, version, and comment location information.
+- Replace the comment content with an appropriate deleted-state message.
+- Do not allow users to interact with the deleted comment as if it were an active comment.
+
+Example:
+
+**Vijay · V2 · 10:42 AM**
+
+> This button should move higher.
+
+**Deleted**
+
+The deleted comment should remain associated with the same prototype version and UI location.
+
+---
+
+## 2. Comment Filters
+
+Add a simple filtering/sorting control to the comments experience.
+
+Provide options such as:
+
+- **All Comments**
+- **Active Comments**
+- **Deleted Comments**
+
+The default should be **All Comments**.
+
+This allows users to easily understand both current and historical feedback.
+
+---
+
+## 3. Active vs Deleted State
+
+Make the difference between active and deleted comments visually clear.
+
+### Active Comment
+
+Show normally with:
+
+- Commenter
+- Comment
+- Date/time
+- Version
+- Location
+- Replies
+
+### Deleted Comment
+
+Show in a muted/deleted state with:
+
+- Commenter
+- Deleted status
+- Original date/time
+- Version
+- Original location
+
+Do not completely hide the comment.
+
+---
+
+## 4. Sorting
+
+Within the selected filter, provide simple sorting options:
+
+- Newest first
+- Oldest first
+
+Keep the interaction lightweight. Don't introduce unnecessary filtering complexity.
+
+---
+
+## 5. Comment Threads
+
+If a comment has replies and the parent comment is deleted, preserve the thread history.
+
+For example:
+
+**Vijay**
+
+> Please move this button higher.
+
+**Deleted**
+
+**Another user**
+
+> Done, I'll update it in V3.
+
+The conversation history should remain understandable even after deletion.
+
+---
+
+## 6. Prototype Context
+
+Because comments are anchored to specific UI elements, preserve the original comment location even after deletion.
+
+When viewing a deleted comment:
+
+- Show its associated prototype version.
+- Show its original UI location when possible.
+- Allow the user to understand which part of the prototype the deleted comment referred to.
+
+---
+
+## Goal
+
+Treat comments as a **collaboration history**, not temporary UI content.
+
+A deleted comment should become part of the audit/history trail rather than disappearing completely.
+
+The basic experience should be:
+
+**All Comments → Active / Deleted → Sort by Newest / Oldest**
+
+Keep the UI simple and consistent with the existing Fiber Design System.

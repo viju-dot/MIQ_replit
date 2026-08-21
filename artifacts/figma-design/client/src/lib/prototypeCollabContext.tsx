@@ -20,14 +20,22 @@ export interface PrototypeCollabContextValue {
   viewedVersion: PrototypeVersion;
   /** Whether comment mode is active (click-to-pin). */
   commentMode: boolean;
-  /** Comments for the CURRENTLY VIEWED version that have a valid anchor. */
+  /**
+   * TOP-LEVEL comments for the CURRENTLY VIEWED version that have a valid
+   * anchor. Includes soft-deleted ones (rendered as muted/ghost pins). Replies
+   * are not markers — they inherit the parent's pin.
+   */
   markers: PrototypeComment[];
   /** Distinct known commenter names (for the composer's name select). */
   authors: string[];
-  /** Persist a new pinned comment against the viewed version. */
+  /** Replies (oldest-first) for a given parent comment id. */
+  repliesOf: (parentId: string) => PrototypeComment[];
+  /** Persist a new pinned top-level comment against the viewed version. */
   addComment: (author: string, text: string, anchor: CommentAnchor) => void;
-  /** Delete a comment by id. */
-  removeComment: (id: string) => void;
+  /** Persist a reply to an existing comment. */
+  addReply: (parentId: string, author: string, text: string) => void;
+  /** Soft-delete a comment by id (preserves it in a muted "Deleted" state). */
+  softDeleteComment: (id: string) => void;
 }
 
 const PrototypeCollabContext =

@@ -37,7 +37,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { ChatCircle, GitBranch, ListBullets, Trash } from "@phosphor-icons/react";
+import {
+  ArrowBendUpLeft,
+  ChatCircle,
+  GitBranch,
+  ListBullets,
+  Trash,
+} from "@phosphor-icons/react";
 import {
   prototypeRepository,
   type Prototype,
@@ -84,8 +90,30 @@ const C = {
   brandFgOn: "var(--container-dynamic-brand-bold-foreground-default,#ffffff)",
   inputBorder: "var(--border-dynamic-neutral-subtle-default,#c6c6cc)",
   errorFg: "var(--container-dynamic-error-subtle-foreground-default,#da294b)",
+  errorSubtleBg: "var(--container-dynamic-error-subtle-background-default,#fbe9ec)",
   hoverBg: "var(--container-dynamic-neutral-subtle-background-hover,#71718014)",
 };
+
+/** UI text shown in place of a soft-deleted comment's body. */
+const DELETED_TEXT = "This comment was deleted.";
+
+const isDeleted = (c: PrototypeComment): boolean => Boolean(c.deletedAt);
+
+/** A small pill: version tag, or a muted "Deleted" status badge. */
+function StatusBadge({ deleted }: { deleted: boolean }) {
+  return (
+    <span
+      className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium"
+      style={
+        deleted
+          ? { backgroundColor: C.errorSubtleBg, color: C.errorFg }
+          : { backgroundColor: C.brandSubtle, color: C.brandFg }
+      }
+    >
+      {deleted ? "Deleted" : "Active"}
+    </span>
+  );
+}
 
 // DS Button Group segment tokens (mirrored from ds/ButtonGroupPage.tsx).
 const SEG = {
@@ -267,33 +295,129 @@ function VersionRow({
 /* Comments list (Show all comments panel — secondary list view)      */
 /* ------------------------------------------------------------------ */
 
+type StatusFilter = "All" | "Active" | "Deleted";
+type SortOrder = "Newest" | "Oldest";
+
+/** A small segmented pill control (single-select). */
+function SegmentedPills<T extends string>({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: readonly T[];
+  value: T;
+  onChange: (v: T) => void;
+}) {
+  return (
+    <div
+      className="inline-flex items-center rounded-full border border-solid p-0.5"
+      role="group"
+      aria-label={label}
+      style={{ borderColor: C.border, backgroundColor: C.surface }}
+    >
+      {options.map((opt) => {
+        const active = value === opt;
+        return (
+          <button
+            key={opt}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(opt)}
+            className="rounded-full px-2.5 py-1 text-[12px] font-medium transition-colors"
+            style={{
+              backgroundColor: active ? C.brandFg : "transparent",
+              color: active ? C.brandFgOn : C.textBody,
+            }}
+          >
+            {opt}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function CommentsPanelBody({
   comments,
   versions,
+  authors,
+  onReply,
+  onSoftDelete,
 }: {
   comments: PrototypeComment[];
   versions: PrototypeVersion[];
+  authors: string[];
+  onReply: (parentId: string, author: string, text: string) => void;
+  onSoftDelete: (id: string) => void;
 }) {
-  const [filter, setFilter] = useState<string>("All");
-  const filtered =
-    filter === "All"
-      ? comments
-      : comments.filter((c) => c.versionName === filter);
+  const [versionFilter, setVersionFilter] = useState<string>("All");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("All");
+  const [sort, setSort] = useState<SortOrder>("Newest");
 
   const chips = ["All", ...versions.map((v) => v.name).reverse()];
 
+  // Build threads: top-level comments (no parentId) with their replies.
+  const topLevel = comments.filter((c) => !c.parentId);
+  const repliesFor = (parentId: string) =>
+    comments
+      .filter((c) => c.parentId === parentId)
+      .slice()
+      .sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
+
+  // Status filter (simple + predictable):
+  //  • Active:  only threads whose PARENT is active (Active NEVER shows a
+  //             deleted parent card). Nested replies are rendered as-is.
+  //  • Deleted: only threads whose parent is deleted OR that contain at least
+  //             one deleted reply.
+  //  • All:     everything.
+  const threadMatchesStatus = (parent: PrototypeComment): boolean => {
+    if (statusFilter === "All") return true;
+    if (statusFilter === "Active") return !isDeleted(parent);
+    // Deleted
+    return isDeleted(parent) || repliesFor(parent.id).some(isDeleted);
+  };
+
+  let threads = topLevel.filter((parent) => {
+    if (versionFilter !== "All" && parent.versionName !== versionFilter)
+      return false;
+    return threadMatchesStatus(parent);
+  });
+
+  threads = threads.slice().sort((a, b) => {
+    const diff = Date.parse(a.createdAt) - Date.parse(b.createdAt);
+    return sort === "Newest" ? -diff : diff;
+  });
+
   return (
     <div className="flex flex-col gap-[var(--spacing-200,16px)] p-[var(--spacing-300,24px)]">
+      {/* Status + sort controls */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <SegmentedPills
+          label="Filter comments by status"
+          options={["All", "Active", "Deleted"]}
+          value={statusFilter}
+          onChange={setStatusFilter}
+        />
+        <SegmentedPills
+          label="Sort comments"
+          options={["Newest", "Oldest"]}
+          value={sort}
+          onChange={setSort}
+        />
+      </div>
+
       {/* Version filter chips */}
       <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter comments by version">
         {chips.map((chip) => {
-          const active = filter === chip;
+          const active = versionFilter === chip;
           return (
             <button
               key={chip}
               type="button"
               aria-pressed={active}
-              onClick={() => setFilter(chip)}
+              onClick={() => setVersionFilter(chip)}
               className="rounded-full border border-solid px-2.5 py-1 text-[12px] font-medium transition-colors"
               style={{
                 backgroundColor: active ? C.brandFg : C.surface,
@@ -307,61 +431,145 @@ function CommentsPanelBody({
         })}
       </div>
 
-      {filtered.length === 0 ? (
+      {threads.length === 0 ? (
         <div
           className="flex flex-col items-center gap-2 rounded-[var(--radius-100,8px)] border border-dashed p-[var(--spacing-400,32px)] text-center"
           style={{ borderColor: C.border }}
         >
           <ChatCircle size={24} style={{ color: C.textMuted }} aria-hidden />
           <p className="text-[length:var(--body-md-medium-size,14px)] font-medium" style={{ color: C.textPrimary }}>
-            No comments yet
+            No comments
           </p>
           <p className="text-[12px]" style={{ color: C.textMuted }}>
-            {filter === "All"
+            {versionFilter === "All" && statusFilter === "All"
               ? "Turn on comment mode and click the prototype to leave feedback."
-              : `No comments left against ${filter}.`}
+              : "No comments match the current filters."}
           </p>
         </div>
       ) : (
         <ul className="flex flex-col gap-[var(--spacing-150,12px)]">
-          {filtered.map((c) => (
-            <li
+          {threads.map((c) => (
+            <CommentThreadCard
               key={c.id}
-              className="flex flex-col gap-1.5 rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-200,16px)]"
-              style={{ backgroundColor: C.surface, borderColor: C.border }}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span
-                  className="text-[length:var(--body-md-medium-size,14px)] font-semibold"
-                  style={{ color: C.textPrimary }}
-                >
-                  {c.author}
-                </span>
-                <span
-                  className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium"
-                  style={{ backgroundColor: C.brandSubtle, color: C.brandFg }}
-                >
-                  {c.versionName}
-                </span>
-              </div>
-              {/* Target label — where on the prototype this comment is pinned. */}
-              <p className="text-[11px] font-medium" style={{ color: C.textMuted }}>
-                {c.anchor ? c.anchor.targetLabel : "Unpinned"}
-              </p>
-              <p
-                className="whitespace-pre-wrap text-[length:var(--body-sm-regular-size,12px)]"
-                style={{ color: C.textBody }}
-              >
-                {c.text}
-              </p>
-              <p className="text-[11px]" style={{ color: C.textMuted }}>
-                {c.versionName} · {fmtDate(c.createdAt)} · {fmtTime(c.createdAt)}
-              </p>
-            </li>
+              parent={c}
+              replies={repliesFor(c.id)}
+              authors={authors}
+              onReply={onReply}
+              onSoftDelete={onSoftDelete}
+            />
           ))}
         </ul>
       )}
     </div>
+  );
+}
+
+/** A thread card in the list: parent (active or deleted) + nested replies. */
+function CommentThreadCard({
+  parent,
+  replies,
+  authors,
+  onReply,
+  onSoftDelete,
+}: {
+  parent: PrototypeComment;
+  replies: PrototypeComment[];
+  authors: string[];
+  onReply: (parentId: string, author: string, text: string) => void;
+  onSoftDelete: (id: string) => void;
+}) {
+  const [delHover, setDelHover] = useState(false);
+  const [replying, setReplying] = useState(false);
+  const deleted = isDeleted(parent);
+  return (
+    <li
+      className="flex flex-col gap-1.5 rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-200,16px)]"
+      style={{ backgroundColor: C.surface, borderColor: C.border }}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span
+          className="text-[length:var(--body-md-medium-size,14px)] font-semibold"
+          style={{ color: C.textPrimary }}
+        >
+          {parent.author}
+        </span>
+        <div className="flex items-center gap-1.5">
+          {deleted && <StatusBadge deleted />}
+          <span
+            className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium"
+            style={{ backgroundColor: C.brandSubtle, color: C.brandFg }}
+          >
+            {parent.versionName}
+          </span>
+          {!deleted && (
+            <button
+              type="button"
+              aria-label="Delete comment"
+              onClick={() => onSoftDelete(parent.id)}
+              onMouseEnter={() => setDelHover(true)}
+              onMouseLeave={() => setDelHover(false)}
+              className="flex size-[22px] items-center justify-center rounded-[var(--radius-50,4px)] transition-colors"
+              style={{ backgroundColor: delHover ? C.hoverBg : "transparent" }}
+            >
+              <Trash size={13} style={{ color: delHover ? C.errorFg : C.textMuted }} />
+            </button>
+          )}
+        </div>
+      </div>
+      {/* Target label — where on the prototype this comment is pinned. */}
+      <p className="text-[11px] font-medium" style={{ color: C.textMuted }}>
+        {parent.anchor ? parent.anchor.targetLabel : "Unpinned"}
+      </p>
+      <p
+        className="whitespace-pre-wrap text-[length:var(--body-sm-regular-size,12px)]"
+        style={{
+          color: deleted ? C.textMuted : C.textBody,
+          fontStyle: deleted ? "italic" : undefined,
+        }}
+      >
+        {deleted ? DELETED_TEXT : parent.text}
+      </p>
+      <p className="text-[11px]" style={{ color: C.textMuted }}>
+        {parent.versionName} · {fmtDate(parent.createdAt)} · {fmtTime(parent.createdAt)}
+      </p>
+
+      {/* Replies (stay visible even if the parent is deleted). */}
+      {replies.length > 0 && (
+        <div className="mt-1 flex flex-col gap-2">
+          {replies.map((r) => (
+            <ReplyRow key={r.id} reply={r} onSoftDelete={onSoftDelete} />
+          ))}
+        </div>
+      )}
+
+      {/* Reply action / composer. A deleted PARENT is READ-ONLY: no Reply
+          action (its still-active replies keep their own delete actions). */}
+      {!deleted &&
+        (replying ? (
+          <div className="mt-1">
+            <ReplyComposer
+              authors={authors}
+              onPost={(author, text) => {
+                onReply(parent.id, author, text);
+                setReplying(false);
+              }}
+              onCancel={() => setReplying(false)}
+            />
+          </div>
+        ) : (
+          <div className="mt-1">
+            <button
+              type="button"
+              onClick={() => setReplying(true)}
+              className="flex items-center gap-1 text-[11px] font-medium underline-offset-2 hover:underline"
+              style={{ color: C.brandFg }}
+            >
+              <ArrowBendUpLeft size={13} />
+              Reply
+            </button>
+          </div>
+        ))}
+    </li>
   );
 }
 
@@ -543,29 +751,181 @@ function InlineComposer({
 }
 
 /* ------------------------------------------------------------------ */
+/* Reply composer (used inside a thread — bubble + list)               */
+/* ------------------------------------------------------------------ */
+
+function ReplyComposer({
+  authors,
+  onPost,
+  onCancel,
+}: {
+  authors: string[];
+  onPost: (author: string, text: string) => void;
+  onCancel: () => void;
+}) {
+  const [choice, setChoice] = useState<string>(
+    authors.length > 0 ? authors[0] : NEW_NAME,
+  );
+  const [newName, setNewName] = useState("");
+  const [text, setText] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const resolvedName = choice === NEW_NAME ? newName.trim() : choice.trim();
+
+  function post() {
+    if (resolvedName.length === 0) {
+      setError("Please enter a name.");
+      return;
+    }
+    if (text.trim().length === 0) {
+      setError("Please enter a reply.");
+      return;
+    }
+    onPost(resolvedName, text.trim());
+  }
+
+  return (
+    <div
+      className="flex flex-col gap-[var(--spacing-150,12px)] rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-150,12px)]"
+      style={{ borderColor: C.border, backgroundColor: C.surface2 }}
+    >
+      <NameField
+        authors={authors}
+        choice={choice}
+        onChoiceChange={(v) => {
+          setChoice(v);
+          setError(null);
+        }}
+        newName={newName}
+        onNewNameChange={(v) => {
+          setNewName(v);
+          setError(null);
+        }}
+      />
+      <Textarea
+        aria-label="Reply"
+        rows={2}
+        placeholder="Write a reply…"
+        value={text}
+        onChange={(e) => {
+          setText(e.target.value);
+          setError(null);
+        }}
+      />
+      {error && (
+        <p role="alert" className="text-[12px]" style={{ color: C.errorFg }}>
+          {error}
+        </p>
+      )}
+      <div className="flex items-center justify-end gap-2">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-[var(--radius-100,8px)] border border-solid px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)] text-[length:var(--body-sm-medium-size,12px)] font-medium"
+          style={{ borderColor: C.border, color: C.textBody, backgroundColor: C.surface }}
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          onClick={post}
+          className="rounded-[var(--radius-100,8px)] px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)] text-[length:var(--body-sm-medium-size,12px)] font-medium"
+          style={{ backgroundColor: C.brandBg, color: C.brandFgOn }}
+        >
+          Reply
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Thread reply rows (shared by bubble + list)                         */
+/* ------------------------------------------------------------------ */
+
+/** A single reply row with author/time and (when active) a soft-delete action. */
+function ReplyRow({
+  reply,
+  onSoftDelete,
+}: {
+  reply: PrototypeComment;
+  onSoftDelete: (id: string) => void;
+}) {
+  const [delHover, setDelHover] = useState(false);
+  const deleted = isDeleted(reply);
+  return (
+    <div
+      className="flex flex-col gap-1 border-l-2 pl-[var(--spacing-150,12px)]"
+      style={{ borderColor: C.border, opacity: deleted ? 0.7 : 1 }}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span
+          className="text-[length:var(--body-sm-medium-size,12px)] font-semibold"
+          style={{ color: C.textPrimary }}
+        >
+          {reply.author}
+        </span>
+        {deleted ? (
+          <StatusBadge deleted />
+        ) : (
+          <button
+            type="button"
+            aria-label="Delete reply"
+            onClick={() => onSoftDelete(reply.id)}
+            onMouseEnter={() => setDelHover(true)}
+            onMouseLeave={() => setDelHover(false)}
+            className="flex size-[22px] items-center justify-center rounded-[var(--radius-50,4px)] transition-colors"
+            style={{ backgroundColor: delHover ? C.hoverBg : "transparent" }}
+          >
+            <Trash size={13} style={{ color: delHover ? C.errorFg : C.textMuted }} />
+          </button>
+        )}
+      </div>
+      <p
+        className="whitespace-pre-wrap text-[length:var(--body-sm-regular-size,12px)]"
+        style={{ color: deleted ? C.textMuted : C.textBody, fontStyle: deleted ? "italic" : undefined }}
+      >
+        {deleted ? DELETED_TEXT : reply.text}
+      </p>
+      <p className="text-[11px]" style={{ color: C.textMuted }}>
+        {fmtDate(reply.createdAt)} · {fmtTime(reply.createdAt)}
+      </p>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* Marker pin + bubble                                                 */
 /* ------------------------------------------------------------------ */
 
 function MarkerBubble({
   comment,
+  replies,
+  authors,
   flipRight,
   flipUp,
-  onDelete,
+  onReply,
+  onSoftDelete,
   onClose,
 }: {
   comment: PrototypeComment;
+  replies: PrototypeComment[];
+  authors: string[];
   flipRight: boolean;
   flipUp: boolean;
-  onDelete: () => void;
+  onReply: (parentId: string, author: string, text: string) => void;
+  onSoftDelete: (id: string) => void;
   onClose: () => void;
 }) {
   const [delHover, setDelHover] = useState(false);
+  const [replying, setReplying] = useState(false);
+  const parentDeleted = isDeleted(comment);
   return (
     <div
       role="dialog"
-      aria-label={`Comment by ${comment.author}`}
+      aria-label={`Comment thread by ${comment.author}`}
       onClick={(e) => e.stopPropagation()}
-      className="pointer-events-auto absolute z-[4] w-[260px] rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-200,16px)] shadow-lg"
+      className="pointer-events-auto absolute z-[4] flex max-h-[60vh] w-[280px] flex-col gap-1.5 overflow-auto rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-200,16px)] shadow-lg"
       style={{
         left: "50%",
         top: "50%",
@@ -576,18 +936,21 @@ function MarkerBubble({
         borderColor: C.border,
       }}
     >
-      <div className="flex flex-col gap-1.5">
-        <div className="flex items-center justify-between gap-2">
-          <span
-            className="text-[length:var(--body-md-medium-size,14px)] font-semibold"
-            style={{ color: C.textPrimary }}
-          >
-            {comment.author}
-          </span>
+      {/* Parent comment */}
+      <div className="flex items-center justify-between gap-2">
+        <span
+          className="text-[length:var(--body-md-medium-size,14px)] font-semibold"
+          style={{ color: C.textPrimary }}
+        >
+          {comment.author}
+        </span>
+        {parentDeleted ? (
+          <StatusBadge deleted />
+        ) : (
           <button
             type="button"
             aria-label="Delete comment"
-            onClick={onDelete}
+            onClick={() => onSoftDelete(comment.id)}
             onMouseEnter={() => setDelHover(true)}
             onMouseLeave={() => setDelHover(false)}
             className="flex size-[24px] items-center justify-center rounded-[var(--radius-50,4px)] transition-colors"
@@ -595,22 +958,63 @@ function MarkerBubble({
           >
             <Trash size={14} style={{ color: delHover ? C.errorFg : C.textMuted }} />
           </button>
-        </div>
-        {comment.anchor && (
-          <p className="text-[11px] font-medium" style={{ color: C.textMuted }}>
-            {comment.anchor.targetLabel}
-          </p>
         )}
-        <p
-          className="whitespace-pre-wrap text-[length:var(--body-sm-regular-size,12px)]"
-          style={{ color: C.textBody }}
-        >
-          {comment.text}
+      </div>
+      {comment.anchor && (
+        <p className="text-[11px] font-medium" style={{ color: C.textMuted }}>
+          {comment.anchor.targetLabel}
         </p>
-        <p className="text-[11px]" style={{ color: C.textMuted }}>
-          {comment.versionName} · {fmtDate(comment.createdAt)} · {fmtTime(comment.createdAt)}
-        </p>
-        <div className="mt-1 flex justify-end">
+      )}
+      <p
+        className="whitespace-pre-wrap text-[length:var(--body-sm-regular-size,12px)]"
+        style={{
+          color: parentDeleted ? C.textMuted : C.textBody,
+          fontStyle: parentDeleted ? "italic" : undefined,
+        }}
+      >
+        {parentDeleted ? DELETED_TEXT : comment.text}
+      </p>
+      <p className="text-[11px]" style={{ color: C.textMuted }}>
+        {comment.versionName} · {fmtDate(comment.createdAt)} · {fmtTime(comment.createdAt)}
+      </p>
+
+      {/* Replies */}
+      {replies.length > 0 && (
+        <div className="mt-1 flex flex-col gap-2">
+          {replies.map((r) => (
+            <ReplyRow key={r.id} reply={r} onSoftDelete={onSoftDelete} />
+          ))}
+        </div>
+      )}
+
+      {/* Reply composer / actions. A deleted PARENT is READ-ONLY: no Reply
+          action — only Close (its active replies keep their own delete). */}
+      {replying ? (
+        <div className="mt-1">
+          <ReplyComposer
+            authors={authors}
+            onPost={(author, text) => {
+              onReply(comment.id, author, text);
+              setReplying(false);
+            }}
+            onCancel={() => setReplying(false)}
+          />
+        </div>
+      ) : (
+        <div className="mt-1 flex items-center justify-between">
+          {parentDeleted ? (
+            <span />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setReplying(true)}
+              className="flex items-center gap-1 text-[11px] font-medium underline-offset-2 hover:underline"
+              style={{ color: C.brandFg }}
+            >
+              <ArrowBendUpLeft size={13} />
+              Reply
+            </button>
+          )}
           <button
             type="button"
             onClick={onClose}
@@ -620,7 +1024,7 @@ function MarkerBubble({
             Close
           </button>
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -628,39 +1032,54 @@ function MarkerBubble({
 function Marker({
   comment,
   index,
+  replies,
+  authors,
   open,
   onToggle,
-  onDelete,
+  onReply,
+  onSoftDelete,
 }: {
   comment: PrototypeComment;
   index: number;
+  replies: PrototypeComment[];
+  authors: string[];
   open: boolean;
   onToggle: () => void;
-  onDelete: () => void;
+  onReply: (parentId: string, author: string, text: string) => void;
+  onSoftDelete: (id: string) => void;
 }) {
   const anchor = comment.anchor;
   if (!anchor) return null;
   const flipRight = anchor.xPct > 60;
   const flipUp = anchor.yPct > 60;
+  const deleted = isDeleted(comment);
+  const label = deleted
+    ? `Deleted comment ${index + 1} by ${comment.author}`
+    : `Comment ${index + 1} by ${comment.author}`;
   return (
     <div
       className="absolute"
       style={{ left: `${anchor.xPct}%`, top: `${anchor.yPct}%` }}
     >
-      {/* The pin is positioned at the anchor point (its bottom-left tip). */}
+      {/* The pin is positioned at the anchor point (its bottom-left tip). A
+          deleted comment renders a MUTED/GHOST pin (dashed, neutral) that still
+          opens its thread, but is visually distinct from active pins. */}
       <button
         type="button"
-        aria-label={`Comment ${index + 1} by ${comment.author}`}
+        aria-label={label}
         aria-expanded={open}
         onClick={(e) => {
           e.stopPropagation();
           onToggle();
         }}
-        className="pointer-events-auto relative flex size-[26px] -translate-x-1/2 -translate-y-full items-center justify-center rounded-full rounded-bl-none border-2 text-[11px] font-semibold shadow-md outline-none focus-visible:z-[5]"
+        className={`pointer-events-auto relative flex size-[26px] -translate-x-1/2 -translate-y-full items-center justify-center rounded-full rounded-bl-none border-2 text-[11px] font-semibold shadow-md outline-none focus-visible:z-[5] ${
+          deleted ? "border-dashed" : ""
+        }`}
         style={{
-          backgroundColor: C.brandBg,
-          borderColor: C.brandFgOn,
-          color: C.brandFgOn,
+          backgroundColor: deleted ? C.surface2 : C.brandBg,
+          borderColor: deleted ? C.textMuted : C.brandFgOn,
+          color: deleted ? C.textMuted : C.brandFgOn,
+          opacity: deleted ? 0.85 : 1,
           ...(open ? { boxShadow: FOCUS_RING } : null),
         }}
       >
@@ -669,9 +1088,12 @@ function Marker({
       {open && (
         <MarkerBubble
           comment={comment}
+          replies={replies}
+          authors={authors}
           flipRight={flipRight}
           flipUp={flipUp}
-          onDelete={onDelete}
+          onReply={onReply}
+          onSoftDelete={onSoftDelete}
           onClose={onToggle}
         />
       )}
@@ -709,7 +1131,15 @@ export function PrototypeCommentLayer(): JSX.Element | null {
 
   if (!collab) return null;
 
-  const { markers, authors, addComment, removeComment, viewedVersion } = collab;
+  const {
+    markers,
+    authors,
+    repliesOf,
+    addComment,
+    addReply,
+    softDeleteComment,
+    viewedVersion,
+  } = collab;
 
   function handleCaptureClick(e: React.MouseEvent<HTMLDivElement>) {
     // The layer's parent IS the canvas box (centered, max-width). Measure
@@ -767,20 +1197,22 @@ export function PrototypeCommentLayer(): JSX.Element | null {
         />
       )}
 
-      {/* Markers for the currently VIEWED version. */}
+      {/* Markers for the currently VIEWED version (top-level; deleted show as
+          muted ghost pins). Numbering is chronological across all top-level
+          pins so numbers stay stable when a comment is deleted. */}
       {markers.map((c, i) => (
         <Marker
           key={c.id}
           comment={c}
           index={i}
+          replies={repliesOf(c.id)}
+          authors={authors}
           open={openMarkerId === c.id}
           onToggle={() =>
             setOpenMarkerId((cur) => (cur === c.id ? null : c.id))
           }
-          onDelete={() => {
-            removeComment(c.id);
-            setOpenMarkerId(null);
-          }}
+          onReply={addReply}
+          onSoftDelete={softDeleteComment}
         />
       ))}
 
@@ -924,12 +1356,23 @@ export function PrototypeCollabOverlay({
 
   const reconcile = () => setTick((t) => t + 1);
 
-  // Markers = comments for the viewed version WITH a valid anchor.
+  // Markers = TOP-LEVEL comments (no parentId) for the viewed version WITH a
+  // valid anchor. Soft-deleted ones are included so their original location can
+  // still be shown (as a muted/ghost pin).
   const markers = comments
-    .filter((c) => c.versionId === viewedVersion.id && c.anchor)
+    .filter(
+      (c) => !c.parentId && c.versionId === viewedVersion.id && c.anchor,
+    )
     // Oldest-first so numbered pins read 1..n chronologically.
     .slice()
     .reverse();
+
+  // Replies grouped by parent id, oldest-first for readable threads.
+  const repliesOf = (parentId: string): PrototypeComment[] =>
+    comments
+      .filter((c) => c.parentId === parentId)
+      .slice()
+      .reverse();
 
   function addComment(author: string, text: string, anchor: CommentAnchor) {
     if (!proto) return;
@@ -944,8 +1387,24 @@ export function PrototypeCollabOverlay({
     setTick((t) => t + 1);
   }
 
-  function removeComment(id: string) {
-    commentRepository.remove(id);
+  function addReply(parentId: string, author: string, text: string) {
+    if (!proto) return;
+    // A reply inherits the PARENT's version so the whole thread maps to one
+    // version. Find the parent among all comments for this prototype.
+    const parent = comments.find((c) => c.id === parentId);
+    commentRepository.add({
+      prototypeId: proto.id,
+      versionId: parent?.versionId ?? viewedVersion.id,
+      versionName: parent?.versionName ?? viewedVersion.name,
+      author,
+      text,
+      parentId,
+    });
+    setTick((t) => t + 1);
+  }
+
+  function softDeleteComment(id: string) {
+    commentRepository.softDelete(id);
     setTick((t) => t + 1);
   }
 
@@ -965,8 +1424,10 @@ export function PrototypeCollabOverlay({
           commentMode,
           markers,
           authors,
+          repliesOf,
           addComment,
-          removeComment,
+          addReply,
+          softDeleteComment,
         }}
       >
         {/* Prototype content — re-mounted per viewed version so version
@@ -1082,7 +1543,13 @@ export function PrototypeCollabOverlay({
           subtitle={`${proto.name} · ${comments.length} total`}
           size="400"
         >
-          <CommentsPanelBody comments={comments} versions={proto.versions} />
+          <CommentsPanelBody
+            comments={comments}
+            versions={proto.versions}
+            authors={authors}
+            onReply={addReply}
+            onSoftDelete={softDeleteComment}
+          />
         </SidePanel>
       </PrototypeCollabProvider>
     </PrototypeVersionProvider>

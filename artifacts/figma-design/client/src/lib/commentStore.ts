@@ -9,10 +9,13 @@
  * A comment is anchored to BOTH a prototype and the version it was left against
  * (versionId + versionName) so feedback↔version mapping is always unambiguous.
  *
- * ── Architecture seams (intentionally NOT implemented yet) ────────────────
- *  • The PrototypeComment type is kept extensible (flat + optional fields) so
- *    future replies / resolution can be layered on without a migration:
- *    e.g. `parentId?: string`, `resolved?: boolean`. None are wired here.
+ * ── Collaboration history ─────────────────────────────────────────────────
+ *  • Soft delete: `remove` was replaced by `softDelete`, which stamps
+ *    `deletedAt` and PRESERVES the record (author, createdAt, version, anchor).
+ *    Deleted comments stay in history, rendered in a muted "Deleted" state.
+ *  • Lightweight threads: `parentId` links a reply to its top-level comment.
+ *    Deleting a parent does NOT delete its replies (the thread stays readable);
+ *    replies are individually soft-deletable.
  */
 
 const STORAGE_KEY = "fiber:ai-prototype:comments:v1";
@@ -45,12 +48,21 @@ export interface PrototypeComment {
   /**
    * Where the comment is pinned on the prototype UI. Optional: legacy records
    * without an anchor stay valid — they appear in the list panel but render no
-   * marker.
+   * marker. Replies (parentId set) typically carry no anchor.
    */
   anchor?: CommentAnchor;
-  // FUTURE (extensibility seam — do not use yet):
-  //   parentId?: string;   // threaded replies
-  //   resolved?: boolean;  // resolution state
+  /**
+   * If set, this comment is a REPLY to the top-level comment with this id.
+   * Top-level comments leave this undefined. Replies inherit the parent's pin
+   * (they render no marker of their own).
+   */
+  parentId?: string;
+  /**
+   * Soft-delete timestamp (ISO). When set, the comment is preserved in history
+   * but shown in a muted "Deleted" state; its text is hidden in the UI. Legacy
+   * records without this field are active.
+   */
+  deletedAt?: string;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -91,17 +103,23 @@ export interface NewCommentInput {
   text: string;
   /** Where the comment is pinned on the prototype UI (optional). */
   anchor?: CommentAnchor;
+  /** If set, this is a reply to the top-level comment with this id. */
+  parentId?: string;
 }
 
 export interface CommentRepository {
-  /** All comments for a prototype, newest-first. */
+  /** All comments for a prototype, newest-first (includes soft-deleted). */
   list(prototypeId: string): PrototypeComment[];
   /** Distinct commenter names across ALL comments (for the name combobox). */
   listAuthors(): string[];
   /** Persist a new comment. Throws on empty author/text. */
   add(input: NewCommentInput): PrototypeComment;
-  /** Delete a comment by id. */
-  remove(id: string): void;
+  /**
+   * SOFT delete a comment by id: stamps `deletedAt` and preserves the record.
+   * Only the targeted comment is affected — deleting a parent leaves its
+   * replies intact, and replies remain individually soft-deletable.
+   */
+  softDelete(id: string): void;
 }
 
 /**
@@ -128,6 +146,18 @@ function coerceComment(raw: unknown): PrototypeComment | null {
   const createdAtRaw = str(r.createdAt);
   if (createdAtRaw.length === 0 || Number.isNaN(Date.parse(createdAtRaw))) return null;
 
+  // parentId: optional, must be a non-empty string to count (else undefined).
+  const parentIdRaw = str(r.parentId).trim();
+  const parentId = parentIdRaw.length > 0 ? parentIdRaw : undefined;
+
+  // deletedAt: optional; keep only a parseable ISO timestamp, else treat the
+  // record as active (tolerant of legacy/garbage values).
+  const deletedAtRaw = str(r.deletedAt);
+  const deletedAt =
+    deletedAtRaw.length > 0 && !Number.isNaN(Date.parse(deletedAtRaw))
+      ? deletedAtRaw
+      : undefined;
+
   return {
     id: r.id,
     prototypeId: r.prototypeId,
@@ -137,6 +167,8 @@ function coerceComment(raw: unknown): PrototypeComment | null {
     text,
     createdAt: createdAtRaw,
     anchor: coerceAnchor(r.anchor),
+    parentId,
+    deletedAt,
   };
 }
 
@@ -225,6 +257,11 @@ export const localStorageRepository: CommentRepository = {
     let id = newId();
     while (existingIds.has(id)) id = newId();
 
+    const parentId =
+      typeof input.parentId === "string" && input.parentId.trim().length > 0
+        ? input.parentId.trim()
+        : undefined;
+
     const comment: PrototypeComment = {
       id,
       prototypeId: input.prototypeId,
@@ -234,13 +271,25 @@ export const localStorageRepository: CommentRepository = {
       text,
       createdAt: nowIso(),
       anchor: coerceAnchor(input.anchor),
+      parentId,
     };
     all.push(comment);
     writeAll(all);
     return comment;
   },
-  remove(id) {
-    writeAll(readAll().filter((c) => c.id !== id));
+  softDelete(id) {
+    const all = readAll();
+    // Stamp deletedAt on ONLY the targeted record; preserve everything else
+    // (author, createdAt, version, anchor) and never touch parents/replies.
+    let changed = false;
+    const next = all.map((c) => {
+      if (c.id === id && !c.deletedAt) {
+        changed = true;
+        return { ...c, deletedAt: nowIso() };
+      }
+      return c;
+    });
+    if (changed) writeAll(next);
   },
 };
 
