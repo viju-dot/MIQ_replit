@@ -162,6 +162,21 @@ const SEED: Prototype[] = [
           notes: "Added activation flow, refined filters and dark-mode support.",
         },
       },
+      {
+        id: "tvai_v3",
+        name: "V3",
+        createdAt: "2024-04-18T11:00:00.000Z",
+        updatedAt: "2024-04-18T11:00:00.000Z",
+        description: "Content Planner ideation — live.",
+        // Newest/live version: the version-context strip shows the live
+        // prototype description/status (not this snapshot) for the newest.
+        snapshot: {
+          description:
+            "MiQ TV Audience & Content Planner — single-page analytical dashboard with connected cross-filtering and drilldowns.",
+          status: "Live",
+          notes: "Understand → Discover journey; 8 connected KPI areas; market-aware filters.",
+        },
+      },
     ],
     // No pre-baked token: a fresh high-entropy token is generated the first
     // time sharing is enabled (weak/deterministic tokens are never accepted).
@@ -313,11 +328,50 @@ function writeLocal(prototypes: Prototype[]): void {
 function readAll(): Prototype[] {
   const local = readLocal();
   const localById = new Map(local.map((p) => [p.id, p]));
-  const merged: Prototype[] = SEED.map((s) => localById.get(s.id) ?? s);
+  const merged: Prototype[] = SEED.map((s) => {
+    const override = localById.get(s.id);
+    // A local override fully replaces the seed. But newly-seeded versions
+    // (e.g. V3 shipped after a user already persisted V1/V2) would otherwise
+    // be invisible, so reconcile any seed versions the override is missing —
+    // preserving append-only ordering (older seeded versions keep their slot).
+    return override ? reconcileSeededVersions(override, s) : s;
+  });
   for (const p of local) {
     if (!SEED.some((s) => s.id === p.id)) merged.push(p);
   }
   return merged;
+}
+
+/**
+ * Ensure a persisted prototype carries every seeded version. Seeded versions
+ * absent from the local record are appended in seed order (append-only), so a
+ * seeded V3 becomes the newest/live version for users who already had V1/V2.
+ * Locally-added versions are preserved and follow the seeded ones.
+ */
+function reconcileSeededVersions(
+  local: Prototype,
+  seed: Prototype,
+): Prototype {
+  const haveIds = new Set(local.versions.map((v) => v.id));
+  const missingSeeded = seed.versions.filter((v) => !haveIds.has(v.id));
+  if (missingSeeded.length === 0) return local;
+  const seededHere = seed.versions.filter((v) => haveIds.has(v.id));
+  const seedIds = new Set(seed.versions.map((v) => v.id));
+  const localOnly = local.versions.filter((v) => !seedIds.has(v.id));
+  // Order: existing seeded (in seed order) + newly-seeded + local-only extras.
+  return {
+    ...local,
+    versions: [
+      ...seed.versions.filter(
+        (v) => haveIds.has(v.id) || missingSeeded.includes(v),
+      ).map((sv) => {
+        // Keep the user's copy of an already-persisted seeded version if any.
+        const existing = seededHere.find((lv) => lv.id === sv.id);
+        return existing ?? sv;
+      }),
+      ...localOnly,
+    ],
+  };
 }
 
 /**

@@ -20,6 +20,7 @@ import { Moon, Sun } from "lucide-react";
 import { Translate, CaretDown } from "@phosphor-icons/react";
 import { useTheme } from "@/lib/theme";
 import TvAudienceDashboardPage from "@/pages/ds/TvAudienceDashboardPage";
+import V3ContentPlanner from "@/pages/tv-audience/v3/V3ContentPlanner";
 import {
   PrototypeCollabOverlay,
   PrototypeCommentLayer,
@@ -482,7 +483,9 @@ type VersionRenderer = (args: {
 const DEFAULT_RENDERER: VersionRenderer = () => <TvAudienceDashboardPage />;
 
 const VERSION_RENDERERS: Record<string, VersionRenderer> = {
-  // e.g. "tvai_v1": () => <TvAudienceDashboardPageV1 />,
+  // V3 (newest/live) = MiQ TV Audience & Content Planner ideation. V1 & V2 fall
+  // back to the existing dashboard renderer (their frozen snapshots).
+  tvai_v3: () => <V3ContentPlanner />,
 };
 
 /** The prototype body — version-aware. Consumes the version context. */

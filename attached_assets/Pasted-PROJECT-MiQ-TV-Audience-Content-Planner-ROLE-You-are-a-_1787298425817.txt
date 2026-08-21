@@ -1,0 +1,550 @@
+PROJECT: MiQ TV Audience & Content Planner
+
+ROLE
+You are a senior Product Designer, UX Researcher, Data Visualization Designer,
+and Product Analyst working on a MiQ TV Audience & Content Planner.
+
+Your task is to create a functional requirements document and the supporting
+research/design system documentation needed to ideate and build an AI-powered
+functional prototype in Replit.
+
+PROJECT CONTEXT
+
+Goal:
+Build a TV audience and content planner dashboard that provides content and
+viewership consumption insights based on demographic audience inputs.
+
+Markets:
+- UK
+- Four additional European markets
+
+Primary users:
+- Sales teams
+- Trader teams
+
+V1:
+- Single-page analytical dashboard
+- Approximately 8 core KPI/insight areas
+- Insights should be connected through filtering and drilldown rather than
+  behaving as independent charts.
+
+PRIMARY PRODUCT QUESTIONS
+
+The dashboard should help users understand:
+
+1. What does my audience watch?
+2. Where do they watch it?
+3. When do they watch it?
+4. Which genres are most relevant?
+5. Which shows over-index for this audience?
+6. Which platforms contribute to viewing?
+7. What other genres does this audience have an affinity for?
+8. Where does the audience go after watching content?
+9. Where are the commercial opportunities for sellers?
+10. How does one audience compare with another?
+
+CORE KPI / INSIGHT REQUIREMENTS
+
+1. CONSUMPTION BY TYPE
+
+User question:
+"How much time does my audience spend watching streaming, FAST, linear
+and homescreen, and which one should I activate on to reach them?"
+
+Metrics:
+- % of minutes watched per household
+
+Dimensions:
+- Linear
+- Streaming
+- FAST
+- Homescreen
+
+Requirements:
+- Interactive visual
+- Selected type should act as a secondary filter for downstream insights
+- Global viewing environment filter:
+  - All
+  - Commercial only
+- Commercial only should represent commercially addressable opportunities
+  and exclude non-commercial environments where relevant, such as BBC.
+
+Recommended interaction:
+- All
+- Linear
+- Streaming
+- FAST
+- Homescreen
+
+The selected consumption type should dynamically update relevant visualisations
+below.
+
+2. TIME SPENT BY CHANNEL / APP
+
+User question:
+"How much time does my audience spend watching specific apps or channels?"
+
+Metrics:
+- Minutes watched per week
+- % of total watch time
+- Index of viewership vs national average
+
+Dimensions:
+- Linear
+- Streaming
+- FAST
+
+Requirements:
+- Support top 10 apps/channels
+- Streaming examples:
+  Netflix, Amazon Prime, Disney+, Paramount+, Apple TV, YouTube
+- Linear examples:
+  BBC iPlayer, ITVX, Channel 4, NOW, My5, U
+- Support platform/type filtering
+- Commercial-only logic should be available
+- Explore app overlap as a secondary interaction, not a mandatory core chart.
+
+Recommended visual:
+- Bar + line combination chart
+- Bars = average minutes watched per week
+- Line = % of total watch time
+- Index displayed as a supporting value/indicator
+
+3. TEMPORAL INSIGHTS
+
+User question:
+"When does my audience most watch TV, and what type of TV do they watch
+and when?"
+
+Metrics:
+- Average minutes watched per household
+- % of households watching
+
+Dimensions:
+- Linear
+- Streaming
+- FAST
+- Day of week
+- Time of day
+- App/channel depending on selected consumption type
+
+Requirements:
+- Allow selection of Linear, Streaming or FAST
+- Allow channel/app filtering based on selected type
+- Show behaviour across the week
+- Avoid changing the original metric definition into session-based metrics
+  unless explicitly requested.
+
+Recommended visual:
+- Heatmap
+- Day of week × time of day
+
+4. VIEWERSHIP BY GENRE
+
+User question:
+"What genre is most popular with my audience and on what TV type do they
+most consume this genre?"
+
+Metrics:
+- Minutes watched per week
+- % of total watch time
+- Index vs national average
+
+Dimensions:
+- Genre
+- Linear
+- Streaming
+- FAST
+
+Genres should use the IAB taxonomy.
+
+Example genres:
+- Comedy
+- News
+- Film
+- Sports
+- Drama
+- Reality
+- Action
+- Documentary
+- Kids
+- Travel
+- Food
+- Home improvement
+
+Recommended visual:
+- Horizontal bar chart
+- Show minutes prominently
+- Show % as supporting information
+- Show directional index at the end of each bar
+
+IMPORTANT:
+Viewership by Genre and Cultural Affinity are NOT duplicates.
+
+Viewership by Genre answers:
+"What does my audience watch most?"
+
+Cultural Affinity answers:
+"What genres does my audience unusually over-index on compared with
+the national average?"
+
+5. TOP 10 INDEXING SHOWS
+
+User question:
+"Which shows are particularly relevant to my audience?"
+
+Metrics:
+- Average minutes watched per household
+- % of households watching
+- Index vs national average
+
+Dimensions:
+- Show
+
+Requirements:
+- View across all available data feeds
+- Top indexing shows
+- DoY for 7 and 15 day lookbacks
+- WoW for 30 and 60 day lookbacks
+- Dropdown can expose top 50 shows
+- Searchable list
+- If a genre is selected in Viewership by Genre, filter the shows accordingly
+
+IMPORTANT:
+Do not reinterpret this as a generic "Top Trending Shows" chart.
+The primary purpose is indexing against the national average.
+
+6. SHARE OF VIEWING BY PLATFORM
+
+User question:
+"For a selected genre, where does my audience consume it?"
+
+Metrics:
+- Share of viewing minutes
+
+Dimensions:
+- Genre
+- Linear
+- Streaming
+- FAST
+
+Requirements:
+- Genre-level comparison
+- Do not make this a channel-level chart
+- Selected genre should be connected to Viewership by Genre
+
+Recommended visual:
+- 100% horizontal stacked bar
+- Each bar = one genre
+- Segments = Linear / Streaming / FAST
+
+Example:
+Drama:
+Linear 50% | Streaming 40% | FAST 10%
+
+7. CULTURAL AFFINITY
+
+User question:
+"What other genres does my audience have a strong affinity for?"
+
+Metric:
+- Index vs national average
+
+Dimension:
+- Genre
+
+Requirements:
+- Selected genre is the anchor
+- Show at least top 5 other high-index genres
+- Clicking an indexed genre should reveal its top indexing shows
+- Use index as the primary analytical signal
+
+Recommended visual:
+- Star diagram as requested by product
+- Also evaluate readability against a bar-based alternative during
+  data-visualisation research.
+
+IMPORTANT RELATIONSHIP:
+Viewership by Genre
+→ Select genre
+→ Cultural Affinity
+→ Select highly indexed genre
+→ Top Indexing Shows
+
+8. MIGRATION SIGNALS
+
+User question:
+"After watching a show, where does my audience go next?"
+
+Metric:
+- Audience transition event/pathway
+
+Dimension:
+- Show
+
+Requirements:
+- Timeframe of 1 hour
+- Show next show watched
+- Show associated network/platform
+- Top 3 pathways at each branch
+- Maximum 3 branches
+- Avoid visual spaghetti
+
+Recommended visual:
+- Sankey chart
+
+Example:
+Selected Show
+→ Netflix / Show B
+→ ITVX / Show C
+→ Channel 4 / Show D
+
+GLOBAL CAPABILITIES
+
+A. COMMERCIAL ONLY
+
+This is a global viewing-environment filter.
+
+All:
+- Include available viewing environments
+
+Commercial only:
+- Exclude relevant non-commercial environments
+- Focus the analysis on environments representing potential seller
+  opportunities
+
+Do not treat Commercial Only as merely another content category.
+
+B. COMPARISON MODE
+
+This is a global capability, not a separate KPI.
+
+Purpose:
+Allow two audiences to be compared across the dashboard.
+
+Example:
+Audience A:
+Female, 25–34
+
+Audience B:
+Male, 25–34
+
+The same KPI visualisations should update to show differences between the
+two audiences.
+
+Comparison Mode is currently considered a P2 capability, but the V1 design
+should be structurally ready for it.
+
+MARKET-SPECIFIC FILTER LOGIC
+
+UK:
+- Mosaic groups
+- Age
+- Gender
+- More granular demographic inputs
+
+Other four European markets:
+- Simpler TV consumption inputs
+- Heavy
+- Medium
+- Light
+
+Do not assume that UK filter logic can be copied directly to all markets.
+
+DATA / PERFORMANCE CONSTRAINTS
+
+Backend strategy:
+- Multiple RDS tables
+- Multiple APIs
+- Do not assume one massive table
+
+Design implications:
+- Avoid unnecessary simultaneous API calls
+- Use progressive loading where appropriate
+- Design charts so that partial data/loading states can be represented
+- Consider performance when proposing a single-page dashboard with
+  approximately 8 core visualisations.
+
+DESIGN PRINCIPLES
+
+1. Do not create charts just to fill the dashboard.
+2. Prefer connected analytical journeys.
+3. Every visualisation must answer a clear user question.
+4. Use drilldown and filtering to reduce dashboard density.
+5. Avoid duplicate insights.
+6. Prioritise commercial/actionable insights.
+7. Make index vs national average easy to understand.
+8. Maintain consistent interaction patterns.
+9. Support responsive loading/skeleton states.
+10. Design for Sales and Trader workflows rather than generic analytics users.
+
+ANALYTICAL JOURNEY
+
+Structure the experience around:
+
+UNDERSTAND
+→ Consumption by Type
+→ Time Spent by Channel/App
+→ Temporal Insights
+
+DISCOVER
+→ Viewership by Genre
+→ Share of Viewing by Platform
+→ Cultural Affinity
+→ Top Indexing Shows
+→ Migration Signals
+
+COMPARE
+→ Comparison Mode
+
+ACTIVATE / OPPORTUNITY
+→ Commercial Only
+→ Future recommendation opportunities
+
+IMPORTANT PRODUCT PRINCIPLE
+
+The dashboard should move beyond:
+"What does this audience watch?"
+
+towards:
+"Where can I commercially reach this audience, what content is relevant,
+and what should I consider activating?"
+
+AI IDEATION REQUIREMENTS
+
+Use AI prototype ideation to explore:
+- Cross-filtering
+- Drilldowns
+- Connected KPI journeys
+- Audience comparison
+- Commercial opportunity discovery
+- Content recommendations
+- Platform recommendations
+- Future incremental-reach opportunities
+
+Do NOT add new KPIs simply because they look visually interesting.
+
+Potential future ideas such as:
+- Incremental reach opportunity
+- Audience overlap
+- Reach vs frequency opportunity
+- Competitive viewership
+- AI activation recommendations
+
+should be treated as FUTURE OPPORTUNITIES unless they are explicitly
+confirmed as V1 requirements.
+
+COMPETITION RESEARCH
+
+Competition research should focus specifically on MiQ's competitive
+landscape and positioning.
+
+Investigate relevant capabilities from:
+- The Trade Desk
+- Google Display & Video 360
+- Nielsen ONE
+- Samba TV
+- Comscore
+
+Do not copy competitors blindly.
+
+For each competitor capability:
+- Identify the user problem it solves
+- Determine whether MiQ already has an equivalent capability
+- Identify a gap
+- Determine whether the gap is relevant to Sales/Trader users
+- Recommend whether it belongs in V1, P2 or Future
+
+The objective is to identify opportunities that strengthen MiQ's
+differentiation around:
+- TV audience intelligence
+- Cross-platform viewing
+- Reach
+- Frequency
+- Content intelligence
+- Commercial opportunity
+- Planning
+- Activation
+
+OUTPUT
+
+Create and maintain these files:
+
+1. Instruction.md
+2. fpd.framework.md
+3. research-rules.md
+4. evidence-rules.md
+5. components-map.yaml
+6. workflow.yaml
+7. output-schema.yaml
+8. functional-requirements.md
+
+The documents must work together as a coherent documentation system.
+
+Do not duplicate large sections unnecessarily.
+Reference the source-of-truth requirements where appropriate.
+
+The Functional Requirements Document must include:
+
+- Project overview
+- Business goal
+- Users
+- Markets
+- Problem statement
+- Product scope
+- V1 scope
+- P2 scope
+- Future opportunities
+- User questions
+- KPI catalogue
+- Metrics
+- Dimensions
+- Filters
+- Interactions
+- Drilldowns
+- Cross-filter relationships
+- Data requirements
+- Market differences
+- Performance considerations
+- Loading/error/empty states
+- Accessibility considerations
+- Competitive considerations
+- AI prototype requirements
+- Acceptance criteria
+- Open questions
+- Assumptions
+- Dependencies
+- Risks
+
+For every KPI include:
+
+- KPI name
+- User story/question
+- Business purpose
+- Metric
+- Dimension
+- Data source assumption
+- Recommended visualisation
+- Interaction
+- Drilldown
+- Cross-filter behaviour
+- Commercial relevance
+- Open questions
+- Acceptance criteria
+
+Do not invent unavailable data.
+
+Where requirements are uncertain, explicitly mark them:
+[OPEN QUESTION]
+
+Where an assumption is being made, mark:
+[ASSUMPTION]
+
+Where product confirmation is required, mark:
+[NEEDS PRODUCT CONFIRMATION]
+
+Use these labels consistently across all documents.
+
+Finally, use the documentation to create an AI prototype plan in Replit
+that prioritises functional behaviour and analytical relationships over
+visual decoration.
