@@ -13,7 +13,11 @@
 
 import { createContext, useContext } from "react";
 import type { Prototype, PrototypeVersion } from "@/lib/prototypeStore";
-import type { PrototypeComment, CommentAnchor } from "@/lib/commentStore";
+import type {
+  PrototypeComment,
+  CommentAnchor,
+  CommentAttachment,
+} from "@/lib/commentStore";
 
 export interface PrototypeCollabContextValue {
   prototype: Prototype;
@@ -30,10 +34,26 @@ export interface PrototypeCollabContextValue {
   authors: string[];
   /** Replies (oldest-first) for a given parent comment id. */
   repliesOf: (parentId: string) => PrototypeComment[];
-  /** Persist a new pinned top-level comment against the viewed version. */
-  addComment: (author: string, text: string, anchor: CommentAnchor) => void;
-  /** Persist a reply to an existing comment. */
-  addReply: (parentId: string, author: string, text: string) => void;
+  /**
+   * Persist a new pinned top-level comment against the viewed version. Returns
+   * true on success, false if persistence failed (e.g. localStorage quota).
+   */
+  addComment: (
+    author: string,
+    text: string,
+    anchor: CommentAnchor,
+    attachment: CommentAttachment | null,
+  ) => boolean;
+  /**
+   * Persist a reply to an existing comment. Returns true on success, false if
+   * persistence failed (e.g. localStorage quota).
+   */
+  addReply: (
+    parentId: string,
+    author: string,
+    text: string,
+    attachment: CommentAttachment | null,
+  ) => boolean;
   /** Soft-delete a comment by id (preserves it in a muted "Deleted" state). */
   softDeleteComment: (id: string) => void;
 }

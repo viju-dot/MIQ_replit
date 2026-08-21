@@ -32,6 +32,18 @@ export interface CommentAnchor {
   targetLabel: string;
 }
 
+/**
+ * An optional image attachment on a comment. Stored inline as a downscaled
+ * JPEG data URL (client-side canvas resize) to keep localStorage small. Width
+ * and height are the natural pixel dimensions of the downscaled image (used to
+ * size thumbnails without layout shift).
+ */
+export interface CommentAttachment {
+  dataUrl: string;
+  width: number;
+  height: number;
+}
+
 /** A single comment left on a prototype, against a specific version. */
 export interface PrototypeComment {
   id: string;
@@ -63,6 +75,11 @@ export interface PrototypeComment {
    * records without this field are active.
    */
   deletedAt?: string;
+  /**
+   * Optional image attachment (downscaled JPEG data URL). Masked in the UI when
+   * the comment is soft-deleted. Legacy records without this field are fine.
+   */
+  attachment?: CommentAttachment;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -105,6 +122,8 @@ export interface NewCommentInput {
   anchor?: CommentAnchor;
   /** If set, this is a reply to the top-level comment with this id. */
   parentId?: string;
+  /** Optional downscaled image attachment. */
+  attachment?: CommentAttachment;
 }
 
 export interface CommentRepository {
@@ -169,7 +188,25 @@ function coerceComment(raw: unknown): PrototypeComment | null {
     anchor: coerceAnchor(r.anchor),
     parentId,
     deletedAt,
+    attachment: coerceAttachment(r.attachment),
   };
+}
+
+/**
+ * Tolerant attachment parsing. Keeps the attachment only if `dataUrl` is a
+ * `data:image/*` string; otherwise returns undefined (legacy/garbage records
+ * stay valid, just with no attachment). Dimensions default to 0 if missing.
+ */
+function coerceAttachment(raw: unknown): CommentAttachment | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const a = raw as Record<string, unknown>;
+  const dataUrl = a.dataUrl;
+  if (typeof dataUrl !== "string" || !dataUrl.startsWith("data:image/")) {
+    return undefined;
+  }
+  const dim = (v: unknown): number =>
+    typeof v === "number" && Number.isFinite(v) && v > 0 ? Math.round(v) : 0;
+  return { dataUrl, width: dim(a.width), height: dim(a.height) };
 }
 
 /**
@@ -208,10 +245,21 @@ function readAll(): PrototypeComment[] {
   }
 }
 
+/**
+ * Persist the full comment list. THROWS on quota/serialization failure so
+ * callers that add large payloads (image attachments) can surface an inline
+ * error and preserve the user's typed text. Use `writeAllQuiet` for shrinking
+ * operations that must never fail the UI.
+ */
 function writeAll(comments: PrototypeComment[]): void {
   if (typeof window === "undefined") return;
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(comments));
+}
+
+/** Best-effort persist that swallows failures (for delete / shrink paths). */
+function writeAllQuiet(comments: PrototypeComment[]): void {
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(comments));
+    writeAll(comments);
   } catch {
     /* storage full / unavailable — non-fatal for a local authoring tool */
   }
@@ -272,8 +320,11 @@ export const localStorageRepository: CommentRepository = {
       createdAt: nowIso(),
       anchor: coerceAnchor(input.anchor),
       parentId,
+      attachment: coerceAttachment(input.attachment),
     };
     all.push(comment);
+    // May THROW (quota) — nothing is persisted in that case, so the caller can
+    // retry (e.g. without the image) with the typed text intact.
     writeAll(all);
     return comment;
   },
@@ -289,7 +340,7 @@ export const localStorageRepository: CommentRepository = {
       }
       return c;
     });
-    if (changed) writeAll(next);
+    if (changed) writeAllQuiet(next);
   },
 };
 

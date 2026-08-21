@@ -39,10 +39,13 @@ import {
 } from "react";
 import {
   ArrowBendUpLeft,
+  ArrowsOut,
   ChatCircle,
   GitBranch,
   ListBullets,
+  Paperclip,
   Trash,
+  X,
 } from "@phosphor-icons/react";
 import {
   prototypeRepository,
@@ -53,8 +56,15 @@ import {
   commentRepository,
   type PrototypeComment,
   type CommentAnchor,
+  type CommentAttachment,
 } from "@/lib/commentStore";
+import { downscaleImageFile, linkifyParts } from "@/lib/commentMedia";
 import { deriveTargetLabel } from "@/lib/commentTarget";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { PrototypeVersionProvider } from "@/lib/prototypeVersionContext";
 import {
   PrototypeCollabProvider,
@@ -112,6 +122,98 @@ function StatusBadge({ deleted }: { deleted: boolean }) {
     >
       {deleted ? "Deleted" : "Active"}
     </span>
+  );
+}
+
+/**
+ * Render comment body text with http(s) URLs auto-linkified at render time.
+ * Links open in a new tab (rel="noopener noreferrer") so the reviewer keeps the
+ * prototype open. Not used for deleted bodies (those show the deleted message).
+ * The rendered <a> is inline text — safe inside list rows since those rows are
+ * NOT buttons (verified), so this creates no nested interactive controls.
+ */
+function CommentText({ text }: { text: string }) {
+  const parts = linkifyParts(text);
+  return (
+    <p
+      className="whitespace-pre-wrap break-words text-[length:var(--body-sm-regular-size,12px)]"
+      style={{ color: C.textBody }}
+    >
+      {parts.map((p, i) =>
+        p.href ? (
+          <a
+            key={i}
+            href={p.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2"
+            style={{ color: C.brandFg }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {p.text}
+          </a>
+        ) : (
+          <span key={i}>{p.text}</span>
+        ),
+      )}
+    </p>
+  );
+}
+
+/**
+ * A comment's image attachment: a constrained rounded thumbnail with an Expand
+ * affordance that opens the DS Dialog showing the image large (object-contain,
+ * fit-to-viewport). Reuses the shared Dialog component.
+ */
+function AttachmentThumb({
+  attachment,
+  authorLabel,
+}: {
+  attachment: CommentAttachment;
+  authorLabel: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen(true);
+        }}
+        aria-label="Expand attached image"
+        className="group relative mt-0.5 block w-fit overflow-hidden rounded-[var(--radius-100,8px)] border border-solid outline-none"
+        style={{ borderColor: C.border, backgroundColor: C.surface2 }}
+      >
+        <img
+          src={attachment.dataUrl}
+          alt={`Attachment from ${authorLabel}`}
+          className="block max-h-[140px] max-w-full object-contain"
+          style={{ maxWidth: "220px" }}
+        />
+        <span
+          className="absolute bottom-1 right-1 flex items-center gap-1 rounded-[var(--radius-50,4px)] px-1.5 py-0.5 text-[10px] font-medium"
+          style={{ backgroundColor: "rgba(0,0,0,0.6)", color: "#ffffff" }}
+          aria-hidden
+        >
+          <ArrowsOut size={11} />
+          Expand
+        </span>
+      </button>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-[92vw] border-0 bg-transparent p-0 shadow-none sm:max-w-[92vw]">
+          <DialogTitle className="sr-only">
+            Attachment from {authorLabel}
+          </DialogTitle>
+          <img
+            src={attachment.dataUrl}
+            alt={`Attachment from ${authorLabel}`}
+            className="mx-auto max-h-[86vh] w-auto max-w-full rounded-[var(--radius-100,8px)] object-contain"
+          />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -349,7 +451,12 @@ function CommentsPanelBody({
   comments: PrototypeComment[];
   versions: PrototypeVersion[];
   authors: string[];
-  onReply: (parentId: string, author: string, text: string) => void;
+  onReply: (
+    parentId: string,
+    author: string,
+    text: string,
+    attachment: CommentAttachment | null,
+  ) => boolean;
   onSoftDelete: (id: string) => void;
 }) {
   const [versionFilter, setVersionFilter] = useState<string>("All");
@@ -475,7 +582,12 @@ function CommentThreadCard({
   parent: PrototypeComment;
   replies: PrototypeComment[];
   authors: string[];
-  onReply: (parentId: string, author: string, text: string) => void;
+  onReply: (
+    parentId: string,
+    author: string,
+    text: string,
+    attachment: CommentAttachment | null,
+  ) => boolean;
   onSoftDelete: (id: string) => void;
 }) {
   const [delHover, setDelHover] = useState(false);
@@ -520,15 +632,24 @@ function CommentThreadCard({
       <p className="text-[11px] font-medium" style={{ color: C.textMuted }}>
         {parent.anchor ? parent.anchor.targetLabel : "Unpinned"}
       </p>
-      <p
-        className="whitespace-pre-wrap text-[length:var(--body-sm-regular-size,12px)]"
-        style={{
-          color: deleted ? C.textMuted : C.textBody,
-          fontStyle: deleted ? "italic" : undefined,
-        }}
-      >
-        {deleted ? DELETED_TEXT : parent.text}
-      </p>
+      {deleted ? (
+        <p
+          className="whitespace-pre-wrap text-[length:var(--body-sm-regular-size,12px)] italic"
+          style={{ color: C.textMuted }}
+        >
+          {DELETED_TEXT}
+        </p>
+      ) : (
+        <>
+          <CommentText text={parent.text} />
+          {parent.attachment && (
+            <AttachmentThumb
+              attachment={parent.attachment}
+              authorLabel={parent.author}
+            />
+          )}
+        </>
+      )}
       <p className="text-[11px]" style={{ color: C.textMuted }}>
         {parent.versionName} · {fmtDate(parent.createdAt)} · {fmtTime(parent.createdAt)}
       </p>
@@ -549,9 +670,10 @@ function CommentThreadCard({
           <div className="mt-1">
             <ReplyComposer
               authors={authors}
-              onPost={(author, text) => {
-                onReply(parent.id, author, text);
-                setReplying(false);
+              onPost={(author, text, attachment) => {
+                const ok = onReply(parent.id, author, text, attachment);
+                if (ok) setReplying(false);
+                return ok;
               }}
               onCancel={() => setReplying(false)}
             />
@@ -631,6 +753,87 @@ interface DraftPin {
   targetLabel: string;
 }
 
+/**
+ * A single attachment control for a composer: paperclip button (opens a hidden
+ * file input) → downscales the chosen image and shows a small removable
+ * thumbnail preview before posting. One image per comment.
+ */
+function AttachmentPicker({
+  attachment,
+  onPick,
+  onRemove,
+  onError,
+}: {
+  attachment: CommentAttachment | null;
+  onPick: (a: CommentAttachment) => void;
+  onRemove: () => void;
+  onError: (msg: string) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function handleFile(file: File | undefined) {
+    if (!file) return;
+    setBusy(true);
+    try {
+      const a = await downscaleImageFile(file);
+      onPick(a);
+    } catch {
+      onError("Couldn't read that image. Try another file.");
+    } finally {
+      setBusy(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => handleFile(e.target.files?.[0])}
+      />
+      {attachment ? (
+        <div
+          className="relative w-fit overflow-hidden rounded-[var(--radius-100,8px)] border border-solid"
+          style={{ borderColor: C.border, backgroundColor: C.surface2 }}
+        >
+          <img
+            src={attachment.dataUrl}
+            alt="Attachment preview"
+            className="block max-h-[96px] object-contain"
+            style={{ maxWidth: "180px" }}
+          />
+          <button
+            type="button"
+            aria-label="Remove attachment"
+            onClick={onRemove}
+            className="absolute right-1 top-1 flex size-[20px] items-center justify-center rounded-full"
+            style={{ backgroundColor: "rgba(0,0,0,0.6)", color: "#ffffff" }}
+          >
+            <X size={12} />
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={busy}
+          title="Attach an image"
+          aria-label="Attach an image"
+          className="flex w-fit items-center gap-1.5 rounded-[var(--radius-100,8px)] border border-solid px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)] text-[length:var(--body-sm-medium-size,12px)] font-medium transition-colors"
+          style={{ borderColor: C.border, color: C.textBody, backgroundColor: C.surface }}
+        >
+          <Paperclip size={14} />
+          {busy ? "Processing…" : "Attach image"}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function InlineComposer({
   draft,
   authors,
@@ -639,7 +842,12 @@ function InlineComposer({
 }: {
   draft: DraftPin;
   authors: string[];
-  onPost: (author: string, text: string) => void;
+  /** Returns true if the comment was saved; false on failure (quota). */
+  onPost: (
+    author: string,
+    text: string,
+    attachment: CommentAttachment | null,
+  ) => boolean;
   onCancel: () => void;
 }) {
   const [choice, setChoice] = useState<string>(
@@ -647,6 +855,7 @@ function InlineComposer({
   );
   const [newName, setNewName] = useState("");
   const [text, setText] = useState("");
+  const [attachment, setAttachment] = useState<CommentAttachment | null>(null);
   const [error, setError] = useState<string | null>(null);
   const textRef = useRef<HTMLTextAreaElement>(null);
 
@@ -670,7 +879,12 @@ function InlineComposer({
       setError("Please enter a comment.");
       return;
     }
-    onPost(resolvedName, text.trim());
+    // onPost returns false on quota failure — keep text + attachment so the
+    // user can remove the image and retry.
+    const ok = onPost(resolvedName, text.trim(), attachment);
+    if (!ok) {
+      setError("Image too large to attach. Remove it and try again.");
+    }
   }
 
   return (
@@ -722,6 +936,15 @@ function InlineComposer({
             }}
           />
         </div>
+        <AttachmentPicker
+          attachment={attachment}
+          onPick={(a) => {
+            setAttachment(a);
+            setError(null);
+          }}
+          onRemove={() => setAttachment(null)}
+          onError={(msg) => setError(msg)}
+        />
         {error && (
           <p role="alert" className="text-[12px]" style={{ color: C.errorFg }}>
             {error}
@@ -760,7 +983,12 @@ function ReplyComposer({
   onCancel,
 }: {
   authors: string[];
-  onPost: (author: string, text: string) => void;
+  /** Returns true if the reply was saved; false on failure (quota). */
+  onPost: (
+    author: string,
+    text: string,
+    attachment: CommentAttachment | null,
+  ) => boolean;
   onCancel: () => void;
 }) {
   const [choice, setChoice] = useState<string>(
@@ -768,6 +996,7 @@ function ReplyComposer({
   );
   const [newName, setNewName] = useState("");
   const [text, setText] = useState("");
+  const [attachment, setAttachment] = useState<CommentAttachment | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const resolvedName = choice === NEW_NAME ? newName.trim() : choice.trim();
@@ -781,7 +1010,10 @@ function ReplyComposer({
       setError("Please enter a reply.");
       return;
     }
-    onPost(resolvedName, text.trim());
+    const ok = onPost(resolvedName, text.trim(), attachment);
+    if (!ok) {
+      setError("Image too large to attach. Remove it and try again.");
+    }
   }
 
   return (
@@ -811,6 +1043,15 @@ function ReplyComposer({
           setText(e.target.value);
           setError(null);
         }}
+      />
+      <AttachmentPicker
+        attachment={attachment}
+        onPick={(a) => {
+          setAttachment(a);
+          setError(null);
+        }}
+        onRemove={() => setAttachment(null)}
+        onError={(msg) => setError(msg)}
       />
       {error && (
         <p role="alert" className="text-[12px]" style={{ color: C.errorFg }}>
@@ -881,12 +1122,24 @@ function ReplyRow({
           </button>
         )}
       </div>
-      <p
-        className="whitespace-pre-wrap text-[length:var(--body-sm-regular-size,12px)]"
-        style={{ color: deleted ? C.textMuted : C.textBody, fontStyle: deleted ? "italic" : undefined }}
-      >
-        {deleted ? DELETED_TEXT : reply.text}
-      </p>
+      {deleted ? (
+        <p
+          className="whitespace-pre-wrap text-[length:var(--body-sm-regular-size,12px)] italic"
+          style={{ color: C.textMuted }}
+        >
+          {DELETED_TEXT}
+        </p>
+      ) : (
+        <>
+          <CommentText text={reply.text} />
+          {reply.attachment && (
+            <AttachmentThumb
+              attachment={reply.attachment}
+              authorLabel={reply.author}
+            />
+          )}
+        </>
+      )}
       <p className="text-[11px]" style={{ color: C.textMuted }}>
         {fmtDate(reply.createdAt)} · {fmtTime(reply.createdAt)}
       </p>
@@ -913,7 +1166,12 @@ function MarkerBubble({
   authors: string[];
   flipRight: boolean;
   flipUp: boolean;
-  onReply: (parentId: string, author: string, text: string) => void;
+  onReply: (
+    parentId: string,
+    author: string,
+    text: string,
+    attachment: CommentAttachment | null,
+  ) => boolean;
   onSoftDelete: (id: string) => void;
   onClose: () => void;
 }) {
@@ -965,15 +1223,24 @@ function MarkerBubble({
           {comment.anchor.targetLabel}
         </p>
       )}
-      <p
-        className="whitespace-pre-wrap text-[length:var(--body-sm-regular-size,12px)]"
-        style={{
-          color: parentDeleted ? C.textMuted : C.textBody,
-          fontStyle: parentDeleted ? "italic" : undefined,
-        }}
-      >
-        {parentDeleted ? DELETED_TEXT : comment.text}
-      </p>
+      {parentDeleted ? (
+        <p
+          className="whitespace-pre-wrap text-[length:var(--body-sm-regular-size,12px)] italic"
+          style={{ color: C.textMuted }}
+        >
+          {DELETED_TEXT}
+        </p>
+      ) : (
+        <>
+          <CommentText text={comment.text} />
+          {comment.attachment && (
+            <AttachmentThumb
+              attachment={comment.attachment}
+              authorLabel={comment.author}
+            />
+          )}
+        </>
+      )}
       <p className="text-[11px]" style={{ color: C.textMuted }}>
         {comment.versionName} · {fmtDate(comment.createdAt)} · {fmtTime(comment.createdAt)}
       </p>
@@ -993,9 +1260,10 @@ function MarkerBubble({
         <div className="mt-1">
           <ReplyComposer
             authors={authors}
-            onPost={(author, text) => {
-              onReply(comment.id, author, text);
-              setReplying(false);
+            onPost={(author, text, attachment) => {
+              const ok = onReply(comment.id, author, text, attachment);
+              if (ok) setReplying(false);
+              return ok;
             }}
             onCancel={() => setReplying(false)}
           />
@@ -1045,7 +1313,12 @@ function Marker({
   authors: string[];
   open: boolean;
   onToggle: () => void;
-  onReply: (parentId: string, author: string, text: string) => void;
+  onReply: (
+    parentId: string,
+    author: string,
+    text: string,
+    attachment: CommentAttachment | null,
+  ) => boolean;
   onSoftDelete: (id: string) => void;
 }) {
   const anchor = comment.anchor;
@@ -1170,14 +1443,20 @@ export function PrototypeCommentLayer(): JSX.Element | null {
     setDraft({ xPct, yPct, targetLabel });
   }
 
-  function postDraft(author: string, text: string) {
-    if (!draft) return;
-    addComment(author, text, {
-      xPct: draft.xPct,
-      yPct: draft.yPct,
-      targetLabel: draft.targetLabel,
-    });
-    setDraft(null);
+  function postDraft(
+    author: string,
+    text: string,
+    attachment: CommentAttachment | null,
+  ): boolean {
+    if (!draft) return false;
+    const ok = addComment(
+      author,
+      text,
+      { xPct: draft.xPct, yPct: draft.yPct, targetLabel: draft.targetLabel },
+      attachment,
+    );
+    if (ok) setDraft(null);
+    return ok;
   }
 
   return (
@@ -1374,33 +1653,57 @@ export function PrototypeCollabOverlay({
       .slice()
       .reverse();
 
-  function addComment(author: string, text: string, anchor: CommentAnchor) {
-    if (!proto) return;
-    commentRepository.add({
-      prototypeId: proto.id,
-      versionId: viewedVersion.id,
-      versionName: viewedVersion.name,
-      author,
-      text,
-      anchor,
-    });
+  function addComment(
+    author: string,
+    text: string,
+    anchor: CommentAnchor,
+    attachment: CommentAttachment | null,
+  ): boolean {
+    if (!proto) return false;
+    try {
+      commentRepository.add({
+        prototypeId: proto.id,
+        versionId: viewedVersion.id,
+        versionName: viewedVersion.name,
+        author,
+        text,
+        anchor,
+        attachment: attachment ?? undefined,
+      });
+    } catch {
+      // Persist failed (e.g. localStorage quota with a large image). Signal the
+      // composer so it can surface an inline error without losing typed text.
+      return false;
+    }
     setTick((t) => t + 1);
+    return true;
   }
 
-  function addReply(parentId: string, author: string, text: string) {
-    if (!proto) return;
+  function addReply(
+    parentId: string,
+    author: string,
+    text: string,
+    attachment: CommentAttachment | null,
+  ): boolean {
+    if (!proto) return false;
     // A reply inherits the PARENT's version so the whole thread maps to one
     // version. Find the parent among all comments for this prototype.
     const parent = comments.find((c) => c.id === parentId);
-    commentRepository.add({
-      prototypeId: proto.id,
-      versionId: parent?.versionId ?? viewedVersion.id,
-      versionName: parent?.versionName ?? viewedVersion.name,
-      author,
-      text,
-      parentId,
-    });
+    try {
+      commentRepository.add({
+        prototypeId: proto.id,
+        versionId: parent?.versionId ?? viewedVersion.id,
+        versionName: parent?.versionName ?? viewedVersion.name,
+        author,
+        text,
+        parentId,
+        attachment: attachment ?? undefined,
+      });
+    } catch {
+      return false;
+    }
     setTick((t) => t + 1);
+    return true;
   }
 
   function softDeleteComment(id: string) {

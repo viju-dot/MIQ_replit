@@ -1,0 +1,112 @@
+# Task: Add Link & Screenshot Support to Comments
+
+## Description
+
+I want to improve the comment functionality by allowing users to include **website links and screenshots** in their comments.
+
+The comment experience should make these attachments useful during review without requiring users to manually copy links or download screenshots.
+
+---
+
+## 1. Website Links
+
+When a user adds a website URL inside a comment:
+
+* Automatically detect the URL.
+* Display it as a clickable link.
+* When the reviewer clicks the link, open the website directly.
+* Open the link in a new browser tab so the reviewer does not lose the prototype.
+* Do not require the user to copy and paste the URL manually.
+
+Example:
+
+> Please check this reference: [https://example.com](https://example.com)
+
+The `https://example.com` portion should become clickable.
+
+---
+
+## 2. Screenshot Attachments
+
+Allow users to attach screenshots while creating a comment.
+
+The comment composer should provide an attachment option.
+
+The user should be able to:
+
+1. Select/attach a screenshot.
+2. Preview it before submitting the comment.
+3. Add text along with the screenshot.
+4. Submit the comment.
+
+Example:
+
+> The spacing here needs to be adjusted.
+
+`[Screenshot preview]`
+
+---
+
+## 3. Screenshot Preview While Reviewing
+
+When a reviewer sees a comment containing a screenshot:
+
+* Display a thumbnail/preview inside the comment.
+* Keep the screenshot clearly associated with that comment.
+* Preserve the screenshot when viewing the comment later.
+
+---
+
+## 4. Expand Screenshot
+
+Add an **Expand / View** action to screenshot attachments.
+
+When selected:
+
+* Open the screenshot in a larger view.
+* Use an appropriate Fiber Design System Dialog/Modal or existing image-preview component if available.
+* Allow the reviewer to close the expanded view and return to the prototype.
+* Do not navigate away from the prototype.
+
+---
+
+## 5. Comment Interaction
+
+The overall comment experience should now support:
+
+* Text comments
+* Clickable website links
+* Screenshot attachments
+* Screenshot preview
+* Expand screenshot
+* Existing comment threads
+* Existing version association
+* Existing deleted-comment history
+
+Do not break the existing anchored-comment behavior.
+
+---
+
+## Fiber Design System
+
+Use existing Fiber Design System components for:
+
+* Attachment action
+* Link
+* Image preview
+* Dialog/Modal
+* Buttons
+* Tooltip
+* Close action
+
+Do not create a separate visual pattern if an appropriate Fiber component already exists.
+
+---
+
+## Goal
+
+Make comments useful as a real design-review tool:
+
+**Write comment → Add link/screenshot → Submit → Reviewer clicks link or expands screenshot → Continue reviewing the prototype.**
+
+Keep the experience simple and avoid adding unnecessary controls to the comment composer.
