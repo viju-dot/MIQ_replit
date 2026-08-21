@@ -1,0 +1,776 @@
+Task: Rework Design Annotation selection experience
+
+The current Design Annotation feature is not working properly.
+
+The biggest problem is the selection interaction.
+
+I need Design Annotation to work more like Replit's existing
+"Select elements" interaction in the preview, where I can hover over
+components/elements/sections, see the selectable boundary, click to
+select them, and then provide feedback.
+
+Do NOT make click-and-drag the primary selection method.
+
+The goal is to make Design Annotation extremely simple:
+
+Hover → Select → Annotate → Submit
+
+==================================================
+1. CORE PROBLEM
+==================================================
+
+Current Design Annotation relies too heavily on:
+
+Click + drag → create region
+
+This is unreliable and difficult when the UI contains:
+- Cards
+- Charts
+- Buttons
+- Inputs
+- Nested components
+- Sections
+- Interactive elements
+
+I need an element-selection experience similar to Replit's existing
+visual "Select elements" workflow.
+
+Replit already supports selecting elements in the preview and describing
+what should change. Use that interaction model as the UX reference.
+
+REFERENCE PRINCIPLE:
+
+"Select the thing first.
+Then tell Replit what should change."
+
+==================================================
+2. DESIGN ANNOTATION ENTRY POINT
+==================================================
+
+Keep Design Annotation available beside:
+
+[ Comment ] [ Design Annotation ] [ Options ]
+
+When I click:
+
+Design Annotation
+
+enter:
+
+DESIGN ANNOTATION MODE
+
+Do not immediately activate freehand region drawing.
+
+==================================================
+3. HOVER-TO-SELECT SYSTEM
+==================================================
+
+When Design Annotation mode is active:
+
+As I move the cursor over the prototype:
+
+- Detect the element under the cursor.
+- Show a subtle selection boundary.
+- Show the element type/name where possible.
+- Make it clear what will be selected.
+- Do not alter the actual design.
+
+Example:
+
+          ┌─────────────────────┐
+          │ Temporal Insights  │
+          │                     │
+          │      HEATMAP        │
+          │                     │
+          └─────────────────────┘
+                 ↑
+          Hover boundary
+
+Small contextual label:
+
+"Temporal Insights"
+
+or:
+
+"Heatmap"
+
+or:
+
+"Filter group"
+
+The hover boundary must not permanently select the element.
+
+==================================================
+4. CLICK TO SELECT
+==================================================
+
+Clicking the highlighted element selects it.
+
+After selection:
+
+- Keep the boundary visible.
+- Show a selected state.
+- Show a small annotation action.
+- Open the Design Annotation action.
+
+Example:
+
+┌──────────────────────────────┐
+│ ✓ Temporal Insights         │
+│                              │
+│       Heatmap                │
+│                              │
+└──────────────────────────────┘
+
+Contextual control:
+
+[ Add Design Annotation ]
+
+The user should not need to drag.
+
+==================================================
+5. ELEMENT HIERARCHY
+==================================================
+
+This is extremely important.
+
+The system must understand nested UI elements.
+
+Example hierarchy:
+
+Dashboard
+ └── Temporal Insights
+      ├── Header
+      ├── Filter group
+      │    ├── Linear TV
+      │    ├── Streaming
+      │    └── FAST
+      └── Heatmap
+           ├── Row
+           ├── Cell
+           └── Legend
+
+When hovering/clicking:
+
+The system should allow the user to choose the appropriate level.
+
+For example:
+
+Hover:
+Heatmap cell
+
+Possible selection breadcrumb:
+
+Cell
+> Heatmap
+> Temporal Insights
+> Dashboard
+
+Provide an easy way to move up the hierarchy.
+
+Example:
+
+[ Cell ] [ Heatmap ] [ Temporal Insights ]
+
+This allows precise selection without requiring drag selection.
+
+==================================================
+6. SELECTING SECTIONS
+==================================================
+
+The user must also be able to select larger regions.
+
+If I hover over a section container:
+
+Show:
+
+"Section: Temporal Insights"
+
+Clicking it selects the entire section.
+
+This is important because Design Annotation is specifically intended
+for high-level design feedback.
+
+I should be able to select:
+
+- Element
+- Component
+- Component group
+- Card
+- Section
+- Page region
+
+==================================================
+7. MULTI-SELECT
+==================================================
+
+Add multi-select.
+
+I should be able to select multiple elements individually.
+
+Example:
+
+Select:
+- Filter A
+- Filter B
+- Filter C
+
+Then create ONE Design Annotation.
+
+Use a familiar interaction such as:
+
+Shift + click
+
+or:
+
+Cmd/Ctrl + click
+
+depending on platform.
+
+Show:
+
+3 elements selected
+
+Then:
+
+[ Add Design Annotation ]
+
+This is more reliable than trying to draw a rectangle around them.
+
+==================================================
+8. REGION SELECTION
+==================================================
+
+Keep Region Selection, but make it SECONDARY.
+
+Primary:
+Select Elements
+
+Secondary:
+Select Region
+
+Toolbar:
+
+[ Select Elements ] [ Select Region ]
+
+Select Elements:
+Hover and click individual components.
+
+Select Region:
+Click and drag to create a rectangular region.
+
+If drag selection is unreliable, it must not affect the primary workflow.
+
+==================================================
+9. SMART REGION SELECTION
+==================================================
+
+When using Select Region:
+
+Do not simply create a rectangle and treat everything inside it as
+one anonymous object.
+
+Detect the components inside the region.
+
+Example:
+
+Selected region contains:
+
+- 3 filter controls
+- 1 chart
+- 1 legend
+
+Show:
+
+"5 elements selected"
+
+Allow:
+
+[ Add Design Annotation ]
+
+This gives the annotation real structural context.
+
+==================================================
+10. ANNOTATION CONTEXT
+==================================================
+
+When the annotation is created, store:
+
+Selected elements
++
+Selected hierarchy
++
+Selected section
++
+User feedback
+
+Example:
+
+ANNOTATION #04
+
+Selected:
+Temporal Insights
+
+Contains:
+- Viewing-type tabs
+- Commercial filter
+- Channel/app selector
+- Heatmap
+
+Feedback:
+"The controls should be easier to scan and switch between. Use the
+appropriate Fiber pattern for this use case."
+
+This gives Replit much better implementation context.
+
+==================================================
+11. ANNOTATION EDITOR
+==================================================
+
+After selection, open a compact annotation composer.
+
+Title:
+
+Design Annotation
+
+Show:
+
+Selected:
+Temporal Insights
+
+Change type:
+[ Design system correction ]
+
+Feedback:
+
+[ Describe what needs to change... ]
+
+Optional:
+
+Why?
+
+[ Explain the use case... ]
+
+Then:
+
+[ Cancel ] [ Add Annotation ]
+
+Keep this lightweight.
+
+Do not open a huge modal that covers the design.
+
+==================================================
+12. SELECTED ELEMENTS IN CHAT
+==================================================
+
+This is an important requirement.
+
+When the annotation is added, represent the selected elements as context
+inside the chat/review interface.
+
+Example:
+
+Design Annotation #04
+
+Selected:
+`Temporal Insights`
+`Filter group`
+`Heatmap`
+
+Feedback:
+"Use a more suitable Fiber interaction pattern for these controls."
+
+The selected elements should behave like structured references.
+
+Do not only store the screen coordinates.
+
+The system should know WHICH UI elements were selected.
+
+==================================================
+13. CHAT INTEGRATION
+==================================================
+
+The existing chat/review area should show:
+
+Design Annotation
+
+Selected elements:
+[ Temporal Insights ] [ Filter group ] [ Heatmap ]
+
+Feedback:
+"These controls should be easier to scan..."
+
+Then the user can send it to Replit.
+
+This makes the annotation actionable.
+
+==================================================
+14. ELEMENT IDENTIFICATION
+==================================================
+
+When possible, identify elements using meaningful names.
+
+Prefer:
+
+"Temporal Insights"
+"Consumption by Type"
+"Streaming filter"
+"Genre selector"
+"Heatmap"
+"Primary action"
+
+Avoid:
+
+"div"
+"div-27"
+"element-382"
+
+Technical identifiers may exist internally but should not be the primary
+user-facing label.
+
+==================================================
+15. FIBER DESIGN SYSTEM CONTEXT
+==================================================
+
+When an element is selected, optionally identify:
+
+Current component:
+Example:
+Dropdown
+
+Potential Fiber pattern:
+Example:
+Segmented control / Tabs / Filter group
+
+But DO NOT force the user to select the Fiber component.
+
+The system should inspect the existing component and determine the most
+appropriate Fiber pattern based on:
+
+- Current component
+- User feedback
+- Product use case
+- Existing project patterns
+- Fiber design system
+
+==================================================
+16. DESIGN SYSTEM VS USE CASE
+==================================================
+
+Design Annotation must support both types of feedback.
+
+TYPE 1:
+Design System Correction
+
+Example:
+
+"This filter does not follow the Fiber component pattern."
+
+TYPE 2:
+Use Case Correction
+
+Example:
+
+"The dropdown technically works, but users need to switch between these
+three options frequently. Use a pattern better suited to quick comparison."
+
+TYPE 3:
+Both
+
+Example:
+
+"This interaction is difficult for the use case and doesn't follow the
+appropriate Fiber pattern."
+
+==================================================
+17. SELECTION STATES
+==================================================
+
+Support:
+
+Default
+Hover
+Selected
+Multi-selected
+Region selected
+Annotation attached
+Annotation resolved
+
+Use Fiber design tokens for all UI states.
+
+Selection overlays may be custom, but they must visually fit the Fiber
+design language.
+
+==================================================
+18. PREVENT ACCIDENTAL INTERACTION
+==================================================
+
+When Design Annotation mode is active:
+
+Do not trigger the underlying component's normal action when selecting it.
+
+Example:
+
+If I click a dropdown:
+
+Do NOT open the dropdown.
+
+Instead:
+
+Select the dropdown.
+
+If I click a button:
+
+Do NOT trigger the button action.
+
+Instead:
+
+Select the button.
+
+If I click a chart:
+
+Do NOT activate the chart.
+
+Instead:
+
+Select the chart.
+
+The annotation mode temporarily takes priority over normal application
+interaction.
+
+Provide an obvious way to exit annotation mode.
+
+==================================================
+19. SELECTION TOOLBAR
+==================================================
+
+When Design Annotation mode is active, show a compact floating toolbar:
+
+Design Annotation
+
+[ Select Elements ] [ Select Region ]
+
+Optional:
+[ Multi-select ]
+
+The toolbar should remain unobtrusive.
+
+==================================================
+20. SELECTION CONFIRMATION
+==================================================
+
+After selecting:
+
+Show a small floating action:
+
+"3 elements selected"
+
+[ Annotate ]
+
+Do not automatically open the annotation panel after every click.
+
+This allows users to select multiple elements first.
+
+==================================================
+21. ANNOTATION SCOPE
+==================================================
+
+After selection, allow:
+
+Apply to:
+
+○ Selected elements
+○ Similar elements in section
+○ Matching elements on page
+○ Matching elements across prototype
+
+Default:
+
+Selected elements
+
+The user must explicitly choose a broader scope.
+
+==================================================
+22. IMPORTANT WORKFLOW
+==================================================
+
+PRIMARY WORKFLOW:
+
+Click Design Annotation
+        ↓
+Select Elements
+        ↓
+Hover element
+        ↓
+See boundary
+        ↓
+Click
+        ↓
+Select element
+        ↓
+Optionally Cmd/Ctrl + click more elements
+        ↓
+[ Annotate ]
+        ↓
+Write feedback
+        ↓
+Optional use-case explanation
+        ↓
+Choose scope
+        ↓
+Submit
+
+SECONDARY WORKFLOW:
+
+Click Design Annotation
+        ↓
+Select Region
+        ↓
+Drag region
+        ↓
+System detects elements
+        ↓
+Show selected element count
+        ↓
+Annotate
+
+==================================================
+23. EXAMPLE
+==================================================
+
+I want to change the Temporal Insights controls.
+
+Instead of dragging around the entire area:
+
+I click:
+
+Design Annotation
+
+Then hover:
+
+Linear TV
+
+Boundary appears.
+
+Click.
+
+Then:
+
+Streaming
+
+Boundary appears.
+
+Cmd + click.
+
+Then:
+
+FAST
+
+Cmd + click.
+
+Now:
+
+3 elements selected
+
+[ Annotate ]
+
+I enter:
+
+"These controls should work as a quick switching mechanism. Review the
+Fiber design system and use the most appropriate pattern for this use
+case. Keep the current labels and hierarchy."
+
+Submit.
+
+Replit receives:
+
+Selected elements:
+- Linear TV
+- Streaming
+- FAST
+
+Context:
+Temporal Insights
+
+Intent:
+Use-case correction + Design-system review
+
+Scope:
+Selected elements
+
+Feedback:
+[full user feedback]
+
+This is the desired experience.
+
+==================================================
+24. DO NOT
+==================================================
+
+Do NOT:
+
+- Make drag selection the primary workflow.
+- Require users to draw rectangles for normal selection.
+- Open the underlying component interaction when selecting.
+- Force users to know component names.
+- Store only screen coordinates.
+- Treat every annotation as a single DOM rectangle.
+- Require one annotation per element.
+- Automatically apply changes after selection.
+- Change unrelated elements.
+- Force-fit Fiber components.
+- Remove Region Selection entirely.
+
+==================================================
+25. ACCEPTANCE CRITERIA
+==================================================
+
+The feature is successful when:
+
+1. I can activate Design Annotation beside Comments/Options.
+2. I can hover over any component and see its selectable boundary.
+3. I can click the component to select it.
+4. The underlying component does not execute its normal action.
+5. I can select a parent section instead of a child element.
+6. I can select multiple elements.
+7. I can see exactly what is selected.
+8. I can create ONE annotation for multiple selected elements.
+9. I can still use drag-based Region Selection as a secondary option.
+10. Region Selection identifies the elements inside the selected region.
+11. The annotation stores structured selected-element context.
+12. The annotation appears in the chat/review interface.
+13. Replit can understand the selected elements and the design intent.
+14. I can define the scope of the change.
+15. I can edit/delete/resolve the annotation later.
+16. The interaction feels as simple as:
+
+    Hover → Select → Annotate → Submit
+
+FINAL PRINCIPLE:
+
+DO NOT MAKE THE DESIGNER DRAW A BOX TO EXPLAIN A DESIGN CHANGE.
+
+LET THE DESIGNER SELECT THE ACTUAL UI ELEMENTS.
+
+THE SYSTEM SHOULD UNDERSTAND:
+WHAT WAS SELECTED
++
+WHERE IT EXISTS
++
+WHY IT NEEDS TO CHANGE
++
+WHAT DESIGN-SYSTEM / USE-CASE INTENT THE DESIGNER HAS.
+
+Design Annotation should become a bridge between:
+
+Designer intent
+        ↓
+Selected UI elements
+        ↓
+Design-system context
+        ↓
+Use-case context
+        ↓
+AI interpretation
+        ↓
+Implementation

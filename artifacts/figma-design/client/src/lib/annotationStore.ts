@@ -82,6 +82,19 @@ export const APPLY_SCOPES: readonly ApplyScope[] = [
 
 export const DEFAULT_APPLY_SCOPE: ApplyScope = "Selected region only";
 
+/**
+ * Display label for a scope, contextualised to the selection kind. When
+ * elements were picked the first scope reads "Selected elements only" instead
+ * of "Selected region only" (spec §21) — stored value is unchanged.
+ */
+export function scopeLabel(scope: ApplyScope, kind: SelectionKind): string {
+  if (scope === "Selected region only") {
+    if (kind === "elements") return "Selected elements only";
+    if (kind === "page") return "This page";
+  }
+  return scope;
+}
+
 /** Lifecycle status of an annotation (spec §12). Default: "Open". */
 export type AnnotationStatus =
   | "Open"
@@ -118,6 +131,41 @@ export interface AnnotationRegion {
   label: string;
 }
 
+/**
+ * How the elements/region were chosen (spec §8, §17). Drives the marker/badge
+ * treatment and the "Apply change to" default label.
+ *   • "elements" — one or more UI elements picked via hover→click (PRIMARY).
+ *   • "region"   — a dragged rectangle (SECONDARY); may still carry detected
+ *                  elements (smart region, spec §9).
+ *   • "page"     — a page-level annotation with no geometry.
+ */
+export type SelectionKind = "elements" | "region" | "page";
+
+export const SELECTION_KINDS: readonly SelectionKind[] = [
+  "elements",
+  "region",
+  "page",
+];
+
+/**
+ * A single structured reference to a selected UI element (spec §10–§14). We
+ * store the human LABEL, the ancestor breadcrumb PATH (root→element, meaningful
+ * levels only) and a percentage RECT SNAPSHOT of the element against the canvas
+ * so markers/highlights can render even if the element can't be re-found later.
+ * `annotateKey` (from a data-annotate attribute) lets us prefer the live rect on
+ * re-render when the element still exists.
+ */
+export interface SelectedElement {
+  /** User-facing label, e.g. "Temporal Insights", "Streaming filter". */
+  label: string;
+  /** Ancestor breadcrumb (root→element), meaningful levels only, capped ~4. */
+  path: string[];
+  /** Percent-of-canvas rect snapshot at capture time. */
+  rectPct: { xPct: number; yPct: number; wPct: number; hPct: number };
+  /** Optional stable key (data-annotate value) for live re-anchoring. */
+  annotateKey?: string;
+}
+
 /** A single design annotation left on a prototype, against a specific version. */
 export interface DesignAnnotation {
   id: string;
@@ -131,11 +179,25 @@ export interface DesignAnnotation {
   /** Annotation author display name. */
   author: string;
   createdAt: string;
+  /** How the target was chosen (elements / region / page). */
+  selectionKind: SelectionKind;
   /**
    * The covered region, or null for a PAGE-LEVEL annotation (spec §21) which
-   * has no region and renders its marker in a fixed rail.
+   * has no region and renders its marker in a fixed rail. For element
+   * selections this holds the COMPUTED bounding rect so markers/highlights
+   * still render geometrically (label describes the elements).
    */
   region: AnnotationRegion | null;
+  /**
+   * Structured references to the selected UI elements (spec §10–§14). Empty for
+   * page-level annotations and legacy region records (migrated as []).
+   */
+  elements: SelectedElement[];
+  /**
+   * Dominant / common-ancestor section label for the selection (spec §10),
+   * e.g. "Temporal Insights". Empty when unknown.
+   */
+  sectionLabel: string;
   /** Primary, required: "What needs to change?". */
   what: string;
   /** Optional: "Why should this change?". */
@@ -180,7 +242,10 @@ export interface NewAnnotationInput {
   versionId: string;
   versionName: string;
   author: string;
+  selectionKind?: SelectionKind;
   region: AnnotationRegion | null;
+  elements?: SelectedElement[];
+  sectionLabel?: string;
   what: string;
   why?: string;
   types?: ChangeType[];
@@ -191,6 +256,8 @@ export interface NewAnnotationInput {
 /** Fields that may be edited on an existing annotation. */
 export interface AnnotationPatch {
   region?: AnnotationRegion | null;
+  elements?: SelectedElement[];
+  sectionLabel?: string;
   what?: string;
   why?: string;
   types?: ChangeType[];
@@ -242,6 +309,55 @@ function coerceRegion(raw: unknown): AnnotationRegion | null {
     hPct,
     label: label || "Selected region",
   };
+}
+
+function coerceElement(raw: unknown): SelectedElement | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as Record<string, unknown>;
+  const label = typeof r.label === "string" ? r.label.trim() : "";
+  if (label.length === 0) return null;
+  const path = Array.isArray(r.path)
+    ? r.path.filter((p): p is string => typeof p === "string" && p.length > 0).slice(0, 6)
+    : [];
+  const rectRaw = r.rectPct as Record<string, unknown> | undefined;
+  const num = (v: unknown): number =>
+    typeof v === "number" && Number.isFinite(v) ? v : 0;
+  const rectPct = rectRaw
+    ? {
+        xPct: clampPct(num(rectRaw.xPct)),
+        yPct: clampPct(num(rectRaw.yPct)),
+        wPct: clampPct(num(rectRaw.wPct)),
+        hPct: clampPct(num(rectRaw.hPct)),
+      }
+    : { xPct: 0, yPct: 0, wPct: 0, hPct: 0 };
+  const out: SelectedElement = { label, path, rectPct };
+  if (typeof r.annotateKey === "string" && r.annotateKey.length > 0) {
+    out.annotateKey = r.annotateKey;
+  }
+  return out;
+}
+
+function coerceElements(raw: unknown): SelectedElement[] {
+  if (!Array.isArray(raw)) return [];
+  const out: SelectedElement[] = [];
+  for (const v of raw) {
+    const el = coerceElement(v);
+    if (el) out.push(el);
+  }
+  return out;
+}
+
+function coerceSelectionKind(
+  raw: unknown,
+  region: AnnotationRegion | null,
+  elements: SelectedElement[],
+): SelectionKind {
+  if (typeof raw === "string" && SELECTION_KINDS.includes(raw as SelectionKind)) {
+    return raw as SelectionKind;
+  }
+  // Legacy records had no selectionKind — infer from geometry.
+  if (!region) return "page";
+  return elements.length > 0 ? "elements" : "region";
 }
 
 function coerceTypes(raw: unknown): ChangeType[] {
@@ -296,6 +412,8 @@ function coerceAnnotation(raw: unknown): DesignAnnotation | null {
       ? Math.round(r.seq)
       : 0;
 
+  const region = coerceRegion(r.region);
+  const elements = coerceElements(r.elements);
   return {
     id: r.id,
     seq,
@@ -304,7 +422,10 @@ function coerceAnnotation(raw: unknown): DesignAnnotation | null {
     versionName: str(r.versionName) || "—",
     author,
     createdAt: createdAtRaw,
-    region: coerceRegion(r.region),
+    selectionKind: coerceSelectionKind(r.selectionKind, region, elements),
+    region,
+    elements,
+    sectionLabel: str(r.sectionLabel).trim(),
     what,
     why: str(r.why).trim(),
     types: coerceTypes(r.types),
@@ -387,6 +508,8 @@ export const localStorageRepository: AnnotationRepository = {
       .filter((a) => a.prototypeId === input.prototypeId)
       .reduce((m, a) => Math.max(m, a.seq), 0);
 
+    const region = coerceRegion(input.region);
+    const elements = coerceElements(input.elements);
     const annotation: DesignAnnotation = {
       id,
       seq: maxSeq + 1,
@@ -395,7 +518,10 @@ export const localStorageRepository: AnnotationRepository = {
       versionName: input.versionName || "—",
       author,
       createdAt: nowIso(),
-      region: coerceRegion(input.region),
+      selectionKind: coerceSelectionKind(input.selectionKind, region, elements),
+      region,
+      elements,
+      sectionLabel: (input.sectionLabel ?? "").trim(),
       what,
       why: (input.why ?? "").trim(),
       types: coerceTypes(input.types),
@@ -415,6 +541,17 @@ export const localStorageRepository: AnnotationRepository = {
       changed = true;
       const merged: DesignAnnotation = { ...a };
       if (patch.region !== undefined) merged.region = coerceRegion(patch.region);
+      if (patch.elements !== undefined) merged.elements = coerceElements(patch.elements);
+      if (patch.sectionLabel !== undefined)
+        merged.sectionLabel = patch.sectionLabel.trim();
+      if (patch.region !== undefined || patch.elements !== undefined) {
+        // Keep selectionKind consistent with the new geometry (page-level stays
+        // page-level; region↔elements follows whether elements remain).
+        merged.selectionKind =
+          a.selectionKind === "page" && merged.region === null
+            ? "page"
+            : coerceSelectionKind(merged.selectionKind, merged.region, merged.elements);
+      }
       if (patch.what !== undefined) {
         const w = patch.what.trim();
         if (w.length > 0) merged.what = w; // never blank out the required field

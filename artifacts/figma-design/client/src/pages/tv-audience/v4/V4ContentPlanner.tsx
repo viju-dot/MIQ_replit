@@ -144,6 +144,7 @@ function EnvControl({
       className="inline-flex items-center gap-[2px] rounded-[var(--radius-50,4px)] p-[2px]"
       role="group"
       aria-label="Viewing environment: All or Commercials"
+      data-annotate="Viewing environment control"
       style={{ backgroundColor: SURFACE2, border: `1px solid ${GRID}` }}
     >
       {(["all", "commercials"] as const).map((k) => {
@@ -552,10 +553,14 @@ export default function V4ContentPlanner() {
 
       {/* 2 — Global filters (sticky, market-configurable) */}
       <div
+        data-annotate="Global filters"
         className="sticky z-40 -mx-6 px-6 py-[var(--spacing-150,12px)] md:-mx-10 md:px-10"
         style={{ top: "var(--tv-filter-top, 0px)", backgroundColor: SURFACE2, borderBottom: `1px solid ${GRID}` }}
       >
-        <div className="flex flex-wrap items-end gap-[var(--spacing-150,12px)]">
+        <div
+          data-annotate="Audience filter group"
+          className="flex flex-wrap items-end gap-[var(--spacing-150,12px)]"
+        >
           <SearchableDropdown id="v4-market" label="Country" value={filters.market} options={MARKETS} onChange={(v) => updateFilter("market", v)} />
           {uk ? (
             <>
@@ -587,7 +592,10 @@ export default function V4ContentPlanner() {
       </div>
 
       {/* 3 — Executive summary tiles */}
-      <div className="grid grid-cols-2 gap-[var(--spacing-150,12px)] md:grid-cols-3 xl:grid-cols-6">
+      <div
+        data-annotate="Executive summary"
+        className="grid grid-cols-2 gap-[var(--spacing-150,12px)] md:grid-cols-3 xl:grid-cols-6"
+      >
         {summary.map((t) => (
           <StatTile key={t.label} label={t.label} value={t.value} unit={t.unit} index={t.index} loading={loading} />
         ))}

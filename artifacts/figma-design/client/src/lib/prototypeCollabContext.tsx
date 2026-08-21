@@ -29,8 +29,15 @@ export interface PrototypeCollabContextValue {
   viewedVersion: PrototypeVersion;
   /** Whether comment mode is active (click-to-pin). */
   commentMode: boolean;
-  /** Whether Design Annotation mode is active (drag-to-select region). */
+  /** Whether Design Annotation mode is active. */
   annotationMode: boolean;
+  /**
+   * The active selection tool within annotation mode (spec §8/§19). "elements"
+   * is the PRIMARY hover→click picker; "region" is the secondary drag tool.
+   */
+  selectMode: "elements" | "region";
+  /** Switch the active selection tool. */
+  setSelectMode: (m: "elements" | "region") => void;
   /** Enter comment mode at a specific anchor (used by "Comment instead" §15). */
   startCommentAt: (anchor: CommentAnchor) => void;
   /** Design Annotations for the CURRENTLY VIEWED version (chronological). */

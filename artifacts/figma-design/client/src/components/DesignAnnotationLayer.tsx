@@ -40,14 +40,28 @@ import {
   APPLY_SCOPES,
   DEFAULT_APPLY_SCOPE,
   ANNOTATION_STATUSES,
+  scopeLabel,
   type ChangeType,
   type DsGuidance,
   type ApplyScope,
   type AnnotationStatus,
   type AnnotationRegion,
   type DesignAnnotation,
+  type SelectedElement,
+  type SelectionKind,
 } from "@/lib/annotationStore";
 import { deriveRegionLabel, type RegionPxRect } from "@/lib/commentTarget";
+import {
+  elementAtPoint,
+  elementsInRegion,
+  meaningfulChain,
+  toPick,
+  boundingPct,
+  commonSectionLabel,
+  type ElementPick,
+  type CanvasMetrics,
+  type PctRect,
+} from "@/lib/elementSelect";
 import {
   Select,
   SelectTrigger,
@@ -134,6 +148,33 @@ function StatusBadge({ status }: { status: AnnotationStatus }) {
     >
       {status}
     </span>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Element chips (structured selected-element references, §12/§13)     */
+/* ------------------------------------------------------------------ */
+
+/** Read-only chips listing selected element labels. */
+function ElementChips({ elements }: { elements: SelectedElement[] }) {
+  if (elements.length === 0) return null;
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {elements.map((el, i) => (
+        <span
+          key={`${el.label}-${i}`}
+          className="inline-flex items-center rounded-full border border-solid px-2 py-0.5 text-[11px] font-medium"
+          style={{
+            borderColor: C.brandFg,
+            color: C.brandFg,
+            backgroundColor: C.brandSubtle,
+          }}
+          title={el.path.length > 0 ? el.path.join(" › ") : el.label}
+        >
+          {el.label}
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -228,9 +269,11 @@ function TypeToggles({
 function ScopeRadios({
   value,
   onChange,
+  kind,
 }: {
   value: ApplyScope;
   onChange: (s: ApplyScope) => void;
+  kind: SelectionKind;
 }) {
   return (
     <div className="flex flex-col gap-1" role="radiogroup" aria-label="Apply change to">
@@ -262,7 +305,7 @@ function ScopeRadios({
                 />
               )}
             </span>
-            {s}
+            {scopeLabel(s, kind)}
           </button>
         );
       })}
@@ -289,9 +332,12 @@ function scopeImpactNote(scope: ApplyScope): string | null {
 /* Editor draft (region + form state)                                  */
 /* ------------------------------------------------------------------ */
 
-/** A pending region selection being authored (percent coords of the canvas). */
+/** A pending selection being authored (percent coords of the canvas). */
 export interface AnnotationDraft {
+  selectionKind: SelectionKind;
   region: AnnotationRegion | null; // null = page-level
+  elements: SelectedElement[];
+  sectionLabel: string;
 }
 
 interface EditorValues {
@@ -318,6 +364,9 @@ function AnnotationEditor({
   title,
   authors,
   areaLabel,
+  sectionLabel,
+  elements,
+  selectionKind,
   seqLabel,
   initial,
   initialAuthor,
@@ -330,6 +379,9 @@ function AnnotationEditor({
   title: string;
   authors: string[];
   areaLabel: string;
+  sectionLabel: string;
+  elements: SelectedElement[];
+  selectionKind: SelectionKind;
   seqLabel: string;
   initial: EditorValues;
   initialAuthor?: string;
@@ -413,17 +465,25 @@ function AnnotationEditor({
 
       {step === "form" ? (
         <>
-          {/* Selected area summary */}
+          {/* Selected summary — section + element chips (spec §11/§12). */}
           <div
-            className="rounded-[var(--radius-100,8px)] border border-solid px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)]"
+            className="flex flex-col gap-1.5 rounded-[var(--radius-100,8px)] border border-solid px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)]"
             style={{ borderColor: C.border, backgroundColor: C.surface2 }}
           >
             <p className="text-[11px] font-medium" style={{ color: C.textMuted }}>
-              Selected area
+              Selected
             </p>
             <p className="text-[12px] font-medium" style={{ color: C.textPrimary }}>
-              {areaLabel}
+              {sectionLabel || areaLabel}
             </p>
+            {elements.length > 0 && (
+              <>
+                <p className="text-[11px] font-medium" style={{ color: C.textMuted }}>
+                  {elements.length === 1 ? "Element" : `Contains ${elements.length} elements`}
+                </p>
+                <ElementChips elements={elements} />
+              </>
+            )}
           </div>
 
           {/* What needs to change? (required) */}
@@ -504,6 +564,7 @@ function AnnotationEditor({
             <ScopeRadios
               value={values.scope}
               onChange={(s) => setValues((v) => ({ ...v, scope: s }))}
+              kind={selectionKind}
             />
             {impact && (
               <p
@@ -577,14 +638,25 @@ function AnnotationEditor({
             className="flex flex-col gap-[var(--spacing-150,12px)] rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-200,16px)]"
             style={{ borderColor: C.border, backgroundColor: C.surface2 }}
           >
-            <SummaryRow label="Area" value={areaLabel} />
+            <SummaryRow label="Selected" value={sectionLabel || areaLabel} />
+            {elements.length > 0 && (
+              <div className="flex flex-col gap-1">
+                <span
+                  className="text-[11px] font-medium uppercase tracking-wide"
+                  style={{ color: C.textMuted }}
+                >
+                  Contains
+                </span>
+                <ElementChips elements={elements} />
+              </div>
+            )}
             <SummaryRow label="Change" value={values.what.trim()} />
             {values.why.trim() && <SummaryRow label="Reason" value={values.why.trim()} />}
             <SummaryRow label="Design system" value={values.dsGuidance} />
             {values.types.length > 0 && (
               <SummaryRow label="Type" value={values.types.join(", ")} />
             )}
-            <SummaryRow label="Scope" value={values.scope} />
+            <SummaryRow label="Scope" value={scopeLabel(values.scope, selectionKind)} />
             <SummaryRow label="Author" value={resolvedName} />
           </div>
           {error && (
@@ -721,12 +793,26 @@ function AnnotationDetails({
         </div>
       </div>
 
-      <DetailField label="Area" value={a.region ? a.region.label : "Entire page"} />
+      <DetailField
+        label="Selected"
+        value={a.sectionLabel || (a.region ? a.region.label : "Entire page")}
+      />
+      {a.elements.length > 0 && (
+        <div className="flex flex-col gap-1">
+          <span
+            className="text-[11px] font-medium uppercase tracking-wide"
+            style={{ color: C.textMuted }}
+          >
+            Selected elements
+          </span>
+          <ElementChips elements={a.elements} />
+        </div>
+      )}
       <DetailField label="What needs to change" value={a.what} />
       {a.why && <DetailField label="Why" value={a.why} />}
       {a.types.length > 0 && <DetailField label="Change type" value={a.types.join(", ")} />}
       <DetailField label="Design system guidance" value={a.dsGuidance} />
-      <DetailField label="Scope" value={a.scope} />
+      <DetailField label="Scope" value={scopeLabel(a.scope, a.selectionKind)} />
 
       {/* Actions */}
       <div className="flex flex-wrap items-center gap-2 pt-1">
@@ -948,6 +1034,16 @@ function normalizeDraw(d: DrawRect): { xPct: number; yPct: number; wPct: number;
 /** Minimum drag size (percent of canvas) to count as a region. */
 const MIN_REGION_PCT = 2;
 
+/** Convert a live element pick into the persisted SelectedElement shape. */
+function pickToElement(p: ElementPick): SelectedElement {
+  return {
+    label: p.label,
+    path: p.path,
+    rectPct: p.rectPct,
+    ...(p.annotateKey ? { annotateKey: p.annotateKey } : {}),
+  };
+}
+
 export function DesignAnnotationLayer(): JSX.Element | null {
   const collab = usePrototypeCollab();
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -975,15 +1071,49 @@ export function DesignAnnotationLayer(): JSX.Element | null {
   // without reading it from inside a setState updater (which runs in render).
   const liveRegionRef = useRef<AnnotationRegion | null>(null);
 
-  const annotationMode = collab?.annotationMode ?? false;
+  // Element-selection state (PRIMARY workflow).
+  //   hoverRect/hoverLabel/hoverPath — the boundary under the cursor.
+  //   picks — the committed multi-selection awaiting [Annotate].
+  const [hoverRect, setHoverRect] = useState<PctRect | null>(null);
+  const [hoverLabel, setHoverLabel] = useState<string>("");
+  const [hoverPath, setHoverPath] = useState<string[]>([]);
+  const [picks, setPicks] = useState<ElementPick[]>([]);
+  // A dragged region awaiting [Annotate] (smart region, spec §9/§20).
+  const [pendingRegion, setPendingRegion] = useState<{
+    region: AnnotationRegion;
+    elements: SelectedElement[];
+    sectionLabel: string;
+  } | null>(null);
+  const hoverElRef = useRef<HTMLElement | null>(null);
+  const rafRef = useRef<number | null>(null);
 
-  // Leaving annotation mode clears any in-progress draw/draft.
+  const annotationMode = collab?.annotationMode ?? false;
+  const selectMode = collab?.selectMode ?? "elements";
+
+  // Leaving annotation mode clears any in-progress draw/draft/hover/selection.
   useEffect(() => {
     if (!annotationMode) {
       setDrawing(null);
       setDraft(null);
+      setHoverRect(null);
+      setHoverLabel("");
+      setHoverPath([]);
+      setPicks([]);
+      setPendingRegion(null);
+      hoverElRef.current = null;
     }
   }, [annotationMode]);
+
+  // Switching tool clears the current hover + region draw + any pending
+  // selection so the two tools don't leak into each other.
+  useEffect(() => {
+    setHoverRect(null);
+    setHoverLabel("");
+    setHoverPath([]);
+    setDrawing(null);
+    setPicks([]);
+    setPendingRegion(null);
+  }, [selectMode]);
 
   // Measure the canvas box (the layer's parent) in px, incl. scroll extent.
   const measure = useCallback(() => {
@@ -1010,12 +1140,152 @@ export function DesignAnnotationLayer(): JSX.Element | null {
     [measure],
   );
 
+  // While drawing a region, suppress text selection on the whole document so a
+  // fast drag can't select page content underneath the overlay.
+  useEffect(() => {
+    if (!drawing) return;
+    const prev = document.body.style.userSelect;
+    document.body.style.userSelect = "none";
+    return () => {
+      document.body.style.userSelect = prev;
+    };
+  }, [drawing !== null]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* ---- element hover + click (PRIMARY, spec §3/§4/§18) ---- */
+  // Capture-phase listeners on the canvas host: hover shows a boundary; click
+  // selects (single) or toggles (⌘/Ctrl/Shift) WITHOUT triggering the
+  // underlying control. Only active in element mode with no draft/editor open.
+  const elementModeActive =
+    annotationMode && selectMode === "elements" && !draft && !editingId;
+
+  const resolveHover = useCallback(
+    (clientX: number, clientY: number) => {
+      const m = measure();
+      if (!m) return;
+      const el = elementAtPoint(clientX, clientY, m.host);
+      if (!el || el === m.host) {
+        hoverElRef.current = null;
+        setHoverRect(null);
+        setHoverLabel("");
+        setHoverPath([]);
+        return;
+      }
+      if (el === hoverElRef.current) return; // unchanged — skip work
+      hoverElRef.current = el;
+      const pick = toPick(el, m.host, m as CanvasMetrics);
+      if (!pick) {
+        setHoverRect(null);
+        setHoverLabel("");
+        setHoverPath([]);
+        return;
+      }
+      setHoverRect(pick.rectPct);
+      setHoverLabel(pick.label);
+      setHoverPath(pick.path);
+    },
+    [measure],
+  );
+
+  useEffect(() => {
+    if (!elementModeActive) return;
+    const m = measure();
+    const host = m?.host;
+    if (!host) return;
+
+    const onMoveCapture = (ev: MouseEvent) => {
+      if (rafRef.current !== null) return;
+      const x = ev.clientX;
+      const y = ev.clientY;
+      rafRef.current = window.requestAnimationFrame(() => {
+        rafRef.current = null;
+        resolveHover(x, y);
+      });
+    };
+    // Capture-phase: intercept BEFORE the underlying control (spec §18).
+    const onClickCapture = (ev: MouseEvent) => {
+      const target = ev.target as Element | null;
+      if (target && target.closest("[data-annotation-ui]")) return; // our chrome
+      ev.preventDefault();
+      ev.stopPropagation();
+      const el = elementAtPoint(ev.clientX, ev.clientY, host);
+      if (!el || el === host) return;
+      const pick = toPick(el, host, m as CanvasMetrics);
+      if (!pick) return;
+      const additive = ev.metaKey || ev.ctrlKey || ev.shiftKey;
+      setPendingRegion(null);
+      setOpenId(null);
+      setPicks((cur) => {
+        const idx = cur.findIndex((p) => p.el === pick.el);
+        if (additive) {
+          return idx >= 0 ? cur.filter((_, i) => i !== idx) : [...cur, pick];
+        }
+        // Plain click: single selection (replaces).
+        return idx >= 0 && cur.length === 1 ? [] : [pick];
+      });
+    };
+    // Swallow mouse/pointer events so controls never react (spec §18).
+    const swallow = (ev: Event) => {
+      const target = ev.target as Element | null;
+      if (target && target.closest("[data-annotation-ui]")) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+    };
+
+    host.addEventListener("mousemove", onMoveCapture, true);
+    host.addEventListener("click", onClickCapture, true);
+    host.addEventListener("mousedown", swallow, true);
+    host.addEventListener("mouseup", swallow, true);
+    host.addEventListener("dblclick", swallow, true);
+    // Radix / pointer-based controls open on pointerdown — swallow those too so
+    // no dropdown/menu opens while selecting (spec §18).
+    host.addEventListener("pointerdown", swallow, true);
+    host.addEventListener("pointerup", swallow, true);
+    return () => {
+      host.removeEventListener("mousemove", onMoveCapture, true);
+      host.removeEventListener("click", onClickCapture, true);
+      host.removeEventListener("mousedown", swallow, true);
+      host.removeEventListener("mouseup", swallow, true);
+      host.removeEventListener("dblclick", swallow, true);
+      host.removeEventListener("pointerdown", swallow, true);
+      host.removeEventListener("pointerup", swallow, true);
+      if (rafRef.current !== null) {
+        window.cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+  }, [elementModeActive, measure, resolveHover]);
+
+  /* ---- re-target selection up the hierarchy (breadcrumb, §5) ---- */
+  // `depthFromRoot` indexes the crumb path (root→element). Re-select the
+  // ancestor at that meaningful level. Anchor off the currently-selected single
+  // pick (preferred, survives after the click) or the live hover element.
+  function selectCrumb(depthFromRoot: number) {
+    const el = picks.length === 1 ? picks[0].el : hoverElRef.current;
+    const m = measure();
+    if (!el || !m) return;
+    // meaningfulChain is element→root; reverse it to root→element to match path.
+    const chain = meaningfulChain(el, m.host).reverse();
+    const node = chain[depthFromRoot] ?? el;
+    const pick = toPick(node, m.host, m as CanvasMetrics);
+    if (!pick) return;
+    setPicks([pick]);
+    hoverElRef.current = node;
+    setHoverRect(pick.rectPct);
+    setHoverLabel(pick.label);
+    setHoverPath(pick.path);
+  }
+
   /* ---- fresh draw handlers (capture overlay) ---- */
   function onCaptureDown(e: React.MouseEvent<HTMLDivElement>) {
     if (e.button !== 0) return;
+    // Suppress the browser's native text selection so the drag becomes a clean
+    // rubber-band rectangle (defect: dragging selected page text instead).
+    e.preventDefault();
     const p = toPct(e.clientX, e.clientY);
     if (!p) return;
     setOpenId(null);
+    setPicks([]);
+    setPendingRegion(null);
     setDrawing({ x0: p.xPct, y0: p.yPct, x1: p.xPct, y1: p.yPct });
   }
   function onCaptureMove(e: React.MouseEvent<HTMLDivElement>) {
@@ -1032,9 +1302,12 @@ export function DesignAnnotationLayer(): JSX.Element | null {
       // Too small to be a region — ignore (treat as a mis-click).
       return;
     }
-    // Derive the area label from the DOM under the region.
+    // Derive the area label + detect the meaningful elements inside (smart
+    // region, spec §9). Show the selection pill; the user presses Annotate.
     const m = measure();
     let label = "Selected region";
+    let elements: SelectedElement[] = [];
+    let sectionLabel = "";
     if (m) {
       const rectPx: RegionPxRect = {
         x: (norm.xPct / 100) * m.width,
@@ -1043,8 +1316,16 @@ export function DesignAnnotationLayer(): JSX.Element | null {
         h: (norm.hPct / 100) * m.height,
       };
       label = deriveRegionLabel(m.host, rectPx);
+      const found = elementsInRegion(m.host, rectPx, m as CanvasMetrics);
+      elements = found.map(pickToElement);
+      sectionLabel = commonSectionLabel(found);
     }
-    setDraft({ region: { ...norm, label } });
+    setPicks([]);
+    setPendingRegion({
+      region: { ...norm, label },
+      elements,
+      sectionLabel,
+    });
   }
 
   /* ---- move / resize an existing region ---- */
@@ -1130,7 +1411,14 @@ export function DesignAnnotationLayer(): JSX.Element | null {
       setOpenId(null);
       setEditingId(null);
       setDrawing(null);
-      setDraft({ region: null });
+      setPicks([]);
+      setPendingRegion(null);
+      setDraft({
+        selectionKind: "page",
+        region: null,
+        elements: [],
+        sectionLabel: "",
+      });
     }
     window.addEventListener("fiber:new-page-annotation", onNewPage);
     return () => window.removeEventListener("fiber:new-page-annotation", onNewPage);
@@ -1174,7 +1462,10 @@ export function DesignAnnotationLayer(): JSX.Element | null {
     if (!draft) return false;
     const created = addAnnotation({
       author,
+      selectionKind: draft.selectionKind,
       region: draft.region,
+      elements: draft.elements,
+      sectionLabel: draft.sectionLabel,
       what: values.what,
       why: values.why,
       types: values.types,
@@ -1183,10 +1474,45 @@ export function DesignAnnotationLayer(): JSX.Element | null {
     });
     if (created) {
       setDraft(null);
+      setPicks([]);
+      setPendingRegion(null);
       setOpenId(created.id);
       return true;
     }
     return false;
+  }
+
+  // Build a draft from the current element selection and open the editor (§20:
+  // the user presses Annotate — selection does not auto-open the editor).
+  function annotatePicks() {
+    if (picks.length === 0) return;
+    const elements = picks.map(pickToElement);
+    const bound = boundingPct(picks.map((p) => p.rectPct));
+    const sectionLabel = commonSectionLabel(picks);
+    const label =
+      elements.length === 1
+        ? elements[0].label
+        : `${elements.length} elements${sectionLabel ? ` · ${sectionLabel}` : ""}`;
+    const region: AnnotationRegion | null = bound
+      ? { ...bound, label }
+      : null;
+    setDraft({
+      selectionKind: "elements",
+      region,
+      elements,
+      sectionLabel,
+    });
+  }
+
+  // Build a draft from the pending region (smart region → Annotate, §9).
+  function annotateRegion() {
+    if (!pendingRegion) return;
+    setDraft({
+      selectionKind: "region",
+      region: pendingRegion.region,
+      elements: pendingRegion.elements,
+      sectionLabel: pendingRegion.sectionLabel,
+    });
   }
 
   function submitEdit(values: EditorValues, _author: string): boolean {
@@ -1202,22 +1528,57 @@ export function DesignAnnotationLayer(): JSX.Element | null {
     return true;
   }
 
-  function commentInstead() {
-    if (!draft || !draft.region) return;
-    const r = draft.region;
-    const cx = Math.min(100, Math.max(0, r.xPct + r.wPct / 2));
-    const cy = Math.min(100, Math.max(0, r.yPct + r.hPct / 2));
+  // "Comment instead" (§15) — convert a selection into an anchored comment at
+  // its center. Works for both the draft editor and the raw selection pill.
+  function commentInsteadAt(region: AnnotationRegion | null, fallbackLabel: string) {
+    if (!region) return;
+    const cx = Math.min(100, Math.max(0, region.xPct + region.wPct / 2));
+    const cy = Math.min(100, Math.max(0, region.yPct + region.hPct / 2));
     setDraft(null);
-    collab?.startCommentAt({ xPct: cx, yPct: cy, targetLabel: r.label });
+    setPicks([]);
+    setPendingRegion(null);
+    collab?.startCommentAt({ xPct: cx, yPct: cy, targetLabel: region.label || fallbackLabel });
   }
 
+  function commentInstead() {
+    if (!draft || !draft.region) return;
+    commentInsteadAt(draft.region, draft.sectionLabel || "Selected region");
+  }
+
+  // Bounding rect (percent) of the current element selection, for the pill +
+  // "comment instead" anchor.
+  const picksBound = picks.length > 0 ? boundingPct(picks.map((p) => p.rectPct)) : null;
+
+  // Breadcrumb path (root→element) shown in the pill when exactly one element
+  // is selected. Prefer the selected pick's own path (persists after click);
+  // fall back to the live hover path while nothing is selected yet.
+  const crumbPath =
+    picks.length === 1
+      ? picks[0].path
+      : picks.length === 0
+        ? hoverPath
+        : [];
+
+  const regionModeActive =
+    annotationMode && selectMode === "region" && !draft && !editingAnnotation;
+
   return (
-    <div ref={wrapRef} className="pointer-events-none absolute inset-0 z-[6]">
-      {/* Capture overlay — only in region mode & when no draft/editor is open. */}
-      {annotationMode && !draft && !editingAnnotation && (
+    <div
+      ref={wrapRef}
+      data-annotation-ui
+      className="pointer-events-none absolute inset-0 z-[6]"
+    >
+      {/* Region-mode crosshair capture overlay (drag to draw). */}
+      {regionModeActive && (
         <div
+          data-annotation-ui
           className="pointer-events-auto absolute inset-0"
-          style={{ cursor: "crosshair" }}
+          style={{
+            cursor: "crosshair",
+            userSelect: "none",
+            WebkitUserSelect: "none",
+            touchAction: "none",
+          }}
           onMouseDown={onCaptureDown}
           onMouseMove={onCaptureMove}
           onMouseUp={onCaptureUp}
@@ -1226,15 +1587,84 @@ export function DesignAnnotationLayer(): JSX.Element | null {
         />
       )}
 
-      {/* In-progress draw rectangle. */}
+      {/* Element-mode hover boundary + contextual label + breadcrumb (§3/§5). */}
+      {elementModeActive && hoverRect && hoverRect.wPct > 0 && (
+        <div
+          data-annotation-ui
+          className="pointer-events-none absolute rounded-[var(--radius-50,4px)] border-2"
+          style={{
+            left: `${hoverRect.xPct}%`,
+            top: `${hoverRect.yPct}%`,
+            width: `${hoverRect.wPct}%`,
+            height: `${hoverRect.hPct}%`,
+            borderColor: C.brandFg,
+            backgroundColor: C.brandSubtle,
+            boxShadow: "0 0 0 1px rgba(255,255,255,0.6)",
+          }}
+          aria-hidden
+        >
+          {/* Contextual label at the top-left of the boundary. */}
+          <span
+            className="pointer-events-none absolute left-0 flex max-w-[240px] items-center gap-1 truncate rounded-[var(--radius-50,4px)] px-1.5 py-0.5 text-[11px] font-semibold shadow-sm"
+            style={{
+              top: hoverRect.yPct < 6 ? "2px" : "-20px",
+              backgroundColor: C.brandBg,
+              color: C.brandFgOn,
+            }}
+          >
+            {hoverLabel || "Element"}
+          </span>
+        </div>
+      )}
+
+      {/* Committed element selections (highlight boxes). */}
+      {elementModeActive &&
+        picks.map((p, i) => (
+          <div
+            key={`pick-${i}`}
+            data-annotation-ui
+            className="pointer-events-none absolute rounded-[var(--radius-50,4px)] border-2"
+            style={{
+              left: `${p.rectPct.xPct}%`,
+              top: `${p.rectPct.yPct}%`,
+              width: `${p.rectPct.wPct}%`,
+              height: `${p.rectPct.hPct}%`,
+              borderColor: C.brandFg,
+              backgroundColor: C.brandSubtle,
+              opacity: 0.55,
+            }}
+            aria-hidden
+          />
+        ))}
+
+      {/* In-progress draw rectangle (region mode). */}
       {drawNorm && drawNorm.wPct > 0 && drawNorm.hPct > 0 && (
         <div
+          data-annotation-ui
           className="absolute rounded-[var(--radius-100,8px)] border-2"
           style={{
             left: `${drawNorm.xPct}%`,
             top: `${drawNorm.yPct}%`,
             width: `${drawNorm.wPct}%`,
             height: `${drawNorm.hPct}%`,
+            borderColor: C.brandFg,
+            backgroundColor: C.brandSubtle,
+            opacity: 0.4,
+          }}
+          aria-hidden
+        />
+      )}
+
+      {/* Pending region highlight (drawn, awaiting Annotate). */}
+      {pendingRegion && !draft && (
+        <div
+          data-annotation-ui
+          className="pointer-events-none absolute rounded-[var(--radius-100,8px)] border-2"
+          style={{
+            left: `${pendingRegion.region.xPct}%`,
+            top: `${pendingRegion.region.yPct}%`,
+            width: `${pendingRegion.region.wPct}%`,
+            height: `${pendingRegion.region.hPct}%`,
             borderColor: C.brandFg,
             backgroundColor: C.brandSubtle,
             opacity: 0.4,
@@ -1293,6 +1723,99 @@ export function DesignAnnotationLayer(): JSX.Element | null {
         </div>
       )}
 
+      {/* Selection confirmation pill (§20) — element multi-select or pending
+          region. Never auto-opens the editor; the user presses Annotate. */}
+      {!draft && (picks.length > 0 || pendingRegion) && (
+        <div
+          data-annotation-ui
+          className="pointer-events-auto absolute left-1/2 top-3 z-[9] flex max-w-[92%] -translate-x-1/2 flex-col gap-1.5 rounded-[var(--radius-100,8px)] border border-solid p-2 shadow-lg"
+          style={{ backgroundColor: C.surface, borderColor: C.brandFg }}
+          role="status"
+        >
+          {/* Breadcrumb of the single selected element (§5). Derived from the
+              selected pick's own path so it persists after the click (hover
+              state is cleared once the pointer stops moving). */}
+          {selectMode === "elements" && crumbPath.length > 1 && (
+            <div className="flex flex-wrap items-center gap-1 px-1">
+              {crumbPath.map((crumb, i) => (
+                <span key={`${crumb}-${i}`} className="flex items-center gap-1">
+                  {i > 0 && (
+                    <span className="text-[11px]" style={{ color: C.textMuted }} aria-hidden>
+                      ›
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => selectCrumb(i)}
+                    className="rounded-full border border-solid px-1.5 py-0.5 text-[11px] font-medium transition-colors"
+                    style={{
+                      borderColor: i === crumbPath.length - 1 ? C.brandFg : C.border,
+                      color: i === crumbPath.length - 1 ? C.brandFg : C.textBody,
+                      backgroundColor:
+                        i === crumbPath.length - 1 ? C.brandSubtle : C.surface,
+                    }}
+                  >
+                    {crumb}
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="px-1 text-[12px] font-semibold" style={{ color: C.textPrimary }}>
+              {selectMode === "elements"
+                ? `${picks.length} element${picks.length === 1 ? "" : "s"} selected`
+                : pendingRegion
+                  ? pendingRegion.elements.length > 0
+                    ? `${pendingRegion.elements.length} element${
+                        pendingRegion.elements.length === 1 ? "" : "s"
+                      } selected`
+                    : "Region selected"
+                  : ""}
+            </span>
+            <div className="ml-auto flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setPicks([]);
+                  setPendingRegion(null);
+                }}
+                className="rounded-[var(--radius-100,8px)] border border-solid px-2.5 py-1 text-[12px] font-medium"
+                style={{ borderColor: C.border, color: C.textBody, backgroundColor: C.surface }}
+              >
+                Clear
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  commentInsteadAt(
+                    selectMode === "elements"
+                      ? picksBound
+                        ? { ...picksBound, label: hoverLabel || "Selected elements" }
+                        : null
+                      : pendingRegion?.region ?? null,
+                    "Selected region",
+                  )
+                }
+                className="rounded-[var(--radius-100,8px)] border border-solid px-2.5 py-1 text-[12px] font-medium"
+                style={{ borderColor: C.border, color: C.textBody, backgroundColor: C.surface }}
+              >
+                Comment instead
+              </button>
+              <button
+                type="button"
+                onClick={() => (selectMode === "elements" ? annotatePicks() : annotateRegion())}
+                className="rounded-[var(--radius-100,8px)] px-2.5 py-1 text-[12px] font-medium"
+                style={{ backgroundColor: C.brandBg, color: C.brandFgOn }}
+              >
+                Annotate
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Editor for a fresh draft. */}
       {draft && (
         <AnchoredPopover
@@ -1303,13 +1826,20 @@ export function DesignAnnotationLayer(): JSX.Element | null {
             title="Design annotation"
             authors={authors}
             areaLabel={draft.region ? draft.region.label : "Entire page"}
+            sectionLabel={draft.sectionLabel}
+            elements={draft.elements}
+            selectionKind={draft.selectionKind}
             seqLabel="New annotation"
             initial={EMPTY_EDITOR}
-            submitLabel="Submit annotation"
+            submitLabel="Add annotation"
             showCommentInstead={Boolean(draft.region)}
             onCommentInstead={commentInstead}
             onSubmit={submitDraft}
-            onCancel={() => setDraft(null)}
+            onCancel={() => {
+              setDraft(null);
+              setPicks([]);
+              setPendingRegion(null);
+            }}
           />
         </AnchoredPopover>
       )}
@@ -1324,6 +1854,9 @@ export function DesignAnnotationLayer(): JSX.Element | null {
             title="Edit annotation"
             authors={authors}
             areaLabel={editingAnnotation.region ? editingAnnotation.region.label : "Entire page"}
+            sectionLabel={editingAnnotation.sectionLabel}
+            elements={editingAnnotation.elements}
+            selectionKind={editingAnnotation.selectionKind}
             seqLabel={`Design annotation #${pad2(editingAnnotation.seq)}`}
             initial={{
               what: editingAnnotation.what,
@@ -1349,7 +1882,7 @@ export function DesignAnnotationLayer(): JSX.Element | null {
         >
           <AnnotationDetails
             annotation={openAnnotation}
-            showMove
+            showMove={openAnnotation.selectionKind === "region"}
             moveActive={movingId === openAnnotation.id}
             onEdit={() => {
               setEditingId(openAnnotation.id);
@@ -1483,7 +2016,7 @@ export function AnnotationsPanelBody({
           </p>
           <p className="text-[12px]" style={{ color: C.textMuted }}>
             {annotations.length === 0
-              ? "Start a new annotation, then drag over a region of the design."
+              ? "Start a new annotation, then hover the design and click an element to select it."
               : "No annotations match this filter."}
           </p>
         </div>
@@ -1509,7 +2042,8 @@ function AnnotationRow({
 }) {
   const [hover, setHover] = useState(false);
   const a = annotation;
-  const area = a.region ? a.region.label : "Entire page";
+  const area =
+    a.sectionLabel || (a.region ? a.region.label : "Entire page");
   return (
     <button
       type="button"
@@ -1531,6 +2065,8 @@ function AnnotationRow({
         </span>
         <StatusBadge status={a.status} />
       </div>
+      {/* Structured element references (§13). */}
+      {a.elements.length > 0 && <ElementChips elements={a.elements} />}
       <p className="line-clamp-2 text-[length:var(--body-sm-regular-size,12px)]" style={{ color: C.textBody }}>
         {a.what}
       </p>

@@ -1615,6 +1615,9 @@ export function PrototypeCollabOverlay({
   const [showCommentsOpen, setShowCommentsOpen] = useState(false);
   const [commentMode, setCommentMode] = useState(false);
   const [annotationMode, setAnnotationMode] = useState(false);
+  // Active selection tool within annotation mode. "elements" is the PRIMARY
+  // hover→click picker (spec §8); "region" is the secondary drag tool.
+  const [selectMode, setSelectMode] = useState<"elements" | "region">("elements");
 
   // Read comments (re-reads whenever tick / prototype changes).
   const comments = useMemo<PrototypeComment[]>(
@@ -1841,6 +1844,8 @@ export function PrototypeCollabOverlay({
           viewedVersion,
           commentMode,
           annotationMode,
+          selectMode,
+          setSelectMode,
           startCommentAt,
           markers,
           authors: combinedAuthors,
@@ -1895,25 +1900,68 @@ export function PrototypeCollabOverlay({
             </div>
           )}
 
-          {/* Annotation-mode contextual toolbar (spec §3). Region comment is the
-              PRIMARY mode (drag to select); Page-level is a secondary action. */}
+          {/* Annotation-mode contextual toolbar (spec §19). Select Elements is
+              the PRIMARY tool (hover→click); Select Region is secondary; Page-
+              level stays available. */}
           {annotationMode && (
             <div
+              data-annotation-ui
               className="flex flex-col items-end gap-1.5 rounded-[var(--radius-100,8px)] border border-solid p-2 shadow-sm"
               style={{ backgroundColor: C.surface, borderColor: C.brandFg }}
               role="group"
               aria-label="Design Annotation"
             >
-              <span className="px-1 text-[11px] font-semibold" style={{ color: C.brandFg }}>
-                Design Annotation
-              </span>
-              <div className="flex items-center gap-1.5">
-                <span
-                  className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-medium"
-                  style={{ backgroundColor: C.brandBg, color: C.brandFgOn }}
-                >
-                  <NotePencil size={13} /> Region comment
+              <div className="flex w-full items-center justify-between gap-2">
+                <span className="px-1 text-[11px] font-semibold" style={{ color: C.brandFg }}>
+                  Design Annotation
                 </span>
+                <button
+                  type="button"
+                  aria-label="Exit Design Annotation"
+                  onClick={() => setAnnotationMode(false)}
+                  className="flex size-[20px] items-center justify-center rounded-[var(--radius-50,4px)]"
+                  style={{ color: C.textMuted }}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+              {/* Tool toggle */}
+              <div
+                className="flex items-center rounded-full border border-solid p-0.5"
+                style={{ borderColor: C.border, backgroundColor: C.surface }}
+                role="radiogroup"
+                aria-label="Selection tool"
+              >
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={selectMode === "elements"}
+                  onClick={() => setSelectMode("elements")}
+                  className="rounded-full px-2.5 py-1 text-[12px] font-medium transition-colors"
+                  style={
+                    selectMode === "elements"
+                      ? { backgroundColor: C.brandBg, color: C.brandFgOn }
+                      : { backgroundColor: "transparent", color: C.textBody }
+                  }
+                >
+                  Select Elements
+                </button>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={selectMode === "region"}
+                  onClick={() => setSelectMode("region")}
+                  className="rounded-full px-2.5 py-1 text-[12px] font-medium transition-colors"
+                  style={
+                    selectMode === "region"
+                      ? { backgroundColor: C.brandBg, color: C.brandFgOn }
+                      : { backgroundColor: "transparent", color: C.textBody }
+                  }
+                >
+                  Select Region
+                </button>
+              </div>
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => {
@@ -1921,14 +1969,16 @@ export function PrototypeCollabOverlay({
                       window.dispatchEvent(new CustomEvent("fiber:new-page-annotation"));
                     }
                   }}
-                  className="rounded-full border border-solid px-2.5 py-1 text-[12px] font-medium"
+                  className="rounded-full border border-solid px-2.5 py-1 text-[11px] font-medium"
                   style={{ borderColor: C.border, color: C.textBody, backgroundColor: C.surface }}
                 >
                   Page-level annotation
                 </button>
               </div>
               <span className="px-1 text-[11px]" style={{ color: C.textMuted }}>
-                Drag over an area to annotate. Esc to exit.
+                {selectMode === "elements"
+                  ? "Hover an element, click to select. ⌘/Ctrl-click for more. Esc to exit."
+                  : "Drag over an area to select. Esc to exit."}
               </span>
             </div>
           )}
@@ -1977,7 +2027,12 @@ export function PrototypeCollabOverlay({
               onClick={() => {
                 setAnnotationMode((v) => {
                   const next = !v;
-                  if (next) setCommentMode(false);
+                  if (next) {
+                    setCommentMode(false);
+                    // Entering annotation mode defaults to the PRIMARY element
+                    // picker (spec §8) — NOT region drawing.
+                    setSelectMode("elements");
+                  }
                   return next;
                 });
               }}
@@ -2034,11 +2089,13 @@ export function PrototypeCollabOverlay({
                 onNewAnnotation={() => {
                   setCommentMode(false);
                   setAnnotationMode(true);
+                  setSelectMode("elements");
                   setOptionsOpen(false);
                 }}
                 onNewPageLevel={() => {
                   setCommentMode(false);
                   setAnnotationMode(true);
+                  setSelectMode("elements");
                   setOptionsOpen(false);
                   if (typeof window !== "undefined") {
                     window.setTimeout(() => {

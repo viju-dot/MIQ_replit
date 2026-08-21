@@ -108,6 +108,7 @@ export function SmartCard({
   return (
     <section
       aria-label={ariaLabel ?? title}
+      data-annotate={ariaLabel ?? title}
       className="flex w-full flex-col overflow-hidden rounded-[var(--radius-50,4px)]"
       style={{ backgroundColor: CARD_BG, boxShadow: CARD_SHADOW }}
     >
@@ -487,6 +488,7 @@ export function SearchableDropdown({
   return (
     <div
       ref={ref}
+      data-annotate={`${label} filter`}
       className="relative flex min-w-[160px] flex-col gap-[var(--spacing-50,4px)]"
     >
       <label
