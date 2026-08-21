@@ -26,7 +26,8 @@
  * ========================================================================= */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MagnifyingGlass, ArrowUp, ArrowDown, Minus, Info } from "@phosphor-icons/react";
+import { MagnifyingGlass, Info } from "@phosphor-icons/react";
+import { MetricsTile } from "@/components/ds/MetricsTile";
 import {
   FONT,
   GRID,
@@ -37,7 +38,6 @@ import {
   SURFACE2,
   SUCCESS_FG,
   ERROR_FG,
-  CARD_SHADOW,
   SmartCard,
   CardBody,
   Chip,
@@ -48,7 +48,7 @@ import {
   fmtK,
   seeded,
 } from "./primitives";
-import { CHART, indexExplanation } from "./chartTokens";
+import { CHART } from "./chartTokens";
 import {
   MARKETS,
   MOSAIC,
@@ -98,6 +98,11 @@ const TAB_LABELS = TV_TABS.map((t) => t.label); // ["Linear TV","Streaming","Fas
 
 /* ============================================ Executive summary tile ======= */
 
+/* Executive summary tiles render via the shared Fiber DS Metrics Tile
+ * (@/components/ds/MetricsTile) instead of bespoke markup. This adapter maps
+ * the summary model (label, value, unit, index) onto the shared component,
+ * preserving the "Index N vs national" line with the up/down arrow and the
+ * green > 100 / red < 100 index semantics. */
 function StatTile({
   label,
   value,
@@ -111,51 +116,17 @@ function StatTile({
   index?: number | null;
   loading: boolean;
 }) {
-  const up = index != null && index > 100;
-  const flat = index === 100;
-  const fg = index == null ? MUTED : flat ? MUTED : up ? SUCCESS_FG : ERROR_FG;
-  const Arrow = flat ? Minus : up ? ArrowUp : ArrowDown;
   return (
-    <div
-      className="flex min-w-0 flex-col gap-[var(--spacing-50,4px)] rounded-[var(--radius-50,4px)] p-[var(--spacing-150,12px)]"
-      style={{ backgroundColor: CARD_BG, boxShadow: CARD_SHADOW }}
-    >
-      <span
-        className="truncate text-[length:var(--body-sm-regular-size,12px)] leading-[var(--body-sm-regular-line-height,18px)]"
-        style={{ color: MUTED }}
-        title={label}
-      >
-        {label}
-      </span>
-      {loading ? (
-        <span
-          className="h-[24px] w-[70%] animate-pulse rounded-[var(--radius-25,2px)]"
-          style={{ backgroundColor: "var(--surface-background-lvl3, #ebebf0)" }}
-        />
-      ) : (
-        <div className="flex items-baseline gap-[var(--spacing-50,4px)]">
-          <span
-            className="text-[length:var(--headline-sm-semibold-size,20px)] font-semibold tracking-[-0.2px]"
-            style={{ color: TITLE }}
-          >
-            {value}
-          </span>
-          {unit && (
-            <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ color: MUTED }}>
-              {unit}
-            </span>
-          )}
-        </div>
-      )}
-      {index != null && !loading && (
-        <span className="flex items-center gap-[3px]" aria-label={`Index ${index}, ${indexExplanation(index)}`}>
-          <Arrow size={12} weight="bold" color={fg} aria-hidden />
-          <span className="text-[length:var(--body-sm-medium-size,12px)] font-medium" style={{ color: fg }}>
-            Index {index} vs national
-          </span>
-        </span>
-      )}
-    </div>
+    <MetricsTile
+      state="Default"
+      showIcon={false}
+      fullWidth
+      descriptionText={label}
+      metricValue={value}
+      unit={unit}
+      trendIndex={index ?? null}
+      loading={loading}
+    />
   );
 }
 

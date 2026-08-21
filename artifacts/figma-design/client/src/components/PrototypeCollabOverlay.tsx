@@ -43,6 +43,7 @@ import {
   ChatCircle,
   GitBranch,
   ListBullets,
+  NotePencil,
   Paperclip,
   Trash,
   X,
@@ -60,6 +61,16 @@ import {
 } from "@/lib/commentStore";
 import { downscaleImageFile, linkifyParts } from "@/lib/commentMedia";
 import { deriveTargetLabel } from "@/lib/commentTarget";
+import {
+  annotationRepository,
+  type DesignAnnotation,
+  type AnnotationPatch,
+  type NewAnnotationInput,
+} from "@/lib/annotationStore";
+import { AnnotationsPanelBody } from "@/components/DesignAnnotationLayer";
+// Re-exported so prototype pages import the in-content layer from the same
+// module as PrototypeCommentLayer (parallel structure).
+export { DesignAnnotationLayer } from "@/components/DesignAnnotationLayer";
 import {
   Dialog,
   DialogContent,
@@ -271,14 +282,18 @@ const NEW_NAME = "__new__";
 /* Local DS-style segmented button group                              */
 /* ------------------------------------------------------------------ */
 
-type Side = "Left" | "Right";
+type Side = "Left" | "Mid" | "Right";
 
 function radiusStyle(side: Side): React.CSSProperties {
   const r = "var(--old-radiuses-2,2px)";
   if (side === "Left") {
     return { borderTopLeftRadius: r, borderBottomLeftRadius: r };
   }
-  return { borderTopRightRadius: r, borderBottomRightRadius: r };
+  if (side === "Right") {
+    return { borderTopRightRadius: r, borderBottomRightRadius: r };
+  }
+  // Middle segment — square on both ends.
+  return {};
 }
 
 function Segment({
@@ -1402,6 +1417,24 @@ export function PrototypeCommentLayer(): JSX.Element | null {
     if (!commentMode) setDraft(null);
   }, [commentMode]);
 
+  // "Comment instead" (§15): the annotation layer converts a drawn region into
+  // an anchored comment by firing this event with the region-center anchor.
+  useEffect(() => {
+    function onStartComment(ev: Event) {
+      const anchor = (ev as CustomEvent<CommentAnchor>).detail;
+      if (!anchor || typeof anchor.xPct !== "number") return;
+      setOpenMarkerId(null);
+      setDraft({
+        xPct: anchor.xPct,
+        yPct: anchor.yPct,
+        targetLabel: anchor.targetLabel || "Selected region",
+      });
+    }
+    window.addEventListener("fiber:start-comment", onStartComment as EventListener);
+    return () =>
+      window.removeEventListener("fiber:start-comment", onStartComment as EventListener);
+  }, []);
+
   if (!collab) return null;
 
   const {
@@ -1581,6 +1614,7 @@ export function PrototypeCollabOverlay({
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [showCommentsOpen, setShowCommentsOpen] = useState(false);
   const [commentMode, setCommentMode] = useState(false);
+  const [annotationMode, setAnnotationMode] = useState(false);
 
   // Read comments (re-reads whenever tick / prototype changes).
   const comments = useMemo<PrototypeComment[]>(
@@ -1593,6 +1627,32 @@ export function PrototypeCollabOverlay({
     () => commentRepository.listAuthors(),
     [tick],
   );
+
+  // Read design annotations (re-reads whenever tick / prototype changes).
+  const allAnnotations = useMemo<DesignAnnotation[]>(
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    () => (proto ? annotationRepository.list(proto.id) : []),
+    [proto, tick],
+  );
+  // Authors combobox draws from BOTH comment + annotation authors so a name
+  // used in either surface is offered in the other (single collaborator list).
+  const annotationAuthors = useMemo<string[]>(
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    () => annotationRepository.listAuthors(),
+    [tick],
+  );
+  const combinedAuthors = useMemo<string[]>(() => {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const a of [...authors, ...annotationAuthors]) {
+      const key = a.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        out.push(a);
+      }
+    }
+    return out.sort((a, b) => a.localeCompare(b));
+  }, [authors, annotationAuthors]);
 
   const selectVersion = useCallback(
     (id: string) => {
@@ -1614,15 +1674,18 @@ export function PrototypeCollabOverlay({
     }
   }, [proto, viewedVersionId, selectVersion]);
 
-  // Escape exits comment mode.
+  // Escape exits comment / annotation mode.
   useEffect(() => {
-    if (!commentMode) return;
+    if (!commentMode && !annotationMode) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setCommentMode(false);
+      if (e.key === "Escape") {
+        setCommentMode(false);
+        setAnnotationMode(false);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [commentMode]);
+  }, [commentMode, annotationMode]);
 
   // No matching prototype (or no versions) → render children version-unaware.
   if (!proto || proto.versions.length === 0) return <>{children}</>;
@@ -1711,6 +1774,58 @@ export function PrototypeCollabOverlay({
     setTick((t) => t + 1);
   }
 
+  // Design annotations for the VIEWED version, chronological (oldest-first) so
+  // #NN markers read naturally. Version-scoped like comments.
+  const annotations = allAnnotations
+    .filter((a) => a.versionId === viewedVersion.id)
+    .slice()
+    .sort((a, b) => a.seq - b.seq);
+
+  function addAnnotation(
+    input: Omit<NewAnnotationInput, "prototypeId" | "versionId" | "versionName">,
+  ): DesignAnnotation | null {
+    if (!proto) return null;
+    try {
+      const created = annotationRepository.add({
+        ...input,
+        prototypeId: proto.id,
+        versionId: viewedVersion.id,
+        versionName: viewedVersion.name,
+      });
+      setTick((t) => t + 1);
+      return created;
+    } catch {
+      // Persist failed (e.g. localStorage quota). Signal the editor.
+      return null;
+    }
+  }
+
+  function updateAnnotation(id: string, patch: AnnotationPatch) {
+    annotationRepository.update(id, patch);
+    setTick((t) => t + 1);
+  }
+
+  function deleteAnnotation(id: string) {
+    annotationRepository.remove(id);
+    setTick((t) => t + 1);
+  }
+
+  // "Comment instead" (§15): switch out of annotation mode into comment mode and
+  // hand the composer a pre-anchored pin at the region center via a window event
+  // the comment layer listens for.
+  function startCommentAt(anchor: CommentAnchor) {
+    setAnnotationMode(false);
+    setCommentMode(true);
+    if (typeof window !== "undefined") {
+      // Defer so comment mode has mounted the capture layer before it pins.
+      window.setTimeout(() => {
+        window.dispatchEvent(
+          new CustomEvent("fiber:start-comment", { detail: anchor }),
+        );
+      }, 0);
+    }
+  }
+
   return (
     <PrototypeVersionProvider
       value={{
@@ -1725,12 +1840,18 @@ export function PrototypeCollabOverlay({
           prototype: proto,
           viewedVersion,
           commentMode,
+          annotationMode,
+          startCommentAt,
           markers,
-          authors,
+          authors: combinedAuthors,
           repliesOf,
           addComment,
           addReply,
           softDeleteComment,
+          annotations,
+          addAnnotation,
+          updateAnnotation,
+          deleteAnnotation,
         }}
       >
         {/* Prototype content — re-mounted per viewed version so version
@@ -1774,6 +1895,44 @@ export function PrototypeCollabOverlay({
             </div>
           )}
 
+          {/* Annotation-mode contextual toolbar (spec §3). Region comment is the
+              PRIMARY mode (drag to select); Page-level is a secondary action. */}
+          {annotationMode && (
+            <div
+              className="flex flex-col items-end gap-1.5 rounded-[var(--radius-100,8px)] border border-solid p-2 shadow-sm"
+              style={{ backgroundColor: C.surface, borderColor: C.brandFg }}
+              role="group"
+              aria-label="Design Annotation"
+            >
+              <span className="px-1 text-[11px] font-semibold" style={{ color: C.brandFg }}>
+                Design Annotation
+              </span>
+              <div className="flex items-center gap-1.5">
+                <span
+                  className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-medium"
+                  style={{ backgroundColor: C.brandBg, color: C.brandFgOn }}
+                >
+                  <NotePencil size={13} /> Region comment
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (typeof window !== "undefined") {
+                      window.dispatchEvent(new CustomEvent("fiber:new-page-annotation"));
+                    }
+                  }}
+                  className="rounded-full border border-solid px-2.5 py-1 text-[12px] font-medium"
+                  style={{ borderColor: C.border, color: C.textBody, backgroundColor: C.surface }}
+                >
+                  Page-level annotation
+                </button>
+              </div>
+              <span className="px-1 text-[11px]" style={{ color: C.textMuted }}>
+                Drag over an area to annotate. Esc to exit.
+              </span>
+            </div>
+          )}
+
           {/* Segmented button group (DS Button Group style). */}
           <div
             className="flex items-start rounded-[var(--old-radiuses-2,2px)] shadow-md"
@@ -1793,13 +1952,35 @@ export function PrototypeCollabOverlay({
               }}
             />
             <Segment
-              side="Right"
+              side="Mid"
               selected={commentMode}
-              overlap={false}
+              overlap
               icon={<ChatCircle size={16} />}
               label="Comments"
               ariaPressed={commentMode}
-              onClick={() => setCommentMode((v) => !v)}
+              onClick={() => {
+                setCommentMode((v) => {
+                  const next = !v;
+                  // Comment + annotation modes are mutually exclusive.
+                  if (next) setAnnotationMode(false);
+                  return next;
+                });
+              }}
+            />
+            <Segment
+              side="Right"
+              selected={annotationMode}
+              overlap={false}
+              icon={<NotePencil size={16} />}
+              label="Design Annotation"
+              ariaPressed={annotationMode}
+              onClick={() => {
+                setAnnotationMode((v) => {
+                  const next = !v;
+                  if (next) setCommentMode(false);
+                  return next;
+                });
+              }}
             />
           </div>
         </div>
@@ -1835,6 +2016,38 @@ export function PrototypeCollabOverlay({
                 setShowCommentsOpen(true);
               }}
             />
+
+            {/* Design Annotations section (spec §22). */}
+            <div
+              className="mt-2 border-t pt-[var(--spacing-200,16px)]"
+              style={{ borderColor: C.border }}
+            >
+              <h3
+                className="mb-2 text-[length:var(--body-md-medium-size,14px)] font-semibold"
+                style={{ color: C.textPrimary }}
+              >
+                Design Annotations
+              </h3>
+              <AnnotationsPanelBody
+                annotations={annotations}
+                onRowActivate={() => setOptionsOpen(false)}
+                onNewAnnotation={() => {
+                  setCommentMode(false);
+                  setAnnotationMode(true);
+                  setOptionsOpen(false);
+                }}
+                onNewPageLevel={() => {
+                  setCommentMode(false);
+                  setAnnotationMode(true);
+                  setOptionsOpen(false);
+                  if (typeof window !== "undefined") {
+                    window.setTimeout(() => {
+                      window.dispatchEvent(new CustomEvent("fiber:new-page-annotation"));
+                    }, 0);
+                  }
+                }}
+              />
+            </div>
           </div>
         </SidePanel>
 

@@ -18,12 +18,38 @@ import type {
   CommentAnchor,
   CommentAttachment,
 } from "@/lib/commentStore";
+import type {
+  DesignAnnotation,
+  AnnotationPatch,
+  NewAnnotationInput,
+} from "@/lib/annotationStore";
 
 export interface PrototypeCollabContextValue {
   prototype: Prototype;
   viewedVersion: PrototypeVersion;
   /** Whether comment mode is active (click-to-pin). */
   commentMode: boolean;
+  /** Whether Design Annotation mode is active (drag-to-select region). */
+  annotationMode: boolean;
+  /** Enter comment mode at a specific anchor (used by "Comment instead" §15). */
+  startCommentAt: (anchor: CommentAnchor) => void;
+  /** Design Annotations for the CURRENTLY VIEWED version (chronological). */
+  annotations: DesignAnnotation[];
+  /**
+   * Persist a new annotation against the viewed version. `region` is null for a
+   * page-level annotation. Returns the created annotation, or null on failure
+   * (e.g. localStorage quota).
+   */
+  addAnnotation: (
+    input: Omit<
+      NewAnnotationInput,
+      "prototypeId" | "versionId" | "versionName"
+    >,
+  ) => DesignAnnotation | null;
+  /** Patch an existing annotation (edit / move / resize / status). */
+  updateAnnotation: (id: string, patch: AnnotationPatch) => void;
+  /** Hard-delete an annotation. */
+  deleteAnnotation: (id: string) => void;
   /**
    * TOP-LEVEL comments for the CURRENTLY VIEWED version that have a valid
    * anchor. Includes soft-deleted ones (rendered as muted/ghost pins). Replies

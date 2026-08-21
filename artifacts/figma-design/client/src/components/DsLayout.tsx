@@ -103,7 +103,7 @@ export function DsLayout() {
     <div className={`flex min-h-full ${canvasBg}`}>
       {/* Desktop secondary component list column */}
       <aside
-        className={`sticky top-[57px] hidden h-[calc(100vh-57px)] w-56 shrink-0 border-r md:block ${borderToken}`}
+        className={`sticky top-[var(--ws-header-offset,57px)] hidden h-[calc(100vh-var(--ws-header-offset,57px))] w-56 shrink-0 border-r md:block ${borderToken}`}
       >
         <Sidebar activeSlug={page?.slug} />
       </aside>
@@ -125,7 +125,7 @@ export function DsLayout() {
       <div className="min-w-0 flex-1">
         {/* Mobile explorer bar to reach the component list */}
         <header
-          className={`sticky top-[57px] z-20 flex items-center gap-3 border-b px-4 py-3 md:hidden ${borderToken} ${surface}`}
+          className={`sticky top-[var(--ws-header-offset,57px)] z-20 flex items-center gap-3 border-b px-4 py-3 md:hidden ${borderToken} ${surface}`}
         >
           <button
             type="button"

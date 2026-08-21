@@ -11,10 +11,12 @@
  * Layout / spacing / typography-size classes stay as utilities.
  * ========================================================================= */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/lib/theme";
+import { useAutoHideHeader } from "@/hooks/useAutoHideHeader";
+import { HEADER_NAV, type HeaderNavItem } from "./headerNav";
 
 // Token-driven colors (var(--token, fallbackHex)) — flip with [data-theme].
 const C = {
@@ -26,46 +28,6 @@ const C = {
   brandFg: "var(--surface-foreground-dynamic-brand-default,#7c33b5)",
   hoverBg: "var(--container-dynamic-neutral-subtle-background-hover,#71718014)",
 };
-
-/** Module-switching nav links, shared across the whole workspace. */
-export interface HeaderNavItem {
-  href: string;
-  label: string;
-  /** Marks the link active for the current path. */
-  match: (path: string) => boolean;
-  /** Module not yet available — rendered inert with a "Coming soon" hint. */
-  comingSoon?: boolean;
-}
-
-export const HEADER_NAV: HeaderNavItem[] = [
-  {
-    href: "/design-system",
-    label: "Fiber Design System",
-    match: (p) => p === "/design-system" || p.startsWith("/design-system/"),
-  },
-  {
-    href: "/ai-prototype",
-    label: "AI Prototype",
-    match: (p) => p === "/ai-prototype" || p.startsWith("/ai-prototype/"),
-  },
-  {
-    href: "/screen-templates",
-    label: "Screen Templates",
-    match: (p) => p === "/screen-templates" || p.startsWith("/screen-templates/"),
-  },
-  {
-    href: "/flow-chart",
-    label: "Flow Chart",
-    match: (p) => p === "/flow-chart" || p.startsWith("/flow-chart/"),
-    comingSoon: true,
-  },
-  {
-    href: "/usability-testing",
-    label: "Usability Testing",
-    match: (p) => p === "/usability-testing" || p.startsWith("/usability-testing/"),
-    comingSoon: true,
-  },
-];
 
 /** MIQ Sigma lettermark, rendered from public assets. */
 export function Lettermark({ height = 24 }: { height?: number }) {
@@ -179,26 +141,100 @@ interface WorkspaceHeaderProps {
   showNav?: boolean;
 }
 
-/** The global workspace header. Logo always links back to the Welcome screen. */
+/**
+ * The global workspace header. Logo always links back to the Welcome screen.
+ *
+ * The header is auto-hiding (floating), not sticky: at the top of the page it
+ * sits in the normal document flow; once scrolled past it floats away and only
+ * reappears — as a fixed overlay — on hover (slim top-of-viewport zone or the
+ * header itself) or keyboard focus. See useAutoHideHeader.
+ */
 export function WorkspaceHeader({ showNav = true }: WorkspaceHeaderProps) {
+  // The header persists across navigations inside AppShell, so give the
+  // auto-hide hook the current location as a routeKey — it resets any remembered
+  // scroll state when the route changes so a previous page's scroll position
+  // cannot keep the header hidden on a page that renders at scroll top.
+  const [location] = useLocation();
+  const auto = useAutoHideHeader({ routeKey: location });
+  const floating = auto.mode === "floating";
+
+  // Publish the header's current in-flow offset so sticky descendants (e.g. the
+  // Design System sidebar) can sit directly under the header while it is at the
+  // top, and stick to the very top of the viewport once it floats away/hidden.
+  const headerOffset = floating ? 0 : auto.headerHeight;
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--ws-header-offset", `${headerOffset}px`);
+    return () => {
+      root.style.removeProperty("--ws-header-offset");
+    };
+  }, [headerOffset]);
+
+  // Spacer height that replaces the header once it floats out of flow.
+  //
+  // Two topologies, each jump-free WITHOUT any scroll compensation:
+  //  • Window-scroll pages: KEEP the spacer at the header height so the
+  //    document height is unchanged (no content jump). Sticky descendants still
+  //    reach the viewport top naturally once the page has scrolled past the
+  //    header, because --ws-header-offset is 0 while floating.
+  //  • Inner-scroll pages (the scrolling <main> is a sibling below the header):
+  //    COLLAPSE the spacer to 0 so <main> — and any sticky element inside it,
+  //    e.g. the Design System sidebar — rises to the very top of the viewport.
+  //    The inner scroll coordinate is independent of this layout change, so
+  //    nothing jumps.
+  const spacerHeight = floating
+    ? auto.windowScroller
+      ? auto.headerHeight
+      : 0
+    : 0;
+
   return (
-    <header
-      className="sticky top-0 z-30 flex items-center gap-3 border-b px-4 py-3 md:px-6"
-      style={{ backgroundColor: C.surface, borderColor: C.border }}
-    >
-      <Link href="/" aria-label="Go to Welcome" className="inline-flex shrink-0 items-center gap-2.5">
-        <Lettermark height={22} />
-        <span
-          className="hidden text-[15px] font-semibold lg:inline"
-          style={{ color: C.textPrimary }}
-        >
-          Fiber Workspace
-        </span>
-      </Link>
+    <>
+      {/* Slim invisible hover zone pinned to the top of the viewport. Only
+          matters while floating; it reveals the hidden header on hover. */}
+      {floating && (
+        <div
+          aria-hidden
+          className="fixed inset-x-0 top-0 z-40 h-4"
+          {...auto.hoverZoneHandlers}
+        />
+      )}
 
-      {showNav ? <ModuleNav /> : <div className="min-w-0 flex-1" />}
+      {/* In-flow spacer — see spacerHeight above. */}
+      {floating && spacerHeight > 0 && (
+        <div aria-hidden style={{ height: spacerHeight }} />
+      )}
 
-      <ThemeToggle />
-    </header>
+      <header
+        ref={auto.headerRef}
+        {...auto.headerHandlers}
+        className={`${
+          floating ? "fixed left-0 right-0 top-0 z-50" : "relative z-30"
+        } flex items-center gap-3 border-b px-4 py-3 transition-[transform,box-shadow] duration-200 ease-out md:px-6`}
+        style={{
+          backgroundColor: C.surface,
+          borderColor: C.border,
+          transform: `translateY(${auto.translateY})`,
+          boxShadow:
+            floating && auto.revealed
+              ? "0px 8px 24px var(--shadow-lvl4, rgba(113,113,128,0.12))"
+              : "none",
+        }}
+      >
+        <Link href="/" aria-label="Go to Welcome" className="inline-flex shrink-0 items-center gap-2.5">
+          <Lettermark height={22} />
+          <span
+            className="hidden text-[15px] font-semibold lg:inline"
+            style={{ color: C.textPrimary }}
+          >
+            Fiber Workspace
+          </span>
+        </Link>
+
+        {showNav ? <ModuleNav /> : <div className="min-w-0 flex-1" />}
+
+        <ThemeToggle />
+      </header>
+    </>
   );
 }

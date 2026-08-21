@@ -138,6 +138,11 @@ export const dsPages: DsPage[] = [
     component: lazy(() => import("@/pages/ds/MetricsPage")),
   },
   {
+    slug: "metrics-tile",
+    title: "Metrics Tile",
+    component: lazy(() => import("@/pages/ds/MetricsTilePage")),
+  },
+  {
     slug: "modals",
     title: "Modals",
     component: lazy(() => import("@/pages/ds/ModalsPage")),

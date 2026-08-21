@@ -1,0 +1,821 @@
+Task: Design Annotation — Region-based design feedback system
+
+Goal:
+Create a Design Annotation feature that allows me to give Replit
+high-level, region-based design feedback without having to comment on
+individual components one by one.
+
+The purpose is to communicate:
+- What needs to change
+- Which area of the design is affected
+- Whether the issue is related to the Fiber design system
+- Whether the issue is related to the product use case
+- Whether multiple elements should be changed consistently
+- What the intended design behaviour should be
+
+This feature should help me annotate an entire region and provide one
+clear instruction that Replit can use to make the required changes.
+
+==================================================
+1. CORE PROBLEM
+==================================================
+
+Replit may have access to the Fiber design system, but having access to a
+design system does not automatically mean Replit understands which
+component, pattern, state or interaction is appropriate for a specific
+product use case.
+
+For example:
+
+The design may use:
+- A dropdown where a segmented control is more appropriate
+- A generic card where a Fiber pattern should be used
+- An incorrect spacing/token combination
+- An inappropriate chart interaction
+- The wrong component state
+- A component that technically exists in Fiber but does not fit the use case
+- Different components that should follow one consistent pattern
+
+I need a way to communicate these problems at the DESIGN INTENT level.
+
+I should not have to identify and comment on every individual component.
+
+==================================================
+2. NEW FEATURE
+==================================================
+
+Add a feature called:
+
+"Design Annotation"
+
+This should be available beside the existing:
+
+- Comments
+- Other review/options controls
+
+Example toolbar:
+
+[ Comment ] [ Design Annotation ] [ Options ]
+
+Design Annotation should have its own active state.
+
+When activated, the interface enters:
+
+ANNOTATION MODE
+
+==================================================
+3. ANNOTATION MODE
+==================================================
+
+When I activate Design Annotation, show a small contextual toolbar:
+
+Design Annotation
+
+[ Region comment ]
+
+The primary mode is:
+
+REGION COMMENT
+
+Definition:
+
+"When you click and drag to select an area while leaving feedback."
+
+The user can click and drag over any part of the interface.
+
+The selected area should receive:
+- Highlighted border
+- Transparent overlay
+- Annotation number/id
+- Clear selection boundary
+
+Example:
+
+┌──────────────────────────────────────┐
+│ Selected region                     │
+│                                     │
+│   charts + filters + cards          │
+│                                     │
+└──────────────────────────────────────┘
+
+The selection should NOT modify the underlying design.
+
+==================================================
+4. REGION SELECTION
+==================================================
+
+Interaction:
+
+1. Click Design Annotation
+2. Select Region Comment
+3. Click and drag over the area
+4. Release
+5. Show annotation editor
+
+The selection can contain:
+
+- One component
+- Multiple components
+- A complete card
+- Multiple cards
+- A section
+- A chart
+- Filters
+- Navigation
+- A complete page region
+
+The user should NOT need to select every component individually.
+
+The selected region is the scope of the feedback.
+
+==================================================
+5. ANNOTATION EDITOR
+==================================================
+
+After selecting a region, open a contextual annotation panel.
+
+Panel title:
+
+"Design Annotation"
+
+Show:
+
+Selected area:
+[ Section / Region / Component count ]
+
+Then provide:
+
+"What needs to change?"
+
+Large text input.
+
+Placeholder:
+
+"Describe the design change you want..."
+
+Example:
+
+"Use the appropriate Fiber components for these filters. The current
+controls look inconsistent and are not suitable for this use case.
+Keep the existing hierarchy but replace the controls with the most
+appropriate Fiber pattern."
+
+==================================================
+6. ANNOTATION TYPE
+==================================================
+
+Provide an optional classification.
+
+Label:
+
+"Change type"
+
+Options:
+
+- Design system correction
+- Use-case correction
+- Layout correction
+- Interaction correction
+- Visual correction
+- Content correction
+- Accessibility correction
+- Other
+
+Allow:
+
+"Multiple"
+
+if more than one applies.
+
+Do NOT require the user to choose a category before submitting.
+
+The text feedback remains the primary source of intent.
+
+==================================================
+7. DESIGN SYSTEM CONTEXT
+==================================================
+
+Add an optional field:
+
+"Design system guidance"
+
+Options:
+
+[ Use Fiber component ]
+[ Follow Fiber pattern ]
+[ Use existing component if suitable ]
+[ Custom pattern required ]
+[ Not sure — determine the best option ]
+
+Default:
+
+"Not sure — determine the best option"
+
+This is important.
+
+The user should not need to know the exact Fiber component name.
+
+Replit should determine the most appropriate component based on:
+
+- Selected region
+- Existing implementation
+- Use case
+- User feedback
+- Fiber design system
+- Existing project patterns
+
+==================================================
+8. USE CASE CONTEXT
+==================================================
+
+Provide an optional input:
+
+"Why should this change?"
+
+Placeholder:
+
+"Explain the user or business need behind this change..."
+
+Example:
+
+"Users need to compare multiple audience segments quickly, so these
+controls should support fast switching rather than opening a dropdown."
+
+This separates:
+
+WHAT should change
+
+from:
+
+WHY it should change.
+
+==================================================
+9. BATCH CHANGE INTENT
+==================================================
+
+This is a critical feature.
+
+The annotation must support feedback that applies to MULTIPLE elements
+inside the selected region.
+
+Example:
+
+"Apply the same spacing and component treatment to all controls in this
+section."
+
+or:
+
+"All cards in this region should follow the same Fiber card pattern."
+
+or:
+
+"Replace these individual dropdowns with a consistent filter pattern."
+
+Replit must interpret the annotation as a REGIONAL DESIGN INSTRUCTION,
+not as a request to modify only one element.
+
+==================================================
+10. APPLY SCOPE
+==================================================
+
+After entering feedback, show:
+
+"Apply change to"
+
+Options:
+
+○ Selected region only
+○ Similar elements in this section
+○ All matching elements on this page
+○ All matching elements across the prototype
+
+Default:
+
+Selected region only
+
+This prevents accidental global changes.
+
+If the user chooses a broader scope, clearly communicate the impact.
+
+==================================================
+11. ANNOTATION SUMMARY
+==================================================
+
+Before submitting, generate a compact summary.
+
+Example:
+
+DESIGN ANNOTATION #04
+
+Area:
+Audience filters
+
+Change:
+Replace the current controls with the appropriate Fiber filter pattern.
+
+Reason:
+The current controls are difficult to scan and do not support the
+audience-selection use case efficiently.
+
+Design system:
+Use Fiber components/patterns where suitable.
+
+Scope:
+Selected section
+
+[ Cancel ] [ Submit Annotation ]
+
+This summary is what Replit should use as the implementation instruction.
+
+==================================================
+12. AFTER SUBMISSION
+==================================================
+
+After submitting:
+
+- Keep the highlighted region visible
+- Add annotation marker
+- Show annotation number
+- Store annotation text
+- Show status
+
+Status options:
+
+[ Open ]
+[ In progress ]
+[ Applied ]
+[ Needs review ]
+[ Resolved ]
+
+The annotation should remain connected to the selected region.
+
+==================================================
+13. ANNOTATION MARKERS
+==================================================
+
+Use numbered markers:
+
+01
+02
+03
+
+Place the marker near the selected region.
+
+Clicking the marker opens the annotation.
+
+Example:
+
+        04
+        ●
+┌───────────────────────┐
+│ Selected region       │
+└───────────────────────┘
+
+Markers should not interfere with the actual UI.
+
+==================================================
+14. COMMENTS VS DESIGN ANNOTATION
+==================================================
+
+Do NOT merge these two concepts.
+
+COMMENT:
+
+Used for:
+- Questions
+- Small corrections
+- General feedback
+- Discussion
+- Specific observations
+
+DESIGN ANNOTATION:
+
+Used for:
+- Regional changes
+- Multiple-component changes
+- Design-system corrections
+- Use-case corrections
+- Layout changes
+- Interaction changes
+- Consistency improvements
+- Batch design instructions
+
+Example:
+
+Comment:
+"Change this button label."
+
+Design Annotation:
+"Review all actions in this section and use the appropriate Fiber button
+hierarchy and states consistently."
+
+==================================================
+15. QUICK ACTION
+==================================================
+
+When the user selects a region, provide contextual actions:
+
+[ Comment ]
+[ Design Annotation ]
+
+If the user chooses Comment:
+open the existing comment flow.
+
+If the user chooses Design Annotation:
+open the annotation editor.
+
+Do not make the user navigate to another page.
+
+==================================================
+16. EDITING AN ANNOTATION
+==================================================
+
+Allow users to:
+
+- Edit annotation
+- Resize selection
+- Move selection
+- Change category
+- Change scope
+- Delete annotation
+- Resolve annotation
+- Reopen annotation
+
+When resizing the selection, update the annotation scope.
+
+==================================================
+17. MULTIPLE ANNOTATIONS
+==================================================
+
+The page may contain multiple annotations.
+
+Example:
+
+Annotation 01
+Header/filter issue
+
+Annotation 02
+Chart interaction issue
+
+Annotation 03
+Card consistency issue
+
+Annotation 04
+Temporal insights layout issue
+
+Do not combine unrelated annotations automatically.
+
+Each annotation should have its own:
+- Region
+- Feedback
+- Scope
+- Status
+- Timestamp
+- Author
+
+==================================================
+18. DESIGN SYSTEM INTELLIGENCE
+==================================================
+
+The purpose of this feature is NOT to force the user to know Fiber's
+component names.
+
+If the user says:
+
+"This should be a better filter pattern."
+
+Replit should inspect the Fiber design system and determine the most
+appropriate available pattern.
+
+If the user says:
+
+"This doesn't work for the use case."
+
+Replit should prioritize the stated use case over blindly preserving the
+existing component.
+
+The system should distinguish between:
+
+1. Existing component is correct
+2. Existing component is incorrect
+3. Existing component is technically valid but inappropriate for this
+   use case
+4. Fiber does not provide a suitable component
+5. A custom component is required
+
+If Fiber does not provide a suitable pattern:
+create a custom solution that follows Fiber's visual language.
+
+Do not force-fit an unsuitable Fiber component.
+
+==================================================
+19. AI INTERPRETATION
+==================================================
+
+When an annotation is submitted, the implementation agent should interpret:
+
+- Selected region
+- Existing components
+- Design system
+- User feedback
+- Change type
+- Use-case explanation
+- Apply scope
+
+Then produce an implementation plan.
+
+Example:
+
+ANNOTATION:
+
+"These three controls feel inconsistent. They should work as one filter
+group and users need to switch between them quickly."
+
+AI interpretation:
+
+- Identify three existing controls
+- Identify current component types
+- Check Fiber filter patterns
+- Determine whether segmented control/tabs/filter group is more suitable
+- Preserve current information hierarchy
+- Apply consistent spacing
+- Preserve existing data behaviour
+- Update all three controls as one interaction group
+
+Do NOT immediately modify unrelated areas.
+
+==================================================
+20. BEFORE APPLYING CHANGES
+==================================================
+
+For significant annotations, show:
+
+"Proposed changes"
+
+1. Replace current filter controls
+2. Apply Fiber filter pattern
+3. Maintain existing labels
+4. Preserve selected state
+5. Maintain existing data behaviour
+6. Apply consistent spacing
+
+Then:
+
+[ Apply changes ]
+
+This creates a safe review step.
+
+For small changes, the system may apply directly.
+
+==================================================
+21. GLOBAL DESIGN ANNOTATION
+==================================================
+
+In addition to Region Comment, provide an optional:
+
+"Page-level annotation"
+
+This is for feedback that applies to the overall design.
+
+Example:
+
+"The entire dashboard needs stronger Fiber design-system consistency.
+Review spacing, typography, controls, cards and chart treatments
+throughout the page."
+
+This should not require selecting a region.
+
+However:
+
+Do not make Page-level Annotation the default.
+
+Region Comment is the primary workflow.
+
+==================================================
+22. ANNOTATION PANEL
+==================================================
+
+Provide an annotation panel accessible from the existing review/comment
+area.
+
+Panel structure:
+
+DESIGN ANNOTATIONS
+
+[ + New annotation ]
+
+Filters:
+All | Open | In progress | Applied | Resolved
+
+List:
+
+#04
+Audience filters
+Design system correction
+Open
+
+#03
+Temporal insights
+Use-case correction
+Applied
+
+#02
+Charts
+Visual correction
+Needs review
+
+Clicking an annotation:
+- Focuses the selected region
+- Opens annotation details
+- Shows feedback
+- Shows status
+- Shows proposed/applied changes
+
+==================================================
+23. VISUAL DESIGN
+==================================================
+
+The Design Annotation UI itself must use the existing Fiber design system.
+
+Use Fiber for:
+
+- Buttons
+- Inputs
+- Dropdowns
+- Tabs
+- Status
+- Typography
+- Spacing
+- Panels
+- Tooltips
+- Icons
+
+For annotation overlays and region selection:
+
+Create custom interaction styles if required.
+
+But the annotation UI must visually belong to the Fiber system.
+
+Use design-system colour tokens.
+
+Do not introduce random colours.
+
+The selected region should be visually obvious without obscuring the
+underlying design.
+
+==================================================
+24. IMPORTANT UX PRINCIPLE
+==================================================
+
+The user should be able to complete this workflow in seconds:
+
+Design Annotation
+↓
+Region Comment
+↓
+Drag over region
+↓
+Describe overall problem
+↓
+Select optional change type
+↓
+Select optional scope
+↓
+Submit
+
+The user should NOT have to:
+
+- Click every component
+- Create separate comments for every component
+- Know Fiber component names
+- Explain technical implementation details
+- Navigate away from the design
+- Manually specify every CSS change
+
+The purpose is to communicate DESIGN INTENT.
+
+==================================================
+25. EXAMPLE USE CASES
+==================================================
+
+Example 1:
+
+Selected region:
+Global filters
+
+Feedback:
+"These filters are too fragmented. Use a consistent Fiber filter pattern
+that allows users to scan and change audience criteria quickly."
+
+Expected:
+Replit reviews the entire selected filter region and proposes a
+consistent Fiber-based solution.
+
+--------------------------------------------------
+
+Example 2:
+
+Selected region:
+Three dashboard cards
+
+Feedback:
+"These cards should use the same Fiber card structure, spacing and
+hierarchy. Apply the same pattern consistently across this section."
+
+Expected:
+All selected cards are treated as one design-system correction.
+
+--------------------------------------------------
+
+Example 3:
+
+Selected region:
+Chart area
+
+Feedback:
+"The chart is technically correct but doesn't support the user's need to
+compare viewing time and share. Keep the data but change the visualisation
+to a combination chart that communicates both metrics."
+
+Expected:
+Replit understands this as a use-case/data-visualisation correction.
+
+--------------------------------------------------
+
+Example 4:
+
+Selected region:
+Temporal Insights
+
+Feedback:
+"The heatmap is useful, but the controls should make it easier to switch
+between Linear, Streaming and FAST without opening multiple dropdowns."
+
+Expected:
+Replit evaluates the interaction pattern and proposes an appropriate
+Fiber-compatible solution.
+
+==================================================
+26. DO NOT
+==================================================
+
+Do NOT:
+
+- Treat Design Annotation as a normal comment
+- Require one annotation per component
+- Force users to know Fiber component names
+- Automatically modify the entire page
+- Change unrelated components
+- Invent new product requirements
+- Replace the wireframe information architecture
+- Ignore the user's stated use case
+- Force an unsuitable Fiber component
+- Introduce arbitrary colours
+- Create a completely new annotation visual language
+- Apply global changes without showing scope
+- Turn every annotation into a technical instruction
+
+==================================================
+27. SUCCESS CRITERIA
+==================================================
+
+The feature is successful when I can:
+
+1. Click Design Annotation beside Comments/Options.
+2. Enter Region Comment mode.
+3. Drag over a region of the design.
+4. Highlight that region.
+5. Explain the overall design problem in one input.
+6. Optionally identify the change type.
+7. Explain the use case.
+8. Ask Replit to determine the appropriate Fiber component/pattern.
+9. Define how broadly the change should apply.
+10. Submit the annotation.
+11. See the annotation marker on the design.
+12. Open and edit the annotation later.
+13. Review Replit's proposed changes.
+14. Apply the changes without manually editing every component.
+
+The key outcome:
+
+ONE ANNOTATION SHOULD BE CAPABLE OF COMMUNICATING A
+MULTI-ELEMENT DESIGN CHANGE.
+
+The system should help translate:
+
+DESIGNER INTENT
+        ↓
+SELECTED REGION
+        ↓
+DESIGN FEEDBACK
+        ↓
+USE-CASE CONTEXT
+        ↓
+FIBER DESIGN-SYSTEM EVALUATION
+        ↓
+PROPOSED DESIGN CHANGE
+        ↓
+IMPLEMENTATION
+
+Do not reduce this feature to a simple comment-with-a-rectangle.
+It is a structured design-feedback and design-system guidance workflow.

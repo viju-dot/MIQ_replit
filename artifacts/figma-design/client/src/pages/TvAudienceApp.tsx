@@ -19,12 +19,14 @@ import { useState, useEffect } from "react";
 import { Moon, Sun } from "lucide-react";
 import { Translate, CaretDown } from "@phosphor-icons/react";
 import { useTheme } from "@/lib/theme";
+import { useAutoHideHeader } from "@/hooks/useAutoHideHeader";
 import TvAudienceDashboardPage from "@/pages/ds/TvAudienceDashboardPage";
 import V3ContentPlanner from "@/pages/tv-audience/v3/V3ContentPlanner";
 import V4ContentPlanner from "@/pages/tv-audience/v4/V4ContentPlanner";
 import {
   PrototypeCollabOverlay,
   PrototypeCommentLayer,
+  DesignAnnotationLayer,
 } from "@/components/PrototypeCollabOverlay";
 import { usePrototypeVersion } from "@/lib/prototypeVersionContext";
 import type { PrototypeVersion, Prototype } from "@/lib/prototypeStore";
@@ -531,20 +533,68 @@ function PrototypeContentRegion() {
       {/* Figma-style comment layer — markers + click-capture, scoped to this
           canvas. Renders nothing without collab context (e.g. /share). */}
       <PrototypeCommentLayer />
+
+      {/* Design Annotation layer — region drag-capture, region overlays +
+          numbered markers, editor/details, scoped to this same canvas. Renders
+          nothing without collab context (e.g. /share). */}
+      <DesignAnnotationLayer />
     </main>
   );
 }
 
 /** The full prototype experience (header + version strip + body). Rendered as
- *  the overlay's children so it is re-mounted when the viewed version changes. */
+ *  the overlay's children so it is re-mounted when the viewed version changes.
+ *
+ *  The Fiber navigation header is auto-hiding (floating), not sticky: at the
+ *  top of the page it sits in flow; once scrolled past it floats away and only
+ *  reappears on hover (slim top zone or the header) or keyboard focus.
+ *
+ *  The V4/V3 sticky filter bars read --tv-filter-top to sit below the header.
+ *  When the header floats away, that offset becomes 0 so the filters stick to
+ *  the very top of the viewport; when scrolled back to the top it restores to
+ *  the header height. The floating header uses a higher z-index than the stuck
+ *  filter bar (z-40), so a revealed header overlays it without pushing content. */
 function TvAudienceExperience() {
+  const auto = useAutoHideHeader();
+  const floating = auto.mode === "floating";
+  // At top → filters offset by header height; floating/hidden → offset 0.
+  const filterTop = floating ? 0 : auto.headerHeight || HEADER_H;
+
   return (
     <div
       className="flex min-h-screen flex-col bg-[var(--surface-background-lvl2,#f7f7fa)]"
-      style={{ fontFamily: FONT, ["--tv-filter-top" as string]: `${HEADER_H}px` }}
+      style={{ fontFamily: FONT, ["--tv-filter-top" as string]: `${filterTop}px` }}
     >
-      {/* Full-width sticky Fiber navigation header */}
-      <header className="sticky top-0 z-50 w-full">
+      {/* Slim invisible hover zone pinned to the top of the viewport. Only
+          matters while floating; it reveals the hidden header on hover. */}
+      {floating && (
+        <div
+          aria-hidden
+          className="fixed inset-x-0 top-0 z-[60] h-4"
+          {...auto.hoverZoneHandlers}
+        />
+      )}
+
+      {/* In-flow spacer. On window-scroll (this page) keep the header height so
+          the document does not jump; on an inner-scroll topology collapse it to
+          0 so content can reach the viewport top. */}
+      {floating && auto.windowScroller && auto.headerHeight > 0 && (
+        <div aria-hidden style={{ height: auto.headerHeight }} />
+      )}
+
+      {/* Full-width auto-hiding Fiber navigation header */}
+      <header
+        ref={auto.headerRef}
+        {...auto.headerHandlers}
+        className={`${floating ? "fixed left-0 right-0 top-0 z-[70]" : "relative z-50"} w-full transition-transform duration-200 ease-out`}
+        style={{
+          transform: `translateY(${auto.translateY})`,
+          boxShadow:
+            floating && auto.revealed
+              ? "0px 8px 24px var(--shadow-lvl4, rgba(113,113,128,0.12))"
+              : "none",
+        }}
+      >
         <PrimaryNavigation />
         <SecondaryNavigation />
         {/* Version-context strip lives directly under the prototype's own nav. */}
