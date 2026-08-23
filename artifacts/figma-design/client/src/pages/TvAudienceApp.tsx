@@ -376,7 +376,7 @@ function PrototypeContentRegion() {
   return (
     // <main> is the positioned canvas. The dashboard's own filter bar padding
     // uses -mx-6 / -mx-10, so mirror that px-6 / px-10 here.
-    <main className="relative mx-auto w-full max-w-[1440px] px-6 pt-16 pb-8 md:px-10">
+    <main className="relative mx-auto w-full max-w-[1440px] px-6 pt-24 pb-8 md:px-10">
       {/* Prototype body — imported, not duplicated. Wrapped so inert styling
           applies only to the body, never to the comment layer sibling. */}
       <div
