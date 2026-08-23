@@ -26,7 +26,7 @@
  * ========================================================================= */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MagnifyingGlass, Info } from "@phosphor-icons/react";
+import { Info } from "@phosphor-icons/react";
 import { MetricsTile } from "@/components/ds/MetricsTile";
 import {
   FONT,
@@ -34,7 +34,6 @@ import {
   TITLE,
   MUTED,
   BODY2,
-  CARD_BG,
   SURFACE2,
   SUCCESS_FG,
   ERROR_FG,
@@ -177,7 +176,6 @@ export default function V4ContentPlanner() {
   const [topN, setTopN] = useState("10");
   const [showsFilter, setShowsFilter] = useState("all");
   const [trendsWeeks, setTrendsWeeks] = useState("wow30");
-  const [showSearch, setShowSearch] = useState("");
   // §7 Temporal controls.
   const [temporalTab, setTemporalTab] = useState("Linear TV");
   const [temporalChannel, setTemporalChannel] = useState("All");
@@ -371,12 +369,10 @@ export default function V4ContentPlanner() {
   }, [shows]);
 
   const filteredShows = useMemo(() => {
-    const q = showSearch.trim().toLowerCase();
     let base = shows;
     if (showsFilter !== "all") base = base.filter((s) => s.genre === showsFilter);
-    if (q) base = base.filter((s) => s.title.toLowerCase().includes(q));
     return base.slice(0, Number(topN));
-  }, [shows, showSearch, showsFilter, topN]);
+  }, [shows, showsFilter, topN]);
 
   /* ---- §7 Temporal heatmap ---- */
   const temporalChannelOptions = useMemo(() => {
@@ -712,29 +708,11 @@ export default function V4ContentPlanner() {
         {/* Controls visually attached to the chart */}
         <div className="mb-[var(--spacing-150,12px)] flex flex-wrap items-center justify-between gap-[var(--spacing-100,8px)]">
           {trendsView === "Shows" ? (
-            <>
-              {/* Compact search remains left; every show filter is grouped right. */}
-              <div
-                className="flex h-[28px] items-center gap-[var(--spacing-75,6px)] rounded-[var(--radius-50,4px)] px-[var(--spacing-75,6px)]"
-                style={{ backgroundColor: CARD_BG, border: `1px solid ${GRID}` }}
-              >
-                <MagnifyingGlass size={14} color={MUTED} aria-hidden />
-                <input
-                  type="text"
-                  value={showSearch}
-                  onChange={(e) => setShowSearch(e.target.value)}
-                  placeholder="Search shows…"
-                  aria-label="Search top indexing shows"
-                  className="w-[150px] bg-transparent text-[length:var(--body-sm-regular-size,12px)] outline-none"
-                  style={{ fontFamily: FONT, color: TITLE }}
-                />
-              </div>
-              <div className="ml-auto flex flex-wrap items-center justify-end gap-[var(--spacing-100,8px)]">
-                <SearchableDropdown id="v4-topn" label="" value={topN} options={TOP_N} onChange={setTopN} compact />
-                <SearchableDropdown id="v4-showsfilter" label="" value={showsFilter} options={showFilterOptions} onChange={setShowsFilter} compact />
-                <SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} compact />
-              </div>
-            </>
+            <div className="ml-auto flex flex-wrap items-center justify-end gap-[var(--spacing-100,8px)]">
+              <SearchableDropdown id="v4-topn" label="" value={topN} options={TOP_N} onChange={setTopN} compact />
+              <SearchableDropdown id="v4-showsfilter" label="" value={showsFilter} options={showFilterOptions} onChange={setShowsFilter} compact />
+              <SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} compact />
+            </div>
           ) : (
             <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ color: MUTED }}>
               Click a genre to set the Cultural Affinity anchor and Shows drilldown.
@@ -746,24 +724,41 @@ export default function V4ContentPlanner() {
           empty={empty || (trendsView === "Shows" && filteredShows.length === 0)}
           height={340}
           emptyTitle="No shows match"
-          emptyMessage="No shows match your search / filters — clear the search or change the genre filter."
+          emptyMessage="No shows match these filters — change the genre filter or viewing scope."
         >
           {trendsView === "Shows" ? (
-            <ComboChart
-              categories={filteredShows.map((show) => show.title)}
-              categoryDetails={filteredShows.map((show) => show.network)}
-              bars={filteredShows.map((show) => show.mins)}
-              secondaryBars={filteredShows.map((show) => show.hhPct)}
-              line={filteredShows.map((show) => show.index)}
-              barLabel="Avg min / household"
-              secondaryBarLabel="Households"
-              lineLabel="Index"
-              barAxisLabel="Avg min / HH"
-              secondaryBarAxisLabel="HH households (%)"
-              lineAxisLabel="Index"
-              barUnit=" min"
-              secondaryBarUnit="%"
-            />
+            <div
+              className="w-full overflow-x-auto pb-[var(--spacing-100,8px)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+              style={{ scrollbarGutter: "stable", color: BODY2 }}
+              tabIndex={0}
+              role="region"
+              aria-label={`Top ${filteredShows.length} shows chart. Scroll horizontally to view all shows.`}
+            >
+              <div
+                style={{
+                  minWidth:
+                    filteredShows.length > 10
+                      ? `${filteredShows.length * 64 + 180}px`
+                      : "100%",
+                }}
+              >
+                <ComboChart
+                  categories={filteredShows.map((show) => show.title)}
+                  categoryDetails={filteredShows.map((show) => show.network)}
+                  bars={filteredShows.map((show) => show.mins)}
+                  secondaryBars={filteredShows.map((show) => show.hhPct)}
+                  line={filteredShows.map((show) => show.index)}
+                  barLabel="Avg min / household"
+                  secondaryBarLabel="Households"
+                  lineLabel="Index"
+                  barAxisLabel="Avg min / HH"
+                  secondaryBarAxisLabel="HH households (%)"
+                  lineAxisLabel="Index"
+                  barUnit=" min"
+                  secondaryBarUnit="%"
+                />
+              </div>
+            </div>
           ) : (
             <GenreBars
               data={genres}
@@ -778,6 +773,25 @@ export default function V4ContentPlanner() {
       </SmartCard>
 
       {/* 7 — Temporal Insights */}
+      <div
+        className="flex flex-wrap items-center justify-between gap-[var(--spacing-100,8px)]"
+        data-annotate="Temporal insights filters"
+      >
+        {/* Global viewing environment sits above/outside the card, matching the
+            control hierarchy used above Consumption by Type & Time Spent. */}
+        <EnvControl value={env} onChange={setEnv} />
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-[var(--spacing-100,8px)]">
+          <SearchableDropdown
+            id="v4-temporal-channel"
+            label=""
+            value={temporalChannel}
+            options={temporalChannelOptions}
+            onChange={setTemporalChannel}
+            compact
+          />
+          <SearchableDropdown id="v4-temporal-weeks" label="" value={temporalWeeks} options={LOOKBACK} onChange={setTemporalWeeks} compact />
+        </div>
+      </div>
       <SmartCard
         title="Temporal Insights"
         subtitle={
@@ -786,31 +800,14 @@ export default function V4ContentPlanner() {
         }
         ariaLabel="Temporal insights"
       >
-        {/* Heading first, then one coherent hierarchy row: environment + TV type. */}
-        <div
-          className="mb-[var(--spacing-150,12px)] flex flex-wrap items-center gap-[var(--spacing-200,16px)]"
-          data-annotate="Temporal insights filters"
-        >
-          {/* Same GLOBAL environment state (not a duplicate concept). */}
-          <EnvControl value={env} onChange={setEnv} />
+        {/* TV type remains the first in-card hierarchy row beneath the heading. */}
+        <div className="mb-[var(--spacing-150,12px)] flex flex-wrap items-center gap-[var(--spacing-200,16px)]">
           <TabsBarUnderline
             options={TAB_LABELS}
             value={temporalTab}
             onChange={setTemporalTab}
             ariaLabel="Temporal TV type"
           />
-        </div>
-        <div className="mb-[var(--spacing-150,12px)] flex flex-wrap items-center justify-between gap-[var(--spacing-100,8px)]">
-          <SearchableDropdown
-            id="v4-temporal-channel"
-            label=""
-            value={temporalChannel}
-            options={temporalChannelOptions}
-            onChange={setTemporalChannel}
-          />
-          <div className="ml-auto flex items-center justify-end">
-            <SearchableDropdown id="v4-temporal-weeks" label="" value={temporalWeeks} options={LOOKBACK} onChange={setTemporalWeeks} compact />
-          </div>
         </div>
         <CardBody
           loading={loading}
