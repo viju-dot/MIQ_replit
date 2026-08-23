@@ -796,25 +796,23 @@ export function TemporalHeatmap({
 
 /* ============================================= Cultural affinity radar ===== */
 
-/* Custom radar/star diagram: anchor genre + top over-indexing genres on axes,
- * with a 100 = national-average baseline ring. */
+/* Eight-parameter radar with a readable numeric ring scale and accessible
+ * parameter controls rendered directly on the label/vertex groups. */
 export function RadarChart({
   data,
-  anchor,
   selected,
   onSelect,
 }: {
   data: { name: string; index: number }[];
-  anchor: string;
-  selected: string | null;
+  selected: string;
   onSelect: (g: string) => void;
 }) {
   const [hover, setHover] = useState<string | null>(null);
-  const size = 300;
+  const size = 320;
   const cx = size / 2;
   const cy = size / 2;
   const rMax = 118;
-  const maxIndex = Math.max(...data.map((d) => d.index), 160);
+  const maxIndex = 200;
   const baseIndexR = (100 / maxIndex) * rMax;
   const n = data.length;
   const angle = (i: number) => (Math.PI * 2 * i) / n - Math.PI / 2;
@@ -829,25 +827,113 @@ export function RadarChart({
       return `${p.x.toFixed(1)},${p.y.toFixed(1)}`;
     })
     .join(" ");
+  const ringFractions = [0.25, 0.5, 0.75, 1];
 
   return (
     <div className="flex flex-col items-center gap-[var(--spacing-100,8px)]">
       <div className="relative" style={{ width: size, height: size }}>
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={`Cultural affinity radar anchored to ${anchor}; baseline ring = national average (index 100)`}>
-          {/* Reference rings */}
-          {[0.5, 0.75, 1].map((f) => (
-            <circle key={f} cx={cx} cy={cy} r={rMax * f} fill="none" stroke={CHART.grid} strokeWidth={1} />
+        <svg
+          width={size}
+          height={size}
+          viewBox={`0 0 ${size} ${size}`}
+          role="group"
+          aria-label="Cultural affinity radar. Scale zero to 200; national baseline is 100. Select a parameter for details."
+        >
+          {/* Reference rings + values along the top spoke. */}
+          {ringFractions.map((f) => (
+            <circle key={f} cx={cx} cy={cy} r={rMax * f} fill="none" stroke={CHART.grid} strokeWidth={1} pointerEvents="none" />
+          ))}
+          {ringFractions.map((f) => (
+            <text
+              key={`scale-${f}`}
+              x={cx + 4}
+              y={cy - rMax * f + 11}
+              textAnchor="start"
+              pointerEvents="none"
+              style={{
+                fontFamily: FONT,
+                fontSize: 10,
+                fontWeight: 500,
+                fill: AXIS_LABEL,
+              }}
+            >
+              {Math.round(maxIndex * f)}
+            </text>
           ))}
           {/* Baseline (index 100) ring emphasised */}
-          <circle cx={cx} cy={cy} r={baseIndexR} fill="none" stroke={CHART.baseline} strokeWidth={1.5} strokeDasharray="4 4" />
-          {/* Axes + labels */}
+          <circle cx={cx} cy={cy} r={baseIndexR} fill="none" stroke={CHART.baseline} strokeWidth={1.5} strokeDasharray="4 4" pointerEvents="none" />
+          {/* Axes */}
           {data.map((d, i) => {
             const outer = point(i, rMax);
-            const lbl = point(i, rMax + 14);
-            const isSel = selected === d.name || anchor === d.name;
             return (
-              <g key={d.name}>
+              <g key={`axis-${d.name}`} pointerEvents="none">
                 <line x1={cx} y1={cy} x2={outer.x} y2={outer.y} stroke={CHART.grid} strokeWidth={1} />
+              </g>
+            );
+          })}
+          {/* Data polygon */}
+          <polygon points={polyPts} fill={CHART.primary} fillOpacity={0.18} stroke={CHART.primary} strokeWidth={2} strokeLinejoin="round" pointerEvents="none" />
+          {/* Each label + vertex is one keyboard-operable selection control. */}
+          {data.map((d, i) => {
+            const rr = (d.index / maxIndex) * rMax;
+            const p = point(i, rr);
+            const lbl = point(i, rMax + 18);
+            const isSel = selected === d.name;
+            const labelWidth = Math.max(28, d.name.length * 6.2);
+            const labelLeft =
+              lbl.x > cx + 4
+                ? lbl.x
+                : lbl.x < cx - 4
+                  ? lbl.x - labelWidth
+                  : lbl.x - labelWidth / 2;
+            const labelRight = labelLeft + labelWidth;
+            const hitLeft = Math.min(p.x - 12, labelLeft - 4);
+            const hitRight = Math.max(p.x + 12, labelRight + 4);
+            const hitTop = Math.min(p.y - 12, lbl.y - 10);
+            const hitBottom = Math.max(p.y + 12, lbl.y + 10);
+            return (
+              <g
+                key={d.name}
+                role="button"
+                tabIndex={0}
+                aria-pressed={isSel}
+                aria-label={`${d.name}: ${d.index}, ${indexExplanation(d.index)}. Select for details.`}
+                onClick={() => onSelect(d.name)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelect(d.name);
+                  }
+                }}
+                onMouseEnter={() => setHover(d.name)}
+                onMouseLeave={() => setHover(null)}
+                onFocus={() => setHover(d.name)}
+                onBlur={() => setHover(null)}
+                pointerEvents="all"
+                style={{ cursor: "pointer" }}
+              >
+                <title>{`${d.name}: ${d.index}, ${indexExplanation(d.index)}`}</title>
+                {/* One continuous transparent hit target joins the vertex and
+                    label. It also makes the SVG group's computed click box
+                    genuinely clickable at its center (not just on painted
+                    glyphs), which is important for pointer and E2E activation. */}
+                <rect
+                  x={hitLeft}
+                  y={hitTop}
+                  width={hitRight - hitLeft}
+                  height={hitBottom - hitTop}
+                  fill="transparent"
+                  pointerEvents="all"
+                />
+                <circle cx={p.x} cy={p.y} r={11} fill="transparent" />
+                <circle
+                  cx={p.x}
+                  cy={p.y}
+                  r={isSel || hover === d.name ? 6 : 4}
+                  fill={isSel ? CHART.selected : CHART.primary}
+                  stroke="var(--surface-background-lvl1, #ffffff)"
+                  strokeWidth={1.5}
+                />
                 <text
                   x={lbl.x}
                   y={lbl.y}
@@ -855,7 +941,7 @@ export function RadarChart({
                   dominantBaseline="middle"
                   style={{
                     fontFamily: FONT,
-                    fontSize: 11,
+                    fontSize: 10,
                     fontWeight: isSel ? 700 : 500,
                     fill: isSel ? CHART.selected : AXIS_LABEL,
                   }}
@@ -865,51 +951,10 @@ export function RadarChart({
               </g>
             );
           })}
-          {/* Data polygon */}
-          <polygon points={polyPts} fill={CHART.primary} fillOpacity={0.18} stroke={CHART.primary} strokeWidth={2} strokeLinejoin="round" />
-          {/* Vertices (clickable) */}
-          {data.map((d, i) => {
-            const rr = (d.index / maxIndex) * rMax;
-            const p = point(i, rr);
-            const isSel = selected === d.name;
-            return (
-              <circle
-                key={d.name}
-                cx={p.x}
-                cy={p.y}
-                r={isSel || hover === d.name ? 6 : 4}
-                fill={isSel ? CHART.selected : CHART.primary}
-                stroke="var(--surface-background-lvl1, #ffffff)"
-                strokeWidth={1.5}
-              />
-            );
-          })}
         </svg>
-        {/* Clickable overlay hotspots for each vertex (keyboard + tooltip). */}
-        {data.map((d, i) => {
-          const rr = (d.index / maxIndex) * rMax;
-          const p = point(i, rr);
-          return (
-            <button
-              key={d.name}
-              type="button"
-              onClick={() => onSelect(d.name)}
-              onMouseEnter={() => setHover(d.name)}
-              onMouseLeave={() => setHover(null)}
-              onFocus={() => setHover(d.name)}
-              onBlur={() => setHover(null)}
-              aria-pressed={selected === d.name}
-              aria-label={`${d.name}: index ${d.index} — ${indexExplanation(d.index)}. Click to reveal its top indexing shows.`}
-              className="absolute h-[22px] w-[22px] -translate-x-1/2 -translate-y-1/2 rounded-full focus:outline-none focus-visible:ring-2"
-              style={{ left: p.x, top: p.y, backgroundColor: "transparent" }}
-            >
-              {hover === d.name && <Tooltip lines={[{ label: d.name }, { label: "Index", value: `${d.index}` }, { label: "vs national avg", value: indexExplanation(d.index) }]} />}
-            </button>
-          );
-        })}
       </div>
       <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ color: MUTED }}>
-        Dashed ring = national average (index 100). Click a genre to reveal its top shows.
+        Dashed ring = national average (100). Select a parameter to view its details.
       </span>
     </div>
   );

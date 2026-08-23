@@ -91,11 +91,21 @@ import {
   GenreBars,
   TemporalHeatmap,
   RadarChart,
-  AffinityList,
   MigrationSankey,
 } from "./charts";
 
 const TAB_LABELS = TV_TABS.map((t) => t.label); // ["Linear TV","Streaming","Fast"]
+
+const AFFINITY_PARAMETERS = [
+  { name: "FOOD", sourceGenre: "Food", baseline: 118 },
+  { name: "TRAVEL", sourceGenre: "Travel", baseline: 132 },
+  { name: "COMEDY", sourceGenre: "Comedy", baseline: 145 },
+  { name: "DOCUMENTARY", sourceGenre: "Documentary", baseline: 124 },
+  { name: "NEWS", sourceGenre: "News", baseline: 108 },
+  { name: "MUSIC", sourceGenre: "Reality", baseline: 137 },
+  { name: "LIFESTYLE", sourceGenre: "Home improvement", baseline: 115 },
+  { name: "SPORTS", sourceGenre: "Sports", baseline: 154 },
+] as const;
 
 /* ============================================ Executive summary tile ======= */
 
@@ -328,7 +338,10 @@ export default function V4ContentPlanner() {
    * per-show affinity. Scoped by the donut consumption type (a show only counts
    * where its network belongs to that TV type) and by the selected genre. */
   const shows = useMemo(() => {
-    const listGenre = affinityGenre ?? selectedGenre ?? null;
+    const affinitySourceGenre =
+      AFFINITY_PARAMETERS.find((parameter) => parameter.name === affinityGenre)
+        ?.sourceGenre ?? null;
+    const listGenre = affinitySourceGenre ?? selectedGenre ?? null;
     const audience = seedKey(filters, `-${trendsWeeks}`);
     // If a genre is selected, restrict to it; otherwise draw from all genres.
     const pool = listGenre
@@ -412,45 +425,53 @@ export default function V4ContentPlanner() {
   const temporalEmpty = empty || (temporalChannel !== "All" && commercials && !isCommercialNetwork(market, temporalChannel));
 
   /* ---- §8 Cultural Affinity (radar) ---- *
-   * Index re-weighted by Commercials (public-service genres shift) and by the
-   * consumption scope so the affinity anchor reflects the selected type. */
+   * Eight fixed, comparable parameters. Values remain audience-specific and
+   * react to environment/platform scope while staying on a readable index
+   * scale where 100 is the national baseline. */
   const affinity = useMemo(() => {
     const audience = seedKey(filters);
-    const idxFor = (g: string, min: number, max: number) => {
-      let index = Math.round(seeded(`affidx-${audience}-${anchorGenre}-${g}`, min, max));
-      if (commercials) index = Math.round(index * (1 + (0.2 - nonCommercialShare(g)) * 0.6));
-      if (scopeTvType) index = Math.round(index * (0.9 + seeded(`ascope-${scopeTvType}-${g}`, 0, 0.3)));
-      return index;
-    };
-    const others = GENRES.filter((g) => g !== anchorGenre)
-      .map((g) => ({ name: g, index: idxFor(g, 78, 205) }))
-      .sort((a, b) => b.index - a.index)
-      .slice(0, 5);
-    // Anchor first, then top 5 over-indexing genres → 6 radar axes.
-    return [{ name: anchorGenre, index: idxFor(anchorGenre, 128, 190) }, ...others];
-  }, [filters, anchorGenre, commercials, scopeTvType]);
-
-  /* ---- §8 Cultural Affinity drilldown: top shows for the selected genre ---- */
-  const affinityShows = useMemo(() => {
-    const g = affinityGenre ?? anchorGenre;
-    const audience = seedKey(filters);
-    const list = (SHOWS_BY_GENRE[g] ?? []).map((t) => {
-      const m = entityModel(audience, `affshow-${g}-${t}`, {
-        baseMin: 8,
-        baseMax: 46,
-        affMin: 1.08,
-        affMax: 2.1,
-        reachMin: 6,
-        reachMax: 30,
-      });
-      return { title: t, network: networkOf(t, market), index: m.index, hhPct: m.hhShare };
+    return AFFINITY_PARAMETERS.map((parameter) => {
+      const audienceShift = seeded(
+        `affinity-${audience}-${parameter.name}`,
+        -14,
+        14,
+      );
+      const commercialShift = commercials
+        ? (0.2 - nonCommercialShare(parameter.sourceGenre)) * 18
+        : 0;
+      const scopeShift = scopeTvType
+        ? seeded(
+            `affinity-scope-${scopeTvType}-${parameter.name}`,
+            -8,
+            12,
+          )
+        : 0;
+      return {
+        name: parameter.name,
+        index: Math.round(
+          Math.min(
+            190,
+            Math.max(
+              70,
+              parameter.baseline + audienceShift + commercialShift + scopeShift,
+            ),
+          ),
+        ),
+      };
     });
-    return list
-      .filter((s) => !commercials || isCommercialNetwork(market, s.network))
-      .filter((s) => !scopeTvType || platformType(market, s.network) === scopeTvType)
+  }, [filters, commercials, scopeTvType]);
+
+  const selectedAffinity =
+    affinity.find((parameter) => parameter.name === affinityGenre) ??
+    affinity.reduce(
+      (highest, parameter) =>
+        parameter.index > highest.index ? parameter : highest,
+      affinity[0],
+    );
+  const selectedAffinityRank =
+    [...affinity]
       .sort((a, b) => b.index - a.index)
-      .slice(0, 5);
-  }, [filters, affinityGenre, anchorGenre, commercials, market, scopeTvType]);
+      .findIndex((parameter) => parameter.name === selectedAffinity.name) + 1;
 
   /* ---- §8 Migration Signals (Sankey) ---- */
   const migration = useMemo(() => {
@@ -824,58 +845,54 @@ export default function V4ContentPlanner() {
       <div className="grid grid-cols-1 gap-[var(--spacing-200,16px)] lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)]">
         <SmartCard
           title="Cultural Affinity"
-          subtitle={`Genres this audience over-indexes on vs national average, anchored to ${anchorGenre}`}
+          subtitle="Audience affinity across eight content and lifestyle parameters"
           ariaLabel="Cultural affinity"
           right={
-            affinityGenre ? (
-              <Chip label={`Shows: ${affinityGenre}`} selected onRemove={() => setAffinityGenre(null)} />
-            ) : undefined
+            <Chip
+              label={`Parameter: ${selectedAffinity.name}`}
+              selected
+              as="span"
+            />
           }
         >
           <CardBody loading={loading} empty={empty} height={420}>
             <div className="flex flex-col gap-[var(--spacing-200,16px)]">
-              <RadarChart data={affinity} anchor={anchorGenre} selected={affinityGenre} onSelect={(g) => setAffinityGenre((cur) => (cur === g ? null : g))} />
-              <div className="flex flex-col gap-[var(--spacing-75,6px)]">
-                <SectionHeading title="Affinity index" subtitle="Genre · index · difference from 100" />
-                <AffinityList data={affinity} selected={affinityGenre} onSelect={(g) => setAffinityGenre((cur) => (cur === g ? null : g))} />
-              </div>
-              {/* Drilldown: top shows for the selected / anchor genre */}
-              <div className="flex flex-col gap-[var(--spacing-75,6px)]">
-                <p className="text-[length:var(--body-md-medium-size,14px)] font-semibold" style={{ color: TITLE }}>
-                  {affinityGenre ?? anchorGenre} — top indexing shows
+              <RadarChart
+                data={affinity}
+                selected={selectedAffinity.name}
+                onSelect={setAffinityGenre}
+              />
+              {/* Only the selected parameter is explained below the chart; the
+                  former all-parameter Affinity index readout is intentionally
+                  removed now that the radar rings carry numeric scale labels. */}
+              <div
+                className="flex flex-col gap-[var(--spacing-75,6px)] rounded-[var(--radius-50,4px)] border border-solid p-[var(--spacing-150,12px)]"
+                style={{
+                  borderColor: GRID,
+                  backgroundColor: SURFACE2,
+                }}
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+                data-annotate="Selected affinity parameter details"
+              >
+                <SectionHeading
+                  title={selectedAffinity.name}
+                  subtitle={`Selected parameter · rank ${selectedAffinityRank} of ${affinity.length}`}
+                />
+                <p
+                  className="text-[length:var(--body-sm-regular-size,12px)]"
+                  style={{ color: BODY2 }}
+                >
+                  This audience shows{" "}
+                  {selectedAffinity.index === 100
+                    ? "the same affinity as"
+                    : `${Math.abs(selectedAffinity.index - 100)}% ${
+                        selectedAffinity.index > 100 ? "stronger" : "weaker"
+                      } affinity than`}{" "}
+                  the national baseline for{" "}
+                  {selectedAffinity.name.toLowerCase()} content.
                 </p>
-                {affinityShows.length === 0 ? (
-                  <p className="text-[length:var(--body-sm-regular-size,12px)]" style={{ color: MUTED }}>
-                    No commercial shows for this genre under the current environment.
-                  </p>
-                ) : (
-                  <div className="flex flex-col">
-                    {affinityShows.map((s, i) => {
-                      const up = s.index > 100;
-                      const fg = up ? SUCCESS_FG : ERROR_FG;
-                      return (
-                        <div
-                          key={s.title}
-                          className="flex items-center gap-[var(--spacing-100,8px)] border-b border-solid py-[var(--spacing-75,6px)]"
-                          style={{ borderColor: GRID }}
-                        >
-                          <span className="w-[16px] shrink-0 text-[length:var(--body-sm-regular-size,12px)] tabular-nums" style={{ color: MUTED }}>
-                            {i + 1}
-                          </span>
-                          <span className="min-w-0 flex-1 truncate text-[length:var(--body-md-regular-size,14px)]" style={{ color: TITLE }} title={s.title}>
-                            {s.title}
-                          </span>
-                          <span className="shrink-0 text-[length:var(--body-sm-regular-size,12px)]" style={{ color: MUTED }}>
-                            {s.network}
-                          </span>
-                          <span className="w-[54px] shrink-0 text-right text-[length:var(--body-sm-medium-size,12px)] font-semibold tabular-nums" style={{ color: fg }}>
-                            {s.index}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
               </div>
             </div>
           </CardBody>
