@@ -9,7 +9,7 @@
  * ========================================================================= */
 
 import { useState } from "react";
-import { ArrowUp, ArrowDown, Minus, ArrowRight } from "@phosphor-icons/react";
+import { ArrowUp, ArrowDown, Minus } from "@phosphor-icons/react";
 import {
   FONT,
   GRID,
@@ -17,7 +17,6 @@ import {
   TITLE,
   MUTED,
   BODY2,
-  SURFACE2,
   SUCCESS_FG,
   ERROR_FG,
   CARD_SHADOW,
@@ -246,23 +245,40 @@ export function DonutChart({
 
 export function ComboChart({
   categories,
+  categoryDetails,
   bars,
+  secondaryBars,
   line,
   indices,
   barLabel,
+  secondaryBarLabel,
   lineLabel,
+  barAxisLabel,
+  secondaryBarAxisLabel,
+  lineAxisLabel,
   barUnit = "",
+  secondaryBarUnit = "",
   lineUnit = "",
   onSelect,
   selectedIndex,
 }: {
   categories: string[];
+  /** Optional secondary x-axis label, e.g. each show's platform/network. */
+  categoryDetails?: string[];
   bars: number[];
+  /** Optional second bar series, plotted on the primary axis. */
+  secondaryBars?: number[];
   line: number[];
   indices?: number[];
   barLabel: string;
+  secondaryBarLabel?: string;
   lineLabel: string;
+  /** Explicit axis titles. Defaults to the corresponding series label. */
+  barAxisLabel?: string;
+  secondaryBarAxisLabel?: string;
+  lineAxisLabel?: string;
   barUnit?: string;
+  secondaryBarUnit?: string;
   lineUnit?: string;
   onSelect?: (i: number) => void;
   selectedIndex?: number | null;
@@ -270,14 +286,23 @@ export function ComboChart({
   const [hover, setHover] = useState<number | null>(null);
   const plotW = 720;
   const plotH = 240;
+  // Each bar series has its OWN scale. Avg minutes and household percentage
+  // are incomparable units, so sharing barMax would imply a false magnitude
+  // relationship. The optional second series gets a dedicated labeled axis.
   const barMax = Math.max(...bars, 1);
+  const secondaryBarMax = Math.max(...(secondaryBars ?? []), 1);
   const lineMax = Math.max(...line, 1);
   const n = categories.length;
   const slot = plotW / Math.max(n, 1);
-  const colW = Math.max(14, Math.min(30, slot * 0.55));
+  const grouped = Boolean(secondaryBars);
+  const groupW = Math.max(14, Math.min(38, slot * 0.68));
+  const colW = grouped ? Math.max(6, groupW / 2 - 1) : Math.max(14, Math.min(30, slot * 0.55));
   const yTicks = 5;
   const barTickVals = Array.from({ length: yTicks }, (_, i) =>
     Math.round((barMax * (yTicks - 1 - i)) / (yTicks - 1)),
+  );
+  const secondaryBarTickVals = Array.from({ length: yTicks }, (_, i) =>
+    ((secondaryBarMax * (yTicks - 1 - i)) / (yTicks - 1)).toFixed(0),
   );
   const lineTickVals = Array.from({ length: yTicks }, (_, i) =>
     (((lineMax * (yTicks - 1 - i)) / (yTicks - 1))).toFixed(0),
@@ -300,6 +325,17 @@ export function ComboChart({
             {barLabel}
           </span>
         </div>
+        {secondaryBars && secondaryBarLabel && (
+          <div className="flex items-center gap-[var(--spacing-75,6px)]">
+            <span
+              className="block h-[12px] w-[12px] rounded-[var(--radius-25,2px)]"
+              style={{ backgroundColor: CHART.secondary }}
+            />
+            <span className="text-[length:var(--body-md-regular-size,14px)]" style={{ color: AXIS_LABEL }}>
+              {secondaryBarLabel}
+            </span>
+          </div>
+        )}
         <div className="flex items-center gap-[var(--spacing-75,6px)]">
           <span className="block h-[3px] w-[16px] rounded-full" style={{ backgroundColor: CHART.line }} />
           <span className="text-[length:var(--body-md-regular-size,14px)]" style={{ color: AXIS_LABEL }}>
@@ -308,15 +344,57 @@ export function ComboChart({
         </div>
       </div>
 
-      <div className="flex w-full">
+      {/* Explicit axis titles: the optional second bar series is deliberately
+          separate because its unit/scale is not comparable with the first. */}
+      <div className="flex w-full items-end gap-[var(--spacing-50,4px)]">
+        <span
+          className="w-[58px] shrink-0 text-right text-[10px] font-medium"
+          style={{ color: CHART.primary }}
+        >
+          {barAxisLabel ?? barLabel}
+        </span>
+        {secondaryBars && (
+          <span
+            className="w-[50px] shrink-0 text-right text-[10px] font-medium"
+            style={{ color: CHART.secondary }}
+          >
+            {secondaryBarAxisLabel ?? secondaryBarLabel}
+          </span>
+        )}
+        <span className="min-w-0 flex-1" />
+        <span
+          className="w-[58px] shrink-0 text-left text-[10px] font-medium"
+          style={{ color: CHART.line }}
+        >
+          {lineAxisLabel ?? lineLabel}
+        </span>
+      </div>
+
+      <div className="flex w-full gap-[var(--spacing-50,4px)]">
         {/* Left axis */}
-        <div className="flex flex-col justify-between pr-[var(--spacing-100,8px)] text-right" style={{ height: plotH }}>
+        <div className="flex w-[58px] shrink-0 flex-col justify-between text-right" style={{ height: plotH }}>
           {barTickVals.map((t, i) => (
             <span key={i} className="text-[length:var(--body-sm-regular-size,12px)]" style={{ color: AXIS_LABEL }}>
               {t}
             </span>
           ))}
         </div>
+
+        {/* Dedicated scale for the opt-in second bar series (e.g. HH%). */}
+        {secondaryBars && (
+          <div className="flex w-[50px] shrink-0 flex-col justify-between text-right" style={{ height: plotH }}>
+            {secondaryBarTickVals.map((t, i) => (
+              <span
+                key={i}
+                className="text-[length:var(--body-sm-regular-size,12px)]"
+                style={{ color: CHART.secondary }}
+              >
+                {t}
+                {secondaryBarUnit.trim()}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="relative min-w-0 flex-1">
           <div className="relative w-full" style={{ height: plotH }}>
@@ -336,7 +414,9 @@ export function ComboChart({
             >
               {bars.map((v, i) => {
                 const h = (v / barMax) * plotH;
-                const x = i * slot + (slot - colW) / 2;
+                const x = grouped
+                  ? i * slot + (slot - groupW) / 2
+                  : i * slot + (slot - colW) / 2;
                 const isSel = selectedIndex === i;
                 return (
                   <rect
@@ -347,6 +427,22 @@ export function ComboChart({
                     height={h}
                     rx={1}
                     fill={isSel ? CHART.selected : CHART.primary}
+                    opacity={hover == null || hover === i ? 1 : 0.5}
+                  />
+                );
+              })}
+              {secondaryBars?.map((v, i) => {
+                const h = (v / secondaryBarMax) * plotH;
+                const x = i * slot + (slot - groupW) / 2 + colW + 2;
+                return (
+                  <rect
+                    key={`secondary-${i}`}
+                    x={x}
+                    y={plotH - h}
+                    width={colW}
+                    height={h}
+                    rx={1}
+                    fill={CHART.secondary}
                     opacity={hover == null || hover === i ? 1 : 0.5}
                   />
                 );
@@ -373,7 +469,7 @@ export function ComboChart({
                 onFocus={() => setHover(i)}
                 onBlur={() => setHover(null)}
                 onClick={onSelect ? () => onSelect(i) : undefined}
-                aria-label={`${c}: ${barLabel} ${fmtInt(bars[i])}${barUnit}, ${lineLabel} ${line[i].toFixed(1)}${lineUnit}${indices ? `, index ${indices[i]} — ${indexExplanation(indices[i])}` : ""}`}
+                aria-label={`${c}${categoryDetails?.[i] ? `, ${categoryDetails[i]}` : ""}: ${barLabel} ${fmtInt(bars[i])}${barUnit}${secondaryBars && secondaryBarLabel ? `, ${secondaryBarLabel} ${secondaryBars[i].toFixed(1)}${secondaryBarUnit}` : ""}, ${lineLabel} ${line[i].toFixed(1)}${lineUnit}${indices ? `, index ${indices[i]} — ${indexExplanation(indices[i])}` : ""}`}
                 className="absolute top-0 h-full focus:outline-none"
                 style={{
                   left: `${(i / n) * 100}%`,
@@ -386,7 +482,16 @@ export function ComboChart({
                   <Tooltip
                     lines={[
                       { label: c },
+                      ...(categoryDetails?.[i]
+                        ? [{ label: "Platform", value: categoryDetails[i] }]
+                        : []),
                       { label: barLabel, value: `${fmtInt(bars[i])}${barUnit}` },
+                      ...(secondaryBars && secondaryBarLabel
+                        ? [{
+                            label: secondaryBarLabel,
+                            value: `${secondaryBars[i].toFixed(1)}${secondaryBarUnit}`,
+                          }]
+                        : []),
                       { label: lineLabel, value: `${line[i].toFixed(1)}${lineUnit}` },
                       ...(indices
                         ? [{ label: "Index", value: `${indices[i]} (${indexExplanation(indices[i])})` }]
@@ -408,6 +513,14 @@ export function ComboChart({
                 >
                   {c.length > 12 ? `${c.slice(0, 11)}…` : c}
                 </span>
+                {categoryDetails?.[i] && (
+                  <span
+                    className="block w-full truncate text-center text-[10px]"
+                    style={{ color: MUTED }}
+                  >
+                    {categoryDetails[i]}
+                  </span>
+                )}
                 {indices && <MiniIndex index={indices[i]} />}
               </div>
             ))}
@@ -415,7 +528,7 @@ export function ComboChart({
         </div>
 
         {/* Right axis */}
-        <div className="flex flex-col justify-between pl-[var(--spacing-100,8px)] text-left" style={{ height: plotH }}>
+        <div className="flex w-[58px] shrink-0 flex-col justify-between text-left" style={{ height: plotH }}>
           {lineTickVals.map((t, i) => (
             <span key={i} className="text-[length:var(--body-sm-regular-size,12px)]" style={{ color: AXIS_LABEL }}>
               {t}
@@ -866,9 +979,10 @@ export function AffinityList({
 
 /* ============================================= Migration Sankey ============ */
 
-/* Custom Sankey: source show → up to 3 next-behaviour branches, each fanning
- * into up to 3 destination shows/networks within a 1-hour window. Flow-weight
- * shown by band width + % label; tooltips expose source/destination/%/window. */
+/* Fiber Sankey: the three strongest next behaviours ("From") flow into the two
+ * strongest destinations plus an aggregated remainder ("To"). The smooth
+ * ribbon thickness is the real audience share from the existing migration
+ * model; nodes and ribbons use only the categorical chart-token palette. */
 export function MigrationSankey({
   source,
   branches,
@@ -881,92 +995,257 @@ export function MigrationSankey({
   }[];
 }) {
   const [hover, setHover] = useState<string | null>(null);
-  const maxShare = Math.max(...branches.map((b) => b.share), 1);
+  const width = 720;
+  const height = 350;
+  const sourceX = 150;
+  const targetX = 540;
+  const nodeW = 10;
+  const plotTop = 48;
+  const plotBottom = 326;
+  const gap = 18;
+  const sourceRows = branches.slice(0, 3);
+  const colors = [CHART.primary, CHART.line, CHART.quaternary];
+
+  // Pick the two strongest named destinations. Everything else (including
+  // "Stop watching") becomes the third, explicit drop/remainder target.
+  const destinationTotals = new Map<string, { label: string; value: number }>();
+  for (const branch of sourceRows) {
+    for (const destination of branch.destinations) {
+      const key = `${destination.title}||${destination.network}`;
+      const current = destinationTotals.get(key);
+      destinationTotals.set(key, {
+        label: `${destination.title} · ${destination.network}`,
+        value: (current?.value ?? 0) + destination.share,
+      });
+    }
+  }
+  const strongest = Array.from(destinationTotals.entries())
+    .sort((a, b) => b[1].value - a[1].value)
+    .slice(0, 2);
+  const targetKeys = [
+    strongest[0]?.[0] ?? "destination-1",
+    strongest[1]?.[0] ?? "destination-2",
+    "__other__",
+  ];
+  const targetLabels = [
+    strongest[0]?.[1].label ?? "Primary destination",
+    strongest[1]?.[1].label ?? "Secondary destination",
+    "Other / stopped watching",
+  ];
+
+  const rawFlows: {
+    id: string;
+    sourceIndex: number;
+    targetIndex: number;
+    from: string;
+    to: string;
+    value: number;
+    color: string;
+  }[] = [];
+  sourceRows.forEach((branch, sourceIndex) => {
+    if (branch.destinations.length === 0) {
+      rawFlows.push({
+        id: `${sourceIndex}-stopped`,
+        sourceIndex,
+        targetIndex: 2,
+        from: branch.behaviour,
+        to: targetLabels[2],
+        value: branch.share,
+        color: colors[sourceIndex],
+      });
+      return;
+    }
+    const groupedValues = [0, 0, 0];
+    for (const destination of branch.destinations) {
+      const key = `${destination.title}||${destination.network}`;
+      const targetIndex = key === targetKeys[0] ? 0 : key === targetKeys[1] ? 1 : 2;
+      groupedValues[targetIndex] += destination.share;
+    }
+    groupedValues.forEach((value, targetIndex) => {
+      if (value <= 0) return;
+      rawFlows.push({
+        id: `${sourceIndex}-${targetIndex}`,
+        sourceIndex,
+        targetIndex,
+        from: branch.behaviour,
+        to: targetLabels[targetIndex],
+        value,
+        color: colors[sourceIndex],
+      });
+    });
+  });
+
+  const total = Math.max(
+    sourceRows.reduce((sum, branch) => sum + branch.share, 0),
+    1,
+  );
+  const scale = (plotBottom - plotTop - gap * 2) / total;
+  const sourceValues = sourceRows.map((branch) => branch.share);
+  const targetValues = [0, 0, 0];
+  rawFlows.forEach((flow) => {
+    targetValues[flow.targetIndex] += flow.value;
+  });
+  const stackNodes = (values: number[]) => {
+    let y = plotTop;
+    return values.map((value) => {
+      const node = { y, height: Math.max(value * scale, 2) };
+      y += node.height + gap;
+      return node;
+    });
+  };
+  const sourceNodes = stackNodes(sourceValues);
+  const targetNodes = stackNodes(targetValues);
+  const sourceOffsets = [0, 0, 0];
+  const targetOffsets = [0, 0, 0];
+  const flows = rawFlows.map((flow) => {
+    const thickness = Math.max(flow.value * scale, 1);
+    const sy0 = sourceNodes[flow.sourceIndex].y + sourceOffsets[flow.sourceIndex];
+    const ty0 = targetNodes[flow.targetIndex].y + targetOffsets[flow.targetIndex];
+    sourceOffsets[flow.sourceIndex] += thickness;
+    targetOffsets[flow.targetIndex] += thickness;
+    return { ...flow, thickness, sy0, ty0 };
+  });
+  const activeFlow = flows.find((flow) => flow.id === hover) ?? null;
 
   return (
-    <div className="flex flex-col gap-[var(--spacing-100,8px)] lg:flex-row lg:items-stretch lg:gap-[var(--spacing-200,16px)]">
-      {/* Source node */}
-      <div className="flex items-center lg:w-[200px] lg:shrink-0">
-        <div
-          className="flex w-full flex-col gap-[var(--spacing-25,2px)] rounded-[var(--radius-50,4px)] p-[var(--spacing-150,12px)]"
-          style={{
-            backgroundColor: "var(--container-dynamic-brand-subtle-background-selected, #f6ebff)",
-            border: `1px solid ${CHART.selected}`,
-          }}
+    <div className="flex flex-col gap-[var(--spacing-100,8px)]">
+      <div className="relative w-full overflow-x-auto">
+        <svg
+          className="block h-auto w-full min-w-[560px]"
+          viewBox={`0 0 ${width} ${height}`}
+          aria-hidden="true"
+          focusable="false"
         >
-          <span className="text-[length:var(--body-sm-medium-size,12px)] font-semibold uppercase tracking-[0.06em]" style={{ color: CHART.selected }}>
-            Source
-          </span>
-          <span className="text-[length:var(--body-md-medium-size,14px)] font-semibold" style={{ color: TITLE, fontFamily: FONT }}>
-            {source.title}
-          </span>
-          <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ color: MUTED }}>
-            {source.network} · within 1 hour
-          </span>
-        </div>
-      </div>
+          <text x={sourceX} y={18} fill={MUTED} fontFamily={FONT} fontSize={12} fontWeight={600}>
+            From
+          </text>
+          <text x={targetX + nodeW} y={18} fill={MUTED} fontFamily={FONT} fontSize={12} fontWeight={600} textAnchor="end">
+            To
+          </text>
 
-      {/* Connector */}
-      <div className="flex items-center justify-center py-[var(--spacing-50,4px)] lg:py-0">
-        <ArrowRight size={22} color={MUTED} aria-hidden />
-      </div>
+          {/* Wide translucent ribbons; thickness is the real migration share. */}
+          {flows.map((flow) => {
+            const sx = sourceX + nodeW;
+            const tx = targetX;
+            const sy1 = flow.sy0 + flow.thickness;
+            const ty1 = flow.ty0 + flow.thickness;
+            const c1 = sx + (tx - sx) * 0.42;
+            const c2 = sx + (tx - sx) * 0.58;
+            const path = [
+              `M ${sx} ${flow.sy0}`,
+              `C ${c1} ${flow.sy0}, ${c2} ${flow.ty0}, ${tx} ${flow.ty0}`,
+              `L ${tx} ${ty1}`,
+              `C ${c2} ${ty1}, ${c1} ${sy1}, ${sx} ${sy1}`,
+              "Z",
+            ].join(" ");
+            const dimmed = hover != null && hover !== flow.id;
+            return (
+              <path
+                key={flow.id}
+                d={path}
+                fill={flow.color}
+                opacity={dimmed ? 0.12 : hover === flow.id ? 0.68 : 0.4}
+                onMouseEnter={() => setHover(flow.id)}
+                onMouseLeave={() => setHover(null)}
+                style={{ cursor: "default", transition: "opacity 150ms ease" }}
+              />
+            );
+          })}
 
-      {/* Behaviour branches → destinations */}
-      <div className="flex flex-1 flex-col gap-[var(--spacing-150,12px)]">
-        {branches.map((b) => {
-          const w = 0.4 + 0.6 * (b.share / maxShare); // relative band emphasis
-          return (
-            <div key={b.behaviour} className="flex flex-col gap-[var(--spacing-75,6px)]">
-              {/* Behaviour band */}
-              <div className="flex items-center gap-[var(--spacing-100,8px)]">
-                <span
-                  className="relative flex h-[26px] shrink-0 items-center justify-center rounded-[var(--radius-25,2px)] px-[var(--spacing-100,8px)]"
-                  onMouseEnter={() => setHover(`b-${b.behaviour}`)}
-                  onMouseLeave={() => setHover(null)}
-                  style={{ backgroundColor: CHART.primary, opacity: w, minWidth: 54 }}
-                >
-                  <span className="text-[length:var(--body-sm-medium-size,12px)] font-semibold tabular-nums" style={{ color: LABEL_ON_COLOR }}>
-                    {b.share.toFixed(0)}%
-                  </span>
-                  {hover === `b-${b.behaviour}` && (
-                    <Tooltip lines={[{ label: "From", value: source.title }, { label: "Behaviour", value: b.behaviour }, { label: "% of audience", value: `${b.share.toFixed(1)}%` }, { label: "Window", value: "1 hour" }]} />
-                  )}
-                </span>
-                <span className="text-[length:var(--body-md-medium-size,14px)] font-medium" style={{ color: TITLE }}>
-                  {b.behaviour}
-                </span>
-              </div>
-              {/* Destinations */}
-              {b.destinations.length > 0 && (
-                <div className="flex flex-col gap-[4px] pl-[var(--spacing-300,24px)]">
-                  {b.destinations.map((dst) => (
-                    <div
-                      key={dst.title}
-                      className="relative flex items-center gap-[var(--spacing-100,8px)] rounded-[var(--radius-50,4px)] p-[var(--spacing-75,6px)]"
-                      onMouseEnter={() => setHover(`d-${b.behaviour}-${dst.title}`)}
-                      onMouseLeave={() => setHover(null)}
-                      style={{ backgroundColor: SURFACE2, border: `1px solid ${GRID}` }}
-                    >
-                      <span className="flex h-[24px] w-[42px] shrink-0 items-center justify-center rounded-[var(--radius-25,2px)] text-[length:var(--body-sm-medium-size,12px)] font-semibold tabular-nums" style={{ backgroundColor: CHART.secondary, color: LABEL_ON_COLOR }}>
-                        {dst.share.toFixed(0)}%
-                      </span>
-                      <span className="min-w-0 flex-1 truncate text-[length:var(--body-md-regular-size,14px)]" style={{ color: TITLE }} title={dst.title}>
-                        {dst.title}
-                      </span>
-                      <span className="shrink-0 text-[length:var(--body-sm-regular-size,12px)]" style={{ color: MUTED }}>
-                        {dst.network}
-                      </span>
-                      {hover === `d-${b.behaviour}-${dst.title}` && (
-                        <Tooltip lines={[{ label: "Source", value: source.title }, { label: "Destination", value: `${dst.title} (${dst.network})` }, { label: "% of audience", value: `${dst.share.toFixed(1)}%` }, { label: "Window", value: "1 hour" }]} />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
+          {/* Slim full-opacity source and target bars, matching the reference. */}
+          {sourceNodes.map((node, index) => (
+            <g key={`source-${sourceRows[index].behaviour}`}>
+              <rect
+                x={sourceX}
+                y={node.y}
+                width={nodeW}
+                height={node.height}
+                rx={1}
+                fill={colors[index]}
+              />
+              <text
+                x={sourceX - 8}
+                y={node.y + node.height / 2}
+                fill={TITLE}
+                fontFamily={FONT}
+                fontSize={11}
+                textAnchor="end"
+                dominantBaseline="middle"
+              >
+                {sourceRows[index].behaviour.length > 22
+                  ? `${sourceRows[index].behaviour.slice(0, 21)}…`
+                  : sourceRows[index].behaviour}
+              </text>
+            </g>
+          ))}
+          {targetNodes.map((node, index) => (
+            <g key={`target-${targetLabels[index]}`}>
+              <rect
+                x={targetX}
+                y={node.y}
+                width={nodeW}
+                height={node.height}
+                rx={1}
+                fill={[CHART.primary, CHART.line, CHART.quaternary][index]}
+              />
+              <text
+                x={targetX + nodeW + 8}
+                y={node.y + node.height / 2}
+                fill={TITLE}
+                fontFamily={FONT}
+                fontSize={11}
+                dominantBaseline="middle"
+              >
+                {targetLabels[index].length > 24
+                  ? `${targetLabels[index].slice(0, 23)}…`
+                  : targetLabels[index]}
+              </text>
+            </g>
+          ))}
+        </svg>
+
+        {activeFlow && (
+          <span
+            className="pointer-events-none absolute z-20 block size-px"
+            style={{
+              left: "50%",
+              top: `${((activeFlow.sy0 + activeFlow.ty0 + activeFlow.thickness) / 2 / height) * 100}%`,
+            }}
+          >
+            <Tooltip
+              lines={[
+                { label: `${activeFlow.from} → ${activeFlow.to}` },
+                { label: "Flow share", value: `${activeFlow.value.toFixed(1)}%` },
+                {
+                  label: "Drop from source",
+                  value: `${(100 - activeFlow.value).toFixed(1)}%`,
+                },
+                { label: "Window", value: "Within 1 hour" },
+              ]}
+            />
+          </span>
+        )}
       </div>
+      {/* The SVG is decorative to assistive technology; expose the complete
+          flow data once, consistently, as semantic text instead of presenting
+          non-activating SVG paths as buttons. */}
+      <ul
+        className="sr-only"
+        aria-label={`Migration flows from ${source.title} within one hour`}
+      >
+        {flows.map((flow) => (
+          <li key={`accessible-${flow.id}`}>
+            From {flow.from} to {flow.to}: {flow.value.toFixed(1)}% share,{" "}
+            {(100 - flow.value).toFixed(1)}% drop from the source audience.
+          </li>
+        ))}
+      </ul>
+      <p
+        className="text-[length:var(--body-sm-regular-size,12px)]"
+        style={{ color: MUTED }}
+      >
+        Source audience: {source.title} · {source.network}. Ribbon width represents the share moving within one hour.
+      </p>
     </div>
   );
 }

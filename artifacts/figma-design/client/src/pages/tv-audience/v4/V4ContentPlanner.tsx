@@ -42,7 +42,6 @@ import {
   CardBody,
   Chip,
   SearchableDropdown,
-  SegmentedPills,
   Toggle,
   TabsBarRounded,
   TabsBarUnderline,
@@ -91,7 +90,6 @@ import {
   DonutChart,
   ComboChart,
   GenreBars,
-  ShowsTable,
   TemporalHeatmap,
   RadarChart,
   AffinityList,
@@ -715,27 +713,26 @@ export default function V4ContentPlanner() {
         <div className="mb-[var(--spacing-150,12px)] flex flex-wrap items-center justify-between gap-[var(--spacing-100,8px)]">
           {trendsView === "Shows" ? (
             <>
-              <div className="flex flex-wrap items-center gap-[var(--spacing-100,8px)]">
-                <div
-                  className="flex h-[36px] items-center gap-[var(--spacing-75,6px)] rounded-[var(--radius-50,4px)] px-[var(--spacing-100,8px)]"
-                  style={{ backgroundColor: CARD_BG, border: `1px solid ${GRID}` }}
-                >
-                  <MagnifyingGlass size={16} color={MUTED} aria-hidden />
-                  <input
-                    type="text"
-                    value={showSearch}
-                    onChange={(e) => setShowSearch(e.target.value)}
-                    placeholder="Search shows…"
-                    aria-label="Search top indexing shows"
-                    className="w-[150px] bg-transparent text-[length:var(--body-md-regular-size,14px)] outline-none"
-                    style={{ fontFamily: FONT, color: TITLE }}
-                  />
-                </div>
-                <SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} />
+              {/* Compact search remains left; every show filter is grouped right. */}
+              <div
+                className="flex h-[28px] items-center gap-[var(--spacing-75,6px)] rounded-[var(--radius-50,4px)] px-[var(--spacing-75,6px)]"
+                style={{ backgroundColor: CARD_BG, border: `1px solid ${GRID}` }}
+              >
+                <MagnifyingGlass size={14} color={MUTED} aria-hidden />
+                <input
+                  type="text"
+                  value={showSearch}
+                  onChange={(e) => setShowSearch(e.target.value)}
+                  placeholder="Search shows…"
+                  aria-label="Search top indexing shows"
+                  className="w-[150px] bg-transparent text-[length:var(--body-sm-regular-size,12px)] outline-none"
+                  style={{ fontFamily: FONT, color: TITLE }}
+                />
               </div>
               <div className="ml-auto flex flex-wrap items-center justify-end gap-[var(--spacing-100,8px)]">
                 <SearchableDropdown id="v4-topn" label="" value={topN} options={TOP_N} onChange={setTopN} compact />
                 <SearchableDropdown id="v4-showsfilter" label="" value={showsFilter} options={showFilterOptions} onChange={setShowsFilter} compact />
+                <SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} compact />
               </div>
             </>
           ) : (
@@ -752,7 +749,21 @@ export default function V4ContentPlanner() {
           emptyMessage="No shows match your search / filters — clear the search or change the genre filter."
         >
           {trendsView === "Shows" ? (
-            <ShowsTable rows={filteredShows} />
+            <ComboChart
+              categories={filteredShows.map((show) => show.title)}
+              categoryDetails={filteredShows.map((show) => show.network)}
+              bars={filteredShows.map((show) => show.mins)}
+              secondaryBars={filteredShows.map((show) => show.hhPct)}
+              line={filteredShows.map((show) => show.index)}
+              barLabel="Avg min / household"
+              secondaryBarLabel="Households"
+              lineLabel="Index"
+              barAxisLabel="Avg min / HH"
+              secondaryBarAxisLabel="HH households (%)"
+              lineAxisLabel="Index"
+              barUnit=" min"
+              secondaryBarUnit="%"
+            />
           ) : (
             <GenreBars
               data={genres}
@@ -774,15 +785,22 @@ export default function V4ContentPlanner() {
           (selectedTypeName ? ` · tab synced to ${selectedTypeName}` : "")
         }
         ariaLabel="Temporal insights"
-        right={
-          <div className="flex flex-wrap items-center gap-[var(--spacing-100,8px)]">
-            <SegmentedPills options={TAB_LABELS} value={temporalTab} onChange={setTemporalTab} ariaLabel="Temporal TV type" />
-            {/* Same GLOBAL environment state (not a duplicate concept). */}
-            <EnvControl value={env} onChange={setEnv} />
-          </div>
-        }
       >
-        <div className="mb-[var(--spacing-150,12px)] flex flex-wrap items-center gap-[var(--spacing-100,8px)]">
+        {/* Heading first, then one coherent hierarchy row: environment + TV type. */}
+        <div
+          className="mb-[var(--spacing-150,12px)] flex flex-wrap items-center gap-[var(--spacing-200,16px)]"
+          data-annotate="Temporal insights filters"
+        >
+          {/* Same GLOBAL environment state (not a duplicate concept). */}
+          <EnvControl value={env} onChange={setEnv} />
+          <TabsBarUnderline
+            options={TAB_LABELS}
+            value={temporalTab}
+            onChange={setTemporalTab}
+            ariaLabel="Temporal TV type"
+          />
+        </div>
+        <div className="mb-[var(--spacing-150,12px)] flex flex-wrap items-center justify-between gap-[var(--spacing-100,8px)]">
           <SearchableDropdown
             id="v4-temporal-channel"
             label=""
@@ -790,7 +808,9 @@ export default function V4ContentPlanner() {
             options={temporalChannelOptions}
             onChange={setTemporalChannel}
           />
-          <SearchableDropdown id="v4-temporal-weeks" label="" value={temporalWeeks} options={LOOKBACK} onChange={setTemporalWeeks} />
+          <div className="ml-auto flex items-center justify-end">
+            <SearchableDropdown id="v4-temporal-weeks" label="" value={temporalWeeks} options={LOOKBACK} onChange={setTemporalWeeks} compact />
+          </div>
         </div>
         <CardBody
           loading={loading}
@@ -804,7 +824,7 @@ export default function V4ContentPlanner() {
       </SmartCard>
 
       {/* 8 — Cultural Affinity + Migration Signals */}
-      <div className="grid grid-cols-1 gap-[var(--spacing-200,16px)] lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-[var(--spacing-200,16px)] lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)]">
         <SmartCard
           title="Cultural Affinity"
           subtitle={`Genres this audience over-indexes on vs national average, anchored to ${anchorGenre}`}
