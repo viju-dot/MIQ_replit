@@ -44,7 +44,6 @@ import {
   Toggle,
   TabsBarRounded,
   TabsBarUnderline,
-  AlertInfo,
   SectionHeading,
   fmtInt,
   fmtK,
@@ -106,6 +105,17 @@ const AFFINITY_PARAMETERS = [
   { name: "LIFESTYLE", sourceGenre: "Home improvement", baseline: 115 },
   { name: "SPORTS", sourceGenre: "Sports", baseline: 154 },
 ] as const;
+
+const AFFINITY_PARAMETER_SHOWS: Record<string, string[]> = {
+  FOOD: ["MasterChef", "Bake Off", "Great British Menu", "Saturday Kitchen", "Sunday Brunch"],
+  TRAVEL: ["Race Across the World", "Amazing Hotels", "Grand Tour", "Michael Palin", "Wonders of Europe"],
+  COMEDY: ["Ted Lasso", "Ghosts", "Taskmaster", "The Office", "Derry Girls"],
+  DOCUMENTARY: ["Planet Earth III", "Blue Planet", "Beckham", "Wild Isles", "The Last Dance"],
+  NEWS: ["News at Ten", "Channel 4 News", "Sky News", "Newsnight", "Question Time"],
+  MUSIC: ["The Voice", "Later with Jools Holland", "Glastonbury Live", "Top of the Pops", "Brit Awards"],
+  LIFESTYLE: ["Grand Designs", "Interior Design Masters", "DIY SOS", "Escape to the Country", "Sort Your Life Out"],
+  SPORTS: ["Premier League Live", "Match of the Day", "F1 Grand Prix", "Six Nations", "Wimbledon"],
+};
 
 /* ============================================ Executive summary tile ======= */
 
@@ -177,7 +187,8 @@ export default function V4ContentPlanner() {
   // Cross-filter selections.
   const [selectedType, setSelectedType] = useState<ConsumptionKey | null>(null);
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
-  const [affinityGenre, setAffinityGenre] = useState<string | null>(null);
+  const [selectedAffinityParameter, setSelectedAffinityParameter] =
+    useState<string | null>(null);
 
   // §5B Time-spent local tab.
   const [channelTab, setChannelTab] = useState("Linear TV");
@@ -207,7 +218,7 @@ export default function V4ContentPlanner() {
     }
     setSelectedType(null);
     setSelectedGenre(null);
-    setAffinityGenre(null);
+    setSelectedAffinityParameter(null);
     setLoading(true);
     const t = setTimeout(() => setLoading(false), 550);
     return () => clearTimeout(t);
@@ -331,17 +342,12 @@ export default function V4ContentPlanner() {
     return raw.map((r) => ({ ...r, pct: (r.mins / total) * 100 }));
   }, [filters, commercials, scopeTvType, mult]);
 
-  const anchorGenre = selectedGenre ?? genres[0]?.name ?? "Comedy";
-
   /* ---- §6 Top Indexing Shows (Shows view) ---- *
    * Coherent model: minutes, index and household reach all derive from a single
    * per-show affinity. Scoped by the donut consumption type (a show only counts
    * where its network belongs to that TV type) and by the selected genre. */
   const shows = useMemo(() => {
-    const affinitySourceGenre =
-      AFFINITY_PARAMETERS.find((parameter) => parameter.name === affinityGenre)
-        ?.sourceGenre ?? null;
-    const listGenre = affinitySourceGenre ?? selectedGenre ?? null;
+    const listGenre = selectedGenre ?? null;
     const audience = seedKey(filters, `-${trendsWeeks}`);
     // If a genre is selected, restrict to it; otherwise draw from all genres.
     const pool = listGenre
@@ -374,7 +380,7 @@ export default function V4ContentPlanner() {
       // Scope: only shows whose platform matches the selected consumption type.
       .filter((s) => !scopeTvType || platformType(market, s.network) === scopeTvType)
       .sort((a, b) => b.index - a.index);
-  }, [filters, affinityGenre, selectedGenre, trendsWeeks, commercials, market, mult, scopeTvType]);
+  }, [filters, selectedGenre, trendsWeeks, commercials, market, mult, scopeTvType]);
 
   const showFilterOptions = useMemo(() => {
     const gset = Array.from(new Set(shows.map((s) => s.genre)));
@@ -462,7 +468,9 @@ export default function V4ContentPlanner() {
   }, [filters, commercials, scopeTvType]);
 
   const selectedAffinity =
-    affinity.find((parameter) => parameter.name === affinityGenre) ??
+    affinity.find(
+      (parameter) => parameter.name === selectedAffinityParameter,
+    ) ??
     affinity.reduce(
       (highest, parameter) =>
         parameter.index > highest.index ? parameter : highest,
@@ -472,6 +480,21 @@ export default function V4ContentPlanner() {
     [...affinity]
       .sort((a, b) => b.index - a.index)
       .findIndex((parameter) => parameter.name === selectedAffinity.name) + 1;
+  const selectedAffinityShows = useMemo(() => {
+    const audience = seedKey(filters);
+    return (AFFINITY_PARAMETER_SHOWS[selectedAffinity.name] ?? [])
+      .map((title) => ({
+        title,
+        viewers: Math.round(
+          seeded(`affinity-viewers-${audience}-${title}`, 320, 980),
+        ) * 1_000,
+        index: Math.round(
+          seeded(`affinity-show-index-${audience}-${title}`, 108, 188),
+        ),
+      }))
+      .sort((a, b) => b.viewers - a.viewers)
+      .slice(0, 5);
+  }, [filters, selectedAffinity.name]);
 
   /* ---- §8 Migration Signals (Sankey) ---- */
   const migration = useMemo(() => {
@@ -628,11 +651,6 @@ export default function V4ContentPlanner() {
         ariaLabel="Consumption by type and time spent"
         right={selectedType ? <Chip label={`Filter: ${selectedTypeName}`} selected onRemove={() => setSelectedType(null)} /> : undefined}
       >
-        {/* Educational Info alert (title only — no description, no close). */}
-        <div className="mb-[var(--spacing-150,12px)]">
-          <AlertInfo title="Select a type in the donut to cross-filter the time-spent view; the Time Spent tabs sync to that type." />
-        </div>
-
         <div className="flex flex-col gap-[var(--spacing-200,16px)] lg:flex-row lg:items-stretch">
           {/* 20% — Type column: donut on top, legend/infos below (vertical). */}
           <div
@@ -726,20 +744,6 @@ export default function V4ContentPlanner() {
           </div>
         }
       >
-        {/* Controls visually attached to the chart */}
-        <div className="mb-[var(--spacing-150,12px)] flex flex-wrap items-center justify-between gap-[var(--spacing-100,8px)]">
-          {trendsView === "Shows" ? (
-            <div className="ml-auto flex flex-wrap items-center justify-end gap-[var(--spacing-100,8px)]">
-              <SearchableDropdown id="v4-topn" label="" value={topN} options={TOP_N} onChange={setTopN} compact />
-              <SearchableDropdown id="v4-showsfilter" label="" value={showsFilter} options={showFilterOptions} onChange={setShowsFilter} compact />
-              <SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} compact />
-            </div>
-          ) : (
-            <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ color: MUTED }}>
-              Click a genre to set the Cultural Affinity anchor and Shows drilldown.
-            </span>
-          )}
-        </div>
         <CardBody
           loading={loading}
           empty={empty || (trendsView === "Shows" && filteredShows.length === 0)}
@@ -748,45 +752,40 @@ export default function V4ContentPlanner() {
           emptyMessage="No shows match these filters — change the genre filter or viewing scope."
         >
           {trendsView === "Shows" ? (
-            <div
-              className="w-full overflow-x-auto pb-[var(--spacing-100,8px)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-              style={{ scrollbarGutter: "stable", color: BODY2 }}
-              tabIndex={0}
-              role="region"
-              aria-label={`Top ${filteredShows.length} shows chart. Scroll horizontally to view all shows.`}
-            >
-              <div
-                style={{
-                  minWidth:
-                    filteredShows.length > 10
-                      ? `${filteredShows.length * 64 + 180}px`
-                      : "100%",
-                }}
-              >
-                <ComboChart
-                  categories={filteredShows.map((show) => show.title)}
-                  categoryDetails={filteredShows.map((show) => show.network)}
-                  bars={filteredShows.map((show) => show.mins)}
-                  secondaryBars={filteredShows.map((show) => show.hhPct)}
-                  line={filteredShows.map((show) => show.index)}
-                  barLabel="Avg min / household"
-                  secondaryBarLabel="Households"
-                  lineLabel="Index"
-                  barAxisLabel="Avg min / HH"
-                  secondaryBarAxisLabel="HH households (%)"
-                  lineAxisLabel="Index"
-                  barUnit=" min"
-                  secondaryBarUnit="%"
-                />
-              </div>
-            </div>
+            <ComboChart
+              categories={filteredShows.map((show) => show.title)}
+              categoryDetails={filteredShows.map((show) => show.network)}
+              bars={filteredShows.map((show) => show.mins)}
+              secondaryBars={filteredShows.map((show) => show.hhPct)}
+              line={filteredShows.map((show) => show.index)}
+              barLabel="Avg min / household"
+              secondaryBarLabel="Households"
+              lineLabel="Index"
+              barAxisLabel="Avg min / HH"
+              secondaryBarAxisLabel="HH households (%)"
+              lineAxisLabel="Index"
+              barUnit=" min"
+              secondaryBarUnit="%"
+              legendRight={
+                <>
+                  <SearchableDropdown id="v4-topn" label="" value={topN} options={TOP_N} onChange={setTopN} compact />
+                  <SearchableDropdown id="v4-showsfilter" label="" value={showsFilter} options={showFilterOptions} onChange={setShowsFilter} compact />
+                  <SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} compact />
+                </>
+              }
+              minChartWidth={
+                filteredShows.length > 10
+                  ? filteredShows.length * 64 + 180
+                  : undefined
+              }
+              scrollAriaLabel={`Top ${filteredShows.length} shows chart. Scroll horizontally to view all shows.`}
+            />
           ) : (
             <GenreBars
               data={genres}
               selected={selectedGenre}
               onSelect={(g) => {
                 setSelectedGenre((cur) => (cur === g ? null : g));
-                setAffinityGenre(null);
               }}
             />
           )}
@@ -801,17 +800,6 @@ export default function V4ContentPlanner() {
         {/* Global viewing environment sits above/outside the card, matching the
             control hierarchy used above Consumption by Type & Time Spent. */}
         <EnvControl value={env} onChange={setEnv} />
-        <div className="ml-auto flex flex-wrap items-center justify-end gap-[var(--spacing-100,8px)]">
-          <SearchableDropdown
-            id="v4-temporal-channel"
-            label=""
-            value={temporalChannel}
-            options={temporalChannelOptions}
-            onChange={setTemporalChannel}
-            compact
-          />
-          <SearchableDropdown id="v4-temporal-weeks" label="" value={temporalWeeks} options={LOOKBACK} onChange={setTemporalWeeks} compact />
-        </div>
       </div>
       <SmartCard
         title="Temporal Insights"
@@ -822,13 +810,24 @@ export default function V4ContentPlanner() {
         ariaLabel="Temporal insights"
       >
         {/* TV type remains the first in-card hierarchy row beneath the heading. */}
-        <div className="mb-[var(--spacing-150,12px)] flex flex-wrap items-center gap-[var(--spacing-200,16px)]">
+        <div className="mb-[var(--spacing-150,12px)] flex flex-wrap items-center justify-between gap-[var(--spacing-200,16px)]">
           <TabsBarUnderline
             options={TAB_LABELS}
             value={temporalTab}
             onChange={setTemporalTab}
             ariaLabel="Temporal TV type"
           />
+          <div className="ml-auto flex flex-wrap items-center justify-end gap-[var(--spacing-100,8px)]">
+            <SearchableDropdown
+              id="v4-temporal-channel"
+              label=""
+              value={temporalChannel}
+              options={temporalChannelOptions}
+              onChange={setTemporalChannel}
+              compact
+            />
+            <SearchableDropdown id="v4-temporal-weeks" label="" value={temporalWeeks} options={LOOKBACK} onChange={setTemporalWeeks} compact />
+          </div>
         </div>
         <CardBody
           loading={loading}
@@ -847,20 +846,13 @@ export default function V4ContentPlanner() {
           title="Cultural Affinity"
           subtitle="Audience affinity across eight content and lifestyle parameters"
           ariaLabel="Cultural affinity"
-          right={
-            <Chip
-              label={`Parameter: ${selectedAffinity.name}`}
-              selected
-              as="span"
-            />
-          }
         >
           <CardBody loading={loading} empty={empty} height={420}>
             <div className="flex flex-col gap-[var(--spacing-200,16px)]">
               <RadarChart
                 data={affinity}
                 selected={selectedAffinity.name}
-                onSelect={setAffinityGenre}
+                onSelect={setSelectedAffinityParameter}
               />
               {/* Only the selected parameter is explained below the chart; the
                   former all-parameter Affinity index readout is intentionally
@@ -877,22 +869,33 @@ export default function V4ContentPlanner() {
                 data-annotate="Selected affinity parameter details"
               >
                 <SectionHeading
-                  title={selectedAffinity.name}
+                  title={`${selectedAffinity.name} — top 5 shows`}
                   subtitle={`Selected parameter · rank ${selectedAffinityRank} of ${affinity.length}`}
                 />
-                <p
-                  className="text-[length:var(--body-sm-regular-size,12px)]"
-                  style={{ color: BODY2 }}
-                >
-                  This audience shows{" "}
-                  {selectedAffinity.index === 100
-                    ? "the same affinity as"
-                    : `${Math.abs(selectedAffinity.index - 100)}% ${
-                        selectedAffinity.index > 100 ? "stronger" : "weaker"
-                      } affinity than`}{" "}
-                  the national baseline for{" "}
-                  {selectedAffinity.name.toLowerCase()} content.
-                </p>
+                <ol className="flex flex-col" aria-label={`Top five shows for ${selectedAffinity.name}`}>
+                  {selectedAffinityShows.map((show, index) => (
+                    <li
+                      key={show.title}
+                      className="flex items-center gap-[var(--spacing-75,6px)] border-b border-solid py-[var(--spacing-75,6px)] text-[length:var(--body-sm-regular-size,12px)]"
+                      style={{ borderColor: GRID }}
+                    >
+                      <span className="w-[16px] shrink-0 tabular-nums" style={{ color: MUTED }}>
+                        {index + 1}
+                      </span>
+                      <span className="min-w-0 flex-1 truncate font-medium" style={{ color: TITLE }} title={show.title}>
+                        {show.title}
+                      </span>
+                      <span aria-hidden style={{ color: MUTED }}>·</span>
+                      <span className="shrink-0 tabular-nums" style={{ color: BODY2 }}>
+                        {fmtK(show.viewers)}
+                      </span>
+                      <span aria-hidden style={{ color: MUTED }}>·</span>
+                      <span className="shrink-0 font-semibold tabular-nums" style={{ color: BODY2 }}>
+                        {show.index} idx
+                      </span>
+                    </li>
+                  ))}
+                </ol>
               </div>
             </div>
           </CardBody>

@@ -8,7 +8,7 @@
  * hover/selected via local state + inline style. Meaningful tooltips per §19.
  * ========================================================================= */
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { ArrowUp, ArrowDown, Minus } from "@phosphor-icons/react";
 import {
   FONT,
@@ -261,6 +261,9 @@ export function ComboChart({
   lineUnit = "",
   onSelect,
   selectedIndex,
+  legendRight,
+  minChartWidth,
+  scrollAriaLabel,
 }: {
   categories: string[];
   /** Optional secondary x-axis label, e.g. each show's platform/network. */
@@ -282,6 +285,11 @@ export function ComboChart({
   lineUnit?: string;
   onSelect?: (i: number) => void;
   selectedIndex?: number | null;
+  /** Optional chart filters aligned on the same row, opposite the legend. */
+  legendRight?: ReactNode;
+  /** Grow only the plot/axes area and make it horizontally scrollable. */
+  minChartWidth?: number;
+  scrollAriaLabel?: string;
 }) {
   const [hover, setHover] = useState<number | null>(null);
   const plotW = 720;
@@ -315,8 +323,9 @@ export function ComboChart({
   return (
     <div className="flex flex-col gap-[var(--spacing-150,12px)]">
       {/* Legend */}
-      <div className="flex flex-wrap items-center gap-x-[var(--spacing-200,16px)] gap-y-[var(--spacing-75,6px)]">
-        <div className="flex items-center gap-[var(--spacing-75,6px)]">
+      <div className="flex flex-wrap items-center justify-between gap-x-[var(--spacing-200,16px)] gap-y-[var(--spacing-75,6px)]">
+        <div className="flex flex-wrap items-center gap-x-[var(--spacing-200,16px)] gap-y-[var(--spacing-75,6px)]">
+          <div className="flex items-center gap-[var(--spacing-75,6px)]">
           <span
             className="block h-[12px] w-[12px] rounded-[var(--radius-25,2px)]"
             style={{ backgroundColor: CHART.primary }}
@@ -324,9 +333,9 @@ export function ComboChart({
           <span className="text-[length:var(--body-md-regular-size,14px)]" style={{ color: AXIS_LABEL }}>
             {barLabel}
           </span>
-        </div>
-        {secondaryBars && secondaryBarLabel && (
-          <div className="flex items-center gap-[var(--spacing-75,6px)]">
+          </div>
+          {secondaryBars && secondaryBarLabel && (
+            <div className="flex items-center gap-[var(--spacing-75,6px)]">
             <span
               className="block h-[12px] w-[12px] rounded-[var(--radius-25,2px)]"
               style={{ backgroundColor: CHART.secondary }}
@@ -334,19 +343,33 @@ export function ComboChart({
             <span className="text-[length:var(--body-md-regular-size,14px)]" style={{ color: AXIS_LABEL }}>
               {secondaryBarLabel}
             </span>
+            </div>
+          )}
+          <div className="flex items-center gap-[var(--spacing-75,6px)]">
+            <span className="block h-[3px] w-[16px] rounded-full" style={{ backgroundColor: CHART.line }} />
+            <span className="text-[length:var(--body-md-regular-size,14px)]" style={{ color: AXIS_LABEL }}>
+              {lineLabel}
+            </span>
+          </div>
+        </div>
+        {legendRight && (
+          <div className="ml-auto flex flex-wrap items-center justify-end gap-[var(--spacing-100,8px)]">
+            {legendRight}
           </div>
         )}
-        <div className="flex items-center gap-[var(--spacing-75,6px)]">
-          <span className="block h-[3px] w-[16px] rounded-full" style={{ backgroundColor: CHART.line }} />
-          <span className="text-[length:var(--body-md-regular-size,14px)]" style={{ color: AXIS_LABEL }}>
-            {lineLabel}
-          </span>
-        </div>
       </div>
 
-      {/* Explicit axis titles: the optional second bar series is deliberately
-          separate because its unit/scale is not comparable with the first. */}
-      <div className="flex w-full items-end gap-[var(--spacing-50,4px)]">
+      <div
+        className="w-full overflow-x-auto pb-[var(--spacing-100,8px)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+        style={{ scrollbarGutter: minChartWidth ? "stable" : undefined, color: BODY2 }}
+        tabIndex={minChartWidth ? 0 : undefined}
+        role={minChartWidth ? "region" : undefined}
+        aria-label={minChartWidth ? scrollAriaLabel : undefined}
+      >
+        <div style={{ minWidth: minChartWidth ? `${minChartWidth}px` : "100%" }}>
+        {/* Explicit axis titles: the optional second bar series is deliberately
+            separate because its unit/scale is not comparable with the first. */}
+        <div className="flex w-full items-end gap-[var(--spacing-50,4px)]">
         <span
           className="w-[58px] shrink-0 text-right text-[10px] font-medium"
           style={{ color: CHART.primary }}
@@ -368,9 +391,9 @@ export function ComboChart({
         >
           {lineAxisLabel ?? lineLabel}
         </span>
-      </div>
+        </div>
 
-      <div className="flex w-full gap-[var(--spacing-50,4px)]">
+        <div className="flex w-full gap-[var(--spacing-50,4px)]">
         {/* Left axis */}
         <div className="flex w-[58px] shrink-0 flex-col justify-between text-right" style={{ height: plotH }}>
           {barTickVals.map((t, i) => (
@@ -536,6 +559,8 @@ export function ComboChart({
             </span>
           ))}
         </div>
+        </div>
+        </div>
       </div>
     </div>
   );
@@ -566,7 +591,7 @@ export function GenreBars({
   const [hover, setHover] = useState<string | null>(null);
   const max = Math.max(...data.map((d) => d.mins), 1);
   return (
-    <div className="flex flex-col gap-[var(--spacing-100,8px)]" role="group" aria-label="Viewership by genre — click to cross-filter">
+    <div className="flex flex-col gap-[var(--spacing-100,8px)]" role="group" aria-label="Viewership by genre — select a genre to filter Trends shows">
       {data.map((d) => {
         const isSel = selected === d.name;
         const dimmed = selected != null && !isSel;
@@ -584,7 +609,7 @@ export function GenreBars({
             onFocus={() => setHover(d.name)}
             onBlur={() => setHover(null)}
             aria-pressed={isSel}
-            aria-label={`${d.name}: ${fmtInt(d.mins)} minutes per week, ${d.pct.toFixed(1)}% of watch time, index ${d.index} — ${indexExplanation(d.index)}. Click to set as affinity anchor and shows genre.`}
+            aria-label={`${d.name}: ${fmtInt(d.mins)} minutes per week, ${d.pct.toFixed(1)}% of watch time, index ${d.index} — ${indexExplanation(d.index)}. Select to filter the Trends shows view.`}
             className="relative flex w-full items-center gap-[var(--spacing-150,12px)] rounded-[var(--radius-50,4px)] px-[var(--spacing-75,6px)] py-[3px] text-left focus:outline-none"
             style={{
               opacity: dimmed ? 0.5 : 1,
@@ -872,7 +897,7 @@ export function RadarChart({
             );
           })}
           {/* Data polygon */}
-          <polygon points={polyPts} fill={CHART.primary} fillOpacity={0.18} stroke={CHART.primary} strokeWidth={2} strokeLinejoin="round" pointerEvents="none" />
+          <polygon points={polyPts} fill="none" stroke={CHART.primary} strokeWidth={2} strokeLinejoin="round" pointerEvents="none" />
           {/* Each label + vertex is one keyboard-operable selection control. */}
           {data.map((d, i) => {
             const rr = (d.index / maxIndex) * rMax;
@@ -930,9 +955,9 @@ export function RadarChart({
                   cx={p.x}
                   cy={p.y}
                   r={isSel || hover === d.name ? 6 : 4}
-                  fill={isSel ? CHART.selected : CHART.primary}
+                  fill={CHART.primary}
                   stroke="var(--surface-background-lvl1, #ffffff)"
-                  strokeWidth={1.5}
+                  strokeWidth={isSel ? 3 : 1.5}
                 />
                 <text
                   x={lbl.x}
@@ -943,7 +968,8 @@ export function RadarChart({
                     fontFamily: FONT,
                     fontSize: 10,
                     fontWeight: isSel ? 700 : 500,
-                    fill: isSel ? CHART.selected : AXIS_LABEL,
+                    fill: AXIS_LABEL,
+                    textDecoration: isSel ? "underline" : "none",
                   }}
                 >
                   {d.name}
