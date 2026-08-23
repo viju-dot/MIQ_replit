@@ -257,21 +257,31 @@ export default function V4ContentPlanner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [temporalTab, market, commercials]);
 
-  function updateFilter(key: keyof Filters, value: string) {
+  function updateFilter(
+    key: "market" | "tier" | "dateRange",
+    value: string,
+  ) {
     setFilters((prev) => {
       const next = { ...prev, [key]: value };
       if (key === "market") {
         if (value !== "UK") {
-          next.mosaic = "all";
-          next.age = "all";
-          next.gender = "all";
-          next.children = "all";
+          next.mosaic = [];
+          next.age = [];
+          next.gender = [];
+          next.children = [];
         } else {
           next.tier = "all";
         }
       }
       return next;
     });
+  }
+
+  function updateMultiFilter(
+    key: "mosaic" | "age" | "gender" | "children",
+    value: string[],
+  ) {
+    setFilters((prev) => ({ ...prev, [key]: value }));
   }
 
   const selectedTypeName = CONSUMPTION_TYPES.find((t) => t.key === selectedType)?.name ?? null;
@@ -557,11 +567,14 @@ export default function V4ContentPlanner() {
     ];
   }, [filters, commercials, mult]);
 
-  const filterCount = uk
-    ? [filters.mosaic, filters.age, filters.gender, filters.children].filter((v) => v !== "all").length
-    : filters.tier !== "all"
-      ? 1
-      : 0;
+  const hasGlobalFilterChanges =
+    filters.market !== DEFAULT_FILTERS.market ||
+    filters.dateRange !== DEFAULT_FILTERS.dateRange ||
+    filters.tier !== DEFAULT_FILTERS.tier ||
+    filters.mosaic.length > 0 ||
+    filters.age.length > 0 ||
+    filters.gender.length > 0 ||
+    filters.children.length > 0;
 
   /* ------------------------------------------------------------- render --- */
   return (
@@ -589,28 +602,27 @@ export default function V4ContentPlanner() {
           data-annotate="Audience filter group"
           className="flex flex-wrap items-end gap-[var(--spacing-150,12px)]"
         >
-          <SearchableDropdown id="v4-market" label="Country" value={filters.market} options={MARKETS} onChange={(v) => updateFilter("market", v)} />
+          <SearchableDropdown id="v4-market" label="Country" value={filters.market} options={MARKETS} onChange={(v) => updateFilter("market", v)} fullWidth />
           {uk ? (
             <>
-              <SearchableDropdown id="v4-mosaic" label="Mosaic group" value={filters.mosaic} options={MOSAIC} onChange={(v) => updateFilter("mosaic", v)} />
-              <SearchableDropdown id="v4-age" label="Age" value={filters.age} options={AGE} onChange={(v) => updateFilter("age", v)} />
-              <SearchableDropdown id="v4-gender" label="Gender" value={filters.gender} options={GENDER} onChange={(v) => updateFilter("gender", v)} />
-              <SearchableDropdown id="v4-children" label="Children" value={filters.children} options={CHILDREN} onChange={(v) => updateFilter("children", v)} />
+              <SearchableDropdown id="v4-mosaic" label="Mosaic group" value={filters.mosaic} options={MOSAIC} onChange={(v) => updateMultiFilter("mosaic", v)} multiple fullWidth />
+              <SearchableDropdown id="v4-age" label="Age" value={filters.age} options={AGE} onChange={(v) => updateMultiFilter("age", v)} multiple fullWidth />
+              <SearchableDropdown id="v4-gender" label="Gender" value={filters.gender} options={GENDER} onChange={(v) => updateMultiFilter("gender", v)} multiple fullWidth />
+              <SearchableDropdown id="v4-children" label="Children" value={filters.children} options={CHILDREN} onChange={(v) => updateMultiFilter("children", v)} multiple fullWidth />
             </>
           ) : (
-            <SearchableDropdown id="v4-tier" label="TV consumption" value={filters.tier} options={CONSUMPTION_TIER} onChange={(v) => updateFilter("tier", v)} />
+            <SearchableDropdown id="v4-tier" label="TV consumption" value={filters.tier} options={CONSUMPTION_TIER} onChange={(v) => updateFilter("tier", v)} fullWidth />
           )}
-          <SearchableDropdown id="v4-daterange" label="Date range" value={filters.dateRange} options={DATE_RANGE} onChange={(v) => updateFilter("dateRange", v)} />
-          {filterCount > 0 && (
-            <button
-              type="button"
-              onClick={() => setFilters((p) => ({ ...DEFAULT_FILTERS, market: p.market, dateRange: p.dateRange }))}
-              className="h-[36px] text-[length:var(--body-sm-medium-size,12px)] font-medium"
-              style={{ color: CHART.selected }}
-            >
-              Reset audience
-            </button>
-          )}
+          <SearchableDropdown id="v4-daterange" label="Date range" value={filters.dateRange} options={DATE_RANGE} onChange={(v) => updateFilter("dateRange", v)} fullWidth />
+          <button
+            type="button"
+            disabled={!hasGlobalFilterChanges}
+            onClick={() => setFilters({ ...DEFAULT_FILTERS })}
+            className="h-[36px] whitespace-nowrap rounded-[var(--radius-50,4px)] px-[var(--spacing-150,12px)] text-[length:var(--body-md-medium-size,14px)] font-medium transition-colors hover:bg-[var(--container-dynamic-brand-subtle-background-hover,#ead7f7)] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            style={{ color: CHART.selected }}
+          >
+            Clear filter
+          </button>
         </div>
         <p className="mt-[var(--spacing-75,6px)] text-[length:var(--body-sm-regular-size,12px)]" style={{ color: MUTED }}>
           {uk

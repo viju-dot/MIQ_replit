@@ -622,6 +622,30 @@ export function AlertInfo({ title }: { title: string }) {
 
 /* ------------------------------------------------ Searchable Dropdown ------ */
 
+type SearchableDropdownCommonProps = {
+  id: string;
+  label: string;
+  options: Option[];
+  disabled?: boolean;
+  compact?: boolean;
+  align?: "left" | "right";
+  /** Stretch to the width supplied by a responsive grid/flex parent. */
+  fullWidth?: boolean;
+};
+
+type SearchableDropdownProps =
+  | (SearchableDropdownCommonProps & {
+      multiple?: false;
+      value: string;
+      onChange: (v: string) => void;
+    })
+  | (SearchableDropdownCommonProps & {
+      multiple: true;
+      /** Empty means the inclusive "All" option. */
+      value: string[];
+      onChange: (v: string[]) => void;
+    });
+
 export function SearchableDropdown({
   id,
   label,
@@ -631,23 +655,29 @@ export function SearchableDropdown({
   disabled = false,
   compact = false,
   align = "left",
-}: {
-  id: string;
-  label: string;
-  value: string;
-  options: Option[];
-  onChange: (v: string) => void;
-  disabled?: boolean;
-  /** Fiber compact variant for dense card toolbars. */
-  compact?: boolean;
-  /** Horizontal popup alignment relative to the trigger. */
-  align?: "left" | "right";
-}) {
+  fullWidth = false,
+  multiple = false,
+}: SearchableDropdownProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [hovered, setHovered] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
-  const selected = options.find((o) => o.value === value);
+  const selectedValues: string[] = multiple ? (value as string[]) : [];
+  const onMultiChange = onChange as (v: string[]) => void;
+  const onSingleChange = onChange as (v: string) => void;
+  const selected = multiple
+    ? selectedValues.length === 1
+      ? options.find((o) => o.value === selectedValues[0])
+      : undefined
+    : options.find((o) => o.value === value);
+  const allOption = options.find((o) => o.value === "all");
+  const triggerText = multiple
+    ? selectedValues.length === 0
+      ? allOption?.label ?? "All"
+      : selectedValues.length === 1
+        ? selected?.label ?? "1 selected"
+        : `${selectedValues.length} selected`
+    : selected?.label ?? "Select…";
 
   useEffect(() => {
     if (!open) return;
@@ -668,7 +698,11 @@ export function SearchableDropdown({
       ref={ref}
       data-annotate={`${label} filter`}
       className={`relative flex flex-col gap-[var(--spacing-50,4px)] ${
-        compact ? "min-w-[112px]" : "min-w-[160px]"
+        fullWidth
+          ? "min-w-[140px] flex-[1_1_150px]"
+          : compact
+            ? "min-w-[112px]"
+            : "min-w-[160px]"
       }`}
     >
       <label
@@ -683,6 +717,7 @@ export function SearchableDropdown({
         type="button"
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-label={multiple ? `${label}: ${triggerText}` : undefined}
         disabled={disabled}
         onClick={() => {
           setOpen((o) => !o);
@@ -707,7 +742,7 @@ export function SearchableDropdown({
           }`}
           style={{ fontFamily: FONT, color: selected ? TITLE : MUTED }}
         >
-          {selected ? selected.label : "Select…"}
+          {triggerText}
         </span>
         <CaretDown size={compact ? 14 : 16} color={AXIS_LABEL} aria-hidden />
       </button>
@@ -744,6 +779,7 @@ export function SearchableDropdown({
           <ul
             role="listbox"
             aria-label={label}
+            aria-multiselectable={multiple || undefined}
             className="max-h-[220px] overflow-y-auto"
           >
             {filtered.length === 0 && (
@@ -755,33 +791,65 @@ export function SearchableDropdown({
               </li>
             )}
             {filtered.map((o) => {
-              const isSel = o.value === value;
+              const isSel = multiple
+                ? o.value === "all"
+                  ? selectedValues.length === 0
+                  : selectedValues.includes(o.value)
+                : o.value === value;
               return (
                 <li key={o.value} role="option" aria-selected={isSel}>
                   <button
                     type="button"
                     onClick={() => {
-                      onChange(o.value);
-                      setOpen(false);
+                      if (multiple) {
+                        if (o.value === "all") {
+                          onMultiChange([]);
+                        } else {
+                          onMultiChange(
+                            isSel
+                              ? selectedValues.filter((item) => item !== o.value)
+                              : [...selectedValues, o.value],
+                          );
+                        }
+                      } else {
+                        onSingleChange(o.value);
+                        setOpen(false);
+                      }
                     }}
                     onMouseEnter={() => setHovered(o.value)}
                     onMouseLeave={() => setHovered(null)}
                     onFocus={() => setHovered(o.value)}
                     onBlur={() => setHovered(null)}
-                    className="flex w-full items-center justify-between gap-[var(--spacing-100,8px)] border-b border-solid px-[var(--spacing-100,8px)] py-[var(--spacing-75,6px)] text-left transition-colors focus:outline-none"
+                    className="flex w-full items-center gap-[var(--spacing-100,8px)] border-b border-solid px-[var(--spacing-100,8px)] py-[var(--spacing-75,6px)] text-left transition-colors focus:outline-none"
                     style={{
                       borderColor: GRID,
                       backgroundColor:
                         hovered === o.value ? HOVER_BG : "transparent",
                     }}
                   >
+                    {multiple && (
+                      <span
+                        className="flex size-[16px] shrink-0 items-center justify-center rounded-[var(--radius-25,2px)]"
+                        style={{
+                          backgroundColor: isSel
+                            ? "var(--controls-background-selected, #7c33b5)"
+                            : "transparent",
+                          border: isSel
+                            ? "1.5px solid transparent"
+                            : "1.5px solid var(--border-dynamic-neutral-subtle-default, #c6c6cc)",
+                        }}
+                        aria-hidden
+                      >
+                        {isSel && <Check size={12} color="var(--surface-foreground-static-neutral-inversed, #ffffff)" weight="bold" />}
+                      </span>
+                    )}
                     <span
-                      className="text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)]"
+                      className="min-w-0 flex-1 text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)]"
                       style={{ fontFamily: FONT, color: isSel ? BRAND : TITLE }}
                     >
                       {o.label}
                     </span>
-                    {isSel && (
+                    {!multiple && isSel && (
                       <Check size={16} color={BRAND} weight="bold" aria-hidden />
                     )}
                   </button>

@@ -71,10 +71,10 @@ export const DATE_RANGE: Option[] = [
 export type Filters = {
   market: string;
   // UK dimensions
-  mosaic: string;
-  age: string;
-  gender: string;
-  children: string;
+  mosaic: string[];
+  age: string[];
+  gender: string[];
+  children: string[];
   // EU dimension
   tier: string;
   // shared
@@ -83,10 +83,10 @@ export type Filters = {
 
 export const DEFAULT_FILTERS: Filters = {
   market: "UK",
-  mosaic: "all",
-  age: "all",
-  gender: "all",
-  children: "all",
+  mosaic: [],
+  age: [],
+  gender: [],
+  children: [],
   tier: "all",
   dateRange: "l12w",
 };
@@ -101,7 +101,8 @@ export function isEmptyCombo(f: Filters): boolean {
 }
 
 export function seedKey(f: Filters, extra = ""): string {
-  return `${f.market}|${f.mosaic}|${f.age}|${f.gender}|${f.children}|${f.tier}|${f.dateRange}|${extra}`;
+  const selected = (values: string[]) => [...values].sort().join(",") || "all";
+  return `${f.market}|${selected(f.mosaic)}|${selected(f.age)}|${selected(f.gender)}|${selected(f.children)}|${f.tier}|${f.dateRange}|${extra}`;
 }
 
 /* --------------------------------------------- coherent entity model ------ *
