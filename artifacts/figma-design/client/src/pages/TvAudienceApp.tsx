@@ -17,7 +17,7 @@
 
 import { useState, useEffect } from "react";
 import { Moon, Sun } from "lucide-react";
-import { Translate, CaretDown } from "@phosphor-icons/react";
+import { CaretDown } from "@phosphor-icons/react";
 import { useTheme } from "@/lib/theme";
 import { useAutoHideHeader } from "@/hooks/useAutoHideHeader";
 import TvAudienceDashboardPage from "@/pages/ds/TvAudienceDashboardPage";
@@ -93,37 +93,12 @@ function ThemeToggle() {
   );
 }
 
-/* ------------------------------------------------ Language selector -------- */
-/* JSON: 122×34, radius 2, bg rgba(255,255,255,0.2), padding 12/4, gap 8;
- * translate icon 20 + "English" (DM Sans Regular 14/20 white) + caret-down 20. */
-function LanguageSelector() {
-  return (
-    <button
-      type="button"
-      aria-label="Language: English"
-      className="relative flex h-[34px] shrink-0 items-center justify-center gap-[var(--numbers-8,8px)] rounded-[var(--radiuses-small,2px)] bg-[rgba(255,255,255,0.2)] px-[var(--numbers-12,12px)] py-[var(--numbers-4,4px)] transition-colors hover:bg-[rgba(255,255,255,0.3)]"
-      style={{ fontFamily: FONT }}
-      data-name="language"
-    >
-      <span className="relative flex items-center gap-[var(--numbers-4,4px)]">
-        <Translate size={20} weight="regular" style={{ color: ON_DARK }} aria-hidden />
-        <span className="whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] font-normal not-italic leading-[var(--body-md-regular-line-height,20px)]" style={{ color: ON_DARK }}>
-          English
-        </span>
-      </span>
-      <CaretDown size={20} weight="regular" style={{ color: ON_DARK }} aria-hidden />
-    </button>
-  );
-}
-
-/* The right-hand cluster, per user request: theme toggle, language selector,
- * diamond, avatar (gap 20). Search/flask/bell/heart removed. */
+/* The right-hand cluster, per user request: theme toggle, diamond, avatar
+ * (gap 20). Search/flask/bell/heart/language removed. */
 function RightCluster() {
   return (
     <div className="relative flex shrink-0 items-center justify-end gap-[20px]" data-name="right">
       <ThemeToggle />
-
-      <LanguageSelector />
 
       {/* Single Diamond (24) */}
       <div className="relative size-[24px] shrink-0" data-name="Single Diamond">
