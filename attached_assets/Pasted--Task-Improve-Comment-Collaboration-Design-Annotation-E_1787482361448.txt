@@ -1,0 +1,155 @@
+# Task: Improve Comment Collaboration & Design Annotation Experience
+
+## Objective
+
+I want to improve two areas of the review experience:
+
+1. **Comments** — make comments from different users visually distinguishable.
+2. **Design Annotations** — make the annotation workflow accessible from anywhere on the screen without forcing users to scroll back to find actions.
+
+The main goal is to make the experience closer to a practical design-review tool and remove unnecessary interaction friction.
+
+---
+
+# 1. Improve Comment Color Differentiation
+
+Currently, every comment uses the same color, which makes it difficult to understand who added which comment.
+
+Allow each user to choose a comment color when creating their comments.
+
+### Comment Color Options
+
+Provide up to **6 predefined comment colors**.
+
+For example:
+
+- Color 1
+- Color 2
+- Color 3
+- Color 4
+- Color 5
+- Color 6
+
+Use colors that have enough contrast against the prototype and remain readable.
+
+Do not allow users to enter arbitrary colors. Keep the choices predefined.
+
+### User Behavior
+
+When a user creates a comment:
+
+1. Select their name.
+2. Select a comment color.
+3. Add the comment.
+4. Place the comment on the selected UI location.
+
+The selected color should be associated with that user's comments.
+
+For example:
+
+**Vijay → Purple**
+
+**Designer 2 → Blue**
+
+**Reviewer → Orange**
+
+This makes comments visually identifiable while reviewing the prototype.
+
+### Important
+
+The color should apply consistently to:
+
+- Comment marker
+- Comment indicator
+- Comment header/avatar treatment where appropriate
+- Active comment state
+
+Do not change the existing comment functionality such as threads, deleted comments, links, screenshots, or version association.
+
+---
+
+# 2. Rework Design Annotation Actions
+
+There is currently a major usability problem with Design Annotations.
+
+When I select an element or multiple elements, the annotation actions appear in a fixed area at the bottom of the screen.
+
+This creates two problems:
+
+### Problem 1 — Scrolling
+
+If I select an element somewhere lower on the page, I have to scroll back to the top/bottom area to find the annotation action.
+
+This interrupts the workflow.
+
+### Problem 2 — Bottom-right Elements
+
+If the selected element is already near the bottom/right side of the screen, the current annotation action area can overlap the content or become difficult to access.
+
+This makes it difficult to annotate elements located near the bottom of a long screen.
+
+---
+
+# 3. Move Annotation Actions into a Side Panel
+
+Instead of showing the annotation controls as a floating/bottom action popup, open a **Side Panel** when an element is selected for annotation.
+
+Use the existing **Fiber Design System Side Panel / Drawer component**.
+
+Do not create a new custom side panel.
+
+The side panel should remain available while the selected element stays active.
+
+---
+
+# 4. Annotation Side Panel
+
+When I select one or multiple elements and choose to annotate them:
+
+**Selected element → Annotation Side Panel opens**
+
+The side panel should provide everything required to create and review the annotation.
+
+For example:
+
+### Selected Elements
+
+Show what has been selected.
+
+- Element name/type where available
+- Number of selected elements
+- Selection preview/context
+
+### Annotation
+
+Provide the annotation controls/content area.
+
+Allow me to add:
+
+- Annotation title
+- Annotation description
+- Relevant properties
+- Notes/instructions
+
+The exact controls should be based on the existing annotation functionality.
+
+---
+
+# 5. Persistent Selection Context
+
+The important part is that the selected element should remain visually identifiable while the side panel is open.
+
+For example:
+
+```text
+┌───────────────────────────────────────────────┬──────────────────────┐
+│                                               │ Design Annotation    │
+│                                               │                      │
+│          Selected UI Element                  │ Selected element     │
+│               ┌─────────────┐                 │                      │
+│               │   Button    │ ← highlighted   │ Annotation           │
+│               └─────────────┘                 │ [Title]              │
+│                                               │ [Description]        │
+│                                               │                      │
+│                                               │ [Cancel] [Add]       │
+└───────────────────────────────────────────────┴──────────────────────┘

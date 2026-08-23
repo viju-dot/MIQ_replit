@@ -24,6 +24,7 @@
  * ========================================================================= */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   ArrowsOutCardinal,
   Check,
@@ -53,6 +54,7 @@ import {
   type SelectionKind,
 } from "@/lib/annotationStore";
 import { deriveRegionLabel, type RegionPxRect } from "@/lib/commentTarget";
+import { SidePanel } from "@/pages/app/SidePanel";
 import {
   elementAtPoint,
   elementsInRegion,
@@ -377,6 +379,8 @@ function AnnotationEditor({
   onCommentInstead,
   onSubmit,
   onCancel,
+  panelMode = false,
+  footerTarget = null,
 }: {
   title: string;
   authors: string[];
@@ -393,6 +397,9 @@ function AnnotationEditor({
   /** Returns true if saved; false on failure (keeps the form open). */
   onSubmit: (values: EditorValues, author: string) => boolean;
   onCancel: () => void;
+  /** Side-panel mode omits the duplicate popover header and portals actions. */
+  panelMode?: boolean;
+  footerTarget?: HTMLElement | null;
 }) {
   // Prefer the annotation's existing author (edit mode). It is always offered
   // in the Select because the author list is the combined collaborator set.
@@ -439,10 +446,21 @@ function AnnotationEditor({
   }
 
   const impact = scopeImpactNote(values.scope);
+  const EditorBody = panelMode ? PanelEditorBody : PopoverBody;
+  const renderFooter = (content: React.ReactNode) => {
+    if (!panelMode) return <PopoverFooter>{content}</PopoverFooter>;
+    if (!footerTarget) return null;
+    return createPortal(
+      <div className="flex w-full items-center gap-2 px-[var(--spacing-300,24px)] py-[var(--spacing-200,16px)]">
+        {content}
+      </div>,
+      footerTarget,
+    );
+  };
 
   return (
     <>
-      <PopoverHeader>
+      {!panelMode && <PopoverHeader>
         <div className="flex flex-col gap-0.5">
           <h3
             className="text-[length:var(--body-md-medium-size,14px)] font-semibold"
@@ -463,11 +481,11 @@ function AnnotationEditor({
         >
           <X size={16} />
         </button>
-      </PopoverHeader>
+      </PopoverHeader>}
 
       {step === "form" ? (
         <>
-          <PopoverBody>
+          <EditorBody>
           {/* Selected summary — section + element chips (spec §11/§12). */}
           <div
             className="flex flex-col gap-1.5 rounded-[var(--radius-100,8px)] border border-solid px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)]"
@@ -600,9 +618,10 @@ function AnnotationEditor({
                 {error}
               </p>
             )}
-          </PopoverBody>
+          </EditorBody>
 
-          <PopoverFooter>
+          {renderFooter(
+            <>
             {showCommentInstead ? (
               <button
                 type="button"
@@ -633,12 +652,13 @@ function AnnotationEditor({
                 Review
               </button>
             </div>
-          </PopoverFooter>
+            </>,
+          )}
         </>
       ) : (
         /* Summary step (spec §11) */
         <>
-          <PopoverBody>
+          <EditorBody>
             <div
               className="flex flex-col gap-[var(--spacing-150,12px)] rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-200,16px)]"
               style={{ borderColor: C.border, backgroundColor: C.surface2 }}
@@ -669,8 +689,9 @@ function AnnotationEditor({
                 {error}
               </p>
             )}
-          </PopoverBody>
-          <PopoverFooter>
+          </EditorBody>
+          {renderFooter(
+            <>
             <div className="ml-auto flex items-center gap-2">
               <button
                 type="button"
@@ -689,7 +710,8 @@ function AnnotationEditor({
                 {submitLabel}
               </button>
             </div>
-          </PopoverFooter>
+            </>,
+          )}
         </>
       )}
     </>
@@ -1032,6 +1054,15 @@ function PopoverBody({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** Side Panel owns scrolling; this body only supplies workspace spacing. */
+function PanelEditorBody({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-[var(--spacing-200,16px)] p-[var(--spacing-300,24px)]">
+      {children}
+    </div>
+  );
+}
+
 function PopoverFooter({ children }: { children: React.ReactNode }) {
   return (
     <div
@@ -1194,6 +1225,8 @@ export function DesignAnnotationLayer(): JSX.Element | null {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [movingId, setMovingId] = useState<string | null>(null);
   const [pulseId, setPulseId] = useState<string | null>(null);
+  const [editorFooterNode, setEditorFooterNode] =
+    useState<HTMLDivElement | null>(null);
 
   // Live move/resize gesture (updates stored pcts on release).
   const gestureRef = useRef<{
@@ -1227,6 +1260,13 @@ export function DesignAnnotationLayer(): JSX.Element | null {
   const annotationMode = collab?.annotationMode ?? false;
   const selectMode = collab?.selectMode ?? "elements";
   const hideAnnotations = collab?.hideAnnotations ?? false;
+
+  // Tell the collaboration overlay to close Options/Comments when the editor
+  // drawer takes over. This preserves one Side Panel at a time.
+  useEffect(() => {
+    if (!draft && !editingId) return;
+    window.dispatchEvent(new CustomEvent("fiber:annotation-editor-open"));
+  }, [draft, editingId]);
 
   // Leaving annotation mode clears any in-progress draw/draft/hover/selection,
   // AND any open details/edit/move popover (otherwise the popover would linger
@@ -1806,7 +1846,7 @@ export function DesignAnnotationLayer(): JSX.Element | null {
       )}
 
       {/* Committed element selections (highlight boxes). */}
-      {elementModeActive &&
+      {annotationMode &&
         picks.map((p, i) => (
           <div
             key={`pick-${i}`}
@@ -1844,7 +1884,7 @@ export function DesignAnnotationLayer(): JSX.Element | null {
       )}
 
       {/* Pending region highlight (drawn, awaiting Annotate). */}
-      {pendingRegion && !draft && (
+      {pendingRegion && (
         <div
           data-annotation-ui
           className="pointer-events-none absolute rounded-[var(--radius-100,8px)] border-2"
@@ -1856,6 +1896,25 @@ export function DesignAnnotationLayer(): JSX.Element | null {
             borderColor: C.brandFg,
             backgroundColor: C.brandSubtle,
             opacity: 0.4,
+          }}
+          aria-hidden
+        />
+      )}
+
+      {/* Editing keeps the stored selection context visible even when committed
+          annotation markers are globally hidden. */}
+      {editingAnnotation?.region && (
+        <div
+          data-annotation-ui
+          className="pointer-events-none absolute rounded-[var(--radius-100,8px)] border-2"
+          style={{
+            left: `${editingAnnotation.region.xPct}%`,
+            top: `${editingAnnotation.region.yPct}%`,
+            width: `${editingAnnotation.region.wPct}%`,
+            height: `${editingAnnotation.region.hPct}%`,
+            borderColor: C.brandFg,
+            backgroundColor: C.brandSubtle,
+            opacity: 0.55,
           }}
           aria-hidden
         />
@@ -2007,64 +2066,96 @@ export function DesignAnnotationLayer(): JSX.Element | null {
         </div>
       )}
 
-      {/* Editor for a fresh draft. */}
-      {draft && (
-        <AnchoredPopover
-          layerRef={wrapRef}
-          anchorXPct={draft.region ? draft.region.xPct : 50}
-          anchorYPct={draft.region ? draft.region.yPct : 8}
-        >
-          <AnnotationEditor
-            title="Design annotation"
-            authors={authors}
-            areaLabel={draft.region ? draft.region.label : "Entire page"}
-            sectionLabel={draft.sectionLabel}
-            elements={draft.elements}
-            selectionKind={draft.selectionKind}
-            seqLabel="New annotation"
-            initial={EMPTY_EDITOR}
-            submitLabel="Add annotation"
-            showCommentInstead={Boolean(draft.region)}
-            onCommentInstead={commentInstead}
-            onSubmit={submitDraft}
-            onCancel={() => {
-              setDraft(null);
-              setPicks([]);
-              setPendingRegion(null);
+      {/* CREATE / EDIT use the existing Fiber SidePanel rather than an anchored
+          popover. Details remain compact and anchored below. */}
+      {(draft || editingAnnotation) &&
+        typeof document !== "undefined" &&
+        createPortal(
+        <div className="pointer-events-auto">
+          <SidePanel
+            open
+            size="600"
+            title={editingAnnotation ? "Edit design annotation" : "Design annotation"}
+            subtitle={
+              editingAnnotation
+                ? `Design annotation #${pad2(editingAnnotation.seq)}`
+                : draft && draft.elements.length > 0
+                  ? `${draft.elements.length} selected ${draft.elements.length === 1 ? "element" : "elements"} · ${draft.sectionLabel || draft.region?.label || "Current selection"}`
+                  : draft?.region?.label || "Entire page"
+            }
+            onClose={() => {
+              if (editingAnnotation) {
+                setEditingId(null);
+                setMovingId(null);
+              } else {
+                setDraft(null);
+                setPicks([]);
+                setPendingRegion(null);
+              }
             }}
-          />
-        </AnchoredPopover>
-      )}
-
-      {/* Edit an existing annotation. */}
-      {editingAnnotation && (
-        <AnchoredPopover
-          layerRef={wrapRef}
-          anchorXPct={editingAnnotation.region ? editingAnnotation.region.xPct : 50}
-          anchorYPct={editingAnnotation.region ? editingAnnotation.region.yPct : 8}
-        >
-          <AnnotationEditor
-            title="Edit annotation"
-            authors={authors}
-            areaLabel={editingAnnotation.region ? editingAnnotation.region.label : "Entire page"}
-            sectionLabel={editingAnnotation.sectionLabel}
-            elements={editingAnnotation.elements}
-            selectionKind={editingAnnotation.selectionKind}
-            seqLabel={`Design annotation #${pad2(editingAnnotation.seq)}`}
-            initial={{
-              what: editingAnnotation.what,
-              why: editingAnnotation.why,
-              types: editingAnnotation.types,
-              dsGuidance: editingAnnotation.dsGuidance,
-              scope: editingAnnotation.scope,
-            }}
-            initialAuthor={editingAnnotation.author}
-            submitLabel="Save changes"
-            showCommentInstead={false}
-            onSubmit={submitEdit}
-            onCancel={() => setEditingId(null)}
-          />
-        </AnchoredPopover>
+            footer={
+              <div
+                ref={setEditorFooterNode}
+                className="w-full"
+                data-annotation-editor-footer
+              />
+            }
+          >
+            {draft ? (
+              <AnnotationEditor
+                key="new-annotation-panel"
+                title="Design annotation"
+                authors={authors}
+                areaLabel={draft.region ? draft.region.label : "Entire page"}
+                sectionLabel={draft.sectionLabel}
+                elements={draft.elements}
+                selectionKind={draft.selectionKind}
+                seqLabel="New annotation"
+                initial={EMPTY_EDITOR}
+                submitLabel="Add annotation"
+                showCommentInstead={Boolean(draft.region)}
+                onCommentInstead={commentInstead}
+                onSubmit={submitDraft}
+                onCancel={() => {
+                  setDraft(null);
+                  setPicks([]);
+                  setPendingRegion(null);
+                }}
+                panelMode
+                footerTarget={editorFooterNode}
+              />
+            ) : editingAnnotation ? (
+              <AnnotationEditor
+                key={editingAnnotation.id}
+                title="Edit annotation"
+                authors={authors}
+                areaLabel={editingAnnotation.region ? editingAnnotation.region.label : "Entire page"}
+                sectionLabel={editingAnnotation.sectionLabel}
+                elements={editingAnnotation.elements}
+                selectionKind={editingAnnotation.selectionKind}
+                seqLabel={`Design annotation #${pad2(editingAnnotation.seq)}`}
+                initial={{
+                  what: editingAnnotation.what,
+                  why: editingAnnotation.why,
+                  types: editingAnnotation.types,
+                  dsGuidance: editingAnnotation.dsGuidance,
+                  scope: editingAnnotation.scope,
+                }}
+                initialAuthor={editingAnnotation.author}
+                submitLabel="Save changes"
+                showCommentInstead={false}
+                onSubmit={submitEdit}
+                onCancel={() => {
+                  setEditingId(null);
+                  setMovingId(null);
+                }}
+                panelMode
+                footerTarget={editorFooterNode}
+              />
+            ) : null}
+          </SidePanel>
+        </div>,
+        document.body,
       )}
 
       {/* Details for an open annotation (not while editing it). */}

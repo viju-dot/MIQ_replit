@@ -20,6 +20,25 @@
 
 const STORAGE_KEY = "fiber:ai-prototype:comments:v1";
 
+/** Stable predefined swatch ids. The UI maps these ids to Fiber color tokens. */
+export const COMMENT_COLORS = [
+  "purple",
+  "blue",
+  "orange",
+  "green",
+  "pink",
+  "teal",
+] as const;
+export type CommentColor = (typeof COMMENT_COLORS)[number];
+export const DEFAULT_COMMENT_COLOR: CommentColor = "purple";
+
+export function coerceCommentColor(raw: unknown): CommentColor {
+  return typeof raw === "string" &&
+    (COMMENT_COLORS as readonly string[]).includes(raw)
+    ? (raw as CommentColor)
+    : DEFAULT_COMMENT_COLOR;
+}
+
 /**
  * Where a comment is pinned on the prototype UI. Position is stored as
  * PERCENTAGES relative to the versioned content wrapper so markers stay
@@ -54,6 +73,8 @@ export interface PrototypeComment {
   versionName: string;
   /** Commenter display name. */
   author: string;
+  /** Predefined collaboration color associated with this author. */
+  color: CommentColor;
   /** Comment body. */
   text: string;
   createdAt: string;
@@ -117,6 +138,8 @@ export interface NewCommentInput {
   versionId: string;
   versionName: string;
   author: string;
+  /** Predefined author color; legacy callers safely default to purple. */
+  color?: CommentColor;
   text: string;
   /** Where the comment is pinned on the prototype UI (optional). */
   anchor?: CommentAnchor;
@@ -131,6 +154,8 @@ export interface CommentRepository {
   list(prototypeId: string): PrototypeComment[];
   /** Distinct commenter names across ALL comments (for the name combobox). */
   listAuthors(): string[];
+  /** The persisted color currently associated with an author. */
+  colorForAuthor(author: string): CommentColor;
   /** Persist a new comment. Throws on empty author/text. */
   add(input: NewCommentInput): PrototypeComment;
   /**
@@ -183,6 +208,7 @@ function coerceComment(raw: unknown): PrototypeComment | null {
     versionId: r.versionId,
     versionName: str(r.versionName) || "—",
     author,
+    color: coerceCommentColor(r.color),
     text,
     createdAt: createdAtRaw,
     anchor: coerceAnchor(r.anchor),
@@ -287,6 +313,14 @@ export const localStorageRepository: CommentRepository = {
     }
     return out.sort((a, b) => a.localeCompare(b));
   },
+  colorForAuthor(author) {
+    const key = author.trim().toLowerCase();
+    if (!key) return DEFAULT_COMMENT_COLOR;
+    return (
+      readAll().find((comment) => comment.author.toLowerCase() === key)?.color ??
+      DEFAULT_COMMENT_COLOR
+    );
+  },
   add(input) {
     const author = input.author.trim();
     const text = input.text.trim();
@@ -298,6 +332,7 @@ export const localStorageRepository: CommentRepository = {
     if (text.length === 0) throw new Error("commentStore: text is required.");
 
     const all = readAll();
+    const color = coerceCommentColor(input.color);
 
     // Guarantee a unique id against existing records (defends against the
     // timestamp fallback and any persisted collisions).
@@ -316,16 +351,26 @@ export const localStorageRepository: CommentRepository = {
       versionId: input.versionId,
       versionName: input.versionName || "—",
       author,
+      color,
       text,
       createdAt: nowIso(),
       anchor: coerceAnchor(input.anchor),
       parentId,
       attachment: coerceAttachment(input.attachment),
     };
-    all.push(comment);
+    // Color belongs to the AUTHOR, not just this record. Recolor their existing
+    // comments/replies so one author is visually consistent across threads and
+    // versions after they choose a new predefined swatch.
+    const authorKey = author.toLowerCase();
+    const next = all.map((existing) =>
+      existing.author.toLowerCase() === authorKey
+        ? { ...existing, color }
+        : existing,
+    );
+    next.push(comment);
     // May THROW (quota) — nothing is persisted in that case, so the caller can
     // retry (e.g. without the image) with the typed text intact.
-    writeAll(all);
+    writeAll(next);
     return comment;
   },
   softDelete(id) {

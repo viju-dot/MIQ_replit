@@ -57,9 +57,12 @@ import {
 } from "@/lib/prototypeStore";
 import {
   commentRepository,
+  COMMENT_COLORS,
+  DEFAULT_COMMENT_COLOR,
   type PrototypeComment,
   type CommentAnchor,
   type CommentAttachment,
+  type CommentColor,
 } from "@/lib/commentStore";
 import { downscaleImageFile, linkifyParts } from "@/lib/commentMedia";
 import { deriveTargetLabel } from "@/lib/commentTarget";
@@ -116,6 +119,92 @@ const C = {
   errorSubtleBg: "var(--container-dynamic-error-subtle-background-default,#fbe9ec)",
   hoverBg: "var(--container-dynamic-neutral-subtle-background-hover,#71718014)",
 };
+
+/** Six predefined, token-backed author colors (never arbitrary user input). */
+const COMMENT_SWATCHES: Record<
+  CommentColor,
+  { label: string; value: string }
+> = {
+  purple: { label: "Purple", value: "var(--datavis-qualitative-4,#7c33b5)" },
+  blue: { label: "Blue", value: "var(--datavis-qualitative-8,#2f6fed)" },
+  orange: { label: "Orange", value: "var(--datavis-qualitative-2,#c45d10)" },
+  green: { label: "Green", value: "var(--datavis-qualitative-9,#1e7d54)" },
+  pink: { label: "Pink", value: "var(--datavis-qualitative-5,#c52d6f)" },
+  teal: { label: "Teal", value: "var(--datavis-qualitative-10,#087f8c)" },
+};
+
+const commentColorValue = (color: CommentColor): string =>
+  COMMENT_SWATCHES[color].value;
+
+const authorInitials = (author: string): string =>
+  author
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("") || "?";
+
+function CommentColorPicker({
+  value,
+  onChange,
+}: {
+  value: CommentColor;
+  onChange: (color: CommentColor) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-[12px] font-medium" style={{ color: C.textBody }}>
+        Comment color
+      </span>
+      <div className="flex items-center gap-2" role="radiogroup" aria-label="Comment color">
+        {COMMENT_COLORS.map((color) => {
+          const selected = value === color;
+          return (
+            <button
+              key={color}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              aria-label={COMMENT_SWATCHES[color].label}
+              title={COMMENT_SWATCHES[color].label}
+              onClick={() => onChange(color)}
+              className="size-[24px] rounded-full border-2 outline-none transition-transform focus-visible:scale-110"
+              style={{
+                backgroundColor: commentColorValue(color),
+                borderColor: selected ? C.textPrimary : C.surface,
+                boxShadow: selected
+                  ? `0 0 0 2px ${C.surface}, 0 0 0 4px ${commentColorValue(color)}`
+                  : `0 0 0 1px ${C.border}`,
+              }}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function AuthorAvatar({
+  author,
+  color,
+  small = false,
+}: {
+  author: string;
+  color: CommentColor;
+  small?: boolean;
+}) {
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center justify-center rounded-full font-semibold ${
+        small ? "size-[22px] text-[9px]" : "size-[28px] text-[10px]"
+      }`}
+      style={{ backgroundColor: commentColorValue(color), color: C.brandFgOn }}
+      aria-hidden
+    >
+      {authorInitials(author)}
+    </span>
+  );
+}
 
 /** UI text shown in place of a soft-deleted comment's body. */
 const DELETED_TEXT = "This comment was deleted.";
@@ -474,6 +563,7 @@ function CommentsPanelBody({
   onReply: (
     parentId: string,
     author: string,
+    color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
   ) => boolean;
@@ -605,6 +695,7 @@ function CommentThreadCard({
   onReply: (
     parentId: string,
     author: string,
+    color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
   ) => boolean;
@@ -616,15 +707,21 @@ function CommentThreadCard({
   return (
     <li
       className="flex flex-col gap-1.5 rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-200,16px)]"
-      style={{ backgroundColor: C.surface, borderColor: C.border }}
+      style={{
+        backgroundColor: C.surface,
+        borderColor: deleted ? C.border : commentColorValue(parent.color),
+      }}
     >
       <div className="flex items-center justify-between gap-2">
-        <span
-          className="text-[length:var(--body-md-medium-size,14px)] font-semibold"
-          style={{ color: C.textPrimary }}
-        >
-          {parent.author}
-        </span>
+        <div className="flex items-center gap-2">
+          <AuthorAvatar author={parent.author} color={parent.color} />
+          <span
+            className="text-[length:var(--body-md-medium-size,14px)] font-semibold"
+            style={{ color: C.textPrimary }}
+          >
+            {parent.author}
+          </span>
+        </div>
         <div className="flex items-center gap-1.5">
           {deleted && <StatusBadge deleted />}
           <span
@@ -690,8 +787,8 @@ function CommentThreadCard({
           <div className="mt-1">
             <ReplyComposer
               authors={authors}
-              onPost={(author, text, attachment) => {
-                const ok = onReply(parent.id, author, text, attachment);
+              onPost={(author, color, text, attachment) => {
+                const ok = onReply(parent.id, author, color, text, attachment);
                 if (ok) setReplying(false);
                 return ok;
               }}
@@ -771,6 +868,7 @@ interface DraftPin {
   xPct: number;
   yPct: number;
   targetLabel: string;
+  color: CommentColor;
 }
 
 /**
@@ -859,21 +957,29 @@ function InlineComposer({
   authors,
   onPost,
   onCancel,
+  onColorChange,
 }: {
   draft: DraftPin;
   authors: string[];
   /** Returns true if the comment was saved; false on failure (quota). */
   onPost: (
     author: string,
+    color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
   ) => boolean;
   onCancel: () => void;
+  onColorChange: (color: CommentColor) => void;
 }) {
   const [choice, setChoice] = useState<string>(
     authors.length > 0 ? authors[0] : NEW_NAME,
   );
   const [newName, setNewName] = useState("");
+  const [color, setColor] = useState<CommentColor>(() =>
+    authors.length > 0
+      ? commentRepository.colorForAuthor(authors[0])
+      : DEFAULT_COMMENT_COLOR,
+  );
   const [text, setText] = useState("");
   const [attachment, setAttachment] = useState<CommentAttachment | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -883,6 +989,9 @@ function InlineComposer({
     const t = window.setTimeout(() => textRef.current?.focus(), 0);
     return () => window.clearTimeout(t);
   }, []);
+  useEffect(() => {
+    onColorChange(color);
+  }, [color, onColorChange]);
 
   // Flip horizontally / vertically near the wrapper edges so it stays on screen.
   const flipRight = draft.xPct > 60;
@@ -901,7 +1010,7 @@ function InlineComposer({
     }
     // onPost returns false on quota failure — keep text + attachment so the
     // user can remove the image and retry.
-    const ok = onPost(resolvedName, text.trim(), attachment);
+    const ok = onPost(resolvedName, color, text.trim(), attachment);
     if (!ok) {
       setError("Image too large to attach. Remove it and try again.");
     }
@@ -932,6 +1041,7 @@ function InlineComposer({
           choice={choice}
           onChoiceChange={(v) => {
             setChoice(v);
+            if (v !== NEW_NAME) setColor(commentRepository.colorForAuthor(v));
             setError(null);
           }}
           newName={newName}
@@ -940,6 +1050,7 @@ function InlineComposer({
             setError(null);
           }}
         />
+        <CommentColorPicker value={color} onChange={setColor} />
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="collab-comment-text" style={{ color: C.textBody }}>
             Comment
@@ -1006,6 +1117,7 @@ function ReplyComposer({
   /** Returns true if the reply was saved; false on failure (quota). */
   onPost: (
     author: string,
+    color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
   ) => boolean;
@@ -1015,6 +1127,11 @@ function ReplyComposer({
     authors.length > 0 ? authors[0] : NEW_NAME,
   );
   const [newName, setNewName] = useState("");
+  const [color, setColor] = useState<CommentColor>(() =>
+    authors.length > 0
+      ? commentRepository.colorForAuthor(authors[0])
+      : DEFAULT_COMMENT_COLOR,
+  );
   const [text, setText] = useState("");
   const [attachment, setAttachment] = useState<CommentAttachment | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -1030,7 +1147,7 @@ function ReplyComposer({
       setError("Please enter a reply.");
       return;
     }
-    const ok = onPost(resolvedName, text.trim(), attachment);
+    const ok = onPost(resolvedName, color, text.trim(), attachment);
     if (!ok) {
       setError("Image too large to attach. Remove it and try again.");
     }
@@ -1046,6 +1163,7 @@ function ReplyComposer({
         choice={choice}
         onChoiceChange={(v) => {
           setChoice(v);
+          if (v !== NEW_NAME) setColor(commentRepository.colorForAuthor(v));
           setError(null);
         }}
         newName={newName}
@@ -1054,6 +1172,7 @@ function ReplyComposer({
           setError(null);
         }}
       />
+      <CommentColorPicker value={color} onChange={setColor} />
       <Textarea
         aria-label="Reply"
         rows={2}
@@ -1117,15 +1236,21 @@ function ReplyRow({
   return (
     <div
       className="flex flex-col gap-1 border-l-2 pl-[var(--spacing-150,12px)]"
-      style={{ borderColor: C.border, opacity: deleted ? 0.7 : 1 }}
+      style={{
+        borderColor: deleted ? C.border : commentColorValue(reply.color),
+        opacity: deleted ? 0.7 : 1,
+      }}
     >
       <div className="flex items-center justify-between gap-2">
-        <span
-          className="text-[length:var(--body-sm-medium-size,12px)] font-semibold"
-          style={{ color: C.textPrimary }}
-        >
-          {reply.author}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <AuthorAvatar author={reply.author} color={reply.color} small />
+          <span
+            className="text-[length:var(--body-sm-medium-size,12px)] font-semibold"
+            style={{ color: C.textPrimary }}
+          >
+            {reply.author}
+          </span>
+        </div>
         {deleted ? (
           <StatusBadge deleted />
         ) : (
@@ -1189,6 +1314,7 @@ function MarkerBubble({
   onReply: (
     parentId: string,
     author: string,
+    color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
   ) => boolean;
@@ -1211,17 +1337,20 @@ function MarkerBubble({
           flipUp ? "-100%" : "0"
         }) translate(${flipRight ? "-14px" : "14px"}, ${flipUp ? "-14px" : "14px"})`,
         backgroundColor: C.surface,
-        borderColor: C.border,
+        borderColor: parentDeleted ? C.border : commentColorValue(comment.color),
       }}
     >
       {/* Parent comment */}
       <div className="flex items-center justify-between gap-2">
-        <span
-          className="text-[length:var(--body-md-medium-size,14px)] font-semibold"
-          style={{ color: C.textPrimary }}
-        >
-          {comment.author}
-        </span>
+        <div className="flex items-center gap-2">
+          <AuthorAvatar author={comment.author} color={comment.color} />
+          <span
+            className="text-[length:var(--body-md-medium-size,14px)] font-semibold"
+            style={{ color: C.textPrimary }}
+          >
+            {comment.author}
+          </span>
+        </div>
         {parentDeleted ? (
           <StatusBadge deleted />
         ) : (
@@ -1280,8 +1409,8 @@ function MarkerBubble({
         <div className="mt-1">
           <ReplyComposer
             authors={authors}
-            onPost={(author, text, attachment) => {
-              const ok = onReply(comment.id, author, text, attachment);
+            onPost={(author, color, text, attachment) => {
+              const ok = onReply(comment.id, author, color, text, attachment);
               if (ok) setReplying(false);
               return ok;
             }}
@@ -1336,6 +1465,7 @@ function Marker({
   onReply: (
     parentId: string,
     author: string,
+    color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
   ) => boolean;
@@ -1369,11 +1499,17 @@ function Marker({
           deleted ? "border-dashed" : ""
         }`}
         style={{
-          backgroundColor: deleted ? C.surface2 : C.brandBg,
+          backgroundColor: deleted
+            ? C.surface2
+            : commentColorValue(comment.color),
           borderColor: deleted ? C.textMuted : C.brandFgOn,
           color: deleted ? C.textMuted : C.brandFgOn,
           opacity: deleted ? 0.85 : 1,
-          ...(open ? { boxShadow: FOCUS_RING } : null),
+          ...(open
+            ? {
+                boxShadow: `0 0 0 2px ${C.surface}, 0 0 0 4px ${commentColorValue(comment.color)}`,
+              }
+            : null),
         }}
       >
         {index + 1}
@@ -1433,6 +1569,9 @@ export function PrototypeCommentLayer(): JSX.Element | null {
         xPct: anchor.xPct,
         yPct: anchor.yPct,
         targetLabel: anchor.targetLabel || "Selected region",
+        color: commentRepository.colorForAuthor(
+          commentRepository.listAuthors()[0] ?? "",
+        ),
       });
     }
     window.addEventListener("fiber:start-comment", onStartComment as EventListener);
@@ -1478,17 +1617,27 @@ export function PrototypeCommentLayer(): JSX.Element | null {
     captureEl.style.pointerEvents = prevPE;
     const targetLabel = deriveTargetLabel(beneath, host);
     setOpenMarkerId(null);
-    setDraft({ xPct, yPct, targetLabel });
+    setDraft({
+      xPct,
+      yPct,
+      targetLabel,
+      color:
+        authors.length > 0
+          ? commentRepository.colorForAuthor(authors[0])
+          : DEFAULT_COMMENT_COLOR,
+    });
   }
 
   function postDraft(
     author: string,
+    color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
   ): boolean {
     if (!draft) return false;
     const ok = addComment(
       author,
+      color,
       text,
       { xPct: draft.xPct, yPct: draft.yPct, targetLabel: draft.targetLabel },
       attachment,
@@ -1543,7 +1692,10 @@ export function PrototypeCommentLayer(): JSX.Element | null {
           >
             <span
               className="absolute flex size-[26px] -translate-x-1/2 -translate-y-full items-center justify-center rounded-full rounded-bl-none border-2 shadow-md"
-              style={{ backgroundColor: C.brandBg, borderColor: C.brandFgOn }}
+              style={{
+                backgroundColor: commentColorValue(draft.color),
+                borderColor: C.brandFgOn,
+              }}
               aria-hidden
             >
               <ChatCircle size={13} style={{ color: C.brandFgOn }} />
@@ -1554,6 +1706,13 @@ export function PrototypeCommentLayer(): JSX.Element | null {
             authors={authors}
             onPost={postDraft}
             onCancel={() => setDraft(null)}
+            onColorChange={(color) =>
+              setDraft((current) =>
+                current && current.color !== color
+                  ? { ...current, color }
+                  : current,
+              )
+            }
           />
         </div>
       )}
@@ -1640,6 +1799,24 @@ export function PrototypeCollabOverlay({
       /* ignore quota / disabled storage */
     }
   };
+
+  // Annotation create/edit uses the shared SidePanel. Close either collaboration
+  // list panel first so drawers never stack or fight over focus/inert state.
+  useEffect(() => {
+    const onAnnotationEditorOpen = () => {
+      setOptionsOpen(false);
+      setShowCommentsOpen(false);
+    };
+    window.addEventListener(
+      "fiber:annotation-editor-open",
+      onAnnotationEditorOpen,
+    );
+    return () =>
+      window.removeEventListener(
+        "fiber:annotation-editor-open",
+        onAnnotationEditorOpen,
+      );
+  }, []);
 
   // Read comments (re-reads whenever tick / prototype changes).
   const comments = useMemo<PrototypeComment[]>(
@@ -1765,6 +1942,7 @@ export function PrototypeCollabOverlay({
 
   function addComment(
     author: string,
+    color: CommentColor,
     text: string,
     anchor: CommentAnchor,
     attachment: CommentAttachment | null,
@@ -1776,6 +1954,7 @@ export function PrototypeCollabOverlay({
         versionId: viewedVersion.id,
         versionName: viewedVersion.name,
         author,
+        color,
         text,
         anchor,
         attachment: attachment ?? undefined,
@@ -1792,6 +1971,7 @@ export function PrototypeCollabOverlay({
   function addReply(
     parentId: string,
     author: string,
+    color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
   ): boolean {
@@ -1805,6 +1985,7 @@ export function PrototypeCollabOverlay({
         versionId: parent?.versionId ?? viewedVersion.id,
         versionName: parent?.versionName ?? viewedVersion.name,
         author,
+        color,
         text,
         parentId,
         attachment: attachment ?? undefined,

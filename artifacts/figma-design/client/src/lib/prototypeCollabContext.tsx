@@ -17,6 +17,7 @@ import type {
   PrototypeComment,
   CommentAnchor,
   CommentAttachment,
+  CommentColor,
 } from "@/lib/commentStore";
 import type {
   DesignAnnotation,
@@ -81,6 +82,7 @@ export interface PrototypeCollabContextValue {
    */
   addComment: (
     author: string,
+    color: CommentColor,
     text: string,
     anchor: CommentAnchor,
     attachment: CommentAttachment | null,
@@ -92,6 +94,7 @@ export interface PrototypeCollabContextValue {
   addReply: (
     parentId: string,
     author: string,
+    color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
   ) => boolean;
