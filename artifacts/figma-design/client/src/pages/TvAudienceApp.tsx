@@ -3,7 +3,7 @@
  *
  * Rendered OUTSIDE the design-system explorer (no explorer sidebar). It provides
  * a proper Fiber navigation header (Primary Navigation + Secondary Navigation
- * "Intelligence" module) and then renders the existing dashboard body.
+ * "Reports" module) and then renders the existing dashboard body.
  *
  * The navigation anatomy + tokens are copied locally from
  * client/src/pages/ds/NavigationPage.tsx (per requirement — do not import the
@@ -39,9 +39,9 @@ const PRIMARY_NAV_H = 64;
 const SECONDARY_NAV_H = 56;
 const HEADER_H = PRIMARY_NAV_H + SECONDARY_NAV_H; // 120px total sticky header
 
-// Center nav modules. "Audiences" is the ACTIVE item (matches the Figma spec).
+// This product experience belongs to the Reports module.
 const NAV_ITEMS = ["Intelligence", "Audiences", "Creatives", "Campaigns", "Reports"] as const;
-const ACTIVE_ITEM: (typeof NAV_ITEMS)[number] = "Audiences";
+const ACTIVE_ITEM: (typeof NAV_ITEMS)[number] = "Reports";
 
 // The active-item 4px gradient underline (literal stops from the JSON:
 // #d71982 @ 25.52% → #ff540c @ 59.375% → #dad310 @ 100%).
@@ -321,18 +321,8 @@ function PrimaryNavigation() {
 }
 
 /* ------------------------------------------------- Secondary Navigation ---- */
-/* Intelligence module row with "TV Audience Intelligence" as active item.
- * Anatomy/tokens copied from NavigationPage.tsx SecondaryNavigation. */
-function StandardBadge({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="relative flex h-[18px] shrink-0 items-center justify-center gap-[var(--numbers-2,2px)] rounded-[var(--radiuses-small,2px)] bg-[var(--container-dynamic-neutral-bold-background-default,#4b4b59)] px-[3px] py-0">
-      <p className="whitespace-nowrap text-center text-[length:var(--body-sm-medium-size,12px)] font-medium not-italic leading-[var(--body-sm-medium-line-height,18px)] text-[var(--container-dynamic-neutral-bold-foreground-default,#ffffff)]" style={{ fontFamily: FONT }}>
-        {children}
-      </p>
-    </div>
-  );
-}
-
+/* Reports module row. Anatomy/tokens and labels match the Reports variant in
+ * NavigationPage.tsx SecondaryNavigation. */
 function SecondaryNavigation() {
   const activeColor = "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]";
   const regularColor = "text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]";
@@ -347,19 +337,14 @@ function SecondaryNavigation() {
       data-name="Secondary Navigation"
     >
       <nav
-        aria-label="Intelligence sections"
+        aria-label="Reports sections"
         className="absolute left-1/2 top-[calc(50%+0.5px)] flex -translate-x-1/2 -translate-y-1/2 items-center gap-[var(--spacing-24,24px)] whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] not-italic leading-[var(--body-md-regular-line-height,20px)]"
         style={{ fontFamily: FONT }}
       >
         <a href="/tv-audience-intelligence" aria-current="page" className={`shrink-0 font-semibold ${activeColor}`}>
-          TV Audience Intelligence
+          Standard
         </a>
-        <span className={`shrink-0 font-normal ${regularColor}`}>Watching</span>
-        <span className="relative flex shrink-0 items-center gap-[var(--numbers-8,8px)]">
-          <span className={`shrink-0 font-normal ${regularColor}`}>Browsing</span>
-          <StandardBadge>Beta</StandardBadge>
-        </span>
-        <span className={`shrink-0 font-normal ${regularColor}`}>Buying</span>
+        <span className={`shrink-0 font-normal ${regularColor}`}>Advanced</span>
       </nav>
     </div>
   );
@@ -367,115 +352,11 @@ function SecondaryNavigation() {
 
 /* ------------------------------------------------------------- Page -------- */
 
-/* ---------------------------------------------------- Version strip -------- */
-/* A version-context strip rendered INSIDE the prototype (under its own nav) so
- * switching versions visibly changes the prototype itself, not just the
- * floating chip. Older versions show their FROZEN snapshot values; the newest
- * version shows the live prototype values. */
-
-function fmtDate(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-const STATUS_STYLE: Record<string, { bg: string; fg: string }> = {
-  Live: {
-    bg: "var(--container-dynamic-success-subtle-background-default,#e7faef)",
-    fg: "var(--container-dynamic-success-subtle-foreground-default,#1e8158)",
-  },
-  Draft: {
-    bg: "var(--container-dynamic-neutral-subtle-background-hover,#71718014)",
-    fg: "var(--surface-foreground-static-neutral-lvl3,#717180)",
-  },
-  Archived: {
-    bg: "var(--container-dynamic-neutral-subtle-background-hover,#71718014)",
-    fg: "var(--surface-foreground-static-neutral-lvl3,#717180)",
-  },
-};
-
-function VersionContextStrip() {
-  const ctx = usePrototypeVersion();
-  // Rendered version-unaware (e.g. the /share view) → no strip.
-  if (!ctx) return null;
-
-  const { prototype, viewedVersion, isNewest } = ctx;
-  // Newest = live prototype values; older = frozen snapshot values.
-  const description = isNewest
-    ? prototype.description
-    : viewedVersion.snapshot?.description ||
-      viewedVersion.description ||
-      prototype.description;
-  const status = isNewest
-    ? prototype.status
-    : viewedVersion.snapshot?.status || prototype.status;
-  const st = STATUS_STYLE[status] ?? STATUS_STYLE.Draft;
-
-  return (
-    <div
-      className="w-full border-b border-solid"
-      style={{
-        backgroundColor: "var(--surface-background-lvl1,#ffffff)",
-        borderColor: "var(--border-static-subtle-neutral,#e1e1e8)",
-      }}
-      aria-label="Prototype version context"
-    >
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-2 px-6 py-3 md:flex-row md:items-center md:justify-between md:px-10">
-        <div className="flex items-center gap-2">
-          <span
-            className="inline-flex items-center rounded-full px-2 py-0.5 text-[12px] font-semibold"
-            style={{
-              backgroundColor:
-                "var(--container-dynamic-brand-subtle-background-default,#f6ebff)",
-              color: "var(--surface-foreground-dynamic-brand-default,#7c33b5)",
-            }}
-          >
-            {viewedVersion.name}
-          </span>
-          <span
-            className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium"
-            style={{ backgroundColor: st.bg, color: st.fg }}
-          >
-            {status}
-          </span>
-          {isNewest ? (
-            <span
-              className="text-[12px] font-medium"
-              style={{ color: "var(--surface-foreground-static-neutral-lvl3,#717180)" }}
-            >
-              Live · current
-            </span>
-          ) : (
-            <span
-              className="text-[12px] font-medium"
-              style={{ color: "var(--surface-foreground-static-neutral-lvl3,#717180)" }}
-            >
-              Snapshot · {fmtDate(viewedVersion.createdAt)}
-            </span>
-          )}
-        </div>
-        <p
-          className="min-w-0 truncate text-[length:var(--body-md-regular-size,14px)]"
-          style={{
-            color: "var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)",
-          }}
-        >
-          {description}
-        </p>
-      </div>
-    </div>
-  );
-}
-
 /* ------------------------------------------ Version → renderer map --------- */
 /* A version-bound renderer registry so future per-version prototype renderers
  * can plug in (keyed by version id). Unknown versions fall back to the current
- * dashboard. The version-aware strip above communicates which version's
- * (frozen or live) values are in effect. */
+ * dashboard. Version selection and current-version context remain available in
+ * the collaboration overlay controls. */
 
 type VersionRenderer = (args: {
   prototype: Prototype;
@@ -542,7 +423,7 @@ function PrototypeContentRegion() {
   );
 }
 
-/** The full prototype experience (header + version strip + body). Rendered as
+/** The full prototype experience (header + body). Rendered as
  *  the overlay's children so it is re-mounted when the viewed version changes.
  *
  *  The Fiber navigation header is auto-hiding (floating), not sticky: at the
@@ -597,8 +478,6 @@ function TvAudienceExperience() {
       >
         <PrimaryNavigation />
         <SecondaryNavigation />
-        {/* Version-context strip lives directly under the prototype's own nav. */}
-        <VersionContextStrip />
       </header>
 
       <PrototypeContentRegion />
