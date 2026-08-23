@@ -87,6 +87,7 @@ import type { Filters, ConsumptionKey } from "./data";
 import {
   DonutChart,
   ComboChart,
+  ShowTrendChart,
   GenreBars,
   TemporalHeatmap,
   RadarChart,
@@ -393,6 +394,34 @@ export default function V4ContentPlanner() {
     return base.slice(0, Number(topN));
   }, [shows, showsFilter, topN]);
 
+  const showTrends = useMemo(() => {
+    const labels =
+      trendsWeeks === "doy7"
+        ? ["D−6", "D−5", "D−4", "D−3", "D−2", "Yesterday", "Today"]
+        : trendsWeeks === "doy15"
+          ? ["D−14", "D−11", "D−8", "D−5", "D−2", "Today"]
+          : trendsWeeks === "wow60"
+            ? ["W−8", "W−7", "W−6", "W−5", "W−4", "W−3", "W−2", "Last week", "This week"]
+            : ["W−4", "W−3", "W−2", "Last week", "This week"];
+    const series = filteredShows.slice(0, 10).map((show) => ({
+      name: show.title,
+      detail: show.network,
+      hhPct: show.hhPct,
+      index: show.index,
+      values: labels.map((_, point) => {
+        if (point === labels.length - 1) return show.mins;
+        const variation = seeded(
+          seedKey(filters, `show-trend-${trendsWeeks}-${show.title}-${point}`),
+          0.72,
+          1.12,
+        );
+        const direction = 0.9 + (point / Math.max(labels.length - 1, 1)) * 0.1;
+        return Math.max(1, Math.round(show.mins * variation * direction));
+      }),
+    }));
+    return { labels, series };
+  }, [filteredShows, filters, trendsWeeks]);
+
   /* ---- §7 Temporal heatmap ---- */
   const temporalChannelOptions = useMemo(() => {
     const list = channelsFor(market, tabToType(temporalTab))
@@ -686,9 +715,19 @@ export default function V4ContentPlanner() {
               Time Spent by Channel / App
               {selectedTypeName ? ` · tab synced to ${selectedTypeName}` : ""}
             </span>
-            {/* Tabs Bar — underline, left-aligned WITHIN this column. */}
-            <div className="flex justify-start">
+            {/* Tabs left and the chart's legends right on one balanced row. */}
+            <div className="flex flex-wrap items-center justify-between gap-x-[var(--spacing-200,16px)] gap-y-[var(--spacing-75,6px)]">
               <TabsBarUnderline options={TAB_LABELS} value={channelTab} onChange={setChannelTab} ariaLabel="Channel TV type" />
+              <div className="ml-auto flex flex-wrap items-center justify-end gap-[var(--spacing-200,16px)]" aria-label="Time spent chart legend">
+                <span className="flex items-center gap-[var(--spacing-75,6px)] text-[length:var(--body-md-regular-size,14px)]" style={{ color: BODY2 }}>
+                  <span className="h-[12px] w-[12px] rounded-[var(--radius-25,2px)]" style={{ backgroundColor: CHART.primary }} aria-hidden />
+                  Avg min/week
+                </span>
+                <span className="flex items-center gap-[var(--spacing-75,6px)] text-[length:var(--body-md-regular-size,14px)]" style={{ color: BODY2 }}>
+                  <span className="h-[3px] w-[16px] rounded-full" style={{ backgroundColor: CHART.line }} aria-hidden />
+                  % of watch time
+                </span>
+              </div>
             </div>
             <CardBody
               loading={loading}
@@ -706,6 +745,7 @@ export default function V4ContentPlanner() {
                 lineLabel="% of watch time"
                 barUnit=" min"
                 lineUnit="%"
+                showLegend={false}
               />
             </CardBody>
           </div>
@@ -752,20 +792,10 @@ export default function V4ContentPlanner() {
           emptyMessage="No shows match these filters — change the genre filter or viewing scope."
         >
           {trendsView === "Shows" ? (
-            <ComboChart
-              categories={filteredShows.map((show) => show.title)}
-              categoryDetails={filteredShows.map((show) => show.network)}
-              bars={filteredShows.map((show) => show.mins)}
-              secondaryBars={filteredShows.map((show) => show.hhPct)}
-              line={filteredShows.map((show) => show.index)}
-              barLabel="Avg min / household"
-              secondaryBarLabel="Households"
-              lineLabel="Index"
-              barAxisLabel="Avg min / HH"
-              secondaryBarAxisLabel="HH households (%)"
-              lineAxisLabel="Index"
-              barUnit=" min"
-              secondaryBarUnit="%"
+            <ShowTrendChart
+              labels={showTrends.labels}
+              series={showTrends.series}
+              totalShows={filteredShows.length}
               legendRight={
                 <>
                   <SearchableDropdown id="v4-topn" label="" value={topN} options={TOP_N} onChange={setTopN} compact />
@@ -773,12 +803,6 @@ export default function V4ContentPlanner() {
                   <SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} compact />
                 </>
               }
-              minChartWidth={
-                filteredShows.length > 10
-                  ? filteredShows.length * 64 + 180
-                  : undefined
-              }
-              scrollAriaLabel={`Top ${filteredShows.length} shows chart. Scroll horizontally to view all shows.`}
             />
           ) : (
             <GenreBars

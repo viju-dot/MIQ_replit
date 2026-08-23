@@ -264,6 +264,7 @@ export function ComboChart({
   legendRight,
   minChartWidth,
   scrollAriaLabel,
+  showLegend = true,
 }: {
   categories: string[];
   /** Optional secondary x-axis label, e.g. each show's platform/network. */
@@ -290,6 +291,8 @@ export function ComboChart({
   /** Grow only the plot/axes area and make it horizontally scrollable. */
   minChartWidth?: number;
   scrollAriaLabel?: string;
+  /** Allows a parent to place the same legend beside adjacent controls. */
+  showLegend?: boolean;
 }) {
   const [hover, setHover] = useState<number | null>(null);
   const plotW = 720;
@@ -323,7 +326,7 @@ export function ComboChart({
   return (
     <div className="flex flex-col gap-[var(--spacing-150,12px)]">
       {/* Legend */}
-      <div className="flex flex-wrap items-center justify-between gap-x-[var(--spacing-200,16px)] gap-y-[var(--spacing-75,6px)]">
+      {showLegend && <div className="flex flex-wrap items-center justify-between gap-x-[var(--spacing-200,16px)] gap-y-[var(--spacing-75,6px)]">
         <div className="flex flex-wrap items-center gap-x-[var(--spacing-200,16px)] gap-y-[var(--spacing-75,6px)]">
           <div className="flex items-center gap-[var(--spacing-75,6px)]">
           <span
@@ -357,7 +360,7 @@ export function ComboChart({
             {legendRight}
           </div>
         )}
-      </div>
+      </div>}
 
       <div
         className="w-full overflow-x-auto pb-[var(--spacing-100,8px)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
@@ -560,6 +563,195 @@ export function ComboChart({
           ))}
         </div>
         </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ================================================ Multi-show trend lines === */
+
+const TREND_COLORS = [
+  CHART.primary,
+  CHART.line,
+  CHART.secondary,
+  CHART.tertiary,
+  CHART.quaternary,
+  CHART.positive,
+  CHART.negative,
+] as const;
+
+export function ShowTrendChart({
+  labels,
+  series,
+  legendRight,
+  totalShows,
+}: {
+  labels: string[];
+  series: {
+    name: string;
+    detail?: string;
+    values: number[];
+    hhPct: number;
+    index: number;
+  }[];
+  legendRight?: ReactNode;
+  totalShows: number;
+}) {
+  const [hover, setHover] = useState<{ series: number; point: number } | null>(null);
+  const plotW = 760;
+  const plotH = 238;
+  const values = series.flatMap((item) => item.values);
+  const max = Math.max(...values, 1);
+  const min = Math.max(0, Math.floor(Math.min(...values, 0) / 10) * 10);
+  const ceiling = Math.ceil(max / 10) * 10;
+  const span = Math.max(ceiling - min, 1);
+  const ticks = Array.from({ length: 5 }, (_, i) =>
+    Math.round(ceiling - (span * i) / 4),
+  );
+  const xFor = (point: number) =>
+    labels.length <= 1 ? plotW / 2 : (point / (labels.length - 1)) * plotW;
+  const yFor = (value: number) => plotH - ((value - min) / span) * plotH;
+
+  return (
+    <div className="flex min-w-0 flex-col gap-[var(--spacing-150,12px)]">
+      <div className="flex flex-wrap items-start justify-between gap-x-[var(--spacing-200,16px)] gap-y-[var(--spacing-100,8px)] md:flex-nowrap">
+        <div
+          className="flex min-w-0 flex-1 flex-wrap items-center gap-x-[var(--spacing-150,12px)] gap-y-[var(--spacing-50,4px)]"
+          role="list"
+          aria-label="Show trend legend"
+        >
+          {series.map((item, index) => (
+            <div key={item.name} className="flex min-w-0 items-center gap-[var(--spacing-50,4px)]" role="listitem">
+              <span
+                className="block h-[3px] w-[14px] shrink-0 rounded-full"
+                style={{ backgroundColor: TREND_COLORS[index % TREND_COLORS.length] }}
+                aria-hidden
+              />
+              <span
+                className="max-w-[120px] truncate text-[length:var(--body-sm-regular-size,12px)]"
+                style={{ color: AXIS_LABEL }}
+                title={item.name}
+              >
+                {item.name}
+              </span>
+            </div>
+          ))}
+          {totalShows > series.length && (
+            <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ color: MUTED }}>
+              Top {series.length} lines shown from {totalShows}
+            </span>
+          )}
+        </div>
+        {legendRight && (
+          <div className="ml-auto flex shrink-0 flex-wrap items-center justify-end gap-[var(--spacing-100,8px)]">
+            {legendRight}
+          </div>
+        )}
+      </div>
+
+      <div className="flex w-full items-end gap-[var(--spacing-100,8px)]">
+        <span className="w-[62px] shrink-0 text-right text-[10px] font-medium" style={{ color: CHART.primary }}>
+          Avg min / HH
+        </span>
+        <span className="min-w-0 flex-1 text-center text-[10px] font-medium" style={{ color: AXIS_LABEL }}>
+          Time
+        </span>
+      </div>
+      <div className="flex w-full gap-[var(--spacing-100,8px)]">
+        <div className="flex w-[62px] shrink-0 flex-col justify-between text-right" style={{ height: plotH }}>
+          {ticks.map((tick) => (
+            <span key={tick} className="text-[length:var(--body-sm-regular-size,12px)] tabular-nums" style={{ color: AXIS_LABEL }}>
+              {tick} min
+            </span>
+          ))}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="relative w-full" style={{ height: plotH }}>
+            {ticks.map((tick, index) => (
+              <div
+                key={tick}
+                className="absolute left-0 right-0 h-0 border-t border-solid"
+                style={{ borderColor: GRID, top: `${(index / (ticks.length - 1)) * 100}%` }}
+                aria-hidden
+              />
+            ))}
+            <svg
+              className="absolute inset-0 h-full w-full overflow-visible"
+              viewBox={`0 0 ${plotW} ${plotH}`}
+              preserveAspectRatio="none"
+              role="img"
+              aria-label={`Average minutes per household over time for ${series.length} top shows. Vertical axis ranges from ${min} to ${ceiling} minutes.`}
+            >
+              {series.map((item, seriesIndex) => {
+                const points = item.values.map((value, point) => `${xFor(point)},${yFor(value)}`).join(" ");
+                const dim = hover != null && hover.series !== seriesIndex;
+                return (
+                  <polyline
+                    key={item.name}
+                    points={points}
+                    fill="none"
+                    stroke={TREND_COLORS[seriesIndex % TREND_COLORS.length]}
+                    strokeWidth={hover?.series === seriesIndex ? 3 : 2}
+                    strokeDasharray={seriesIndex >= TREND_COLORS.length ? "5 3" : undefined}
+                    opacity={dim ? 0.2 : 1}
+                    vectorEffect="non-scaling-stroke"
+                  />
+                );
+              })}
+              {series.map((item, seriesIndex) =>
+                item.values.map((value, point) => (
+                  <circle
+                    key={`${item.name}-${point}`}
+                    cx={xFor(point)}
+                    cy={yFor(value)}
+                    r={hover?.series === seriesIndex && hover.point === point ? 4 : 2.5}
+                    fill={TREND_COLORS[seriesIndex % TREND_COLORS.length]}
+                    opacity={hover != null && hover.series !== seriesIndex ? 0.2 : 1}
+                    vectorEffect="non-scaling-stroke"
+                  />
+                )),
+              )}
+            </svg>
+            {series.flatMap((item, seriesIndex) =>
+              item.values.map((value, point) => (
+                <button
+                  key={`${item.name}-${point}`}
+                  type="button"
+                  className="absolute z-10 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full focus:outline-none focus-visible:outline focus-visible:outline-2"
+                  style={{
+                    left: `${(xFor(point) / plotW) * 100}%`,
+                    top: `${(yFor(value) / plotH) * 100}%`,
+                  }}
+                  onMouseEnter={() => setHover({ series: seriesIndex, point })}
+                  onMouseLeave={() => setHover(null)}
+                  onFocus={() => setHover({ series: seriesIndex, point })}
+                  onBlur={() => setHover(null)}
+                  aria-label={`${item.name}${item.detail ? `, ${item.detail}` : ""}, ${labels[point]}: ${value} average minutes per household, ${item.hhPct.toFixed(1)}% households, index ${item.index}`}
+                >
+                  {hover?.series === seriesIndex && hover.point === point && (
+                    <Tooltip
+                      lines={[
+                        { label: item.name },
+                        ...(item.detail ? [{ label: "Platform", value: item.detail }] : []),
+                        { label: "Period", value: labels[point] },
+                        { label: "Avg min / household", value: `${value} min` },
+                        { label: "Households", value: `${item.hhPct.toFixed(1)}%` },
+                        { label: "Index", value: `${item.index}` },
+                      ]}
+                    />
+                  )}
+                </button>
+              )),
+            )}
+          </div>
+          <div className="mt-[var(--spacing-75,6px)] flex justify-between">
+            {labels.map((label) => (
+              <span key={label} className="text-[length:var(--body-sm-regular-size,12px)]" style={{ color: AXIS_LABEL }}>
+                {label}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </div>
