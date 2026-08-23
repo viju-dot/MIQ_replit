@@ -630,6 +630,7 @@ export function SearchableDropdown({
   onChange,
   disabled = false,
   compact = false,
+  align = "left",
 }: {
   id: string;
   label: string;
@@ -639,6 +640,8 @@ export function SearchableDropdown({
   disabled?: boolean;
   /** Fiber compact variant for dense card toolbars. */
   compact?: boolean;
+  /** Horizontal popup alignment relative to the trigger. */
+  align?: "left" | "right";
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -711,7 +714,9 @@ export function SearchableDropdown({
 
       {open && !disabled && (
         <div
-          className={`absolute left-0 z-50 flex w-full min-w-[220px] flex-col overflow-hidden rounded-[var(--radius-50,4px)] ${
+          className={`absolute z-50 flex w-full min-w-[220px] flex-col overflow-hidden rounded-[var(--radius-50,4px)] ${
+            align === "right" ? "right-0" : "left-0"
+          } ${
             compact && !label ? "top-[32px]" : "top-[64px]"
           }`}
           style={{

@@ -778,9 +778,9 @@ export default function V4ContentPlanner() {
               secondaryBarUnit="%"
               legendRight={
                 <>
-                  <SearchableDropdown id="v4-topn" label="" value={topN} options={TOP_N} onChange={setTopN} compact />
-                  <SearchableDropdown id="v4-showsfilter" label="" value={showsFilter} options={showFilterOptions} onChange={setShowsFilter} compact />
-                  <SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} compact />
+                  <SearchableDropdown id="v4-topn" label="" value={topN} options={TOP_N} onChange={setTopN} compact align="right" />
+                  <SearchableDropdown id="v4-showsfilter" label="" value={showsFilter} options={showFilterOptions} onChange={setShowsFilter} compact align="right" />
+                  <SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} compact align="right" />
                 </>
               }
               minChartWidth={
@@ -817,7 +817,7 @@ export default function V4ContentPlanner() {
                   );
                 }
               }}
-              legendRight={<SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} compact />}
+              legendRight={<SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} compact align="right" />}
             />
           )}
         </CardBody>
@@ -856,8 +856,9 @@ export default function V4ContentPlanner() {
               options={temporalChannelOptions}
               onChange={setTemporalChannel}
               compact
+              align="right"
             />
-            <SearchableDropdown id="v4-temporal-weeks" label="" value={temporalWeeks} options={LOOKBACK} onChange={setTemporalWeeks} compact />
+            <SearchableDropdown id="v4-temporal-weeks" label="" value={temporalWeeks} options={LOOKBACK} onChange={setTemporalWeeks} compact align="right" />
           </div>
         </div>
         <CardBody
