@@ -87,7 +87,6 @@ import type { Filters, ConsumptionKey } from "./data";
 import {
   DonutChart,
   ComboChart,
-  GenreBars,
   TemporalHeatmap,
   RadarChart,
   MigrationSankey,
@@ -792,12 +791,39 @@ export default function V4ContentPlanner() {
               scrollAriaLabel={`Top ${filteredShows.length} shows chart. Scroll horizontally to view all shows.`}
             />
           ) : (
-            <GenreBars
-              data={genres}
-              selected={selectedGenre}
-              onSelect={(g) => {
-                setSelectedGenre((cur) => (cur === g ? null : g));
+            <ComboChart
+              categories={genres.map((genre) => genre.name)}
+              bars={genres.map((genre) => genre.mins)}
+              secondaryBars={genres.map((genre) => genre.pct)}
+              line={genres.map((genre) => genre.index)}
+              barLabel="Avg minutes / week"
+              secondaryBarLabel="Share of watch time"
+              lineLabel="Index"
+              barAxisLabel="Avg min / week"
+              secondaryBarAxisLabel="Watch time (%)"
+              lineAxisLabel="Index"
+              barUnit=" min"
+              secondaryBarUnit="%"
+              selectedIndex={
+                selectedGenre
+                  ? genres.findIndex((genre) => genre.name === selectedGenre)
+                  : null
+              }
+              onSelect={(index) => {
+                const genre = genres[index]?.name;
+                if (genre) {
+                  setSelectedGenre((current) =>
+                    current === genre ? null : genre,
+                  );
+                }
               }}
+              legendRight={
+                <>
+                  <SearchableDropdown id="v4-topn" label="" value={topN} options={TOP_N} onChange={setTopN} compact />
+                  <SearchableDropdown id="v4-showsfilter" label="" value={showsFilter} options={showFilterOptions} onChange={setShowsFilter} compact />
+                  <SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} compact />
+                </>
+              }
             />
           )}
         </CardBody>

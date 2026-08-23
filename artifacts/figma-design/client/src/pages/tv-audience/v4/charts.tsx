@@ -495,6 +495,7 @@ export function ComboChart({
                 onFocus={() => setHover(i)}
                 onBlur={() => setHover(null)}
                 onClick={onSelect ? () => onSelect(i) : undefined}
+                aria-pressed={onSelect ? selectedIndex === i : undefined}
                 aria-label={`${c}${categoryDetails?.[i] ? `, ${categoryDetails[i]}` : ""}: ${barLabel} ${fmtInt(bars[i])}${barUnit}${secondaryBars && secondaryBarLabel ? `, ${secondaryBarLabel} ${secondaryBars[i].toFixed(1)}${secondaryBarUnit}` : ""}, ${lineLabel} ${line[i].toFixed(1)}${lineUnit}${indices ? `, index ${indices[i]} — ${indexExplanation(indices[i])}` : ""}`}
                 className="absolute top-0 h-full focus:outline-none"
                 style={{
