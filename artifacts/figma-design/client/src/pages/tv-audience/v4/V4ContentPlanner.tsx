@@ -43,6 +43,7 @@ import {
   Chip,
   SearchableDropdown,
   SegmentedPills,
+  Toggle,
   TabsBarRounded,
   TabsBarUnderline,
   AlertInfo,
@@ -686,29 +687,55 @@ export default function V4ContentPlanner() {
           (selectedTypeName ? ` · scoped to ${selectedTypeName}` : "")
         }
         ariaLabel="Trends"
-        right={<SegmentedPills options={["Shows", "Genres"]} value={trendsView} onChange={setTrendsView} ariaLabel="Trends view" />}
+        right={
+          <div
+            data-annotate="View by genre toggle"
+            className="flex items-center gap-[var(--spacing-100,8px)]"
+          >
+            <span
+              className="text-[length:var(--body-sm-medium-size,12px)] font-medium"
+              style={{ fontFamily: FONT, color: BODY2 }}
+            >
+              View by genre
+            </span>
+            <Toggle
+              id="v4-trends-view-toggle"
+              label="View trends by genre"
+              on={trendsView === "Genres"}
+              onToggle={() =>
+                setTrendsView((current) =>
+                  current === "Genres" ? "Shows" : "Genres",
+                )
+              }
+            />
+          </div>
+        }
       >
         {/* Controls visually attached to the chart */}
-        <div className="mb-[var(--spacing-150,12px)] flex flex-wrap items-center gap-[var(--spacing-100,8px)]">
+        <div className="mb-[var(--spacing-150,12px)] flex flex-wrap items-center justify-between gap-[var(--spacing-100,8px)]">
           {trendsView === "Shows" ? (
             <>
-              <SearchableDropdown id="v4-topn" label="" value={topN} options={TOP_N} onChange={setTopN} />
-              <SearchableDropdown id="v4-showsfilter" label="" value={showsFilter} options={showFilterOptions} onChange={setShowsFilter} />
-              <SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} />
-              <div
-                className="flex h-[36px] items-center gap-[var(--spacing-75,6px)] rounded-[var(--radius-50,4px)] px-[var(--spacing-100,8px)]"
-                style={{ backgroundColor: CARD_BG, border: `1px solid ${GRID}` }}
-              >
-                <MagnifyingGlass size={16} color={MUTED} aria-hidden />
-                <input
-                  type="text"
-                  value={showSearch}
-                  onChange={(e) => setShowSearch(e.target.value)}
-                  placeholder="Search shows…"
-                  aria-label="Search top indexing shows"
-                  className="w-[150px] bg-transparent text-[length:var(--body-md-regular-size,14px)] outline-none"
-                  style={{ fontFamily: FONT, color: TITLE }}
-                />
+              <div className="flex flex-wrap items-center gap-[var(--spacing-100,8px)]">
+                <div
+                  className="flex h-[36px] items-center gap-[var(--spacing-75,6px)] rounded-[var(--radius-50,4px)] px-[var(--spacing-100,8px)]"
+                  style={{ backgroundColor: CARD_BG, border: `1px solid ${GRID}` }}
+                >
+                  <MagnifyingGlass size={16} color={MUTED} aria-hidden />
+                  <input
+                    type="text"
+                    value={showSearch}
+                    onChange={(e) => setShowSearch(e.target.value)}
+                    placeholder="Search shows…"
+                    aria-label="Search top indexing shows"
+                    className="w-[150px] bg-transparent text-[length:var(--body-md-regular-size,14px)] outline-none"
+                    style={{ fontFamily: FONT, color: TITLE }}
+                  />
+                </div>
+                <SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} />
+              </div>
+              <div className="ml-auto flex flex-wrap items-center justify-end gap-[var(--spacing-100,8px)]">
+                <SearchableDropdown id="v4-topn" label="" value={topN} options={TOP_N} onChange={setTopN} compact />
+                <SearchableDropdown id="v4-showsfilter" label="" value={showsFilter} options={showFilterOptions} onChange={setShowsFilter} compact />
               </div>
             </>
           ) : (

@@ -629,6 +629,7 @@ export function SearchableDropdown({
   options,
   onChange,
   disabled = false,
+  compact = false,
 }: {
   id: string;
   label: string;
@@ -636,6 +637,8 @@ export function SearchableDropdown({
   options: Option[];
   onChange: (v: string) => void;
   disabled?: boolean;
+  /** Fiber compact variant for dense card toolbars. */
+  compact?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -661,7 +664,9 @@ export function SearchableDropdown({
     <div
       ref={ref}
       data-annotate={`${label} filter`}
-      className="relative flex min-w-[160px] flex-col gap-[var(--spacing-50,4px)]"
+      className={`relative flex flex-col gap-[var(--spacing-50,4px)] ${
+        compact ? "min-w-[112px]" : "min-w-[160px]"
+      }`}
     >
       <label
         htmlFor={id}
@@ -680,7 +685,11 @@ export function SearchableDropdown({
           setOpen((o) => !o);
           setQuery("");
         }}
-        className="flex h-[36px] items-center justify-between gap-[var(--spacing-100,8px)] rounded-[var(--radius-50,4px)] px-[var(--spacing-100,8px)] disabled:opacity-50"
+        className={`flex items-center justify-between rounded-[var(--radius-50,4px)] disabled:opacity-50 ${
+          compact
+            ? "h-[28px] gap-[var(--spacing-75,6px)] px-[var(--spacing-75,6px)]"
+            : "h-[36px] gap-[var(--spacing-100,8px)] px-[var(--spacing-100,8px)]"
+        }`}
         style={{
           backgroundColor:
             "var(--container-dynamic-neutral-subtle-background-default-regular, #ffffff)",
@@ -688,17 +697,23 @@ export function SearchableDropdown({
         }}
       >
         <span
-          className="truncate text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)]"
+          className={`truncate ${
+            compact
+              ? "text-[length:var(--body-sm-regular-size,12px)] leading-[var(--body-sm-regular-line-height,18px)]"
+              : "text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)]"
+          }`}
           style={{ fontFamily: FONT, color: selected ? TITLE : MUTED }}
         >
           {selected ? selected.label : "Select…"}
         </span>
-        <CaretDown size={16} color={AXIS_LABEL} aria-hidden />
+        <CaretDown size={compact ? 14 : 16} color={AXIS_LABEL} aria-hidden />
       </button>
 
       {open && !disabled && (
         <div
-          className="absolute left-0 top-[64px] z-50 flex w-full min-w-[220px] flex-col overflow-hidden rounded-[var(--radius-50,4px)]"
+          className={`absolute left-0 z-50 flex w-full min-w-[220px] flex-col overflow-hidden rounded-[var(--radius-50,4px)] ${
+            compact && !label ? "top-[32px]" : "top-[64px]"
+          }`}
           style={{
             backgroundColor: CARD_BG,
             border: `1px solid ${GRID}`,
