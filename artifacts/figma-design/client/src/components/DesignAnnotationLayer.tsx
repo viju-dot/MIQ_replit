@@ -1031,6 +1031,255 @@ function AnchoredPopover({
 }
 
 /* ------------------------------------------------------------------ */
+/* Selection action popup (smart placement around the selected bbox)   */
+/* ------------------------------------------------------------------ */
+
+interface ViewportRect {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+  width: number;
+  height: number;
+}
+
+interface ActionPopupBox {
+  left: number;
+  top: number;
+}
+
+const ACTION_POPUP_GAP = 10;
+const ACTION_POPUP_MARGIN = 12;
+const ACTION_POPUP_FALLBACK_W = 420;
+const ACTION_POPUP_FALLBACK_H = 84;
+
+function intersects(a: ViewportRect, b: ViewportRect): boolean {
+  return (
+    a.left < b.right &&
+    a.right > b.left &&
+    a.top < b.bottom &&
+    a.bottom > b.top
+  );
+}
+
+function intersectionArea(a: ViewportRect, b: ViewportRect): number {
+  const width = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
+  const height = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+  return width * height;
+}
+
+function toViewportSelectionRect(
+  layer: HTMLElement | null,
+  region: PctRect | AnnotationRegion | null,
+): ViewportRect | null {
+  if (!layer || !region) return null;
+  // Percent selection geometry is stored against the canvas parent's full
+  // scroll extent (see rectToPct/measure), not the overlay's visible height.
+  // Invert that exact transform here. Using layerRect.height caused scroll to
+  // be applied twice for low-page selections and produced a large negative Y.
+  const host = layer.parentElement;
+  if (!host) return null;
+  const hostRect = host.getBoundingClientRect();
+  const contentWidth = host.scrollWidth || hostRect.width;
+  const contentHeight = host.scrollHeight || hostRect.height;
+  const left =
+    hostRect.left - host.scrollLeft + (region.xPct / 100) * contentWidth;
+  const top =
+    hostRect.top - host.scrollTop + (region.yPct / 100) * contentHeight;
+  const width = (region.wPct / 100) * contentWidth;
+  const height = (region.hPct / 100) * contentHeight;
+  return { left, top, right: left + width, bottom: top + height, width, height };
+}
+
+/** Prefer current DOM geometry for element picks so scrolling/layout changes
+ * cannot leave the contextual menu tied to an old percentage snapshot. */
+function toViewportPicksRect(picks: ElementPick[]): ViewportRect | null {
+  const rects = picks
+    .filter((pick) => pick.el.isConnected)
+    .map((pick) => pick.el.getBoundingClientRect())
+    .filter((rect) => rect.width > 0 && rect.height > 0);
+  if (rects.length === 0) return null;
+  const left = Math.min(...rects.map((rect) => rect.left));
+  const top = Math.min(...rects.map((rect) => rect.top));
+  const right = Math.max(...rects.map((rect) => rect.right));
+  const bottom = Math.max(...rects.map((rect) => rect.bottom));
+  return {
+    left,
+    top,
+    right,
+    bottom,
+    width: right - left,
+    height: bottom - top,
+  };
+}
+
+/**
+ * Try fully fitting candidates Right → Left → Bottom → Top. If scrolling or a
+ * very large selection makes that impossible, clamp each candidate and score
+ * it, strongly preferring no selection/control-panel overlap.
+ */
+function computeActionPopupBox(
+  selection: ViewportRect | null,
+  popupWidth: number,
+  popupHeight: number,
+  collision: ViewportRect | null,
+): ActionPopupBox {
+  const vw = typeof window !== "undefined" ? window.innerWidth : 1024;
+  const vh = typeof window !== "undefined" ? window.innerHeight : 768;
+  const maxLeft = Math.max(ACTION_POPUP_MARGIN, vw - popupWidth - ACTION_POPUP_MARGIN);
+  const maxTop = Math.max(ACTION_POPUP_MARGIN, vh - popupHeight - ACTION_POPUP_MARGIN);
+  const clampLeft = (left: number) =>
+    Math.max(ACTION_POPUP_MARGIN, Math.min(left, maxLeft));
+  const clampTop = (top: number) =>
+    Math.max(ACTION_POPUP_MARGIN, Math.min(top, maxTop));
+
+  // Page-level selection has no meaningful bbox.
+  if (!selection) {
+    return {
+      left: clampLeft((vw - popupWidth) / 2),
+      top: ACTION_POPUP_MARGIN,
+    };
+  }
+
+  const centerX = selection.left + selection.width / 2;
+  const centerY = selection.top + selection.height / 2;
+  const candidates = [
+    { left: selection.right + ACTION_POPUP_GAP, top: centerY - popupHeight / 2 },
+    {
+      left: selection.left - ACTION_POPUP_GAP - popupWidth,
+      top: centerY - popupHeight / 2,
+    },
+    { left: centerX - popupWidth / 2, top: selection.bottom + ACTION_POPUP_GAP },
+    {
+      left: centerX - popupWidth / 2,
+      top: selection.top - ACTION_POPUP_GAP - popupHeight,
+    },
+  ];
+  const asRect = (left: number, top: number): ViewportRect => ({
+    left,
+    top,
+    right: left + popupWidth,
+    bottom: top + popupHeight,
+    width: popupWidth,
+    height: popupHeight,
+  });
+  const fullyVisible = (box: ViewportRect) =>
+    box.left >= ACTION_POPUP_MARGIN &&
+    box.top >= ACTION_POPUP_MARGIN &&
+    box.right <= vw - ACTION_POPUP_MARGIN &&
+    box.bottom <= vh - ACTION_POPUP_MARGIN;
+
+  for (const candidate of candidates) {
+    const box = asRect(candidate.left, candidate.top);
+    if (
+      fullyVisible(box) &&
+      !intersects(box, selection) &&
+      (!collision || !intersects(box, collision))
+    ) {
+      return candidate;
+    }
+  }
+
+  let best = { left: clampLeft(candidates[0].left), top: clampTop(candidates[0].top) };
+  let bestScore = Number.POSITIVE_INFINITY;
+  candidates.forEach((candidate, priority) => {
+    const left = clampLeft(candidate.left);
+    const top = clampTop(candidate.top);
+    const box = asRect(left, top);
+    const selectionPenalty = intersectionArea(box, selection) * 1_000;
+    const collisionPenalty = collision ? intersectionArea(box, collision) * 2_000 : 0;
+    const clampDistance =
+      Math.abs(left - candidate.left) + Math.abs(top - candidate.top);
+    const score =
+      selectionPenalty + collisionPenalty + clampDistance * 10 + priority;
+    if (score < bestScore) {
+      bestScore = score;
+      best = { left, top };
+    }
+  });
+  return best;
+}
+
+function SelectionActionPopup({
+  layerRef,
+  selection,
+  selectedElements,
+  children,
+}: {
+  layerRef: React.RefObject<HTMLDivElement>;
+  selection: PctRect | AnnotationRegion | null;
+  selectedElements?: ElementPick[];
+  children: React.ReactNode;
+}) {
+  const popupRef = useRef<HTMLDivElement>(null);
+  const [box, setBox] = useState<ActionPopupBox>({
+    left: ACTION_POPUP_MARGIN,
+    top: ACTION_POPUP_MARGIN,
+  });
+
+  useEffect(() => {
+    const recompute = () => {
+      const popupRect = popupRef.current?.getBoundingClientRect();
+      const collisionRect = document
+        .querySelector<HTMLElement>("[data-design-annotation-floating-panel]")
+        ?.getBoundingClientRect();
+      setBox(
+        computeActionPopupBox(
+          (selectedElements && toViewportPicksRect(selectedElements)) ||
+            toViewportSelectionRect(layerRef.current, selection),
+          popupRect?.width ?? ACTION_POPUP_FALLBACK_W,
+          popupRect?.height ?? ACTION_POPUP_FALLBACK_H,
+          collisionRect
+            ? {
+                left: collisionRect.left,
+                top: collisionRect.top,
+                right: collisionRect.right,
+                bottom: collisionRect.bottom,
+                width: collisionRect.width,
+                height: collisionRect.height,
+              }
+            : null,
+        ),
+      );
+    };
+    recompute();
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(recompute)
+        : null;
+    if (popupRef.current) resizeObserver?.observe(popupRef.current);
+    const collision = document.querySelector<HTMLElement>(
+      "[data-design-annotation-floating-panel]",
+    );
+    if (collision) resizeObserver?.observe(collision);
+    window.addEventListener("scroll", recompute, true);
+    window.addEventListener("resize", recompute);
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener("scroll", recompute, true);
+      window.removeEventListener("resize", recompute);
+    };
+  }, [layerRef, selectedElements, selection]);
+
+  return (
+    <div
+      ref={popupRef}
+      data-annotation-ui
+      className="pointer-events-auto fixed z-[9] flex max-h-[calc(100vh-24px)] max-w-[calc(100vw-24px)] flex-col gap-1.5 overflow-y-auto rounded-[var(--radius-100,8px)] border border-solid p-2 shadow-lg"
+      style={{
+        left: `${box.left}px`,
+        top: `${box.top}px`,
+        backgroundColor: C.surface,
+        borderColor: C.brandFg,
+      }}
+      role="status"
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* Popover layout helpers — fixed header, scrollable body, sticky      */
 /* footer (so primary actions never require scrolling — feedback #1).  */
 /* ------------------------------------------------------------------ */
@@ -1976,11 +2225,14 @@ export function DesignAnnotationLayer(): JSX.Element | null {
       {/* Selection confirmation pill (§20) — element multi-select or pending
           region. Never auto-opens the editor; the user presses Annotate. */}
       {!draft && (picks.length > 0 || pendingRegion) && (
-        <div
-          data-annotation-ui
-          className="pointer-events-auto absolute left-1/2 top-3 z-[9] flex max-w-[92%] -translate-x-1/2 flex-col gap-1.5 rounded-[var(--radius-100,8px)] border border-solid p-2 shadow-lg"
-          style={{ backgroundColor: C.surface, borderColor: C.brandFg }}
-          role="status"
+        <SelectionActionPopup
+          layerRef={wrapRef}
+          selectedElements={selectMode === "elements" ? picks : undefined}
+          selection={
+            selectMode === "elements"
+              ? picksBound
+              : pendingRegion?.region ?? null
+          }
         >
           {/* Breadcrumb of the single selected element (§5). Derived from the
               selected pick's own path so it persists after the click (hover
@@ -2063,7 +2315,7 @@ export function DesignAnnotationLayer(): JSX.Element | null {
               </button>
             </div>
           </div>
-        </div>
+        </SelectionActionPopup>
       )}
 
       {/* CREATE / EDIT use the existing Fiber SidePanel rather than an anchored

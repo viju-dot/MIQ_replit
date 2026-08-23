@@ -2094,6 +2094,7 @@ export function PrototypeCollabOverlay({
 
         {/* Floating control cluster — bottom-right, ~24px from edges. */}
         <div
+          data-design-annotation-floating-panel
           className="fixed bottom-[24px] right-[24px] z-40 flex flex-col items-end gap-2"
           style={{ fontFamily: '"DM Sans", Helvetica' }}
         >

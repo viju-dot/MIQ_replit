@@ -1,0 +1,177 @@
+If the selection is on the right
+
+Place the popup on the left side of the selected element.
+
+┌──────────────────────────┐   ┌──────────────┐
+│ Clear | Comment | Annotate│ ← │   Selected   │
+└──────────────────────────┘   │   Element    │
+                               └──────────────┘
+If the selection is in the center
+
+Place the popup directly beside the selection.
+
+Prefer:
+
+Right
+Left
+Below
+Above
+
+Choose the position based on available viewport space.
+
+Large Region / Section Selection
+
+This is particularly important for the second screenshot.
+
+When I select a large region or section, do NOT position the popup based on the page itself.
+
+Calculate the popup position from the selected region's bounding box.
+
+For example:
+
+┌─────────────────────────────────────────────┐
+│                                             │
+│   ┌─────────────────────────────────────┐   │
+│   │                                     │   │
+│   │         SELECTED REGION             │   │
+│   │                                     │   │
+│   │                                     │   │
+│   └─────────────────────────────────────┘   │
+│                              [ACTION POPUP] │
+└─────────────────────────────────────────────┘
+
+The popup should remain visually associated with that selection.
+
+Viewport Boundary Handling
+
+The popup must never go outside the visible viewport.
+
+Calculate available space around the selected element:
+
+Top
+Bottom
+Left
+Right
+
+Then select the best available position.
+
+If the preferred position doesn't have enough room, automatically use the next available position.
+
+Suggested priority:
+
+Right → Left → Bottom → Top
+
+However, dynamically change this based on the actual available space.
+
+Scrolling Behavior
+
+Do not force the user to scroll to the top of the page to access the actions.
+
+If the selected element is currently visible:
+
+Keep the popup visible near the selection.
+Keep it within the current viewport.
+Do not move it to a global fixed location.
+
+If the user scrolls while the selection is still active:
+
+Keep the popup associated with the selected element.
+Recalculate its position as necessary.
+Never leave the action popup stranded somewhere unrelated to the selection.
+Avoid Covering the Selected Element
+
+The popup should not unnecessarily cover the selected element.
+
+Maintain a small consistent gap between:
+
+Selected Element ↔ Action Popup
+
+The selected element should remain visually identifiable with its existing selection outline.
+
+Interaction With Design Annotation Panel
+
+There is another important issue visible in the screenshots.
+
+The Design Annotation panel can appear in the bottom-right area.
+
+The Selected Element action popup must be aware of this panel.
+
+If the annotation panel is open:
+
+Do not place the Selected Element popup underneath it.
+Do not overlap the annotation panel.
+Choose another available position around the selection.
+
+The two UI elements must not compete for the same space.
+
+Keep Existing Actions
+
+Do not change the existing actions.
+
+The popup should continue to contain:
+
+Selection information
+Clear
+Comment instead
+Annotate
+
+Only improve where and how the popup is positioned.
+
+Selection Types
+
+The positioning logic must work for all selection types:
+
+Single Element
+
+Position relative to the selected element.
+
+Multiple Elements
+
+Calculate the combined bounding box of the selection and position the popup relative to that bounding box.
+
+Whole Region / Section
+
+Use the selected region's bounding box.
+
+Page-Level Selection
+
+If there is no meaningful element bounding box, use a sensible viewport position rather than trying to anchor to a nonexistent element.
+
+Important Implementation Principle
+
+Do not hardcode:
+
+top: 20px
+right: 20px
+
+for the selected-element action popup.
+
+Instead, calculate its position dynamically from:
+
+selectedElement.getBoundingClientRect()
+
+or the equivalent bounding-box information already available in the application.
+
+The popup should behave like a contextual action menu attached to the user's selection.
+
+Expected Experience
+
+The final interaction should feel like:
+
+Select something → Actions immediately appear beside the selection → Choose Comment or Annotate
+
+Not:
+
+Select something → Scroll to top → Find actions → Scroll back to the selected element
+
+The goal is to make annotation and commenting much faster, especially when reviewing long screens with many sections and elements.
+
+Important
+
+Do not redesign the selected-element popup.
+
+Do not change the existing Fiber Design System styling.
+
+Do not change the existing annotation functionality.
+
+Only rework the positioning and collision behavior so the popup intelligently follows the selected element/region and remains accessible within the viewport
