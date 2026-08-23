@@ -93,19 +93,12 @@ function ThemeToggle() {
   );
 }
 
-/* The right-hand cluster, per user request: theme toggle, diamond, avatar
- * (gap 20). Search/flask/bell/heart/language removed. */
+/* The right-hand cluster, per user request: theme toggle, avatar (gap 20).
+ * Search/flask/bell/heart/language/diamond removed. */
 function RightCluster() {
   return (
     <div className="relative flex shrink-0 items-center justify-end gap-[20px]" data-name="right">
       <ThemeToggle />
-
-      {/* Single Diamond (24) */}
-      <div className="relative size-[24px] shrink-0" data-name="Single Diamond">
-        <div className="absolute left-1/2 top-1/2 size-[20px] -translate-x-1/2 -translate-y-1/2">
-          <img alt="" className="absolute inset-0 block size-full max-w-none" src={`${A}/pn-diamond.svg`} />
-        </div>
-      </div>
 
       {/* Avatar (Initials, Plan=Pro, 40) */}
       <Avatar />
