@@ -87,7 +87,6 @@ import type { Filters, ConsumptionKey } from "./data";
 import {
   DonutChart,
   ComboChart,
-  ShowTrendChart,
   GenreBars,
   TemporalHeatmap,
   RadarChart,
@@ -393,34 +392,6 @@ export default function V4ContentPlanner() {
     if (showsFilter !== "all") base = base.filter((s) => s.genre === showsFilter);
     return base.slice(0, Number(topN));
   }, [shows, showsFilter, topN]);
-
-  const showTrends = useMemo(() => {
-    const labels =
-      trendsWeeks === "doy7"
-        ? ["D−6", "D−5", "D−4", "D−3", "D−2", "Yesterday", "Today"]
-        : trendsWeeks === "doy15"
-          ? ["D−14", "D−11", "D−8", "D−5", "D−2", "Today"]
-          : trendsWeeks === "wow60"
-            ? ["W−8", "W−7", "W−6", "W−5", "W−4", "W−3", "W−2", "Last week", "This week"]
-            : ["W−4", "W−3", "W−2", "Last week", "This week"];
-    const series = filteredShows.slice(0, 10).map((show) => ({
-      name: show.title,
-      detail: show.network,
-      hhPct: show.hhPct,
-      index: show.index,
-      values: labels.map((_, point) => {
-        if (point === labels.length - 1) return show.mins;
-        const variation = seeded(
-          seedKey(filters, `show-trend-${trendsWeeks}-${show.title}-${point}`),
-          0.72,
-          1.12,
-        );
-        const direction = 0.9 + (point / Math.max(labels.length - 1, 1)) * 0.1;
-        return Math.max(1, Math.round(show.mins * variation * direction));
-      }),
-    }));
-    return { labels, series };
-  }, [filteredShows, filters, trendsWeeks]);
 
   /* ---- §7 Temporal heatmap ---- */
   const temporalChannelOptions = useMemo(() => {
@@ -792,10 +763,20 @@ export default function V4ContentPlanner() {
           emptyMessage="No shows match these filters — change the genre filter or viewing scope."
         >
           {trendsView === "Shows" ? (
-            <ShowTrendChart
-              labels={showTrends.labels}
-              series={showTrends.series}
-              totalShows={filteredShows.length}
+            <ComboChart
+              categories={filteredShows.map((show) => show.title)}
+              categoryDetails={filteredShows.map((show) => show.network)}
+              bars={filteredShows.map((show) => show.mins)}
+              secondaryBars={filteredShows.map((show) => show.hhPct)}
+              line={filteredShows.map((show) => show.index)}
+              barLabel="Avg min / household"
+              secondaryBarLabel="Households"
+              lineLabel="Index"
+              barAxisLabel="Avg min / HH"
+              secondaryBarAxisLabel="HH households (%)"
+              lineAxisLabel="Index"
+              barUnit=" min"
+              secondaryBarUnit="%"
               legendRight={
                 <>
                   <SearchableDropdown id="v4-topn" label="" value={topN} options={TOP_N} onChange={setTopN} compact />
@@ -803,6 +784,12 @@ export default function V4ContentPlanner() {
                   <SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} compact />
                 </>
               }
+              minChartWidth={
+                filteredShows.length > 10
+                  ? filteredShows.length * 64 + 180
+                  : undefined
+              }
+              scrollAriaLabel={`Top ${filteredShows.length} shows chart. Scroll horizontally to view all shows.`}
             />
           ) : (
             <GenreBars
