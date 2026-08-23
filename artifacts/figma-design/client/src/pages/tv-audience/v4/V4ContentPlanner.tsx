@@ -322,7 +322,7 @@ export default function V4ContentPlanner() {
    * (1 − non-commercial share); the consumption scope (if a type is selected)
    * lightly re-weights genres toward that platform. */
   const genres = useMemo(() => {
-    const audience = seedKey(filters);
+    const audience = seedKey(filters, `-genres-${trendsWeeks}`);
     const raw = GENRES.map((g) => {
       const ncs = nonCommercialShare(g);
       // Scope re-weight: when a type is selected, genres that lean toward that
@@ -339,7 +339,7 @@ export default function V4ContentPlanner() {
     }).sort((a, b) => b.mins - a.mins);
     const total = raw.reduce((a, b) => a + b.mins, 0) || 1;
     return raw.map((r) => ({ ...r, pct: (r.mins / total) * 100 }));
-  }, [filters, commercials, scopeTvType, mult]);
+  }, [filters, trendsWeeks, commercials, scopeTvType, mult]);
 
   /* ---- §6 Top Indexing Shows (Shows view) ---- *
    * Coherent model: minutes, index and household reach all derive from a single
@@ -817,13 +817,7 @@ export default function V4ContentPlanner() {
                   );
                 }
               }}
-              legendRight={
-                <>
-                  <SearchableDropdown id="v4-topn" label="" value={topN} options={TOP_N} onChange={setTopN} compact />
-                  <SearchableDropdown id="v4-showsfilter" label="" value={showsFilter} options={showFilterOptions} onChange={setShowsFilter} compact />
-                  <SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} compact />
-                </>
-              }
+              legendRight={<SearchableDropdown id="v4-trendsweeks" label="" value={trendsWeeks} options={LOOKBACK} onChange={setTrendsWeeks} compact />}
             />
           )}
         </CardBody>
