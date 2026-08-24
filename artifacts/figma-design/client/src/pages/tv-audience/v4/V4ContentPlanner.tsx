@@ -751,11 +751,15 @@ export default function V4ContentPlanner() {
               className="text-[length:var(--body-sm-medium-size,12px)] font-medium"
               style={{ fontFamily: FONT, color: BODY2 }}
             >
-              View by genre
+              {trendsView === "Shows" ? "View by genre" : "View by show"}
             </span>
             <Toggle
               id="v4-trends-view-toggle"
-              label="View trends by genre"
+              label={
+                trendsView === "Shows"
+                  ? "View trends by genre"
+                  : "View trends by show"
+              }
               on={trendsView === "Genres"}
               onToggle={() =>
                 setTrendsView((current) =>
