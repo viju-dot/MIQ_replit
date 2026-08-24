@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — module context view (Flow Chart / Usability Testing)
+ * MIQ Collaborative Frameworks — module context view (Flow Chart / Usability Testing)
  *
  * Shared scaffold for a module scoped to a single AI Prototype, mounted at
  * /flow-chart/:prototypeId and /usability-testing/:prototypeId.

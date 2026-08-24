@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — Usability Testing landing (/usability-testing)
+ * MIQ Collaborative Frameworks — Usability Testing landing (/usability-testing)
  *
  * Lists prototypes (from prototypeStore) as entry points into their per-
  * prototype Usability Testing context view (/usability-testing/:prototypeId).

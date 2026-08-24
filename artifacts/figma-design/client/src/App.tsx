@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — application root & routing
+ * MIQ Collaborative Frameworks — application root & routing
  *
  * Multi-module workspace. There is NO login gate — opening the app goes
  * straight to the Welcome screen (route /).

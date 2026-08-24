@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — Prototype Viewer content
+ * MIQ Collaborative Frameworks — Prototype Viewer content
  *
  * Rendered inside the DS Side Panel drawer (authoring) and reused (read-only)
  * on the public /share/:token view. Scalable, clearly-separated Fiber sections:

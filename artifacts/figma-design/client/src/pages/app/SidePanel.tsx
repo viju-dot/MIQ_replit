@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — Side Panel (drawer) — reused DS anatomy
+ * MIQ Collaborative Frameworks — Side Panel (drawer) — reused DS anatomy
  *
  * This replicates the Design System "Side Panel" component defined in the
  * explorer (client/src/pages/ds/SidePanelPage.tsx) so the Prototype Viewer uses

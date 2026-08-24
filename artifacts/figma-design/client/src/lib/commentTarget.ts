@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — Comment target labelling
+ * MIQ Collaborative Frameworks — Comment target labelling
  *
  * Best-effort, human-readable label for a clicked prototype element. Walks up
  * from the event target to the nearest MEANINGFUL element and derives a label

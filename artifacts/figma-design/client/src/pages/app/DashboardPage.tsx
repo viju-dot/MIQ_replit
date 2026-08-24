@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — Welcome / Module Selection (/)
+ * MIQ Collaborative Frameworks — Welcome / Module Selection (/)
  *
  * The launching screen. Standalone entry point with NO global header — the
  * module tiles ARE the navigation. A discreet floating top-right cluster
@@ -198,7 +198,7 @@ export default function DashboardPage(): JSX.Element {
               className="text-[length:var(--headline-lg-semibold-size,28px)] font-semibold tracking-[-1px]"
               style={{ color: C.textPrimary }}
             >
-              Welcome to Fiber Workspace
+              Welcome to MIQ Collaborative Frameworks
             </h1>
             <p
               className="max-w-[640px] text-[length:var(--body-lg-regular-size,16px)]"

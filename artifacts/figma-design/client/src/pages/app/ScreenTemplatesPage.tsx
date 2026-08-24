@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — Screen Templates (/screen-templates)
+ * MIQ Collaborative Frameworks — Screen Templates (/screen-templates)
  *
  * A READ-ONLY reference library of best-practice Fiber Design System screens.
  * Each template is now a LIVE front-end screen built from real Fiber components

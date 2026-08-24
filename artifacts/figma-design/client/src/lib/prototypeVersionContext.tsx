@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — Prototype Version Context
+ * MIQ Collaborative Frameworks — Prototype Version Context
  *
  * Single source of truth for "which version am I viewing" while a prototype is
  * rendered full-screen with the collaboration overlay. The overlay/wrapper

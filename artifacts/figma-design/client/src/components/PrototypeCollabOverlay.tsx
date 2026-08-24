@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — Prototype Collaboration Overlay
+ * MIQ Collaborative Frameworks — Prototype Collaboration Overlay
  *
  * A reusable, self-contained overlay mounted ON TOP of an ACTUAL rendered
  * prototype experience (e.g. the standalone TV Audience Intelligence app at

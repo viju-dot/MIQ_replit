@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — Prototype Collaboration Context
+ * MIQ Collaborative Frameworks — Prototype Collaboration Context
  *
  * Carries the collaboration state shared between the floating action group
  * (rendered by PrototypeCollabOverlay) and the in-content comment layer

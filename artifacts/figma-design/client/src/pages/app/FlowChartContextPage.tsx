@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — Flow Chart, scoped to a prototype (/flow-chart/:id)
+ * MIQ Collaborative Frameworks — Flow Chart, scoped to a prototype (/flow-chart/:id)
  *
  * Structure only: breadcrumb, prototype name + status, and Fiber tabs
  * (Overview | Flows | Versions) with empty states. No editor.

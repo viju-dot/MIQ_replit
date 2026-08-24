@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — public shared prototype view (/share/:token)
+ * MIQ Collaborative Frameworks — public shared prototype view (/share/:token)
  *
  * PUBLIC route (NOT behind RequireAuth). A recipient with a share link sees a
  * single prototype in read-only mode:

@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — AI Prototype (/ai-prototype)
+ * MIQ Collaborative Frameworks — AI Prototype (/ai-prototype)
  *
  * The central workspace. Lists prototypes from the prototype registry
  * (prototypeStore). Clicking a card's title/body opens the Prototype Viewer in

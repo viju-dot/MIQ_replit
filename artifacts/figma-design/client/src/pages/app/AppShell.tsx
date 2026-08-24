@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — App Shell (thin layout for authenticated routes)
+ * MIQ Collaborative Frameworks — App Shell (thin layout for authenticated routes)
  *
  * Module switching now lives in the global header (WorkspaceHeader), so this
  * shell is intentionally thin: the global header over full-width content.

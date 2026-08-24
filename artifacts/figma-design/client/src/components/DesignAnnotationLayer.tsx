@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — Design Annotation Layer
+ * MIQ Collaborative Frameworks — Design Annotation Layer
  *
  * The in-content layer + editor/details/panel for the region-based Design
  * Annotation feature (spec: attached_assets/Pasted-Task-Design-Annotation-...).

@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — header module-switching nav model
+ * MIQ Collaborative Frameworks — header module-switching nav model
  *
  * The nav data + type live in this non-component module so WorkspaceHeader.tsx
  * only exports React components. That keeps WorkspaceHeader compatible with

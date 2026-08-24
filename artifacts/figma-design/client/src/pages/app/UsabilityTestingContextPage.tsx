@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — Usability Testing, scoped to a prototype
+ * MIQ Collaborative Frameworks — Usability Testing, scoped to a prototype
  * (/usability-testing/:id)
  *
  * Structure only: breadcrumb, prototype name + status, and Fiber tabs

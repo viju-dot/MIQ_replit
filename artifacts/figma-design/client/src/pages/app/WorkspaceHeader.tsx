@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — global header
+ * MIQ Collaborative Frameworks — global header
  *
  * Single header used everywhere: MIQ/app logo + name (→ Welcome),
  * module-switching nav links with a Fiber brand active state, then a theme
@@ -227,7 +227,7 @@ export function WorkspaceHeader({ showNav = true }: WorkspaceHeaderProps) {
             className="hidden text-[15px] font-semibold lg:inline"
             style={{ color: C.textPrimary }}
           >
-            Fiber Workspace
+            MIQ Collaborative Frameworks
           </span>
         </Link>
 

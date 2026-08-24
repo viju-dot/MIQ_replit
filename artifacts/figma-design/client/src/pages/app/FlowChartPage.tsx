@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — Flow Chart landing (/flow-chart)
+ * MIQ Collaborative Frameworks — Flow Chart landing (/flow-chart)
  *
  * Lists prototypes (from prototypeStore) as entry points into their per-
  * prototype Flow Chart context view (/flow-chart/:prototypeId).

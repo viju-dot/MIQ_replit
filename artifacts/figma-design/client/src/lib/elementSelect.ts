@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — Element selection (Design Annotation)
+ * MIQ Collaborative Frameworks — Element selection (Design Annotation)
  *
  * Utilities for the Replit-style "Select elements" interaction (spec §3–§9):
  * given a point (or a dragged rectangle) over the prototype canvas, find the

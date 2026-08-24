@@ -1,5 +1,5 @@
 /* =========================================================================
- * Fiber Workspace — module landing page (Flow Chart / Usability Testing roots)
+ * MIQ Collaborative Frameworks — module landing page (Flow Chart / Usability Testing roots)
  *
  * The bare /flow-chart and /usability-testing routes. Keeps the module
  * description + empty-state feel, and lists prototypes (from prototypeStore) as
