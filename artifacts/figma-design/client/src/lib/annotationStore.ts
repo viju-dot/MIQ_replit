@@ -573,5 +573,272 @@ export const localStorageRepository: AnnotationRepository = {
   },
 };
 
-// The UI imports this alias so swapping the backend is a one-line change.
-export const annotationRepository: AnnotationRepository = localStorageRepository;
+/* ---------------------------------------------------------------------- */
+/* Shared API repository                                                   */
+/* ---------------------------------------------------------------------- */
+
+let apiAnnotations: DesignAnnotation[] = [];
+
+function annotationsUrl(prototypeId: string, id?: string): string {
+  const base = `/api/prototypes/${encodeURIComponent(prototypeId)}/annotations`;
+  return id ? `${base}/${encodeURIComponent(id)}` : base;
+}
+
+async function putAnnotation(
+  annotation: DesignAnnotation,
+): Promise<DesignAnnotation> {
+  const response = await fetch(
+    annotationsUrl(annotation.prototypeId, annotation.id),
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(annotation),
+    },
+  );
+  if (!response.ok) {
+    throw new Error(`Annotation save failed (${response.status})`);
+  }
+  const stored: unknown = await response.json();
+  const canonical = coerceAnnotation(stored);
+  if (!canonical || canonical.id !== annotation.id) {
+    throw new Error("Annotation API returned an invalid record");
+  }
+  return canonical;
+}
+
+function cacheAnnotations(
+  prototypeId: string,
+  annotations: DesignAnnotation[],
+): void {
+  apiAnnotations = [
+    ...apiAnnotations.filter(
+      (annotation) => annotation.prototypeId !== prototypeId,
+    ),
+    ...annotations,
+  ];
+  const otherLocal = readAll().filter(
+    (annotation) => annotation.prototypeId !== prototypeId,
+  );
+  writeAllQuiet([...otherLocal, ...annotations]);
+}
+
+/**
+ * Hydrate from Postgres through the API and migrate local-only annotations.
+ * Failed API loads are non-fatal and intentionally expose an empty live store.
+ */
+export async function hydrateAnnotations(prototypeId: string): Promise<void> {
+  try {
+    const response = await fetch(annotationsUrl(prototypeId));
+    if (!response.ok) {
+      throw new Error(`Annotation load failed (${response.status})`);
+    }
+    const raw: unknown = await response.json();
+    if (!Array.isArray(raw)) {
+      throw new Error("Annotation API returned a non-array");
+    }
+    const remote = raw
+      .map(coerceAnnotation)
+      .filter(
+        (annotation): annotation is DesignAnnotation =>
+          annotation !== null && annotation.prototypeId === prototypeId,
+      );
+    const remoteIds = new Set(remote.map((annotation) => annotation.id));
+    const localMissing = readAll().filter(
+      (annotation) =>
+        annotation.prototypeId === prototypeId &&
+        !remoteIds.has(annotation.id),
+    );
+    const migrated: DesignAnnotation[] = [];
+    const migrationFailed: DesignAnnotation[] = [];
+    for (const annotation of localMissing) {
+      try {
+        migrated.push(await putAnnotation(annotation));
+      } catch (error) {
+        migrationFailed.push(annotation);
+        console.warn("[prototype-annotations] local migration failed", error);
+      }
+    }
+    // Keep failed uploads in the live store and local cache. Because their IDs
+    // remain absent remotely, a later hydration will retry the migration.
+    cacheAnnotations(prototypeId, [
+      ...remote,
+      ...migrated,
+      ...migrationFailed,
+    ]);
+  } catch (error) {
+    apiAnnotations = apiAnnotations.filter(
+      (annotation) => annotation.prototypeId !== prototypeId,
+    );
+    console.warn(
+      "[prototype-annotations] API unavailable; showing empty state",
+      error,
+    );
+  }
+}
+
+function persistAnnotationQuiet(
+  annotation: DesignAnnotation,
+  onSaved?: (canonical: DesignAnnotation) => void,
+): void {
+  void putAnnotation(annotation)
+    .then((canonical) => onSaved?.(canonical))
+    .catch((error) => {
+      console.warn("[prototype-annotations] save failed", error);
+    });
+}
+
+export const apiAnnotationRepository: AnnotationRepository = {
+  list(prototypeId) {
+    return apiAnnotations
+      .filter((annotation) => annotation.prototypeId === prototypeId)
+      .sort(byRecent);
+  },
+  listAuthors() {
+    const names = new Map<string, string>();
+    for (const annotation of apiAnnotations) {
+      const key = annotation.author.toLowerCase();
+      if (!names.has(key)) names.set(key, annotation.author);
+    }
+    return Array.from(names.values()).sort((a, b) => a.localeCompare(b));
+  },
+  add(input) {
+    const author = input.author.trim();
+    const what = input.what.trim();
+    if (!input.prototypeId) {
+      throw new Error("annotationStore: prototypeId is required.");
+    }
+    if (!input.versionId) {
+      throw new Error("annotationStore: versionId is required.");
+    }
+    if (!author) throw new Error("annotationStore: author is required.");
+    if (!what) throw new Error("annotationStore: what is required.");
+
+    const existingIds = new Set(
+      apiAnnotations.map((annotation) => annotation.id),
+    );
+    let id = newAnnotationId();
+    while (existingIds.has(id)) id = newAnnotationId();
+    const maxSeq = apiAnnotations
+      .filter((annotation) => annotation.prototypeId === input.prototypeId)
+      .reduce((max, annotation) => Math.max(max, annotation.seq), 0);
+    const region = coerceRegion(input.region);
+    const elements = coerceElements(input.elements);
+    const annotation: DesignAnnotation = {
+      id,
+      seq: maxSeq + 1,
+      prototypeId: input.prototypeId,
+      versionId: input.versionId,
+      versionName: input.versionName || "—",
+      author,
+      createdAt: nowIso(),
+      selectionKind: coerceSelectionKind(
+        input.selectionKind,
+        region,
+        elements,
+      ),
+      region,
+      elements,
+      sectionLabel: (input.sectionLabel ?? "").trim(),
+      what,
+      why: (input.why ?? "").trim(),
+      types: coerceTypes(input.types),
+      dsGuidance: coerceDsGuidance(input.dsGuidance),
+      scope: coerceScope(input.scope),
+      status: DEFAULT_STATUS,
+    };
+    apiAnnotations.push(annotation);
+    cacheAnnotations(
+      input.prototypeId,
+      apiAnnotations.filter(
+        (item) => item.prototypeId === input.prototypeId,
+      ),
+    );
+    persistAnnotationQuiet(annotation, (canonical) => {
+      // The server owns sequence allocation. Replace the optimistic record with
+      // its canonical response and mutate the returned object so any open
+      // annotation UI holding that reference observes the authoritative number.
+      Object.assign(annotation, canonical);
+      apiAnnotations = apiAnnotations.map((item) =>
+        item.id === canonical.id ? canonical : item,
+      );
+      cacheAnnotations(
+        canonical.prototypeId,
+        apiAnnotations.filter(
+          (item) => item.prototypeId === canonical.prototypeId,
+        ),
+      );
+      window.dispatchEvent(
+        new CustomEvent("fiber:annotations-changed", {
+          detail: canonical.prototypeId,
+        }),
+      );
+    });
+    return annotation;
+  },
+  update(id, patch) {
+    const current = apiAnnotations.find((annotation) => annotation.id === id);
+    if (!current) return;
+    const merged: DesignAnnotation = { ...current };
+    if (patch.region !== undefined) merged.region = coerceRegion(patch.region);
+    if (patch.elements !== undefined) {
+      merged.elements = coerceElements(patch.elements);
+    }
+    if (patch.sectionLabel !== undefined) {
+      merged.sectionLabel = patch.sectionLabel.trim();
+    }
+    if (patch.region !== undefined || patch.elements !== undefined) {
+      merged.selectionKind =
+        current.selectionKind === "page" && merged.region === null
+          ? "page"
+          : coerceSelectionKind(
+              merged.selectionKind,
+              merged.region,
+              merged.elements,
+            );
+    }
+    if (patch.what !== undefined && patch.what.trim()) {
+      merged.what = patch.what.trim();
+    }
+    if (patch.why !== undefined) merged.why = patch.why.trim();
+    if (patch.types !== undefined) merged.types = coerceTypes(patch.types);
+    if (patch.dsGuidance !== undefined) {
+      merged.dsGuidance = coerceDsGuidance(patch.dsGuidance);
+    }
+    if (patch.scope !== undefined) merged.scope = coerceScope(patch.scope);
+    if (patch.status !== undefined) merged.status = coerceStatus(patch.status);
+
+    apiAnnotations = apiAnnotations.map((annotation) =>
+      annotation.id === id ? merged : annotation,
+    );
+    cacheAnnotations(
+      merged.prototypeId,
+      apiAnnotations.filter(
+        (item) => item.prototypeId === merged.prototypeId,
+      ),
+    );
+    // Full-object PUT keeps mirrored seq/status/version columns synchronized,
+    // including status-only changes.
+    persistAnnotationQuiet(merged);
+  },
+  remove(id) {
+    const current = apiAnnotations.find((annotation) => annotation.id === id);
+    if (!current) return;
+    apiAnnotations = apiAnnotations.filter((annotation) => annotation.id !== id);
+    cacheAnnotations(
+      current.prototypeId,
+      apiAnnotations.filter(
+        (item) => item.prototypeId === current.prototypeId,
+      ),
+    );
+    void fetch(annotationsUrl(current.prototypeId, id), {
+      method: "DELETE",
+    }).then((response) => {
+      if (!response.ok) throw new Error(`Annotation delete failed (${response.status})`);
+    }).catch((error) => {
+      console.warn("[prototype-annotations] delete failed", error);
+    });
+  },
+};
+
+export const annotationRepository: AnnotationRepository =
+  apiAnnotationRepository;

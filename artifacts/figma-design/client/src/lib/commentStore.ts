@@ -389,5 +389,172 @@ export const localStorageRepository: CommentRepository = {
   },
 };
 
-// The UI imports this alias so swapping the backend is a one-line change.
-export const commentRepository: CommentRepository = localStorageRepository;
+/* ---------------------------------------------------------------------- */
+/* Shared API repository                                                   */
+/* ---------------------------------------------------------------------- */
+
+let apiComments: PrototypeComment[] = [];
+
+function commentsUrl(prototypeId: string, id?: string): string {
+  const base = `/api/prototypes/${encodeURIComponent(prototypeId)}/comments`;
+  return id ? `${base}/${encodeURIComponent(id)}` : base;
+}
+
+async function putComment(comment: PrototypeComment): Promise<void> {
+  const response = await fetch(commentsUrl(comment.prototypeId, comment.id), {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(comment),
+  });
+  if (!response.ok) {
+    throw new Error(`Comment save failed (${response.status})`);
+  }
+}
+
+function cacheComments(prototypeId: string, comments: PrototypeComment[]): void {
+  apiComments = [
+    ...apiComments.filter((comment) => comment.prototypeId !== prototypeId),
+    ...comments,
+  ];
+  // Keep localStorage as a best-effort offline/migration cache, but never use it
+  // as the live source after hydration.
+  const otherLocal = readAll().filter(
+    (comment) => comment.prototypeId !== prototypeId,
+  );
+  writeAllQuiet([...otherLocal, ...comments]);
+}
+
+/**
+ * Load the shared database state, then migrate browser-local records missing by
+ * id. An unreachable API deliberately yields an empty live store: the database
+ * is the source of truth and the prototype must remain usable without crashing.
+ */
+export async function hydrateComments(prototypeId: string): Promise<void> {
+  try {
+    const response = await fetch(commentsUrl(prototypeId));
+    if (!response.ok) throw new Error(`Comment load failed (${response.status})`);
+    const raw: unknown = await response.json();
+    if (!Array.isArray(raw)) throw new Error("Comment API returned a non-array");
+    const remote = raw
+      .map(coerceComment)
+      .filter(
+        (comment): comment is PrototypeComment =>
+          comment !== null && comment.prototypeId === prototypeId,
+      );
+    const remoteIds = new Set(remote.map((comment) => comment.id));
+    const localMissing = readAll().filter(
+      (comment) =>
+        comment.prototypeId === prototypeId && !remoteIds.has(comment.id),
+    );
+    const migrated: PrototypeComment[] = [];
+    const migrationFailed: PrototypeComment[] = [];
+    for (const comment of localMissing) {
+      try {
+        await putComment(comment);
+        migrated.push(comment);
+      } catch (error) {
+        migrationFailed.push(comment);
+        console.warn("[prototype-comments] local migration failed", error);
+      }
+    }
+    // Failed records stay both visible and cached so the next hydration retries
+    // them instead of silently discarding browser-local collaboration data.
+    cacheComments(prototypeId, [...remote, ...migrated, ...migrationFailed]);
+  } catch (error) {
+    apiComments = apiComments.filter(
+      (comment) => comment.prototypeId !== prototypeId,
+    );
+    console.warn("[prototype-comments] API unavailable; showing empty state", error);
+  }
+}
+
+function persistCommentQuiet(comment: PrototypeComment): void {
+  void putComment(comment).catch((error) => {
+    console.warn("[prototype-comments] save failed", error);
+  });
+}
+
+export const apiCommentRepository: CommentRepository = {
+  list(prototypeId) {
+    return apiComments
+      .filter((comment) => comment.prototypeId === prototypeId)
+      .sort(byRecent);
+  },
+  listAuthors() {
+    const names = new Map<string, string>();
+    for (const comment of apiComments) {
+      const key = comment.author.toLowerCase();
+      if (!names.has(key)) names.set(key, comment.author);
+    }
+    return Array.from(names.values()).sort((a, b) => a.localeCompare(b));
+  },
+  colorForAuthor(author) {
+    const key = author.trim().toLowerCase();
+    if (!key) return DEFAULT_COMMENT_COLOR;
+    return (
+      apiComments.find((comment) => comment.author.toLowerCase() === key)?.color ??
+      DEFAULT_COMMENT_COLOR
+    );
+  },
+  add(input) {
+    const author = input.author.trim();
+    const text = input.text.trim();
+    if (!input.prototypeId) throw new Error("commentStore: prototypeId is required.");
+    if (!input.versionId) throw new Error("commentStore: versionId is required.");
+    if (!author) throw new Error("commentStore: author is required.");
+    if (!text) throw new Error("commentStore: text is required.");
+
+    const existingIds = new Set(apiComments.map((comment) => comment.id));
+    let id = newId();
+    while (existingIds.has(id)) id = newId();
+    const color = coerceCommentColor(input.color);
+    const comment: PrototypeComment = {
+      id,
+      prototypeId: input.prototypeId,
+      versionId: input.versionId,
+      versionName: input.versionName || "—",
+      author,
+      color,
+      text,
+      createdAt: nowIso(),
+      anchor: coerceAnchor(input.anchor),
+      parentId: input.parentId?.trim() || undefined,
+      attachment: coerceAttachment(input.attachment),
+    };
+
+    const authorKey = author.toLowerCase();
+    apiComments = apiComments.map((existing) => {
+      if (
+        existing.author.toLowerCase() !== authorKey ||
+        existing.color === color
+      ) {
+        return existing;
+      }
+      const recolored = { ...existing, color };
+      persistCommentQuiet(recolored);
+      return recolored;
+    });
+    apiComments.push(comment);
+    cacheComments(
+      input.prototypeId,
+      apiComments.filter((item) => item.prototypeId === input.prototypeId),
+    );
+    persistCommentQuiet(comment);
+    return comment;
+  },
+  softDelete(id) {
+    const target = apiComments.find((comment) => comment.id === id);
+    if (!target || target.deletedAt) return;
+    const deleted = { ...target, deletedAt: nowIso() };
+    apiComments = apiComments.map((comment) =>
+      comment.id === id ? deleted : comment,
+    );
+    cacheComments(
+      deleted.prototypeId,
+      apiComments.filter((item) => item.prototypeId === deleted.prototypeId),
+    );
+    persistCommentQuiet(deleted);
+  },
+};
+
+export const commentRepository: CommentRepository = apiCommentRepository;

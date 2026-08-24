@@ -57,6 +57,7 @@ import {
 } from "@/lib/prototypeStore";
 import {
   commentRepository,
+  hydrateComments,
   COMMENT_COLORS,
   DEFAULT_COMMENT_COLOR,
   type PrototypeComment,
@@ -68,6 +69,7 @@ import { downscaleImageFile, linkifyParts } from "@/lib/commentMedia";
 import { deriveTargetLabel } from "@/lib/commentTarget";
 import {
   annotationRepository,
+  hydrateAnnotations,
   type DesignAnnotation,
   type AnnotationPatch,
   type NewAnnotationInput,
@@ -1817,6 +1819,45 @@ export function PrototypeCollabOverlay({
         onAnnotationEditorOpen,
       );
   }, []);
+
+  // Hydrate the shared Postgres-backed stores whenever the prototype changes.
+  // Both loaders handle API failures internally and expose an empty, safe state.
+  const collaborationPrototypeId = proto?.id;
+  useEffect(() => {
+    if (!collaborationPrototypeId) return;
+    let cancelled = false;
+    void Promise.all([
+      hydrateComments(collaborationPrototypeId),
+      hydrateAnnotations(collaborationPrototypeId),
+    ]).then(() => {
+      if (!cancelled) setTick((current) => current + 1);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [collaborationPrototypeId]);
+
+  // Refresh optimistic annotation UI when the API returns its canonical,
+  // server-allocated sequence number.
+  useEffect(() => {
+    const onAnnotationsChanged = (event: Event) => {
+      if (
+        (event as CustomEvent<string>).detail === collaborationPrototypeId
+      ) {
+        setTick((current) => current + 1);
+      }
+    };
+    window.addEventListener(
+      "fiber:annotations-changed",
+      onAnnotationsChanged,
+    );
+    return () => {
+      window.removeEventListener(
+        "fiber:annotations-changed",
+        onAnnotationsChanged,
+      );
+    };
+  }, [collaborationPrototypeId]);
 
   // Read comments (re-reads whenever tick / prototype changes).
   const comments = useMemo<PrototypeComment[]>(
