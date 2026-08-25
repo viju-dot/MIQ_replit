@@ -175,7 +175,13 @@ export default function AiPrototypePage(): JSX.Element {
   const prototypes = prototypeRepository.list();
 
   // Which prototype's viewer drawer is open (by id), if any.
-  const [openId, setOpenId] = useState<string | null>(null);
+  // Supports a ?open=<prototypeId> deep link so the viewer can be opened directly.
+  const [openId, setOpenId] = useState<string | null>(() => {
+    const requested = new URLSearchParams(window.location.search).get("open");
+    return requested && prototypeRepository.list().some((p) => p.id === requested)
+      ? requested
+      : null;
+  });
   const active = openId ? prototypes.find((p) => p.id === openId) : undefined;
 
   return (

@@ -1,0 +1,16 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "jdqjPESJFaPNrXPrxooNi"
+uri = "file://screenshots/version-panel.jpg"
+type = "image"
+title = "Where Duplicate lives"
+description = "Version History panel with Duplicate and Archive on each version card."
+logical_id = "50a58bd5-1f43-4346-bd4c-388ec347c26d"
+content_hash = "sha256:eb91428be31dad734efdd8e49c00effbc9ac0275697715016e883f8109fb5aac"
+size = 72796
+mtime_ms = 1787644449249
+storage_uri = "gcs://replit-rams-assets-spock/rams/assets/repl:85adb4f5-ad43-439c-b429-d15bb0ed940c/50a58bd5-1f43-4346-bd4c-388ec347c26d/08e6a63c-7084-40db-8488-40388e445b09"
+storage_version_token = "1787644456303080"
+content_type = "image/jpeg"
