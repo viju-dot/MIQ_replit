@@ -1762,17 +1762,25 @@ export function PrototypeCollabOverlay({
 
   // Versions newest-first (store keeps them oldest-first, append-only).
   const versionsNewestFirst = useMemo(
-    () => (proto ? [...proto.versions].reverse() : []),
+    () =>
+      proto
+        ? proto.versions
+            .filter((version) => version.status === "active")
+            .slice()
+            .reverse()
+        : [],
     [proto],
   );
 
   // View-state ONLY: which version the user is currently looking at.
   const [viewedVersionId, setViewedVersionId] = useState<string>(() => {
     if (!proto || proto.versions.length === 0) return "";
-    const newest = proto.versions[proto.versions.length - 1];
+    const active = proto.versions.filter((version) => version.status === "active");
+    const newest = active[active.length - 1];
+    if (!newest) return "";
     if (typeof window !== "undefined") {
       const saved = window.sessionStorage.getItem(SESSION_KEY(proto.id));
-      if (saved && proto.versions.some((v) => v.id === saved)) return saved;
+      if (saved && active.some((v) => v.id === saved)) return saved;
     }
     return newest.id;
   });
@@ -1933,9 +1941,11 @@ export function PrototypeCollabOverlay({
   // state/sessionStorage when the current selection no longer exists.
   useEffect(() => {
     if (!proto || proto.versions.length === 0) return;
-    const exists = proto.versions.some((v) => v.id === viewedVersionId);
+    const active = proto.versions.filter((version) => version.status === "active");
+    const exists = active.some((v) => v.id === viewedVersionId);
     if (!exists) {
-      selectVersion(proto.versions[proto.versions.length - 1].id);
+      const newest = active[active.length - 1];
+      if (newest) selectVersion(newest.id);
     }
   }, [proto, viewedVersionId, selectVersion]);
 
@@ -1955,11 +1965,14 @@ export function PrototypeCollabOverlay({
   // No matching prototype (or no versions) → render children version-unaware.
   if (!proto || proto.versions.length === 0) return <>{children}</>;
 
+  const activeVersions = proto.versions.filter(
+    (version) => version.status === "active",
+  );
+  const newestActive = activeVersions[activeVersions.length - 1];
   const viewedVersion =
-    proto.versions.find((v) => v.id === viewedVersionId) ??
-    proto.versions[proto.versions.length - 1];
-  const isNewest =
-    viewedVersion.id === proto.versions[proto.versions.length - 1].id;
+    activeVersions.find((v) => v.id === viewedVersionId) ?? newestActive;
+  if (!viewedVersion) return <>{children}</>;
+  const isNewest = viewedVersion.id === newestActive.id;
 
   const reconcile = () => setTick((t) => t + 1);
 
@@ -2127,9 +2140,8 @@ export function PrototypeCollabOverlay({
           deleteAnnotation,
         }}
       >
-        {/* Prototype content — re-mounted per viewed version so version
-            switching actually drives the render. */}
-        <div key={viewedVersion.id} className="contents">
+        {/* Prototype content owns a keep-alive renderer per visited version. */}
+        <div className="contents">
           {children}
         </div>
 

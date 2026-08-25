@@ -28,6 +28,11 @@ export interface ShareVersion {
   createdAt: string;
   updatedAt: string;
   description?: string;
+  rendererKey?: string;
+  status?: "active" | "archived";
+  metadata?: {
+    createdFrom?: string;
+  };
   /** Data captured at save time (what this version looked like). */
   snapshot?: ShareVersionSnapshotData;
 }

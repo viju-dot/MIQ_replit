@@ -579,6 +579,58 @@ export const localStorageRepository: AnnotationRepository = {
 
 let apiAnnotations: DesignAnnotation[] = [];
 
+const annotationMigrationKey = (prototypeId: string) =>
+  `fiber:collab:migrated:annotations:${prototypeId}`;
+const annotationMigrationFailuresKey = (prototypeId: string) =>
+  `fiber:collab:migration-failures:annotations:${prototypeId}`;
+
+function annotationMigrationComplete(prototypeId: string): boolean {
+  try {
+    return (
+      window.localStorage.getItem(annotationMigrationKey(prototypeId)) === "true"
+    );
+  } catch {
+    return false;
+  }
+}
+
+function readAnnotationMigrationFailures(prototypeId: string): Set<string> {
+  try {
+    const raw = window.localStorage.getItem(
+      annotationMigrationFailuresKey(prototypeId),
+    );
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    return new Set(
+      Array.isArray(parsed)
+        ? parsed.filter((id): id is string => typeof id === "string")
+        : [],
+    );
+  } catch {
+    return new Set();
+  }
+}
+
+function finishAnnotationMigration(
+  prototypeId: string,
+  failedIds: string[],
+): void {
+  try {
+    if (failedIds.length === 0) {
+      window.localStorage.setItem(annotationMigrationKey(prototypeId), "true");
+      window.localStorage.removeItem(
+        annotationMigrationFailuresKey(prototypeId),
+      );
+    } else {
+      window.localStorage.setItem(
+        annotationMigrationFailuresKey(prototypeId),
+        JSON.stringify(failedIds),
+      );
+    }
+  } catch {
+    /* storage unavailable — retrying migration remains safe */
+  }
+}
+
 function annotationsUrl(prototypeId: string, id?: string): string {
   const base = `/api/prototypes/${encodeURIComponent(prototypeId)}/annotations`;
   return id ? `${base}/${encodeURIComponent(id)}` : base;
@@ -622,6 +674,19 @@ function cacheAnnotations(
   writeAllQuiet([...otherLocal, ...annotations]);
 }
 
+function removeAnnotationFromLocalCache(
+  prototypeId: string,
+  annotationId: string,
+): void {
+  writeAllQuiet(
+    readAll().filter(
+      (annotation) =>
+        annotation.prototypeId !== prototypeId ||
+        annotation.id !== annotationId,
+    ),
+  );
+}
+
 /**
  * Hydrate from Postgres through the API and migrate local-only annotations.
  * Failed API loads are non-fatal and intentionally expose an empty live store.
@@ -648,15 +713,27 @@ export async function hydrateAnnotations(prototypeId: string): Promise<void> {
         annotation.prototypeId === prototypeId &&
         !remoteIds.has(annotation.id),
     );
+    const previousFailures = readAnnotationMigrationFailures(prototypeId);
+    const migrationCandidates = annotationMigrationComplete(prototypeId)
+      ? []
+      : previousFailures.size > 0
+        ? localMissing.filter((annotation) => previousFailures.has(annotation.id))
+        : localMissing;
     const migrated: DesignAnnotation[] = [];
     const migrationFailed: DesignAnnotation[] = [];
-    for (const annotation of localMissing) {
+    for (const annotation of migrationCandidates) {
       try {
         migrated.push(await putAnnotation(annotation));
       } catch (error) {
         migrationFailed.push(annotation);
         console.warn("[prototype-annotations] local migration failed", error);
       }
+    }
+    if (!annotationMigrationComplete(prototypeId)) {
+      finishAnnotationMigration(
+        prototypeId,
+        migrationFailed.map((annotation) => annotation.id),
+      );
     }
     // Keep failed uploads in the live store and local cache. Because their IDs
     // remain absent remotely, a later hydration will retry the migration.
@@ -834,6 +911,8 @@ export const apiAnnotationRepository: AnnotationRepository = {
       method: "DELETE",
     }).then((response) => {
       if (!response.ok) throw new Error(`Annotation delete failed (${response.status})`);
+      // Confirmed server deletes must also evict any stale migration-cache copy.
+      removeAnnotationFromLocalCache(current.prototypeId, id);
     }).catch((error) => {
       console.warn("[prototype-annotations] delete failed", error);
     });

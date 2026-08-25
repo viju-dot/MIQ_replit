@@ -1,0 +1,526 @@
+````markdown
+# Task: Add Version Duplication, Archive & Preserve Full Prototype Functionality
+
+## Objective
+
+I want to improve the version-management experience so I don't have to come back here every time I need to create a new version.
+
+The **AI Prototype Version Preview** should allow users to duplicate any existing version directly from the version card.
+
+At the same time, fix the current versioning architecture so that creating a new version does **not break the functionality of older or duplicated versions**.
+
+The key principle is:
+
+> **A version is a complete, independently editable prototype — not just a visual copy of a screen.**
+
+---
+
+# 1. Add "Duplicate Version" Action
+
+In every version preview/card, add a **Duplicate** action using an appropriate icon.
+
+Example:
+
+```text
+┌──────────────────────────────────────┐
+│ V4                                   │
+│ TV Audience Intelligence             │
+│                                      │
+│ Last updated: Aug 25, 2026           │
+│                                      │
+│                         [Duplicate]  │
+│                         [Archive]    │
+└──────────────────────────────────────┘
+````
+
+Use the existing Fiber Design System icon/button components where available.
+
+Do not introduce a new visual style.
+
+---
+
+# 2. Duplicate Version Flow
+
+When the user clicks the Duplicate icon, open a confirmation popup/dialog.
+
+The dialog should clearly tell the user which version they are duplicating.
+
+Example:
+
+> **Duplicate V4?**
+>
+> Choose how you want to create the new version.
+
+Provide the primary option:
+
+**Duplicate exact copy of V4**
+
+The version number must be dynamic.
+
+If the user duplicates V1:
+
+> Duplicate exact copy of V1
+
+If the user duplicates V4:
+
+> Duplicate exact copy of V4
+
+Do not hardcode V4.
+
+---
+
+# 3. New Version Number
+
+When duplication is confirmed, automatically create the next available version.
+
+Example:
+
+```text
+V1 → V2
+V2 → V3
+V4 → V5
+```
+
+If V5 already exists, determine the next available version number rather than overwriting an existing version.
+
+The new version should become the active version after duplication.
+
+---
+
+# 4. What Gets Duplicated
+
+When duplicating a version, create a **functional copy** of that version.
+
+Duplicate:
+
+* Complete UI
+* Layout
+* Components
+* Component states
+* Prototype interactions
+* Navigation
+* Buttons
+* Inputs
+* Filters
+* Toggles
+* Charts
+* Data required for the prototype
+* Interactive states
+* Design System components
+* Prototype logic
+* Screen structure
+
+The new version should behave like the version it was duplicated from.
+
+---
+
+# 5. What MUST NOT Be Duplicated
+
+Comments and design-review information must NOT be copied into the new version.
+
+Do not duplicate:
+
+* Comments
+* Comment threads
+* Deleted comments
+* Comment markers
+* Design annotations
+* Annotation markers
+* Annotation history
+* Review-specific metadata
+
+For example:
+
+```text
+V4
+ ├── Prototype UI
+ ├── Interactions
+ ├── Data
+ ├── Comments
+ └── Design Annotations
+
+          ↓ Duplicate
+
+V5
+ ├── Prototype UI       ✓
+ ├── Interactions       ✓
+ ├── Data               ✓
+ ├── Comments           ✕
+ └── Design Annotations ✕
+```
+
+The new version starts as a clean review state.
+
+---
+
+# 6. Comments & Annotations Must Remain Independent
+
+If V4 contains:
+
+> "Move this button higher."
+
+That comment must remain only in V4.
+
+V5 should not contain it.
+
+Likewise, if V4 has design annotations, V5 should start without those annotations.
+
+This allows the user to independently review and annotate the new version.
+
+---
+
+# 7. Add "Archive Version"
+
+Add an **Archive** action beside the Duplicate action on every version card.
+
+Use the existing Fiber Design System components.
+
+When Archive is selected:
+
+Show a confirmation dialog:
+
+> **Archive V4?**
+>
+> This version will be removed from the active version list but won't be permanently deleted.
+
+Actions:
+
+* Cancel
+* Archive Version
+
+---
+
+# 8. Archived Versions
+
+Archived versions should no longer appear in the main active version list.
+
+Do not permanently delete them.
+
+Add a simple way to access archived versions later, such as:
+
+**Active Versions | Archived Versions**
+
+or an appropriate existing filtering pattern.
+
+Archived versions should remain available for reference.
+
+Do not allow accidental permanent deletion.
+
+---
+
+# 9. CRITICAL: Fix Version Interaction Problems
+
+There is currently a major problem with versioning.
+
+When I create a new version, interactions that worked in the original version stop working.
+
+Examples:
+
+* Toggle doesn't work.
+* Chart interactions don't work.
+* Chart information/state doesn't load correctly.
+* Buttons stop responding.
+* Filters stop working.
+* Interactive components become static.
+* Design Annotation selection doesn't work.
+* Comment functionality doesn't work.
+* Prototype interactions are lost.
+
+This must be fixed as part of this task.
+
+---
+
+# 10. Version Must Be a Functional Snapshot
+
+Do NOT implement duplication by simply copying rendered HTML/screenshots or creating a visual representation of the previous version.
+
+A version must contain the complete functional prototype state.
+
+Think of each version as:
+
+```text
+Version
+│
+├── UI Structure
+├── Component State
+├── Interaction Logic
+├── Data
+├── Navigation
+├── Prototype Behavior
+├── Design System Components
+│
+├── Review Layer
+│   ├── Comments
+│   └── Design Annotations
+│
+└── Version Metadata
+```
+
+When duplicating:
+
+```text
+Functional Prototype
+        ↓
+    Deep Clone
+        ↓
+New Independent Version
+```
+
+The new version must not share mutable state with the source version.
+
+---
+
+# 11. Older Versions Must Continue Working
+
+Creating V5 must NOT break V4.
+
+If I open V4 after creating V5:
+
+* Toggle must still work.
+* Charts must still work.
+* Filters must still work.
+* Buttons must still work.
+* Navigation must still work.
+* Component interactions must still work.
+* Comments must still work.
+* Design annotations must still work.
+
+The same applies to every version.
+
+---
+
+# 12. Editing Older Versions
+
+This is extremely important.
+
+I may want to go back to V2 or V3 and continue ideating from that version.
+
+Therefore, **older versions must remain fully interactive**.
+
+Example:
+
+```text
+V1 ── fully interactive
+V2 ── fully interactive
+V3 ── fully interactive
+V4 ── fully interactive
+V5 ── fully interactive
+```
+
+I should be able to:
+
+1. Open V3.
+2. Interact with the prototype.
+3. Change a toggle.
+4. Interact with charts.
+5. Select elements.
+6. Add comments.
+7. Add design annotations.
+8. Continue experimenting.
+
+This should not be disabled just because V3 is an older version.
+
+---
+
+# 13. Version State Isolation
+
+Each version must maintain its own state.
+
+For example:
+
+If I change a toggle in V3:
+
+```text
+V3 → Toggle ON
+```
+
+it must NOT automatically change:
+
+```text
+V4 → Toggle ON
+V5 → Toggle ON
+```
+
+Each version should have independent state.
+
+Similarly:
+
+```text
+V3 comments       ≠ V4 comments
+V3 annotations    ≠ V4 annotations
+V3 component state ≠ V4 component state
+```
+
+---
+
+# 14. Version Duplication Should Preserve Behavior, Not Review History
+
+The duplication rule should be:
+
+### Copy
+
+* UI
+* Components
+* Data
+* Component state
+* Prototype behavior
+* Interactions
+* Navigation
+* Functional logic
+
+### Do NOT copy
+
+* Comments
+* Comment threads
+* Deleted comments
+* Comment markers
+* Design annotations
+* Annotation markers
+* Review history
+
+This gives us a clean version to experiment with while preserving the original version's working prototype.
+
+---
+
+# 15. Version Metadata
+
+Each new version should record:
+
+* Version number
+* Created date
+* Created time
+* Source version
+* Status: Active / Archived
+
+Example:
+
+```text
+V5
+
+Created from: V4
+Created: Aug 25, 2026 · 12:35 PM
+Status: Active
+```
+
+This makes the version history easier to understand.
+
+---
+
+# 16. Validation Requirements
+
+Before considering this task complete, test the version system.
+
+### Duplicate Test
+
+Duplicate V4 → V5.
+
+Verify:
+
+* V5 exists.
+* V5 looks like V4.
+* V5 interactions work.
+* V4 still works.
+
+### Interaction Test
+
+In V5 test:
+
+* Toggle
+* Charts
+* Filters
+* Buttons
+* Navigation
+* Inputs
+* Component interactions
+
+All should work.
+
+### Review Test
+
+In V5:
+
+* Add a comment.
+* Add a design annotation.
+
+Then open V4.
+
+Verify that the V5 comment and annotation do NOT appear in V4.
+
+Then add a comment to V4.
+
+Verify that it does NOT appear in V5.
+
+### Older Version Test
+
+Open an older version such as V2 or V3.
+
+Verify that:
+
+* UI is interactive.
+* Toggle works.
+* Charts work.
+* Data interactions work.
+* Elements can be selected.
+* Comments work.
+* Design annotations work.
+
+### Archive Test
+
+Archive V4.
+
+Verify:
+
+* V4 disappears from Active Versions.
+* V4 is available under Archived Versions.
+* V4 data is not deleted.
+* Other versions are unaffected.
+
+---
+
+# 17. Important Implementation Principle
+
+Do not solve the current issue by disabling interactions on older versions.
+
+That would defeat the purpose of versioning.
+
+The goal is:
+
+> **Every version remains a fully functional prototype that can be independently explored and evaluated.**
+
+Versioning should provide the ability to experiment from any point in the prototype's history.
+
+---
+
+# Expected Final Experience
+
+The version card should provide:
+
+```text
+┌─────────────────────────────────────────────┐
+│ V4                                          │
+│ TV Audience Intelligence                   │
+│                                             │
+│ Created Aug 25, 2026                       │
+│                                             │
+│                    [ Duplicate ] [ Archive ]│
+└─────────────────────────────────────────────┘
+```
+
+Duplicate:
+
+**V4 → Duplicate → Confirm → V5**
+
+Result:
+
+**V5 = Functional copy of V4 + clean comments/annotations**
+
+Archive:
+
+**V4 → Archive → Removed from active list → Available under Archived**
+
+Most importantly:
+
+**V1, V2, V3, V4, V5 must all remain fully interactive and independently editable.**
+
+```
+```

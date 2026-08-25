@@ -28,6 +28,9 @@ import {
   Lock,
   LockOpen,
   FilePlus,
+  CopySimple,
+  Archive as ArchiveIcon,
+  ArrowCounterClockwise,
   WarningCircle,
   type IconProps,
 } from "@phosphor-icons/react";
@@ -40,6 +43,16 @@ import {
   type ShareConfig,
 } from "@/lib/prototypeStore";
 import { putShare, deleteShare, getShareMeta } from "@/lib/shareApi";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const C = {
   surface: "var(--surface-background-lvl1,#ffffff)",
@@ -202,41 +215,121 @@ function VersionHistory({
   selectedId,
   onSelect,
   onSaveNew,
+  onDuplicate,
+  onArchive,
+  onRestore,
   readOnly,
 }: {
   versions: PrototypeVersion[];
   selectedId?: string;
   onSelect: (id: string) => void;
   onSaveNew?: () => void;
+  onDuplicate: (id: string) => void;
+  onArchive: (id: string) => void;
+  onRestore: (id: string) => void;
   readOnly: boolean;
 }) {
-  // Newest first — shows evolution clearly.
-  const ordered = [...versions].reverse();
+  const [listMode, setListMode] = useState<"active" | "archived">("active");
+  const [pending, setPending] = useState<{
+    kind: "duplicate" | "archive";
+    version: PrototypeVersion;
+  } | null>(null);
+  const activeCount = versions.filter(
+    (version) => version.status !== "archived",
+  ).length;
+  const ordered = versions
+    .filter((version) =>
+      listMode === "active"
+        ? version.status !== "archived"
+        : version.status === "archived",
+    )
+    .slice()
+    .reverse();
+  const confirm = () => {
+    if (!pending) return;
+    if (pending.kind === "duplicate") onDuplicate(pending.version.id);
+    else onArchive(pending.version.id);
+    setPending(null);
+  };
   return (
-    <Section
-      icon={ClockCounterClockwise}
-      title="Version History"
-      action={
-        !readOnly && onSaveNew ? <SaveVersionButton onClick={onSaveNew} /> : undefined
-      }
-    >
-      {ordered.length === 0 ? (
-        <p className="text-[14px]" style={{ color: C.textMuted }}>
-          No versions yet. Save the first version to start tracking history.
-        </p>
-      ) : (
-        <ol className="flex flex-col gap-[var(--spacing-100,8px)]">
-          {ordered.map((v) => (
-            <VersionRow
-              key={v.id}
-              version={v}
-              selected={v.id === selectedId}
-              onSelect={() => onSelect(v.id)}
-            />
+    <>
+      <Section
+        icon={ClockCounterClockwise}
+        title="Version History"
+        action={
+          !readOnly && onSaveNew ? <SaveVersionButton onClick={onSaveNew} /> : undefined
+        }
+      >
+        <div
+          className="inline-flex self-start rounded-[var(--radius-50,4px)] border border-solid p-0.5"
+          style={{ borderColor: C.border }}
+          aria-label="Version status"
+        >
+          {(["active", "archived"] as const).map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              aria-pressed={listMode === mode}
+              onClick={() => setListMode(mode)}
+              className="rounded-[var(--radius-50,4px)] px-2.5 py-1.5 text-[12px] font-medium"
+              style={{
+                backgroundColor: listMode === mode ? C.brandSubtle : "transparent",
+                color: listMode === mode ? C.brandFg : C.textBody,
+              }}
+            >
+              {mode === "active" ? "Active Versions" : "Archived Versions"}
+            </button>
           ))}
-        </ol>
-      )}
-    </Section>
+        </div>
+        {ordered.length === 0 ? (
+          <p className="text-[14px]" style={{ color: C.textMuted }}>
+            {listMode === "active"
+              ? "No active versions."
+              : "No archived versions."}
+          </p>
+        ) : (
+          <ol className="flex flex-col gap-[var(--spacing-100,8px)]">
+            {ordered.map((v) => (
+              <VersionRow
+                key={v.id}
+                version={v}
+                selected={v.id === selectedId}
+                onSelect={() => onSelect(v.id)}
+                readOnly={readOnly}
+                archiveDisabled={v.status !== "archived" && activeCount <= 1}
+                onDuplicate={() => setPending({ kind: "duplicate", version: v })}
+                onArchive={() => setPending({ kind: "archive", version: v })}
+                onRestore={() => onRestore(v.id)}
+              />
+            ))}
+          </ol>
+        )}
+      </Section>
+      <AlertDialog open={pending !== null} onOpenChange={(open) => !open && setPending(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pending?.kind === "duplicate"
+                ? `Duplicate ${pending.version.name}?`
+                : `Archive ${pending?.version.name ?? ""}?`}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pending?.kind === "duplicate"
+                ? "Choose how you want to create the new version."
+                : "This version will be removed from the active version list but won't be permanently deleted."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirm}>
+              {pending?.kind === "duplicate"
+                ? `Duplicate exact copy of ${pending.version.name}`
+                : "Archive Version"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 
@@ -244,25 +337,37 @@ function VersionRow({
   version,
   selected,
   onSelect,
+  readOnly,
+  archiveDisabled,
+  onDuplicate,
+  onArchive,
+  onRestore,
 }: {
   version: PrototypeVersion;
   selected: boolean;
   onSelect: () => void;
+  readOnly: boolean;
+  archiveDisabled: boolean;
+  onDuplicate: () => void;
+  onArchive: () => void;
+  onRestore: () => void;
 }) {
   const [hover, setHover] = useState(false);
   return (
-    <li>
+    <li
+      className="rounded-[var(--radius-50,4px)] border border-solid p-[var(--spacing-150,12px)] transition-colors"
+      style={{
+        borderColor: selected ? C.brandFg : C.border,
+        backgroundColor: selected ? C.brandSubtle : hover ? C.hoverBg : C.surface,
+      }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
       <button
         type="button"
         onClick={onSelect}
         aria-pressed={selected}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-        className="flex w-full flex-col gap-[var(--spacing-25,2px)] rounded-[var(--radius-50,4px)] border border-solid p-[var(--spacing-150,12px)] text-left transition-colors"
-        style={{
-          borderColor: selected ? C.brandFg : C.border,
-          backgroundColor: selected ? C.brandSubtle : hover ? C.hoverBg : C.surface,
-        }}
+        className="flex w-full flex-col gap-[var(--spacing-25,2px)] text-left"
       >
         <div className="flex items-center gap-2">
           <span
@@ -278,18 +383,87 @@ function VersionRow({
           )}
         </div>
         <div className="flex flex-wrap gap-x-3 text-[12px]" style={{ color: C.textMuted }}>
-          <span>Created {fmtDate(version.createdAt)}</span>
-          <span>
-            Updated {fmtDate(version.updatedAt)} · {fmtTime(version.updatedAt)}
-          </span>
+          <span>Created {fmtDate(version.createdAt)} · {fmtTime(version.createdAt)}</span>
+          <span>Status: {version.status === "archived" ? "Archived" : "Active"}</span>
         </div>
+        {version.metadata?.createdFrom && (
+          <span className="text-[12px]" style={{ color: C.textMuted }}>
+            Created from: {version.metadata.createdFrom}
+          </span>
+        )}
         {version.description && (
           <p className="text-[13px]" style={{ color: C.textBody }}>
             {version.description}
           </p>
         )}
       </button>
+      {!readOnly && (
+        <div className="mt-2 flex justify-end gap-1.5">
+          {version.status !== "archived" ? (
+            <>
+              <VersionAction
+                label={`Duplicate ${version.name}`}
+                icon={CopySimple}
+                onClick={onDuplicate}
+              />
+              <VersionAction
+                label={`Archive ${version.name}`}
+                icon={ArchiveIcon}
+                onClick={onArchive}
+                disabled={archiveDisabled}
+                title={
+                  archiveDisabled
+                    ? "The last active version cannot be archived"
+                    : `Archive ${version.name}`
+                }
+              />
+            </>
+          ) : (
+            <>
+              <VersionAction
+                label={`Duplicate ${version.name}`}
+                icon={CopySimple}
+                onClick={onDuplicate}
+              />
+              <VersionAction
+                label={`Restore ${version.name}`}
+                icon={ArrowCounterClockwise}
+                onClick={onRestore}
+              />
+            </>
+          )}
+        </div>
+      )}
     </li>
+  );
+}
+
+function VersionAction({
+  label,
+  icon: Icon,
+  onClick,
+  disabled = false,
+  title,
+}: {
+  label: string;
+  icon: React.ComponentType<IconProps>;
+  onClick: () => void;
+  disabled?: boolean;
+  title?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      title={title ?? label}
+      aria-label={label}
+      className="inline-flex items-center gap-1 rounded-[var(--radiuses-small,2px)] px-2 py-1 text-[12px] font-medium disabled:cursor-not-allowed disabled:opacity-50"
+      style={{ color: C.brandFg }}
+    >
+      <Icon size={14} />
+      {label.split(" ")[0]}
+    </button>
   );
 }
 
@@ -561,10 +735,16 @@ export function PrototypeViewer({
   readOnly = false,
   onChanged,
 }: PrototypeViewerProps): JSX.Element {
-  // Selected version defaults to the newest.
-  const newest = prototype.versions[prototype.versions.length - 1];
+  // Selected version defaults to the newest active version.
+  const activeVersions = prototype.versions.filter(
+    (version) => version.status !== "archived",
+  );
+  const newest = activeVersions[activeVersions.length - 1];
   const [selectedId, setSelectedId] = useState<string | undefined>(newest?.id);
-  const selected = prototype.versions.find((v) => v.id === selectedId) ?? newest;
+  const selected =
+    prototype.versions.find((v) => v.id === selectedId) ??
+    newest ??
+    prototype.versions[prototype.versions.length - 1];
   const isNewest = !selected || selected.id === newest?.id;
 
   // Details reflect the SELECTED version's frozen snapshot. The newest version
@@ -658,6 +838,35 @@ export function PrototypeViewer({
     if (updated.share.enabled) runSync(() => doSyncShare(updated));
   };
 
+  const duplicateVersion = (sourceVersionId: string) => {
+    const updated = prototypeRepository.duplicateVersion(
+      prototype.id,
+      sourceVersionId,
+    );
+    const created = updated.versions[updated.versions.length - 1];
+    setSelectedId(created?.id);
+    onChanged?.(updated);
+    if (updated.share.enabled) runSync(() => doSyncShare(updated));
+  };
+
+  const archiveVersion = (versionId: string) => {
+    const updated = prototypeRepository.archiveVersion(prototype.id, versionId);
+    if (selectedId === versionId) {
+      const active = updated.versions.filter(
+        (version) => version.status !== "archived",
+      );
+      setSelectedId(active[active.length - 1]?.id);
+    }
+    onChanged?.(updated);
+    if (updated.share.enabled) runSync(() => doSyncShare(updated));
+  };
+
+  const restoreVersion = (versionId: string) => {
+    const updated = prototypeRepository.unarchiveVersion(prototype.id, versionId);
+    onChanged?.(updated);
+    if (updated.share.enabled) runSync(() => doSyncShare(updated));
+  };
+
   const setShare = (share: ShareConfig) => {
     userChangeSeq.current += 1; // user intent supersedes any pending reconcile
     const updated = prototypeRepository.setShare(prototype.id, share);
@@ -708,6 +917,9 @@ export function PrototypeViewer({
         selectedId={selected?.id}
         onSelect={setSelectedId}
         onSaveNew={saveNewVersion}
+        onDuplicate={duplicateVersion}
+        onArchive={archiveVersion}
+        onRestore={restoreVersion}
         readOnly={readOnly}
       />
 

@@ -395,6 +395,54 @@ export const localStorageRepository: CommentRepository = {
 
 let apiComments: PrototypeComment[] = [];
 
+const commentMigrationKey = (prototypeId: string) =>
+  `fiber:collab:migrated:comments:${prototypeId}`;
+const commentMigrationFailuresKey = (prototypeId: string) =>
+  `fiber:collab:migration-failures:comments:${prototypeId}`;
+
+function commentMigrationComplete(prototypeId: string): boolean {
+  try {
+    return window.localStorage.getItem(commentMigrationKey(prototypeId)) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function readCommentMigrationFailures(prototypeId: string): Set<string> {
+  try {
+    const raw = window.localStorage.getItem(
+      commentMigrationFailuresKey(prototypeId),
+    );
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    return new Set(
+      Array.isArray(parsed)
+        ? parsed.filter((id): id is string => typeof id === "string")
+        : [],
+    );
+  } catch {
+    return new Set();
+  }
+}
+
+function finishCommentMigration(
+  prototypeId: string,
+  failedIds: string[],
+): void {
+  try {
+    if (failedIds.length === 0) {
+      window.localStorage.setItem(commentMigrationKey(prototypeId), "true");
+      window.localStorage.removeItem(commentMigrationFailuresKey(prototypeId));
+    } else {
+      window.localStorage.setItem(
+        commentMigrationFailuresKey(prototypeId),
+        JSON.stringify(failedIds),
+      );
+    }
+  } catch {
+    /* storage unavailable — retrying migration remains safe */
+  }
+}
+
 function commentsUrl(prototypeId: string, id?: string): string {
   const base = `/api/prototypes/${encodeURIComponent(prototypeId)}/comments`;
   return id ? `${base}/${encodeURIComponent(id)}` : base;
@@ -421,7 +469,12 @@ function cacheComments(prototypeId: string, comments: PrototypeComment[]): void 
   const otherLocal = readAll().filter(
     (comment) => comment.prototypeId !== prototypeId,
   );
-  writeAllQuiet([...otherLocal, ...comments]);
+  // Soft-deleted comments remain in the API-backed live state for thread
+  // history, but are no longer migration candidates in the browser cache.
+  writeAllQuiet([
+    ...otherLocal,
+    ...comments.filter((comment) => !comment.deletedAt),
+  ]);
 }
 
 /**
@@ -446,9 +499,15 @@ export async function hydrateComments(prototypeId: string): Promise<void> {
       (comment) =>
         comment.prototypeId === prototypeId && !remoteIds.has(comment.id),
     );
+    const previousFailures = readCommentMigrationFailures(prototypeId);
+    const migrationCandidates = commentMigrationComplete(prototypeId)
+      ? []
+      : previousFailures.size > 0
+        ? localMissing.filter((comment) => previousFailures.has(comment.id))
+        : localMissing;
     const migrated: PrototypeComment[] = [];
     const migrationFailed: PrototypeComment[] = [];
-    for (const comment of localMissing) {
+    for (const comment of migrationCandidates) {
       try {
         await putComment(comment);
         migrated.push(comment);
@@ -456,6 +515,12 @@ export async function hydrateComments(prototypeId: string): Promise<void> {
         migrationFailed.push(comment);
         console.warn("[prototype-comments] local migration failed", error);
       }
+    }
+    if (!commentMigrationComplete(prototypeId)) {
+      finishCommentMigration(
+        prototypeId,
+        migrationFailed.map((comment) => comment.id),
+      );
     }
     // Failed records stay both visible and cached so the next hydration retries
     // them instead of silently discarding browser-local collaboration data.

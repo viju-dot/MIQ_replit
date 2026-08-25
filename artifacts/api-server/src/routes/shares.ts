@@ -43,6 +43,13 @@ const ShareVersionSchema = zod.object({
   createdAt: zod.string(),
   updatedAt: zod.string(),
   description: zod.string().optional(),
+  rendererKey: zod.string().optional(),
+  status: zod.enum(["active", "archived"]).optional(),
+  metadata: zod
+    .object({
+      createdFrom: zod.string().optional(),
+    })
+    .optional(),
   snapshot: VersionSnapshotSchema.optional(),
 });
 

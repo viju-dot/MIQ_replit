@@ -43,6 +43,13 @@ export interface PrototypeVersion {
   createdAt: string;
   updatedAt: string;
   description?: string;
+  /** Selects the functional React renderer independently of this version's id. */
+  rendererKey: "v3" | "v4" | "dashboard";
+  /** Archived versions remain persisted but are hidden from the active list. */
+  status: "active" | "archived";
+  metadata?: {
+    createdFrom?: string;
+  };
   /** Data as of this version (frozen at save time). */
   snapshot?: VersionSnapshotData;
 }
@@ -142,6 +149,8 @@ const SEED: Prototype[] = [
         createdAt: "2024-01-01T09:00:00.000Z",
         updatedAt: "2024-01-08T14:30:00.000Z",
         description: "Initial concept — segment explorer and basic audience overview.",
+        rendererKey: "dashboard",
+        status: "active",
         snapshot: {
           description:
             "Early concept: browse TV audience segments and view a basic audience overview.",
@@ -155,6 +164,8 @@ const SEED: Prototype[] = [
         createdAt: "2024-02-12T10:15:00.000Z",
         updatedAt: "2024-03-04T16:45:00.000Z",
         description: "Added activation flow, refined filters and dark-mode support.",
+        rendererKey: "dashboard",
+        status: "active",
         snapshot: {
           description:
             "A full product experience for exploring and activating TV audience segments.",
@@ -168,6 +179,8 @@ const SEED: Prototype[] = [
         createdAt: "2024-04-18T11:00:00.000Z",
         updatedAt: "2024-04-18T11:00:00.000Z",
         description: "Content Planner ideation — live.",
+        rendererKey: "v3",
+        status: "active",
         snapshot: {
           description:
             "MiQ TV Audience & Content Planner — single-page analytical dashboard with connected cross-filtering and drilldowns.",
@@ -181,6 +194,8 @@ const SEED: Prototype[] = [
         createdAt: "2024-05-20T11:00:00.000Z",
         updatedAt: "2024-05-20T11:00:00.000Z",
         description: "Wireframe-faithful Content Planner — live.",
+        rendererKey: "v4",
+        status: "active",
         // Newest/live version: the version-context strip shows the live
         // prototype description/status (not this snapshot) for the newest.
         snapshot: {
@@ -216,6 +231,9 @@ export interface PrototypeRepository {
   remove(id: string): void;
   /** Append a new version ("V{n}") preserving all prior ones. */
   addVersion(id: string, description?: string): Prototype;
+  duplicateVersion(id: string, sourceVersionId: string): Prototype;
+  archiveVersion(id: string, versionId: string): Prototype;
+  unarchiveVersion(id: string, versionId: string): Prototype;
   /** Replace the share config for a prototype. */
   setShare(id: string, share: ShareConfig): Prototype;
 }
@@ -245,12 +263,30 @@ function coerceVersion(raw: unknown, fallbackTs: string): PrototypeVersion | nul
   if (typeof r.name !== "string" || r.name.length === 0) return null;
   const str = (v: unknown, fb = ""): string => (typeof v === "string" ? v : fb);
   const createdAt = str(r.createdAt) || fallbackTs;
+  const fallbackRenderer =
+    r.id === "tvai_v3" ? "v3" : r.id === "tvai_v4" ? "v4" : "dashboard";
+  const rendererKey =
+    r.rendererKey === "v3" ||
+    r.rendererKey === "v4" ||
+    r.rendererKey === "dashboard"
+      ? r.rendererKey
+      : fallbackRenderer;
+  const metadata =
+    r.metadata && typeof r.metadata === "object"
+      ? (r.metadata as Record<string, unknown>)
+      : undefined;
   return {
     id: r.id,
     name: r.name,
     createdAt,
     updatedAt: str(r.updatedAt) || createdAt,
     description: typeof r.description === "string" ? r.description : undefined,
+    rendererKey,
+    status: r.status === "archived" ? "archived" : "active",
+    metadata:
+      typeof metadata?.createdFrom === "string"
+        ? { createdFrom: metadata.createdFrom }
+        : undefined,
     snapshot: coerceSnapshot(r.snapshot),
   };
 }
@@ -318,7 +354,19 @@ function readLocal(): Prototype[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed.map(coercePrototype).filter((p): p is Prototype => p !== null);
+    const clean = parsed
+      .map(coercePrototype)
+      .filter((p): p is Prototype => p !== null);
+    // Permanently backfill new version fields on legacy local records.
+    if (JSON.stringify(clean) !== JSON.stringify(parsed)) {
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(clean));
+      } catch {
+        // Reconciled values still remain available in memory when storage is
+        // unavailable or full; a later read can retry the durable backfill.
+      }
+    }
+    return clean;
   } catch {
     return [];
   }
@@ -454,12 +502,91 @@ export const localStorageRepository: PrototypeRepository = {
       createdAt: ts,
       updatedAt: ts,
       description: description?.trim() || undefined,
+      rendererKey:
+        current.versions
+          .filter((existing) => existing.status === "active")
+          .slice(-1)[0]?.rendererKey ??
+        "dashboard",
+      status: "active",
       snapshot: {
         description: current.description,
         status: current.status,
       },
     };
     const clean = validateForWrite({ ...current, versions: [...current.versions, version] });
+    persist(clean);
+    return clean;
+  },
+  duplicateVersion(id, sourceVersionId) {
+    const current = readAll().find((p) => p.id === id);
+    if (!current) throw new Error(`prototypeStore: unknown prototype "${id}".`);
+    const source = current.versions.find((version) => version.id === sourceVersionId);
+    if (!source) {
+      throw new Error(
+        `prototypeStore: unknown version "${sourceVersionId}" for prototype "${id}".`,
+      );
+    }
+    const ts = nowIso();
+    const duplicate: PrototypeVersion = {
+      id: newId("ver"),
+      name: nextVersionName(current.versions),
+      createdAt: ts,
+      updatedAt: ts,
+      description: source.description,
+      rendererKey: source.rendererKey,
+      status: "active",
+      metadata: { createdFrom: source.name },
+      snapshot: source.snapshot ? { ...source.snapshot } : undefined,
+    };
+    const clean = validateForWrite({
+      ...current,
+      versions: [...current.versions, duplicate],
+    });
+    persist(clean);
+    return clean;
+  },
+  archiveVersion(id, versionId) {
+    const current = readAll().find((p) => p.id === id);
+    if (!current) throw new Error(`prototypeStore: unknown prototype "${id}".`);
+    const active = current.versions.filter((version) => version.status === "active");
+    const target = current.versions.find((version) => version.id === versionId);
+    if (!target) {
+      throw new Error(
+        `prototypeStore: unknown version "${versionId}" for prototype "${id}".`,
+      );
+    }
+    if (target.status === "active" && active.length <= 1) {
+      throw new Error("prototypeStore: cannot archive the last active version.");
+    }
+    const ts = nowIso();
+    const clean = validateForWrite({
+      ...current,
+      versions: current.versions.map((version) =>
+        version.id === versionId
+          ? { ...version, status: "archived", updatedAt: ts }
+          : version,
+      ),
+    });
+    persist(clean);
+    return clean;
+  },
+  unarchiveVersion(id, versionId) {
+    const current = readAll().find((p) => p.id === id);
+    if (!current) throw new Error(`prototypeStore: unknown prototype "${id}".`);
+    if (!current.versions.some((version) => version.id === versionId)) {
+      throw new Error(
+        `prototypeStore: unknown version "${versionId}" for prototype "${id}".`,
+      );
+    }
+    const ts = nowIso();
+    const clean = validateForWrite({
+      ...current,
+      versions: current.versions.map((version) =>
+        version.id === versionId
+          ? { ...version, status: "active", updatedAt: ts }
+          : version,
+      ),
+    });
     persist(clean);
     return clean;
   },

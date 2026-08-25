@@ -322,7 +322,7 @@ function SecondaryNavigation() {
 
 /* ------------------------------------------ Version → renderer map --------- */
 /* A version-bound renderer registry so future per-version prototype renderers
- * can plug in (keyed by version id). Unknown versions fall back to the current
+ * can plug in (keyed by renderer key). Unknown keys fall back to the current
  * dashboard. Version selection and current-version context remain available in
  * the collaboration overlay controls. */
 
@@ -332,26 +332,81 @@ type VersionRenderer = (args: {
   isNewest: boolean;
 }) => JSX.Element;
 
-const DEFAULT_RENDERER: VersionRenderer = () => <TvAudienceDashboardPage />;
+const DEFAULT_RENDERER: VersionRenderer = ({ version }) => (
+  <TvAudienceDashboardPage key={version.id} />
+);
 
 const VERSION_RENDERERS: Record<string, VersionRenderer> = {
   // V4 (newest/live) = wireframe-faithful Content Planner. V3 = Content Planner
   // ideation. V1 & V2 fall back to the existing dashboard renderer (frozen).
-  tvai_v3: () => <V3ContentPlanner />,
-  tvai_v4: () => <V4ContentPlanner />,
+  dashboard: ({ version }) => <TvAudienceDashboardPage key={version.id} />,
+  v3: ({ version }) => <V3ContentPlanner key={version.id} />,
+  v4: ({ version }) => <V4ContentPlanner key={version.id} />,
 };
 
-/** The prototype body — version-aware. Consumes the version context. */
+/** Version-aware keep-alive renderer host. A renderer mounts on first visit and
+ * remains mounted (but display:none) so its local controls retain session state. */
 function PrototypeBody() {
   const ctx = usePrototypeVersion();
   if (!ctx) return <TvAudienceDashboardPage />;
-  const render =
-    VERSION_RENDERERS[ctx.viewedVersion.id] ?? DEFAULT_RENDERER;
-  return render({
-    prototype: ctx.prototype,
-    version: ctx.viewedVersion,
-    isNewest: ctx.isNewest,
-  });
+  return (
+    <KeepAlivePrototypeBodies
+      prototype={ctx.prototype}
+      viewedVersion={ctx.viewedVersion}
+    />
+  );
+}
+
+function KeepAlivePrototypeBodies({
+  prototype,
+  viewedVersion,
+}: {
+  prototype: Prototype;
+  viewedVersion: PrototypeVersion;
+}) {
+  const [visitedIds, setVisitedIds] = useState<string[]>(() => [
+    viewedVersion.id,
+  ]);
+  const currentId = viewedVersion.id;
+  const idsToRender = visitedIds.includes(currentId)
+    ? visitedIds
+    : [...visitedIds, currentId];
+
+  useEffect(() => {
+    setVisitedIds((ids) =>
+      ids.includes(currentId) ? ids : [...ids, currentId],
+    );
+  }, [currentId]);
+
+  const activeVersions = prototype.versions.filter(
+    (version) => version.status !== "archived",
+  );
+  const newestActive = activeVersions[activeVersions.length - 1];
+
+  return (
+    <>
+      {idsToRender.map((id) => {
+        const version = prototype.versions.find((item) => item.id === id);
+        if (!version) return null;
+        const render =
+          VERSION_RENDERERS[version.rendererKey] ?? DEFAULT_RENDERER;
+        const visible = id === currentId;
+        return (
+          <div
+            key={id}
+            aria-hidden={!visible || undefined}
+            style={visible ? undefined : { display: "none" }}
+          >
+            {render({
+              prototype,
+              version,
+              isNewest: version.id === newestActive?.id,
+            })}
+          </div>
+        );
+      })}
+    </>
+  );
 }
 
 /**
@@ -359,23 +414,15 @@ function PrototypeBody() {
  * coordinate root (position: relative, max-w-[1440px]): comment anchors are
  * measured against — and markers rendered inside — this exact box, so pins
  * track prototype elements on any viewport, including > 1440px where the
- * canvas is narrower than the viewport. Older (non-newest) versions render
- * interaction-disabled; comment-mode clicks still register because the layer's
- * click-capture overlay sits above the (inert) body content.
+ * canvas is narrower than the viewport. Every version remains fully interactive.
  */
 function PrototypeContentRegion() {
-  const ctx = usePrototypeVersion();
-  const inert = ctx ? !ctx.isNewest : false;
   return (
     // <main> is the positioned canvas. The dashboard's own filter bar padding
     // uses -mx-6 / -mx-10, so mirror that px-6 / px-10 here.
     <main className="relative mx-auto w-full max-w-[1440px] px-6 py-8 md:px-24">
-      {/* Prototype body — imported, not duplicated. Wrapped so inert styling
-          applies only to the body, never to the comment layer sibling. */}
-      <div
-        aria-hidden={inert || undefined}
-        style={inert ? { pointerEvents: "none" } : undefined}
-      >
+      {/* Prototype body — imported, not duplicated. */}
+      <div>
         <PrototypeBody />
       </div>
 
@@ -392,7 +439,7 @@ function PrototypeContentRegion() {
 }
 
 /** The full prototype experience (header + body). Rendered as
- *  the overlay's children so it is re-mounted when the viewed version changes.
+ *  the overlay's children with visited version bodies kept alive.
  *
  *  The Fiber navigation header is auto-hiding (floating), not sticky: at the
  *  top of the page it sits in flow; once scrolled past it floats away and only
