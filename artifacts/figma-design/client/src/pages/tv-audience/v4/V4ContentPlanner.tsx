@@ -155,7 +155,7 @@ function StatTile({
 /* Global All / Commercials control. Uses the Fiber "Tabs Bar — rounded"
  * component (annotation #2). The underlying global env state is unchanged, so
  * the Temporal Insights mirror keeps working. */
-const ENV_TABS: string[] = ["All", "Commercials"];
+const ENV_TABS: string[] = ["All", "Addressable channels"];
 
 function EnvControl({
   value,
@@ -168,9 +168,9 @@ function EnvControl({
     <div data-annotate="Viewing environment control">
       <TabsBarRounded
         options={ENV_TABS}
-        value={value === "commercials" ? "Commercials" : "All"}
-        onChange={(v) => onChange(v === "Commercials" ? "commercials" : "all")}
-        ariaLabel="Viewing environment: All or Commercials"
+        value={value === "commercials" ? "Addressable channels" : "All"}
+        onChange={(v) => onChange(v === "Addressable channels" ? "commercials" : "all")}
+        ariaLabel="Viewing environment: All or Addressable channels"
       />
     </div>
   );
@@ -716,7 +716,7 @@ export default function V4ContentPlanner() {
               empty={empty || channels.length === 0}
               height={300}
               emptyTitle="No channels match"
-              emptyMessage="Commercials filtering removed all channels here — switch to All or change the tab."
+              emptyMessage="Addressable channels filtering removed all channels here — switch to All or change the tab."
             >
               <ComboChart
                 categories={channels.slice(0, 10).map((c) => c.name)}
@@ -882,7 +882,7 @@ export default function V4ContentPlanner() {
           empty={temporalEmpty}
           height={340}
           emptyTitle="No temporal data"
-          emptyMessage="This channel is non-commercial and excluded under Commercials — switch to All or pick another channel."
+          emptyMessage="This channel is non-commercial and excluded under Addressable channels — switch to All or pick another channel."
         >
           <TemporalHeatmap grid={temporal} />
         </CardBody>
@@ -971,7 +971,7 @@ export default function V4ContentPlanner() {
         <ul className="list-disc pl-[18px] text-[length:var(--body-sm-regular-size,12px)] leading-[var(--body-sm-regular-line-height,18px)]" style={{ color: MUTED }}>
           <li>Layout and hierarchy follow the delivered wireframe exactly; no sections rearranged or added.</li>
           <li>Index: 100 = national average; e.g. index 150 = 50% above national average (shown via directional badges + tooltips).</li>
-          <li>Commercials excludes non-commercial environments per market (data-source dependent, not hard-coded to BBC).</li>
+          <li>Addressable channels excludes non-commercial environments per market (data-source dependent, not hard-coded to BBC).</li>
           <li>Cross-filters: consumption type scopes downstream; genre (Genres view) sets the affinity anchor + shows; an affinity genre reveals its top shows.</li>
           <li>All figures are illustrative synthetic data derived deterministically from the active filters.</li>
         </ul>
