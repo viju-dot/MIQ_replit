@@ -23,6 +23,7 @@ import { useAutoHideHeader } from "@/hooks/useAutoHideHeader";
 import TvAudienceDashboardPage from "@/pages/ds/TvAudienceDashboardPage";
 import V3ContentPlanner from "@/pages/tv-audience/v3/V3ContentPlanner";
 import V4ContentPlanner from "@/pages/tv-audience/v4/V4ContentPlanner";
+import V5ContentPlanner from "@/pages/tv-audience/v5/V5ContentPlanner";
 import {
   PrototypeCollabOverlay,
   PrototypeCommentLayer,
@@ -342,6 +343,9 @@ const VERSION_RENDERERS: Record<string, VersionRenderer> = {
   dashboard: ({ version }) => <TvAudienceDashboardPage key={version.id} />,
   v3: ({ version }) => <V3ContentPlanner key={version.id} />,
   v4: ({ version }) => <V4ContentPlanner key={version.id} />,
+  v5: ({ version }) => (
+    <V5ContentPlanner key={version.id} instanceId={version.id} />
+  ),
 };
 
 /** Version-aware keep-alive renderer host. A renderer mounts on first visit and

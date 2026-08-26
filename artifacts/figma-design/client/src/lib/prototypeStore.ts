@@ -44,7 +44,7 @@ export interface PrototypeVersion {
   updatedAt: string;
   description?: string;
   /** Selects the functional React renderer independently of this version's id. */
-  rendererKey: "v3" | "v4" | "dashboard";
+  rendererKey: "v3" | "v4" | "v5" | "dashboard";
   /** Archived versions remain persisted but are hidden from the active list. */
   status: "active" | "archived";
   metadata?: {
@@ -205,6 +205,22 @@ const SEED: Prototype[] = [
           notes: "Wireframe-faithful layout; global All/Commercials; chart token layer; cross-filter chain.",
         },
       },
+      {
+        id: "ver_e2b15e8e-a179-4ec1-a46c-6c48f407d62f",
+        name: "V5",
+        createdAt: "2026-08-25T11:00:00.000Z",
+        updatedAt: "2026-08-25T11:00:00.000Z",
+        description: "Stakeholder feedback round — V5 revisions",
+        rendererKey: "v5",
+        status: "active",
+        metadata: { createdFrom: "V4" },
+        snapshot: {
+          description:
+            "MiQ TV Audience & Content Planner — stakeholder feedback revisions.",
+          status: "Live",
+          notes: "V5 stakeholder feedback round.",
+        },
+      },
     ],
     // No pre-baked token: a fresh high-entropy token is generated the first
     // time sharing is enabled (weak/deterministic tokens are never accepted).
@@ -268,6 +284,7 @@ function coerceVersion(raw: unknown, fallbackTs: string): PrototypeVersion | nul
   const rendererKey =
     r.rendererKey === "v3" ||
     r.rendererKey === "v4" ||
+    r.rendererKey === "v5" ||
     r.rendererKey === "dashboard"
       ? r.rendererKey
       : fallbackRenderer;
@@ -333,6 +350,14 @@ function coercePrototype(raw: unknown): Prototype | null {
         .map((v) => coerceVersion(v, createdAt))
         .filter((v): v is PrototypeVersion => v !== null)
     : [];
+  const reconciledVersions =
+    r.id === "tv-audience-intelligence"
+      ? versions.map((version) =>
+          version.name === "V5"
+            ? { ...version, rendererKey: "v5" as const }
+            : version,
+        )
+      : versions;
 
   return {
     id: r.id,
@@ -341,7 +366,7 @@ function coercePrototype(raw: unknown): Prototype | null {
     status: isStatus(r.status) ? r.status : "Draft",
     route: r.route,
     createdAt,
-    versions,
+    versions: reconciledVersions,
     share: coerceShare(r.share),
   };
 }
@@ -413,25 +438,33 @@ function reconcileSeededVersions(
   local: Prototype,
   seed: Prototype,
 ): Prototype {
-  const haveIds = new Set(local.versions.map((v) => v.id));
-  const missingSeeded = seed.versions.filter((v) => !haveIds.has(v.id));
-  if (missingSeeded.length === 0) return local;
-  const seededHere = seed.versions.filter((v) => haveIds.has(v.id));
   const seedIds = new Set(seed.versions.map((v) => v.id));
-  const localOnly = local.versions.filter((v) => !seedIds.has(v.id));
+  const matchedLocalIds = new Set<string>();
+  const reconciledSeed = seed.versions.map((seedVersion) => {
+    const existing =
+      local.versions.find((version) => version.id === seedVersion.id) ??
+      (seedVersion.name === "V5"
+        ? local.versions.find((version) => version.name === "V5")
+        : undefined);
+    if (!existing) return seedVersion;
+    matchedLocalIds.add(existing.id);
+    // V5's seeded identity is canonical: collaboration records are stored
+    // against this version id, including for legacy same-name duplicates.
+    return existing.id === seedVersion.id
+      ? existing
+      : { ...existing, id: seedVersion.id, rendererKey: "v5" as const };
+  });
+  const hasSeededV5 = seed.versions.some((version) => version.name === "V5");
+  const localOnly = local.versions.filter(
+    (version) =>
+      !seedIds.has(version.id) &&
+      !matchedLocalIds.has(version.id) &&
+      !(hasSeededV5 && version.name === "V5"),
+  );
   // Order: existing seeded (in seed order) + newly-seeded + local-only extras.
   return {
     ...local,
-    versions: [
-      ...seed.versions.filter(
-        (v) => haveIds.has(v.id) || missingSeeded.includes(v),
-      ).map((sv) => {
-        // Keep the user's copy of an already-persisted seeded version if any.
-        const existing = seededHere.find((lv) => lv.id === sv.id);
-        return existing ?? sv;
-      }),
-      ...localOnly,
-    ],
+    versions: [...reconciledSeed, ...localOnly],
   };
 }
 
