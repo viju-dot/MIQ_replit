@@ -1,0 +1,250 @@
+. Resolved Comments Must Remain Viewable
+
+Resolved comments should still be accessible from the prototype.
+
+When viewing a resolved comment, show:
+
+Original comment
+Commenter
+Replies
+Attachments
+Links
+Version
+Created date/time
+Resolved status
+Resolved date/time
+Person who resolved it
+
+The user should be able to open the thread and read the entire conversation.
+
+3. Allow Reopening a Resolved Comment
+
+A resolved comment should not be permanently locked.
+
+Provide an action:
+
+Reopen
+
+If the feedback needs further discussion or the implementation is no longer valid, the user can reopen it.
+
+Flow:
+
+Open
+  ↓
+Feedback implemented
+  ↓
+Resolved
+  ↓
+Reopen
+  ↓
+Open again
+4. Do Not Permanently Delete Production Comments
+
+For the normal user workflow, avoid permanently deleting comments.
+
+The standard lifecycle should be:
+
+Open → Resolved
+
+rather than:
+
+Open → Deleted → Gone forever
+
+This protects stakeholder feedback and preserves the design-review history.
+
+5. Handle Previously Deleted Comments
+
+There are already comments that were deleted using the previous implementation.
+
+I want those comments to be recovered if their data still exists.
+
+Create a Comment Recovery / Migration behavior:
+
+Identify comments previously marked as deleted.
+Restore them into the comment history where the original data is available.
+Change their state from deleted to resolved or recoverable, depending on the available information.
+Preserve the original commenter and comment content.
+Preserve the original version/location where available.
+
+Do not invent missing comment content.
+
+If the previous implementation permanently removed the data and it is no longer available, do not create fake comments. Instead, preserve whatever metadata remains and clearly mark the item as unavailable.
+
+6. Staging and Production Behavior
+
+I want the comment system to behave consistently between staging and production.
+
+Staging
+
+Staging should allow us to safely test:
+
+Add comment
+Reply
+Resolve
+Reopen
+View resolved comments
+Comment history
+Version-specific comments
+Production
+
+When the prototype is published:
+
+Existing comments must remain available.
+Resolved comments must remain available.
+Comment threads must remain available.
+Comments must not disappear simply because the prototype is published.
+Publishing a new prototype version must not delete previous comment history.
+7. Publishing a New Version
+
+When a new AI Prototype version is created:
+
+Do not delete previous comments from previous versions.
+
+For example:
+
+V4
+ └── Comment
+     └── Resolved
+
+        ↓ Create V5
+
+V5
+ └── New clean review state
+
+V4's comments remain associated with V4.
+
+V5 starts with its own comment state according to the existing versioning rules.
+
+This is important because comments are part of the history of how the prototype evolved.
+
+8. Comment Status Filter
+
+Update the existing comment filtering experience.
+
+Provide:
+
+All
+Open
+Resolved
+
+Default:
+
+All
+
+This allows reviewers to switch between active feedback and completed feedback.
+
+Example:
+
+Comments
+
+[ All ] [ Open ] [ Resolved ]
+
+────────────────────────────
+
+Vijay
+Move this button higher.
+✓ Resolved
+
+────────────────────────────
+
+Designer
+The chart needs more context.
+Open
+9. Resolved Visual State
+
+Resolved comments should look different from active comments but should still be easy to discover.
+
+Use the existing Fiber Design System styling.
+
+For example:
+
+Open
+
+Normal comment marker and appearance.
+
+Resolved
+
+Muted/secondary appearance with a clear Resolved indicator.
+
+Do not hide resolved comments completely.
+
+10. Preserve Anchored Location
+
+Resolved comments must remain connected to the UI element where the original comment was created.
+
+When I select a resolved comment:
+
+Show its original anchor.
+Highlight the associated element where possible.
+Open the comment thread.
+Allow me to understand exactly what the original feedback was referring to.
+11. Important: Comments Are Review History
+
+Treat comments as historical collaboration data, not temporary UI content.
+
+A stakeholder comment represents part of the design-review process.
+
+Therefore:
+
+Comment
+   ↓
+Discussion
+   ↓
+Feedback implemented
+   ↓
+Resolved
+   ↓
+Still available for future reference
+
+The comment should only disappear if there is an explicit, separate permanent deletion workflow in the future.
+
+Do not expose permanent deletion as the normal comment action.
+
+12. Production-Level Requirement
+
+The final behavior should be safe for real-world use.
+
+I should never accidentally lose stakeholder feedback because I clicked an action that was intended to mean "the feedback is completed."
+
+Change the mental model from:
+
+Delete = remove the comment
+
+to:
+
+Resolve = feedback completed, conversation preserved
+
+Expected Result
+
+After this change:
+
+Adding feedback
+Stakeholder adds comment
+        ↓
+Open comment
+Implementing feedback
+Feedback implemented
+        ↓
+Click Resolve
+        ↓
+Comment remains visible
+        ↓
+Status = Resolved
+Later review
+Open Comments
+        ↓
+Filter → Resolved
+        ↓
+Read original stakeholder feedback
+        ↓
+Read complete conversation
+If needed again
+Resolved
+   ↓
+Reopen
+   ↓
+Continue discussion
+
+The main requirement is:
+
+Never treat "resolved" as "deleted." Preserve the complete comment history in both staging and published/production versions
