@@ -723,9 +723,9 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
           An Info Alert educates how the two views work together (annotation #3).
           Responsive: the 20/80 split stacks on narrow widths. */}
       <SmartCard
-        title="Consumption by Type & Time Spent"
+        title="TV viewership by media type"
         subtitle="% of viewing minutes per household · avg min/week, % of watch time and index vs national by channel/app"
-        ariaLabel="Consumption by type and time spent"
+        ariaLabel="TV viewership by media type"
         right={selectedType ? <Chip label={`Filter: ${selectedTypeName}`} selected onRemove={() => setSelectedType(null)} /> : undefined}
       >
         <div className="flex flex-col gap-[var(--spacing-200,16px)] lg:flex-row lg:items-stretch">
@@ -802,12 +802,12 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
 
       {/* 6 — Trends */}
       <SmartCard
-        title="Trends"
+        title="Content viewership trends"
         subtitle={
           (trendsView === "Shows" ? "Top indexing shows for this audience" : "Viewership by genre (IAB taxonomy)") +
           (selectedTypeName ? ` · scoped to ${selectedTypeName}` : "")
         }
-        ariaLabel="Trends"
+        ariaLabel="Content viewership trends"
         right={
           <div
             data-annotate="View by genre toggle"
@@ -1005,9 +1005,9 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
       {/* 8 — Cultural Affinity + Migration Signals */}
       <div className="grid grid-cols-1 gap-[var(--spacing-200,16px)] lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)]">
         <SmartCard
-          title="Cultural Affinity"
-          subtitle="Audience affinity across eight content and lifestyle parameters"
-          ariaLabel="Cultural affinity"
+          title="Content affinity"
+          subtitle="Audience affinity across eight content and lifestyle parameters · What genres and shows your audience watches in comparison to the national average"
+          ariaLabel="Content affinity"
         >
           <CardBody loading={loading} empty={empty} height={420}>
             <div className="flex flex-col gap-[var(--spacing-200,16px)]">
@@ -1064,9 +1064,9 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
         </SmartCard>
 
         <SmartCard
-          title="Migration Signals"
+          title="TV user behaviour"
           subtitle={`Where the audience goes within 1 hour of ${migration.source.title}`}
-          ariaLabel="Migration signals"
+          ariaLabel="TV user behaviour"
         >
           <div
             className="mb-[var(--spacing-100,8px)] flex justify-end"
