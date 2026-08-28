@@ -87,6 +87,7 @@ import type { Filters, ConsumptionKey } from "./data";
 import {
   DonutChart,
   ComboChart,
+  DualAxisBarChart,
   TemporalHeatmap,
   RadarChart,
   MigrationSankey,
@@ -763,19 +764,9 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
               Time Spent by Channel / App
               {selectedTypeName ? ` · tab synced to ${selectedTypeName}` : ""}
             </span>
-            {/* Tabs left and the chart's legends right on one balanced row. */}
+            {/* Tabs stay left; the two-series Fiber legend is rendered with the chart. */}
             <div className="flex flex-wrap items-center justify-between gap-x-[var(--spacing-200,16px)] gap-y-[var(--spacing-75,6px)]">
               <TabsBarUnderline options={TAB_LABELS} value={channelTab} onChange={setChannelTab} ariaLabel="Channel TV type" />
-              <div className="ml-auto flex flex-wrap items-center justify-end gap-[var(--spacing-200,16px)]" aria-label="Time spent chart legend">
-                <span className="flex items-center gap-[var(--spacing-75,6px)] text-[length:var(--body-md-regular-size,14px)]" style={{ color: BODY2 }}>
-                  <span className="h-[12px] w-[12px] rounded-[var(--radius-25,2px)]" style={{ backgroundColor: CHART.primary }} aria-hidden />
-                  Avg min/week
-                </span>
-                <span className="flex items-center gap-[var(--spacing-75,6px)] text-[length:var(--body-md-regular-size,14px)]" style={{ color: BODY2 }}>
-                  <span className="h-[3px] w-[16px] rounded-full" style={{ backgroundColor: CHART.line }} aria-hidden />
-                  % of watch time
-                </span>
-              </div>
             </div>
             <CardBody
               loading={loading}
@@ -784,16 +775,13 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
               emptyTitle="No channels match"
               emptyMessage="Addressable channels filtering removed all channels here — switch to All or change the tab."
             >
-              <ComboChart
+              <DualAxisBarChart
                 categories={channels.slice(0, 10).map((c) => c.name)}
-                bars={channels.slice(0, 10).map((c) => c.mins)}
-                line={channels.slice(0, 10).map((c) => c.pct)}
+                primary={channels.slice(0, 10).map((c) => c.mins)}
+                secondary={channels.slice(0, 10).map((c) => c.pct)}
                 indices={channels.slice(0, 10).map((c) => c.index)}
-                barLabel="Avg min/week"
-                lineLabel="% of watch time"
-                barUnit=" min"
-                lineUnit="%"
-                showLegend={false}
+                primaryLabel="Avg min/week"
+                secondaryLabel="% of watch time"
               />
             </CardBody>
           </div>

@@ -570,6 +570,185 @@ export function ComboChart({
   );
 }
 
+/* ======================================= Fiber dual-axis grouped bars ======= */
+
+export function DualAxisBarChart({
+  categories,
+  primary,
+  secondary,
+  indices,
+  primaryLabel,
+  secondaryLabel,
+}: {
+  categories: string[];
+  primary: number[];
+  secondary: number[];
+  indices: number[];
+  primaryLabel: string;
+  secondaryLabel: string;
+}) {
+  const [hover, setHover] = useState<number | null>(null);
+  const plotW = 720;
+  const plotH = 230;
+  const ticks = 5;
+  const n = Math.max(categories.length, 1);
+  const slot = plotW / n;
+  const groupW = Math.max(18, Math.min(44, slot * 0.66));
+  const barW = Math.max(7, groupW / 2 - 2);
+  const primaryMax = Math.max(...primary, 1);
+  const secondaryMax = Math.max(...secondary, 1);
+  const primaryTicks = Array.from({ length: ticks }, (_, i) =>
+    Math.round((primaryMax * (ticks - 1 - i)) / (ticks - 1)),
+  );
+  const secondaryTicks = Array.from({ length: ticks }, (_, i) =>
+    ((secondaryMax * (ticks - 1 - i)) / (ticks - 1)).toFixed(0),
+  );
+
+  return (
+    <div
+      className="flex flex-col gap-[var(--spacing-150,12px)]"
+      role="group"
+      aria-label={`${primaryLabel} and ${secondaryLabel} by channel or app`}
+    >
+      <div className="flex flex-wrap items-center justify-end gap-[var(--spacing-200,16px)]">
+        <span className="flex items-center gap-[var(--spacing-75,6px)] text-[length:var(--body-md-regular-size,14px)]" style={{ color: BODY2 }}>
+          <span className="h-[12px] w-[12px] rounded-[var(--radius-25,2px)]" style={{ backgroundColor: CHART.tertiary }} aria-hidden />
+          {primaryLabel}
+        </span>
+        <span className="flex items-center gap-[var(--spacing-75,6px)] text-[length:var(--body-md-regular-size,14px)]" style={{ color: BODY2 }}>
+          <span className="h-[12px] w-[12px] rounded-[var(--radius-25,2px)]" style={{ backgroundColor: CHART.quaternary }} aria-hidden />
+          {secondaryLabel}
+        </span>
+      </div>
+
+      <div className="w-full overflow-x-auto pb-[var(--spacing-100,8px)]">
+        <div className="min-w-[680px]">
+          <div className="flex items-end gap-[var(--spacing-50,4px)]">
+            <span className="w-[62px] shrink-0 text-right text-[10px] font-medium" style={{ color: CHART.tertiary }}>
+              {primaryLabel}
+            </span>
+            <span className="min-w-0 flex-1" />
+            <span className="w-[62px] shrink-0 text-left text-[10px] font-medium" style={{ color: CHART.quaternary }}>
+              {secondaryLabel}
+            </span>
+          </div>
+
+          <div className="flex gap-[var(--spacing-50,4px)]">
+            <div className="flex w-[62px] shrink-0 flex-col justify-between text-right" style={{ height: plotH }}>
+              {primaryTicks.map((tick) => (
+                <span key={tick} className="text-[length:var(--body-sm-regular-size,12px)] tabular-nums" style={{ color: AXIS_LABEL }}>
+                  {tick}
+                </span>
+              ))}
+            </div>
+
+            <div className="relative min-w-0 flex-1">
+              <div className="relative w-full" style={{ height: plotH }}>
+                {primaryTicks.map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute left-0 right-0 h-0 border-t border-solid"
+                    style={{ borderColor: GRID, top: `${(i / (ticks - 1)) * 100}%` }}
+                    aria-hidden
+                  />
+                ))}
+                <svg
+                  className="absolute inset-0 h-full w-full"
+                  viewBox={`0 0 ${plotW} ${plotH}`}
+                  preserveAspectRatio="none"
+                  role="img"
+                  aria-label="Two-series vertical bar chart"
+                >
+                  {primary.map((value, i) => {
+                    const height = (value / primaryMax) * plotH;
+                    return (
+                      <rect
+                        key={`primary-${i}`}
+                        x={i * slot + (slot - groupW) / 2}
+                        y={plotH - height}
+                        width={barW}
+                        height={height}
+                        rx={1}
+                        fill={CHART.tertiary}
+                        opacity={hover == null || hover === i ? 1 : 0.45}
+                      />
+                    );
+                  })}
+                  {secondary.map((value, i) => {
+                    const height = (value / secondaryMax) * plotH;
+                    return (
+                      <rect
+                        key={`secondary-${i}`}
+                        x={i * slot + (slot - groupW) / 2 + barW + 4}
+                        y={plotH - height}
+                        width={barW}
+                        height={height}
+                        rx={1}
+                        fill={CHART.quaternary}
+                        opacity={hover == null || hover === i ? 1 : 0.45}
+                      />
+                    );
+                  })}
+                </svg>
+
+                {categories.map((category, i) => (
+                  <button
+                    key={category}
+                    type="button"
+                    onMouseEnter={() => setHover(i)}
+                    onMouseLeave={() => setHover(null)}
+                    onFocus={() => setHover(i)}
+                    onBlur={() => setHover(null)}
+                    className="absolute top-0 h-full focus:outline-none"
+                    style={{
+                      left: `${(i / n) * 100}%`,
+                      width: `${100 / n}%`,
+                      backgroundColor: hover === i ? HOVER_BG : "transparent",
+                    }}
+                    aria-label={`${category}: Index ${indices[i]}%, ${primaryLabel} ${fmtInt(primary[i])}, ${secondaryLabel} ${secondary[i].toFixed(1)}%`}
+                  >
+                    {hover === i && (
+                      <Tooltip
+                        lines={[
+                          { label: category },
+                          { label: "Index", value: `${indices[i]}%` },
+                          { label: primaryLabel, value: fmtInt(primary[i]) },
+                          { label: secondaryLabel, value: `${secondary[i].toFixed(1)}%` },
+                        ]}
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-[var(--spacing-75,6px)] flex w-full">
+                {categories.map((category, i) => (
+                  <div key={category} className="flex flex-col items-center gap-[2px] px-[2px]" style={{ width: `${100 / n}%` }} title={category}>
+                    <span className="block w-full truncate text-center text-[length:var(--body-sm-regular-size,12px)]" style={{ color: AXIS_LABEL }}>
+                      {category.length > 12 ? `${category.slice(0, 11)}…` : category}
+                    </span>
+                    <span className="text-[10px] tabular-nums" style={{ color: MUTED }}>
+                      Index {indices[i]}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex w-[62px] shrink-0 flex-col justify-between text-left" style={{ height: plotH }}>
+              {secondaryTicks.map((tick, i) => (
+                <span key={i} className="text-[length:var(--body-sm-regular-size,12px)] tabular-nums" style={{ color: AXIS_LABEL }}>
+                  {tick}%
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function MiniIndex({ index }: { index: number }) {
   const up = index > 100;
   const flat = index === 100;
