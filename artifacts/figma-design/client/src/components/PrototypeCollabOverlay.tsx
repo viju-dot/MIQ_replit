@@ -47,7 +47,6 @@ import {
   ListBullets,
   NotePencil,
   Paperclip,
-  Trash,
   X,
 } from "@phosphor-icons/react";
 import {
@@ -208,31 +207,52 @@ function AuthorAvatar({
   );
 }
 
-/** UI text shown in place of a soft-deleted comment's body. */
-const DELETED_TEXT = "This comment was deleted.";
+const isResolved = (c: PrototypeComment): boolean => c.status === "resolved";
 
-const isDeleted = (c: PrototypeComment): boolean => Boolean(c.deletedAt);
-
-/** A small pill: version tag, or a muted "Deleted" status badge. */
-function StatusBadge({ deleted }: { deleted: boolean }) {
+/** A clear lifecycle badge, kept alongside the complete comment content. */
+function StatusBadge({ resolved }: { resolved: boolean }) {
   return (
     <span
       className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium"
       style={
-        deleted
-          ? { backgroundColor: C.errorSubtleBg, color: C.errorFg }
+        resolved
+          ? { backgroundColor: C.surface2, color: C.textMuted }
           : { backgroundColor: C.brandSubtle, color: C.brandFg }
       }
     >
-      {deleted ? "Deleted" : "Active"}
+      {resolved ? "Resolved" : "Open"}
     </span>
   );
+}
+
+function LifecycleActivity({ comment }: { comment: PrototypeComment }) {
+  if (!comment.statusHistory?.length) return null;
+  return <div className="mt-1 text-[10px]" style={{ color: C.textMuted }}>
+    <span className="font-medium">Activity</span>
+    {comment.statusHistory.map((event, index) => (
+      <div key={`${event.at}-${index}`}>
+        {event.action === "resolve" ? "Resolved" : "Reopened"} by {event.actor} · {fmtDate(event.at)} · {fmtTime(event.at)}
+      </div>
+    ))}
+  </div>;
+}
+
+function promptValidatedActor(action: "resolve" | "reopen", authors: string[]): string | null {
+  const entered = window.prompt(
+    `Enter your collaborator name to ${action} this comment. Known collaborators: ${authors.join(", ") || "none"}`,
+  )?.trim();
+  if (!entered) return null;
+  if (authors.length === 0) return entered;
+  const canonical = authors.find((author) => author.toLowerCase() === entered.toLowerCase());
+  if (canonical) return canonical;
+  window.alert("Choose a known collaborator name to change comment status.");
+  return null;
 }
 
 /**
  * Render comment body text with http(s) URLs auto-linkified at render time.
  * Links open in a new tab (rel="noopener noreferrer") so the reviewer keeps the
- * prototype open. Not used for deleted bodies (those show the deleted message).
+ * prototype open.
  * The rendered <a> is inline text — safe inside list rows since those rows are
  * NOT buttons (verified), so this creates no nested interactive controls.
  */
@@ -508,7 +528,7 @@ function VersionRow({
 /* Comments list (Show all comments panel — secondary list view)      */
 /* ------------------------------------------------------------------ */
 
-type StatusFilter = "All" | "Active" | "Deleted";
+type StatusFilter = "All" | "Open" | "Resolved";
 type SortOrder = "Newest" | "Oldest";
 
 /** A small segmented pill control (single-select). */
@@ -557,7 +577,7 @@ function CommentsPanelBody({
   versions,
   authors,
   onReply,
-  onSoftDelete,
+  onStatus,
 }: {
   comments: PrototypeComment[];
   versions: PrototypeVersion[];
@@ -569,7 +589,7 @@ function CommentsPanelBody({
     text: string,
     attachment: CommentAttachment | null,
   ) => boolean;
-  onSoftDelete: (id: string) => void;
+  onStatus: (id: string, action: "resolve" | "reopen") => void;
 }) {
   const [versionFilter, setVersionFilter] = useState<string>("All");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("All");
@@ -585,17 +605,13 @@ function CommentsPanelBody({
       .slice()
       .sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
 
-  // Status filter (simple + predictable):
-  //  • Active:  only threads whose PARENT is active (Active NEVER shows a
-  //             deleted parent card). Nested replies are rendered as-is.
-  //  • Deleted: only threads whose parent is deleted OR that contain at least
-  //             one deleted reply.
-  //  • All:     everything.
+  // Filter top-level threads; replies always remain readable in their thread.
   const threadMatchesStatus = (parent: PrototypeComment): boolean => {
     if (statusFilter === "All") return true;
-    if (statusFilter === "Active") return !isDeleted(parent);
-    // Deleted
-    return isDeleted(parent) || repliesFor(parent.id).some(isDeleted);
+    const members = [parent, ...repliesFor(parent.id)];
+    return statusFilter === "Open"
+      ? members.some((member) => !isResolved(member))
+      : members.some(isResolved);
   };
 
   let threads = topLevel.filter((parent) => {
@@ -615,7 +631,7 @@ function CommentsPanelBody({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <SegmentedPills
           label="Filter comments by status"
-          options={["All", "Active", "Deleted"]}
+          options={["All", "Open", "Resolved"]}
           value={statusFilter}
           onChange={setStatusFilter}
         />
@@ -674,7 +690,7 @@ function CommentsPanelBody({
               replies={repliesFor(c.id)}
               authors={authors}
               onReply={onReply}
-              onSoftDelete={onSoftDelete}
+              onStatus={onStatus}
             />
           ))}
         </ul>
@@ -683,13 +699,13 @@ function CommentsPanelBody({
   );
 }
 
-/** A thread card in the list: parent (active or deleted) + nested replies. */
+/** A thread card preserving the parent and complete reply history. */
 function CommentThreadCard({
   parent,
   replies,
   authors,
   onReply,
-  onSoftDelete,
+  onStatus,
 }: {
   parent: PrototypeComment;
   replies: PrototypeComment[];
@@ -701,17 +717,16 @@ function CommentThreadCard({
     text: string,
     attachment: CommentAttachment | null,
   ) => boolean;
-  onSoftDelete: (id: string) => void;
+  onStatus: (id: string, action: "resolve" | "reopen") => void;
 }) {
-  const [delHover, setDelHover] = useState(false);
   const [replying, setReplying] = useState(false);
-  const deleted = isDeleted(parent);
+  const resolved = isResolved(parent);
   return (
     <li
       className="flex flex-col gap-1.5 rounded-[var(--radius-100,8px)] border border-solid p-[var(--spacing-200,16px)]"
       style={{
         backgroundColor: C.surface,
-        borderColor: deleted ? C.border : commentColorValue(parent.color),
+         borderColor: resolved ? C.border : commentColorValue(parent.color),
       }}
     >
       <div className="flex items-center justify-between gap-2">
@@ -725,66 +740,46 @@ function CommentThreadCard({
           </span>
         </div>
         <div className="flex items-center gap-1.5">
-          {deleted && <StatusBadge deleted />}
+           <StatusBadge resolved={resolved} />
           <span
             className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium"
             style={{ backgroundColor: C.brandSubtle, color: C.brandFg }}
           >
             {parent.versionName}
           </span>
-          {!deleted && (
-            <button
-              type="button"
-              aria-label="Delete comment"
-              onClick={() => onSoftDelete(parent.id)}
-              onMouseEnter={() => setDelHover(true)}
-              onMouseLeave={() => setDelHover(false)}
-              className="flex size-[22px] items-center justify-center rounded-[var(--radius-50,4px)] transition-colors"
-              style={{ backgroundColor: delHover ? C.hoverBg : "transparent" }}
-            >
-              <Trash size={13} style={{ color: delHover ? C.errorFg : C.textMuted }} />
-            </button>
-          )}
+           <button type="button" aria-label={resolved ? "Reopen comment" : "Resolve comment"}
+             onClick={() => onStatus(parent.id, resolved ? "reopen" : "resolve")}
+             className="rounded px-2 py-1 text-[11px] font-medium" style={{ color: C.brandFg }}>
+             {resolved ? "Reopen" : "Resolve"}
+           </button>
         </div>
       </div>
       {/* Target label — where on the prototype this comment is pinned. */}
       <p className="text-[11px] font-medium" style={{ color: C.textMuted }}>
         {parent.anchor ? parent.anchor.targetLabel : "Unpinned"}
       </p>
-      {deleted ? (
-        <p
-          className="whitespace-pre-wrap text-[length:var(--body-sm-regular-size,12px)] italic"
-          style={{ color: C.textMuted }}
-        >
-          {DELETED_TEXT}
-        </p>
-      ) : (
-        <>
-          <CommentText text={parent.text} />
-          {parent.attachment && (
-            <AttachmentThumb
-              attachment={parent.attachment}
-              authorLabel={parent.author}
-            />
-          )}
-        </>
-      )}
+       <CommentText text={parent.text} />
+       {parent.attachment && <AttachmentThumb attachment={parent.attachment} authorLabel={parent.author} />}
       <p className="text-[11px]" style={{ color: C.textMuted }}>
         {parent.versionName} · {fmtDate(parent.createdAt)} · {fmtTime(parent.createdAt)}
       </p>
+       {resolved && <p className="text-[11px]" style={{ color: C.textMuted }}>
+         Resolved {parent.resolvedAt ? `· ${fmtDate(parent.resolvedAt)} · ${fmtTime(parent.resolvedAt)}` : ""}
+         {" · "}{parent.resolvedBy ?? "Resolver unavailable (legacy action)"}
+       </p>}
+       <LifecycleActivity comment={parent} />
 
-      {/* Replies (stay visible even if the parent is deleted). */}
+       {/* Replies always remain visible in their parent thread. */}
       {replies.length > 0 && (
         <div className="mt-1 flex flex-col gap-2">
           {replies.map((r) => (
-            <ReplyRow key={r.id} reply={r} onSoftDelete={onSoftDelete} />
+             <ReplyRow key={r.id} reply={r} onStatus={onStatus} />
           ))}
         </div>
       )}
 
-      {/* Reply action / composer. A deleted PARENT is READ-ONLY: no Reply
-          action (its still-active replies keep their own delete actions). */}
-      {!deleted &&
+       {/* Resolved parents are read-only until reopened. */}
+       {!resolved &&
         (replying ? (
           <div className="mt-1">
             <ReplyComposer
@@ -809,7 +804,8 @@ function CommentThreadCard({
               Reply
             </button>
           </div>
-        ))}
+         ))}
+       {resolved && <p className="mt-1 text-[11px]" style={{ color: C.textMuted }}>Reopen this comment to add a reply.</p>}
     </li>
   );
 }
@@ -1228,19 +1224,18 @@ function ReplyComposer({
 /** A single reply row with author/time and (when active) a soft-delete action. */
 function ReplyRow({
   reply,
-  onSoftDelete,
+  onStatus,
 }: {
   reply: PrototypeComment;
-  onSoftDelete: (id: string) => void;
+  onStatus: (id: string, action: "resolve" | "reopen") => void;
 }) {
-  const [delHover, setDelHover] = useState(false);
-  const deleted = isDeleted(reply);
+  const resolved = isResolved(reply);
   return (
     <div
       className="flex flex-col gap-1 border-l-2 pl-[var(--spacing-150,12px)]"
       style={{
-        borderColor: deleted ? C.border : commentColorValue(reply.color),
-        opacity: deleted ? 0.7 : 1,
+        borderColor: resolved ? C.border : commentColorValue(reply.color),
+        opacity: resolved ? 0.7 : 1,
       }}
     >
       <div className="flex items-center justify-between gap-2">
@@ -1253,43 +1248,23 @@ function ReplyRow({
             {reply.author}
           </span>
         </div>
-        {deleted ? (
-          <StatusBadge deleted />
-        ) : (
-          <button
-            type="button"
-            aria-label="Delete reply"
-            onClick={() => onSoftDelete(reply.id)}
-            onMouseEnter={() => setDelHover(true)}
-            onMouseLeave={() => setDelHover(false)}
-            className="flex size-[22px] items-center justify-center rounded-[var(--radius-50,4px)] transition-colors"
-            style={{ backgroundColor: delHover ? C.hoverBg : "transparent" }}
-          >
-            <Trash size={13} style={{ color: delHover ? C.errorFg : C.textMuted }} />
+        <div className="flex items-center gap-1"><StatusBadge resolved={resolved} />
+          <button type="button" aria-label={resolved ? "Reopen reply" : "Resolve reply"}
+            onClick={() => onStatus(reply.id, resolved ? "reopen" : "resolve")}
+            className="rounded px-2 py-1 text-[11px] font-medium" style={{ color: C.brandFg }}>
+            {resolved ? "Reopen" : "Resolve"}
           </button>
-        )}
+        </div>
       </div>
-      {deleted ? (
-        <p
-          className="whitespace-pre-wrap text-[length:var(--body-sm-regular-size,12px)] italic"
-          style={{ color: C.textMuted }}
-        >
-          {DELETED_TEXT}
-        </p>
-      ) : (
-        <>
-          <CommentText text={reply.text} />
-          {reply.attachment && (
-            <AttachmentThumb
-              attachment={reply.attachment}
-              authorLabel={reply.author}
-            />
-          )}
-        </>
-      )}
+      <CommentText text={reply.text} />
+      {reply.attachment && <AttachmentThumb attachment={reply.attachment} authorLabel={reply.author} />}
       <p className="text-[11px]" style={{ color: C.textMuted }}>
         {fmtDate(reply.createdAt)} · {fmtTime(reply.createdAt)}
       </p>
+      {resolved && <p className="text-[11px]" style={{ color: C.textMuted }}>
+        Resolved {reply.resolvedAt ? `· ${fmtDate(reply.resolvedAt)} · ${fmtTime(reply.resolvedAt)}` : ""} · {reply.resolvedBy ?? "Resolver unavailable (legacy action)"}
+      </p>}
+      <LifecycleActivity comment={reply} />
     </div>
   );
 }
@@ -1305,7 +1280,7 @@ function MarkerBubble({
   flipRight,
   flipUp,
   onReply,
-  onSoftDelete,
+  onStatus,
   onClose,
 }: {
   comment: PrototypeComment;
@@ -1320,12 +1295,11 @@ function MarkerBubble({
     text: string,
     attachment: CommentAttachment | null,
   ) => boolean;
-  onSoftDelete: (id: string) => void;
+  onStatus: (id: string, action: "resolve" | "reopen") => void;
   onClose: () => void;
 }) {
-  const [delHover, setDelHover] = useState(false);
   const [replying, setReplying] = useState(false);
-  const parentDeleted = isDeleted(comment);
+  const parentResolved = isResolved(comment);
   return (
     <div
       role="dialog"
@@ -1339,7 +1313,7 @@ function MarkerBubble({
           flipUp ? "-100%" : "0"
         }) translate(${flipRight ? "-14px" : "14px"}, ${flipUp ? "-14px" : "14px"})`,
         backgroundColor: C.surface,
-        borderColor: parentDeleted ? C.border : commentColorValue(comment.color),
+        borderColor: parentResolved ? C.border : commentColorValue(comment.color),
       }}
     >
       {/* Parent comment */}
@@ -1353,60 +1327,39 @@ function MarkerBubble({
             {comment.author}
           </span>
         </div>
-        {parentDeleted ? (
-          <StatusBadge deleted />
-        ) : (
-          <button
-            type="button"
-            aria-label="Delete comment"
-            onClick={() => onSoftDelete(comment.id)}
-            onMouseEnter={() => setDelHover(true)}
-            onMouseLeave={() => setDelHover(false)}
-            className="flex size-[24px] items-center justify-center rounded-[var(--radius-50,4px)] transition-colors"
-            style={{ backgroundColor: delHover ? C.hoverBg : "transparent" }}
-          >
-            <Trash size={14} style={{ color: delHover ? C.errorFg : C.textMuted }} />
+        <div className="flex items-center gap-1"><StatusBadge resolved={parentResolved} />
+          <button type="button" aria-label={parentResolved ? "Reopen comment" : "Resolve comment"}
+            onClick={() => onStatus(comment.id, parentResolved ? "reopen" : "resolve")}
+            className="rounded px-2 py-1 text-[11px] font-medium" style={{ color: C.brandFg }}>
+            {parentResolved ? "Reopen" : "Resolve"}
           </button>
-        )}
+        </div>
       </div>
       {comment.anchor && (
         <p className="text-[11px] font-medium" style={{ color: C.textMuted }}>
           {comment.anchor.targetLabel}
         </p>
       )}
-      {parentDeleted ? (
-        <p
-          className="whitespace-pre-wrap text-[length:var(--body-sm-regular-size,12px)] italic"
-          style={{ color: C.textMuted }}
-        >
-          {DELETED_TEXT}
-        </p>
-      ) : (
-        <>
-          <CommentText text={comment.text} />
-          {comment.attachment && (
-            <AttachmentThumb
-              attachment={comment.attachment}
-              authorLabel={comment.author}
-            />
-          )}
-        </>
-      )}
+      <CommentText text={comment.text} />
+      {comment.attachment && <AttachmentThumb attachment={comment.attachment} authorLabel={comment.author} />}
       <p className="text-[11px]" style={{ color: C.textMuted }}>
         {comment.versionName} · {fmtDate(comment.createdAt)} · {fmtTime(comment.createdAt)}
       </p>
+      {parentResolved && <p className="text-[11px]" style={{ color: C.textMuted }}>
+        Resolved {comment.resolvedAt ? `· ${fmtDate(comment.resolvedAt)} · ${fmtTime(comment.resolvedAt)}` : ""} · {comment.resolvedBy ?? "Resolver unavailable (legacy action)"}
+      </p>}
+      <LifecycleActivity comment={comment} />
 
       {/* Replies */}
       {replies.length > 0 && (
         <div className="mt-1 flex flex-col gap-2">
           {replies.map((r) => (
-            <ReplyRow key={r.id} reply={r} onSoftDelete={onSoftDelete} />
+            <ReplyRow key={r.id} reply={r} onStatus={onStatus} />
           ))}
         </div>
       )}
 
-      {/* Reply composer / actions. A deleted PARENT is READ-ONLY: no Reply
-          action — only Close (its active replies keep their own delete). */}
+      {/* Resolved parents remain readable but require reopening before replies. */}
       {replying ? (
         <div className="mt-1">
           <ReplyComposer
@@ -1421,8 +1374,8 @@ function MarkerBubble({
         </div>
       ) : (
         <div className="mt-1 flex items-center justify-between">
-          {parentDeleted ? (
-            <span />
+          {parentResolved ? (
+            <span className="text-[11px]" style={{ color: C.textMuted }}>Reopen to reply</span>
           ) : (
             <button
               type="button"
@@ -1456,7 +1409,7 @@ function Marker({
   open,
   onToggle,
   onReply,
-  onSoftDelete,
+  onStatus,
 }: {
   comment: PrototypeComment;
   index: number;
@@ -1471,15 +1424,15 @@ function Marker({
     text: string,
     attachment: CommentAttachment | null,
   ) => boolean;
-  onSoftDelete: (id: string) => void;
+  onStatus: (id: string, action: "resolve" | "reopen") => void;
 }) {
   const anchor = comment.anchor;
   if (!anchor) return null;
   const flipRight = anchor.xPct > 60;
   const flipUp = anchor.yPct > 60;
-  const deleted = isDeleted(comment);
-  const label = deleted
-    ? `Deleted comment ${index + 1} by ${comment.author}`
+  const resolved = isResolved(comment);
+  const label = resolved
+    ? `Resolved comment ${index + 1} by ${comment.author}`
     : `Comment ${index + 1} by ${comment.author}`;
   return (
     <div
@@ -1487,7 +1440,7 @@ function Marker({
       style={{ left: `${anchor.xPct}%`, top: `${anchor.yPct}%` }}
     >
       {/* The pin is positioned at the anchor point (its bottom-left tip). A
-          deleted comment renders a MUTED/GHOST pin (dashed, neutral) that still
+          resolved comment renders a MUTED/GHOST pin (dashed, neutral) that still
           opens its thread, but is visually distinct from active pins. */}
       <button
         type="button"
@@ -1498,15 +1451,15 @@ function Marker({
           onToggle();
         }}
         className={`pointer-events-auto relative flex size-[26px] -translate-x-1/2 -translate-y-full items-center justify-center rounded-full rounded-bl-none border-2 text-[11px] font-semibold shadow-md outline-none focus-visible:z-[5] ${
-          deleted ? "border-dashed" : ""
+           resolved ? "border-dashed" : ""
         }`}
         style={{
-          backgroundColor: deleted
+          backgroundColor: resolved
             ? C.surface2
             : commentColorValue(comment.color),
-          borderColor: deleted ? C.textMuted : C.brandFgOn,
-          color: deleted ? C.textMuted : C.brandFgOn,
-          opacity: deleted ? 0.85 : 1,
+          borderColor: resolved ? C.textMuted : C.brandFgOn,
+          color: resolved ? C.textMuted : C.brandFgOn,
+          opacity: resolved ? 0.85 : 1,
           ...(open
             ? {
                 boxShadow: `0 0 0 2px ${C.surface}, 0 0 0 4px ${commentColorValue(comment.color)}`,
@@ -1524,7 +1477,7 @@ function Marker({
           flipRight={flipRight}
           flipUp={flipUp}
           onReply={onReply}
-          onSoftDelete={onSoftDelete}
+          onStatus={onStatus}
           onClose={onToggle}
         />
       )}
@@ -1589,7 +1542,8 @@ export function PrototypeCommentLayer(): JSX.Element | null {
     repliesOf,
     addComment,
     addReply,
-    softDeleteComment,
+    resolveComment,
+    reopenComment,
     viewedVersion,
   } = collab;
 
@@ -1665,9 +1619,8 @@ export function PrototypeCommentLayer(): JSX.Element | null {
         />
       )}
 
-      {/* Markers for the currently VIEWED version (top-level; deleted show as
-          muted ghost pins). Numbering is chronological across all top-level
-          pins so numbers stay stable when a comment is deleted. */}
+      {/* Markers for the viewed version include resolved muted pins. Numbering
+          remains chronological across the complete review history. */}
       {markers.map((c, i) => (
         <Marker
           key={c.id}
@@ -1680,7 +1633,12 @@ export function PrototypeCommentLayer(): JSX.Element | null {
             setOpenMarkerId((cur) => (cur === c.id ? null : c.id))
           }
           onReply={addReply}
-          onSoftDelete={softDeleteComment}
+          onStatus={(id, action) => {
+            const actor = promptValidatedActor(action, authors);
+            if (!actor) return;
+            if (action === "resolve") resolveComment(id, actor);
+            else reopenComment(id, actor);
+          }}
         />
       ))}
 
@@ -1845,6 +1803,16 @@ export function PrototypeCollabOverlay({
     };
   }, [collaborationPrototypeId]);
 
+  useEffect(() => {
+    const onCommentsChanged = (event: Event) => {
+      if ((event as CustomEvent<string>).detail === collaborationPrototypeId) {
+        setTick((current) => current + 1);
+      }
+    };
+    window.addEventListener("fiber:comments-changed", onCommentsChanged);
+    return () => window.removeEventListener("fiber:comments-changed", onCommentsChanged);
+  }, [collaborationPrototypeId]);
+
   // Refresh optimistic annotation UI when the API returns its canonical,
   // server-allocated sequence number.
   useEffect(() => {
@@ -1977,8 +1945,7 @@ export function PrototypeCollabOverlay({
   const reconcile = () => setTick((t) => t + 1);
 
   // Markers = TOP-LEVEL comments (no parentId) for the viewed version WITH a
-  // valid anchor. Soft-deleted ones are included so their original location can
-  // still be shown (as a muted/ghost pin).
+  // valid anchor. Resolved comments remain at their original location as muted pins.
   const markers = comments
     .filter(
       (c) => !c.parentId && c.versionId === viewedVersion.id && c.anchor,
@@ -2051,8 +2018,13 @@ export function PrototypeCollabOverlay({
     return true;
   }
 
-  function softDeleteComment(id: string) {
-    commentRepository.softDelete(id);
+  function resolveComment(id: string, actor: string) {
+    commentRepository.resolve(id, actor);
+    setTick((t) => t + 1);
+  }
+
+  function reopenComment(id: string, actor: string) {
+    commentRepository.reopen(id, actor);
     setTick((t) => t + 1);
   }
 
@@ -2133,7 +2105,8 @@ export function PrototypeCollabOverlay({
           repliesOf,
           addComment,
           addReply,
-          softDeleteComment,
+          resolveComment,
+          reopenComment,
           annotations,
           addAnnotation,
           updateAnnotation,
@@ -2419,7 +2392,12 @@ export function PrototypeCollabOverlay({
             versions={proto.versions}
             authors={authors}
             onReply={addReply}
-            onSoftDelete={softDeleteComment}
+            onStatus={(id, action) => {
+              const actor = promptValidatedActor(action, combinedAuthors);
+              if (!actor) return;
+              if (action === "resolve") resolveComment(id, actor);
+              else reopenComment(id, actor);
+            }}
           />
         </SidePanel>
       </PrototypeCollabProvider>

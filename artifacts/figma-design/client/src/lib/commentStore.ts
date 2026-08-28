@@ -10,9 +10,8 @@
  * (versionId + versionName) so feedback↔version mapping is always unambiguous.
  *
  * ── Collaboration history ─────────────────────────────────────────────────
- *  • Soft delete: `remove` was replaced by `softDelete`, which stamps
- *    `deletedAt` and PRESERVES the record (author, createdAt, version, anchor).
- *    Deleted comments stay in history, rendered in a muted "Deleted" state.
+ *  • Comments are review history: lifecycle is open → resolved → reopen.
+ *    Records are never removed by normal collaboration actions.
  *  • Lightweight threads: `parentId` links a reply to its top-level comment.
  *    Deleting a parent does NOT delete its replies (the thread stays readable);
  *    replies are individually soft-deletable.
@@ -90,15 +89,15 @@ export interface PrototypeComment {
    * (they render no marker of their own).
    */
   parentId?: string;
-  /**
-   * Soft-delete timestamp (ISO). When set, the comment is preserved in history
-   * but shown in a muted "Deleted" state; its text is hidden in the UI. Legacy
-   * records without this field are active.
-   */
+  /** Legacy migration metadata. A valid value coerces the record to resolved. */
   deletedAt?: string;
+  /** Canonical review lifecycle state. */
+  status: "open" | "resolved";
+  resolvedAt?: string;
+  resolvedBy?: string;
+  statusHistory?: { action: "resolve" | "reopen"; actor: string; at: string }[];
   /**
-   * Optional image attachment (downscaled JPEG data URL). Masked in the UI when
-   * the comment is soft-deleted. Legacy records without this field are fine.
+   * Optional image attachment (downscaled JPEG data URL).
    */
   attachment?: CommentAttachment;
 }
@@ -150,7 +149,7 @@ export interface NewCommentInput {
 }
 
 export interface CommentRepository {
-  /** All comments for a prototype, newest-first (includes soft-deleted). */
+  /** All comments for a prototype, newest-first (including resolved). */
   list(prototypeId: string): PrototypeComment[];
   /** Distinct commenter names across ALL comments (for the name combobox). */
   listAuthors(): string[];
@@ -158,12 +157,8 @@ export interface CommentRepository {
   colorForAuthor(author: string): CommentColor;
   /** Persist a new comment. Throws on empty author/text. */
   add(input: NewCommentInput): PrototypeComment;
-  /**
-   * SOFT delete a comment by id: stamps `deletedAt` and preserves the record.
-   * Only the targeted comment is affected — deleting a parent leaves its
-   * replies intact, and replies remain individually soft-deletable.
-   */
-  softDelete(id: string): void;
+  resolve(id: string, actor: string): void;
+  reopen(id: string, actor: string): void;
 }
 
 /**
@@ -194,13 +189,41 @@ function coerceComment(raw: unknown): PrototypeComment | null {
   const parentIdRaw = str(r.parentId).trim();
   const parentId = parentIdRaw.length > 0 ? parentIdRaw : undefined;
 
-  // deletedAt: optional; keep only a parseable ISO timestamp, else treat the
-  // record as active (tolerant of legacy/garbage values).
+  // A legacy deleted timestamp represents recoverable resolved feedback.
   const deletedAtRaw = str(r.deletedAt);
   const deletedAt =
     deletedAtRaw.length > 0 && !Number.isNaN(Date.parse(deletedAtRaw))
       ? deletedAtRaw
       : undefined;
+  // Explicit canonical status wins; only status-less legacy records infer
+  // resolved from their old deleted timestamp.
+  const status =
+    r.status === "resolved"
+      ? "resolved"
+      : r.status === "open"
+        ? "open"
+        : deletedAt
+          ? "resolved"
+          : "open";
+  const resolvedAtRaw = str(r.resolvedAt);
+  const resolvedAt =
+    resolvedAtRaw.length > 0 && !Number.isNaN(Date.parse(resolvedAtRaw))
+      ? resolvedAtRaw
+      : deletedAt;
+  const resolvedBy = str(r.resolvedBy).trim() || undefined;
+  const statusHistory: PrototypeComment["statusHistory"] = Array.isArray(r.statusHistory)
+    ? r.statusHistory.flatMap((entry) => {
+        if (!entry || typeof entry !== "object") return [];
+        const item = entry as Record<string, unknown>;
+        const action = item.action;
+        const actor = str(item.actor).trim();
+        const at = str(item.at);
+        return (action === "resolve" || action === "reopen") && actor &&
+          !Number.isNaN(Date.parse(at))
+          ? [{ action: action as "resolve" | "reopen", actor, at }]
+          : [];
+      })
+    : undefined;
 
   return {
     id: r.id,
@@ -214,6 +237,10 @@ function coerceComment(raw: unknown): PrototypeComment | null {
     anchor: coerceAnchor(r.anchor),
     parentId,
     deletedAt,
+    status,
+    resolvedAt,
+    resolvedBy,
+    statusHistory,
     attachment: coerceAttachment(r.attachment),
   };
 }
@@ -354,6 +381,7 @@ export const localStorageRepository: CommentRepository = {
       color,
       text,
       createdAt: nowIso(),
+      status: "open",
       anchor: coerceAnchor(input.anchor),
       parentId,
       attachment: coerceAttachment(input.attachment),
@@ -373,19 +401,31 @@ export const localStorageRepository: CommentRepository = {
     writeAll(next);
     return comment;
   },
-  softDelete(id) {
+  resolve(id, actor) {
+    const resolver = actor.trim();
+    if (!resolver) throw new Error("commentStore: resolver is required.");
     const all = readAll();
-    // Stamp deletedAt on ONLY the targeted record; preserve everything else
-    // (author, createdAt, version, anchor) and never touch parents/replies.
     let changed = false;
     const next = all.map((c) => {
-      if (c.id === id && !c.deletedAt) {
+      if (c.id === id && c.status !== "resolved") {
         changed = true;
-        return { ...c, deletedAt: nowIso() };
+        const at = nowIso();
+        return { ...c, status: "resolved" as const, resolvedAt: at, resolvedBy: resolver,
+          statusHistory: [...(c.statusHistory ?? []), { action: "resolve" as const, actor: resolver, at }] };
       }
       return c;
     });
     if (changed) writeAllQuiet(next);
+  },
+  reopen(id, actor) {
+    const reopener = actor.trim();
+    if (!reopener) throw new Error("commentStore: reopener is required.");
+    const all = readAll();
+    const next = all.map((c) => c.id === id && c.status === "resolved"
+      ? { ...c, status: "open" as const, resolvedAt: undefined, resolvedBy: undefined,
+          statusHistory: [...(c.statusHistory ?? []), { action: "reopen" as const, actor: reopener, at: nowIso() }] }
+      : c);
+    writeAllQuiet(next);
   },
 };
 
@@ -394,6 +434,21 @@ export const localStorageRepository: CommentRepository = {
 /* ---------------------------------------------------------------------- */
 
 let apiComments: PrototypeComment[] = [];
+const commentWriteQueues = new Map<string, Promise<unknown>>();
+
+/** Serialize remote mutations per comment id: create PUT always precedes status
+ * PATCH, and rapid resolve/reopen actions cannot arrive out of order. */
+function queueCommentWrite<T>(id: string, write: () => Promise<T>): Promise<T> {
+  const prior = commentWriteQueues.get(id) ?? Promise.resolve();
+  const next = prior.catch(() => undefined).then(write);
+  commentWriteQueues.set(id, next);
+  void next
+    .finally(() => {
+      if (commentWriteQueues.get(id) === next) commentWriteQueues.delete(id);
+    })
+    .catch(() => undefined);
+  return next;
+}
 
 const commentMigrationKey = (prototypeId: string) =>
   `fiber:collab:migrated:comments:${prototypeId}`;
@@ -449,14 +504,14 @@ function commentsUrl(prototypeId: string, id?: string): string {
 }
 
 async function putComment(comment: PrototypeComment): Promise<void> {
-  const response = await fetch(commentsUrl(comment.prototypeId, comment.id), {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(comment),
+  return queueCommentWrite(comment.id, async () => {
+    const response = await fetch(commentsUrl(comment.prototypeId, comment.id), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(comment),
+    });
+    if (!response.ok) throw new Error(`Comment save failed (${response.status})`);
   });
-  if (!response.ok) {
-    throw new Error(`Comment save failed (${response.status})`);
-  }
 }
 
 function cacheComments(prototypeId: string, comments: PrototypeComment[]): void {
@@ -469,12 +524,7 @@ function cacheComments(prototypeId: string, comments: PrototypeComment[]): void 
   const otherLocal = readAll().filter(
     (comment) => comment.prototypeId !== prototypeId,
   );
-  // Soft-deleted comments remain in the API-backed live state for thread
-  // history, but are no longer migration candidates in the browser cache.
-  writeAllQuiet([
-    ...otherLocal,
-    ...comments.filter((comment) => !comment.deletedAt),
-  ]);
+  writeAllQuiet([...otherLocal, ...comments]);
 }
 
 /**
@@ -539,6 +589,30 @@ function persistCommentQuiet(comment: PrototypeComment): void {
   });
 }
 
+async function patchCommentStatus(
+  comment: PrototypeComment,
+  action: "resolve" | "reopen",
+  actor: string,
+): Promise<PrototypeComment> {
+  return queueCommentWrite(comment.id, async () => {
+  const response = await fetch(`${commentsUrl(comment.prototypeId, comment.id)}/status`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action, actor }),
+  });
+  if (!response.ok) throw new Error(`Comment status update failed (${response.status})`);
+  const canonical = coerceComment(await response.json());
+  if (!canonical) throw new Error("Comment status API returned an invalid comment");
+  return canonical;
+  });
+}
+
+function notifyCommentChange(prototypeId: string): void {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("fiber:comments-changed", { detail: prototypeId }));
+  }
+}
+
 export const apiCommentRepository: CommentRepository = {
   list(prototypeId) {
     return apiComments
@@ -582,6 +656,7 @@ export const apiCommentRepository: CommentRepository = {
       color,
       text,
       createdAt: nowIso(),
+      status: "open",
       anchor: coerceAnchor(input.anchor),
       parentId: input.parentId?.trim() || undefined,
       attachment: coerceAttachment(input.attachment),
@@ -607,18 +682,46 @@ export const apiCommentRepository: CommentRepository = {
     persistCommentQuiet(comment);
     return comment;
   },
-  softDelete(id) {
+  resolve(id, actor) {
     const target = apiComments.find((comment) => comment.id === id);
-    if (!target || target.deletedAt) return;
-    const deleted = { ...target, deletedAt: nowIso() };
+    const resolver = actor.trim();
+    if (!target || target.status === "resolved" || !resolver) return;
+    const at = nowIso();
+    const resolved = { ...target, status: "resolved" as const, resolvedAt: at, resolvedBy: resolver,
+      statusHistory: [...(target.statusHistory ?? []), { action: "resolve" as const, actor: resolver, at }] };
     apiComments = apiComments.map((comment) =>
-      comment.id === id ? deleted : comment,
+      comment.id === id ? resolved : comment,
     );
     cacheComments(
-      deleted.prototypeId,
-      apiComments.filter((item) => item.prototypeId === deleted.prototypeId),
+      resolved.prototypeId,
+      apiComments.filter((item) => item.prototypeId === resolved.prototypeId),
     );
-    persistCommentQuiet(deleted);
+    void patchCommentStatus(target, "resolve", resolver).then((canonical) => {
+      apiComments = apiComments.map((comment) => comment.id === id ? canonical : comment);
+      cacheComments(canonical.prototypeId, apiComments.filter((item) => item.prototypeId === canonical.prototypeId));
+      notifyCommentChange(canonical.prototypeId);
+    }).catch((error) => {
+      console.warn("[prototype-comments] resolve failed; reconciling server state", error);
+      void hydrateComments(target.prototypeId).finally(() => notifyCommentChange(target.prototypeId));
+    });
+  },
+  reopen(id, actor) {
+    const target = apiComments.find((comment) => comment.id === id);
+    const reopener = actor.trim();
+    if (!target || target.status !== "resolved" || !reopener) return;
+    const at = nowIso();
+    const open = { ...target, status: "open" as const, resolvedAt: undefined, resolvedBy: undefined,
+      statusHistory: [...(target.statusHistory ?? []), { action: "reopen" as const, actor: reopener, at }] };
+    apiComments = apiComments.map((comment) => comment.id === id ? open : comment);
+    cacheComments(open.prototypeId, apiComments.filter((item) => item.prototypeId === open.prototypeId));
+    void patchCommentStatus(target, "reopen", reopener).then((canonical) => {
+      apiComments = apiComments.map((comment) => comment.id === id ? canonical : comment);
+      cacheComments(canonical.prototypeId, apiComments.filter((item) => item.prototypeId === canonical.prototypeId));
+      notifyCommentChange(canonical.prototypeId);
+    }).catch((error) => {
+      console.warn("[prototype-comments] reopen failed; reconciling server state", error);
+      void hydrateComments(target.prototypeId).finally(() => notifyCommentChange(target.prototypeId));
+    });
   },
 };
 

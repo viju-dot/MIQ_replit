@@ -68,7 +68,7 @@ export interface PrototypeCollabContextValue {
   deleteAnnotation: (id: string) => void;
   /**
    * TOP-LEVEL comments for the CURRENTLY VIEWED version that have a valid
-   * anchor. Includes soft-deleted ones (rendered as muted/ghost pins). Replies
+   * anchor. Includes resolved ones (rendered as muted/secondary pins). Replies
    * are not markers — they inherit the parent's pin.
    */
   markers: PrototypeComment[];
@@ -98,8 +98,9 @@ export interface PrototypeCollabContextValue {
     text: string,
     attachment: CommentAttachment | null,
   ) => boolean;
-  /** Soft-delete a comment by id (preserves it in a muted "Deleted" state). */
-  softDeleteComment: (id: string) => void;
+  /** Change a comment's review lifecycle while preserving its full history. */
+  resolveComment: (id: string, actor: string) => void;
+  reopenComment: (id: string, actor: string) => void;
 }
 
 const PrototypeCollabContext =
