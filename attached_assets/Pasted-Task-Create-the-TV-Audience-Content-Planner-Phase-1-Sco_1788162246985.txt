@@ -1,0 +1,567 @@
+Task: Create the TV Audience Content Planner — Phase 1 Scope & Functional Requirements Document from V5
+Objective
+
+Create a complete, production-ready Functional Requirements & Scope Document for the TV Audience Content Planner — Phase 1, using the V5 AI prototype as the primary source of truth.
+
+The purpose of this document is to translate the V5 prototype into a clear specification that can be used by Product, UX/UI, Data Visualisation, Engineering and Data teams to understand exactly what needs to be built.
+
+Do not redesign the product. Do not invent new KPIs, features, data, interactions or requirements.
+
+Document what exists in V5, including the latest stakeholder feedback and the final agreed behaviour represented in the prototype.
+
+1. Source of Truth
+
+Use the following priority order:
+
+V5 prototype — primary source of truth
+Existing user stories and KPI requirements represented in the prototype
+Existing stakeholder feedback already incorporated into V5
+Existing UI interactions and prototype behaviour
+Previous versions only to understand changes where necessary
+
+Do not reintroduce functionality that was removed from V5.
+
+If something is unclear or cannot be determined from V5, explicitly mark it as:
+
+“Requires product/data clarification”
+
+Do not make assumptions.
+
+2. Document Scope
+
+Create one complete document covering:
+
+Product scope
+Product purpose
+Target users
+Primary user goals
+Phase 1 scope
+Out-of-scope functionality
+Key use cases
+User journey
+Dashboard structure
+
+Document:
+
+Overall page structure
+KPI/module hierarchy
+Global navigation
+Global filters
+Local KPI filters
+Filter dependencies
+Date controls
+Audience controls
+Platform/type controls
+Drilldowns
+Interactions
+Hover behaviour
+Empty/loading/error states where represented
+3. KPI-by-KPI Requirements
+
+For every KPI currently present in V5, create a dedicated section.
+
+Do not add KPIs that aren't present in V5.
+
+For each KPI document:
+
+KPI name
+User story
+Business question
+
+What question is the KPI helping the user answer?
+
+Metric
+
+Document the exact metric(s).
+
+Dimension
+
+Document the dimension/category being analysed.
+
+Data source/feed
+
+Only document this if it is explicitly known from the existing requirements/prototype.
+
+Visualisation
+
+Specify the exact chart type used in V5.
+
+For example:
+
+Vertical bar chart
+Horizontal bar chart
+Heatmap
+Donut chart
+Sankey
+Star/radar visualisation
+Combination chart
+Comparison visualisation
+Line chart
+Axes
+
+Document:
+
+X-axis
+
+Dimension
+Label
+Formatting
+Dynamic behaviour
+
+Y-axis
+
+Metric
+Unit
+Formatting
+
+If there is a secondary axis, document:
+
+Metric
+Unit
+Purpose
+Relationship to primary axis
+Data labels
+
+Document:
+
+What values appear directly on the chart
+What values are shown as supporting labels
+Percentage formatting
+Index formatting
+Any benchmark/reference values
+Legend
+
+Document:
+
+Which metrics require legends
+What each visual encoding represents
+When legends change dynamically
+Tooltip / hover
+
+Document exactly what appears when the user hovers over:
+
+Bars
+Data points
+Channels
+Apps
+Shows
+Genres
+Other interactive elements
+Interaction
+
+Document:
+
+Click
+Hover
+Drilldown
+Selection
+Filtering
+Cross-filtering
+Dynamic dropdown behaviour
+Navigation
+Drilldown behaviour
+
+If a KPI supports drilldown, document:
+
+What can be selected
+What opens
+What data changes
+What chart is displayed
+What filters are inherited
+How the user returns to the previous view
+Data interpretation
+
+Explain what the visualisation means in plain language.
+
+Do not change the underlying metric definitions.
+
+4. Global Filters
+
+Create a dedicated Global Filter Behaviour section.
+
+Identify every global filter represented in V5.
+
+For each filter document:
+
+Filter	Options	Applies to	Behaviour
+
+For example, if represented in V5:
+
+Audience
+Date range
+All / Commercial
+Platform/type
+Gender/demo
+Other audience dimensions
+
+For each filter explain:
+
+What options are available?
+Which KPIs are affected?
+Does the filter affect the entire dashboard?
+Does it affect only selected modules?
+Does changing it update other controls?
+Does it persist when navigating/drilling down?
+Does it reset other filters?
+5. Local KPI Filters
+
+Clearly distinguish global filters from KPI-specific filters.
+
+For every KPI identify:
+
+Local filters
+Available options
+Default selection
+Dynamic behaviour
+Dependent filters
+Effect on visualisation
+
+Pay particular attention to filters where one selection changes another.
+
+Example:
+
+View by → Genre
+
+then:
+
+Genre selector → available genres
+
+versus:
+
+View by → Show
+
+then:
+
+Show selector → available shows
+
+Document this as a dependent filter relationship, not as two unrelated dropdowns.
+
+6. Filter Interaction Matrix
+
+Create a matrix showing how filters affect KPIs.
+
+Example:
+
+Filter	KPI 1	KPI 2	KPI 3	KPI 4
+Audience	✓	✓	✓	✓
+Date range	✓	✓	✓	✓
+Platform	✓	✓	—	✓
+Genre	—	✓	✓	✓
+
+Only include relationships actually supported by V5.
+
+7. KPI Visualisation Matrix
+
+Create a summary table:
+
+KPI	User question	Primary metric	Secondary metric	Dimension	Chart type	Filters	Drilldown
+
+This should become the single reference table for the entire dashboard.
+
+8. Chart Variations
+
+Document all visualisation variations.
+
+For each KPI explain:
+
+Default state
+
+What the user sees initially.
+
+Filtered state
+
+What changes when filters are applied.
+
+Alternative dimension
+
+If the user switches between:
+
+Genre
+Show
+Linear
+Streaming
+FAST
+etc.
+
+document how the chart changes.
+
+Drilldown state
+
+Document the visualisation shown after selecting an item.
+
+Comparison state
+
+If applicable, document how audience comparison works.
+
+Do not create hypothetical states that don't exist in V5.
+
+9. Index Metrics
+
+Where Index is used, document it separately because it is not another consumption/time metric.
+
+Explain:
+
+What Index represents
+What 100 represents
+How Index should be labelled
+How it appears visually
+Where it appears in the chart
+How it appears in hover
+How users understand the comparison against the national average
+
+Do not treat Index as minutes or percentage of viewing.
+
+10. Cross-KPI Interactions
+
+Identify whether selecting something in one KPI affects another KPI.
+
+For example:
+
+Genre selected → Top indexing shows updates
+
+If this behaviour exists in V5, document:
+
+Source KPI → User action → Target KPI → Result
+
+Example:
+
+User selects a genre → Top Shows visualisation updates → only shows belonging to the selected genre are displayed.
+
+Document all confirmed cross-KPI dependencies.
+
+11. Drilldown Requirements
+
+Create a dedicated drilldown specification.
+
+For each drilldown document:
+
+Trigger
+Selected object
+Destination/detail state
+Metrics displayed
+Chart type
+X-axis
+Y-axis
+Secondary axis if applicable
+Filters inherited
+Back/navigation behaviour
+
+Pay particular attention to show-level consumption over time where applicable.
+
+12. Responsive / Component Behaviour
+
+Based on the V5 design, document expected behaviour for:
+
+Chart resizing
+Long channel/app names
+Large numbers of categories
+Dropdowns
+Tooltips
+Legends
+Axis labels
+Overflow
+Scrolling
+Loading states
+
+Do not invent responsive breakpoints unless they already exist.
+
+Mark unknown implementation details as:
+
+“Engineering decision required.”
+
+13. Design System Requirements
+
+Document the design-system expectations represented in V5.
+
+Include:
+
+Fiber Design System components
+Typography
+Spacing
+Controls
+Dropdowns
+Tabs
+Buttons
+Cards
+Tooltips
+Chart components
+Data visualisation colour tokens
+Axis styling
+
+Where a chart does not exist as a Fiber component and a custom visualisation is required, explicitly identify it as:
+
+Custom visualisation using Fiber design tokens
+
+Do not invent new design-system tokens.
+
+14. Data Requirements
+
+For each KPI identify:
+
+Required metric
+Required dimension
+Granularity
+Aggregation
+Comparison/benchmark
+Time period
+Required data relationship
+Dependencies
+
+Separate:
+
+Known requirement
+
+from
+
+Data requirement requiring confirmation.
+
+Do not invent data sources or calculations.
+
+15. Functional Acceptance Criteria
+
+For every KPI create acceptance criteria using:
+
+Given
+When
+Then
+
+Example:
+
+Given the user selects a specific show
+When they open the show drilldown
+Then the system displays the show's viewing trend over time using the defined metrics and chart configuration.
+
+Create acceptance criteria for:
+
+Filters
+Chart updates
+Tooltips
+Drilldowns
+Dynamic dropdowns
+Cross-KPI interactions
+Comparison behaviour
+Index display
+16. Out of Scope
+
+Create a clear Phase 1 out-of-scope section.
+
+Comparison Mode must remain out of Phase 1, as previously agreed as a Phase 2 capability.
+
+Do not accidentally include Phase 2 functionality in the Phase 1 implementation scope.
+
+Only include other out-of-scope items if they are explicitly confirmed by the existing requirements or V5.
+
+17. Stakeholder Feedback Traceability
+
+Create a section showing how the incorporated feedback is represented in V5.
+
+For each confirmed feedback item:
+
+Feedback	V5 solution	KPI / area affected	Status
+
+Include the latest incorporated feedback, including changes to:
+
+Chart types
+Index presentation
+Secondary metrics
+Dynamic filters
+Show drilldowns
+Hover behaviour
+Other confirmed changes
+
+Do not include old feedback that has been superseded by V5 unless necessary to explain the final decision.
+
+18. Final Implementation Summary
+
+End the document with:
+
+Phase 1 must deliver
+
+A concise checklist of everything Engineering/Design/Data need to complete.
+
+Separate it into:
+
+Product
+
+Requirements
+User stories
+
+Data
+
+Metrics
+Dimensions
+Calculations
+Benchmarks
+
+UX/UI
+
+Screens
+Components
+Filters
+States
+Drilldowns
+
+Data Visualisation
+
+Chart types
+Axes
+Labels
+Legends
+Tooltips
+Interactions
+
+Engineering
+
+Filter behaviour
+State management
+Cross-KPI interactions
+Drilldowns
+Performance considerations
+Critical rules
+V5 is the source of truth.
+Do not invent missing requirements.
+Do not add new KPIs.
+Do not add new features simply because they would be useful.
+Do not remove existing V5 functionality.
+Clearly distinguish Global Filters vs Local Filters.
+Clearly distinguish Metric vs Dimension vs Visual Encoding.
+Clearly distinguish Avg min/week, % of watch time and Index.
+Document the exact chart configuration, not just the generic chart name.
+Document both default and interactive states.
+Capture dependencies between KPIs.
+Capture filter dependencies.
+Capture drilldown behaviour.
+Capture tooltip behaviour.
+Capture stakeholder feedback incorporated into V5.
+Comparison Mode remains Phase 2.
+If something cannot be determined from V5 or the existing requirements, write “Requires clarification” rather than guessing.
+Output
+
+Create the final document as:
+
+TV_Audience_Content_Planner_Phase_1_Functional_Requirements.md
+
+Structure it professionally with:
+
+Executive Summary
+Product Scope
+Phase 1 Scope
+Users & User Goals
+Dashboard Architecture
+Global Filters
+Local Filters
+Filter Interaction Matrix
+KPI Requirements
+KPI Visualisation Matrix
+Chart Specifications
+Drilldowns
+Cross-KPI Interactions
+Data Requirements
+Design System Requirements
+Functional Acceptance Criteria
+Stakeholder Feedback Traceability
+Out of Scope / Phase 2
+Implementation Checklist
+Open Questions / Clarifications
+
+Before generating the document, inspect the entire V5 prototype and build an inventory of every screen, KPI, filter, interaction, chart and drilldown. Then cross-check that inventory against the final document so nothing represented in V5 is missed.
