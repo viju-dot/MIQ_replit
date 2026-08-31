@@ -564,7 +564,7 @@ export function ComboChart({
                     className="block w-full truncate text-center text-[10px]"
                     style={{ color: MUTED }}
                   >
-                    {categoryDetails[i]}
+                    {categoryDetailLabel} {categoryDetails[i]}
                   </span>
                 )}
                 {indices && <MiniIndex index={indices[i]} />}

@@ -893,7 +893,7 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
           ) : trendsView === "Shows" ? (
             <ComboChart
               categories={filteredShows.map((show) => show.title)}
-              categoryDetails={filteredShows.map((show) => `Index ${show.index}%`)}
+              categoryDetails={filteredShows.map((show) => `${show.index}%`)}
               bars={filteredShows.map((show) => show.mins)}
               secondaryBars={filteredShows.map((show) => show.hhPct)}
               line={filteredShows.map((show) => show.index)}
@@ -931,6 +931,7 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
           ) : (
             <ComboChart
               categories={genres.map((genre) => genre.name)}
+              categoryDetails={genres.map((genre) => `${genre.index}%`)}
               bars={genres.map((genre) => genre.mins)}
               secondaryBars={genres.map((genre) => genre.pct)}
               line={genres.map((genre) => genre.index)}
@@ -942,6 +943,9 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
               lineAxisLabel="Index"
               barUnit=" min"
               secondaryBarUnit="%"
+              showLine={false}
+              secondaryAxisSide="right"
+              categoryDetailLabel="Index"
               selectedIndex={
                 selectedGenre
                   ? genres.findIndex((genre) => genre.name === selectedGenre)
