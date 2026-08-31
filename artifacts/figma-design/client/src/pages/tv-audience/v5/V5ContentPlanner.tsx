@@ -889,7 +889,7 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
           ) : trendsView === "Shows" ? (
             <ComboChart
               categories={filteredShows.map((show) => show.title)}
-              categoryDetails={filteredShows.map((show) => `${show.index}%`)}
+              categoryDetails={filteredShows.map((show) => `Index ${show.index}%`)}
               bars={filteredShows.map((show) => show.mins)}
               secondaryBars={filteredShows.map((show) => show.hhPct)}
               line={filteredShows.map((show) => show.index)}
