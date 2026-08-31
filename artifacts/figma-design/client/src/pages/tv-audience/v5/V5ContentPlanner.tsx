@@ -338,6 +338,7 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
    * lightly re-weights genres toward that platform. */
   const genres = useMemo(() => {
     const audience = seedKey(filters, "-genres-wow30");
+    const trendsTvType = tabToType(trendsTvTab);
     const raw = GENRES.map((g) => {
       const ncs = nonCommercialShare(g);
       // Scope re-weight: when a type is selected, genres that lean toward that
@@ -345,16 +346,19 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
       const scopeW = scopeTvType
         ? 0.85 + seeded(`gscope-${scopeTvType}-${g}`, 0, 0.4)
         : 1;
+      const platformW =
+        0.75 + seeded(`gtrend-${trendsTvType}-${g}`, 0, 0.65);
       const m = entityModel(audience, `genre-${g}`, {
         baseMin: 40,
         baseMax: 300,
-        weight: mult * scopeW * (commercials ? 1 - ncs : 1),
+        weight:
+          mult * scopeW * platformW * (commercials ? 1 - ncs : 1),
       });
       return { name: g, mins: m.minutes, index: m.index };
     }).sort((a, b) => b.mins - a.mins);
     const total = raw.reduce((a, b) => a + b.mins, 0) || 1;
     return raw.map((r) => ({ ...r, pct: (r.mins / total) * 100 }));
-  }, [filters, commercials, scopeTvType, mult]);
+  }, [filters, commercials, scopeTvType, trendsTvTab, mult]);
 
   /* ---- §6 Top Indexing Shows (Shows view) ---- *
    * Coherent model: minutes, index and household reach all derive from a single
@@ -829,27 +833,27 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
           </div>
         }
       >
-        {trendsView === "Shows" && (
-          <div
-            className="mb-[var(--spacing-150,12px)] flex flex-col gap-[var(--spacing-100,8px)] md:flex-row md:items-start md:justify-between"
-            data-annotate="Trends TV filters"
-          >
-            <div className="shrink-0">
-              <TabsBarUnderline
-                options={TAB_LABELS}
-                value={trendsTvTab}
-                onChange={setTrendsTvTab}
-                ariaLabel="Content viewership trends TV type"
-              />
-            </div>
+        <div
+          className="mb-[var(--spacing-150,12px)] flex flex-col gap-[var(--spacing-100,8px)] md:flex-row md:items-start md:justify-between"
+          data-annotate="Trends TV filters"
+        >
+          <div className="shrink-0">
+            <TabsBarUnderline
+              options={TAB_LABELS}
+              value={trendsTvTab}
+              onChange={setTrendsTvTab}
+              ariaLabel="Content viewership trends TV type"
+            />
+          </div>
+          {trendsView === "Shows" && (
             <div className="w-full md:ml-auto md:max-w-[520px]">
               <AlertInfo
                 title={`You're viewing the top 10 ${trendsTvTab} shows for this audience.`}
                 compact
               />
             </div>
-          </div>
-        )}
+          )}
+        </div>
         <CardBody
           loading={loading}
           empty={empty || (trendsView === "Shows" && filteredShows.length === 0)}
