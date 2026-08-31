@@ -60,12 +60,12 @@ export const CONSUMPTION_TIER: Option[] = [
   { value: "light", label: "Light TV" },
 ];
 
-/* Sensible date-range option (spec allows a date range as a global filter). */
+/* Supported day-based lookback windows for the global date range filter. */
 export const DATE_RANGE: Option[] = [
-  { value: "l4w", label: "Last 4 weeks" },
-  { value: "l12w", label: "Last 12 weeks" },
-  { value: "l26w", label: "Last 26 weeks" },
-  { value: "l52w", label: "Last 52 weeks" },
+  { value: "l7d", label: "Last 7 days" },
+  { value: "l15d", label: "Last 15 days" },
+  { value: "l30d", label: "Last 30 days" },
+  { value: "l60d", label: "Last 60 days" },
 ];
 
 export type Filters = {
@@ -88,7 +88,7 @@ export const DEFAULT_FILTERS: Filters = {
   gender: [],
   children: [],
   tier: "all",
-  dateRange: "l12w",
+  dateRange: "l30d",
 };
 
 export function isUK(f: Filters): boolean {
