@@ -842,6 +842,7 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
             />
             <AlertInfo
               title={`You're viewing the top 10 ${trendsTvTab} shows for this audience.`}
+              compact
             />
           </div>
         )}
@@ -869,7 +870,7 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
                 </button>
                 <SearchableDropdown
                   id={controlId("show-jump-detail")}
-                  label="Show"
+                  label=""
                   value={selectedShow}
                   options={showSelectOptions}
                   onChange={(value) =>
@@ -888,22 +889,25 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
           ) : trendsView === "Shows" ? (
             <ComboChart
               categories={filteredShows.map((show) => show.title)}
-              categoryDetails={filteredShows.map((show) => show.network)}
+              categoryDetails={filteredShows.map((show) => `${show.index}%`)}
               bars={filteredShows.map((show) => show.mins)}
               secondaryBars={filteredShows.map((show) => show.hhPct)}
               line={filteredShows.map((show) => show.index)}
               barLabel="Avg min / household"
-              secondaryBarLabel="Households"
+              secondaryBarLabel="% of total watch time"
               lineLabel="Index"
               barAxisLabel="Avg min / HH"
-              secondaryBarAxisLabel="HH households (%)"
+              secondaryBarAxisLabel="% of total watch time"
               lineAxisLabel="Index"
               barUnit=" min"
               secondaryBarUnit="%"
+              showLine={false}
+              secondaryAxisSide="right"
+              categoryDetailLabel="Index"
               legendRight={
                 <SearchableDropdown
                   id={controlId("show-jump")}
-                  label="Show"
+                  label=""
                   value="all"
                   options={showSelectOptions}
                   onChange={(value) =>

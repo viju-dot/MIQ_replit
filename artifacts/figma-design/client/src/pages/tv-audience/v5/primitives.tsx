@@ -584,11 +584,17 @@ export function TabsBarUnderline({
 /* Fiber DS Alert — Info state, title-only variant (no description, no close),
  * mirrors ds/NotificationPage Alert (bordered, Info tokens). */
 
-export function AlertInfo({ title }: { title: string }) {
+export function AlertInfo({
+  title,
+  compact = false,
+}: {
+  title: string;
+  compact?: boolean;
+}) {
   return (
     <div
       role="status"
-      className="flex flex-col items-start px-3 py-[7px]"
+      className={`flex flex-col items-start ${compact ? "px-2 py-1" : "px-3 py-[7px]"}`}
       style={{
         border:
           "1px solid var(--border-dynamic-info-selected, #2360db)",
@@ -597,16 +603,16 @@ export function AlertInfo({ title }: { title: string }) {
       }}
     >
       <div className="flex w-full items-center gap-2">
-        <span className="flex size-5 shrink-0 items-center justify-center">
+        <span className={`flex shrink-0 items-center justify-center ${compact ? "size-4" : "size-5"}`}>
           <Info
-            size={20}
+            size={compact ? 16 : 20}
             weight="fill"
             color="var(--border-dynamic-info-selected, #2360db)"
             aria-hidden
           />
         </span>
         <span
-          className="min-w-0 flex-1 font-medium text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)]"
+          className={`min-w-0 flex-1 font-medium ${compact ? "text-[length:var(--body-sm-medium-size,12px)] leading-[var(--body-sm-medium-line-height,18px)]" : "text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)]"}`}
           style={{
             fontFamily: FONT,
             color:

@@ -265,6 +265,9 @@ export function ComboChart({
   minChartWidth,
   scrollAriaLabel,
   showLegend = true,
+  showLine = true,
+  secondaryAxisSide = "left",
+  categoryDetailLabel = "Platform",
 }: {
   categories: string[];
   /** Optional secondary x-axis label, e.g. each show's platform/network. */
@@ -293,6 +296,12 @@ export function ComboChart({
   scrollAriaLabel?: string;
   /** Allows a parent to place the same legend beside adjacent controls. */
   showLegend?: boolean;
+  /** Hide the line series when its value is presented on the x-axis. */
+  showLine?: boolean;
+  /** Place the optional second bar scale on the opposite side of the plot. */
+  secondaryAxisSide?: "left" | "right";
+  /** Accessible/tooltip label for the optional supporting x-axis text. */
+  categoryDetailLabel?: string;
 }) {
   const [hover, setHover] = useState<number | null>(null);
   const plotW = 720;
@@ -348,12 +357,12 @@ export function ComboChart({
             </span>
             </div>
           )}
-          <div className="flex items-center gap-[var(--spacing-75,6px)]">
+          {showLine && <div className="flex items-center gap-[var(--spacing-75,6px)]">
             <span className="block h-[3px] w-[16px] rounded-full" style={{ backgroundColor: CHART.line }} />
             <span className="text-[length:var(--body-md-regular-size,14px)]" style={{ color: AXIS_LABEL }}>
               {lineLabel}
             </span>
-          </div>
+          </div>}
         </div>
         {legendRight && (
           <div className="ml-auto flex flex-wrap items-center justify-end gap-[var(--spacing-100,8px)]">
@@ -379,7 +388,7 @@ export function ComboChart({
         >
           {barAxisLabel ?? barLabel}
         </span>
-        {secondaryBars && (
+        {secondaryBars && secondaryAxisSide === "left" && (
           <span
             className="w-[50px] shrink-0 text-right text-[10px] font-medium"
             style={{ color: CHART.secondary }}
@@ -388,12 +397,16 @@ export function ComboChart({
           </span>
         )}
         <span className="min-w-0 flex-1" />
-        <span
-          className="w-[58px] shrink-0 text-left text-[10px] font-medium"
-          style={{ color: CHART.line }}
-        >
-          {lineAxisLabel ?? lineLabel}
-        </span>
+        {(showLine || (secondaryBars && secondaryAxisSide === "right")) && (
+          <span
+            className="w-[58px] shrink-0 text-left text-[10px] font-medium"
+            style={{ color: showLine ? CHART.line : CHART.secondary }}
+          >
+            {showLine
+              ? (lineAxisLabel ?? lineLabel)
+              : (secondaryBarAxisLabel ?? secondaryBarLabel)}
+          </span>
+        )}
         </div>
 
         <div className="flex w-full gap-[var(--spacing-50,4px)]">
@@ -407,7 +420,7 @@ export function ComboChart({
         </div>
 
         {/* Dedicated scale for the opt-in second bar series (e.g. HH%). */}
-        {secondaryBars && (
+        {secondaryBars && secondaryAxisSide === "left" && (
           <div className="flex w-[50px] shrink-0 flex-col justify-between text-right" style={{ height: plotH }}>
             {secondaryBarTickVals.map((t, i) => (
               <span
@@ -436,7 +449,11 @@ export function ComboChart({
               viewBox={`0 0 ${plotW} ${plotH}`}
               preserveAspectRatio="none"
               role="img"
-              aria-label={`${barLabel} bars with ${lineLabel} line overlay`}
+              aria-label={
+                showLine
+                  ? `${barLabel} bars with ${lineLabel} line overlay`
+                  : `${barLabel} and ${secondaryBarLabel ?? "secondary metric"} grouped bars`
+              }
             >
               {bars.map((v, i) => {
                 const h = (v / barMax) * plotH;
@@ -473,14 +490,14 @@ export function ComboChart({
                   />
                 );
               })}
-              <polyline
+              {showLine && <polyline
                 points={linePts.map((p) => `${p.cx},${p.cy}`).join(" ")}
                 fill="none"
                 stroke={CHART.line}
                 strokeWidth={2}
                 vectorEffect="non-scaling-stroke"
-              />
-              {linePts.map((p, i) => (
+              />}
+              {showLine && linePts.map((p, i) => (
                 <circle key={i} cx={p.cx} cy={p.cy} r={3} fill={CHART.line} vectorEffect="non-scaling-stroke" />
               ))}
             </svg>
@@ -496,7 +513,7 @@ export function ComboChart({
                 onBlur={() => setHover(null)}
                 onClick={onSelect ? () => onSelect(i) : undefined}
                 aria-pressed={onSelect ? selectedIndex === i : undefined}
-                aria-label={`${c}${categoryDetails?.[i] ? `, ${categoryDetails[i]}` : ""}: ${barLabel} ${fmtInt(bars[i])}${barUnit}${secondaryBars && secondaryBarLabel ? `, ${secondaryBarLabel} ${secondaryBars[i].toFixed(1)}${secondaryBarUnit}` : ""}, ${lineLabel} ${line[i].toFixed(1)}${lineUnit}${indices ? `, index ${indices[i]} — ${indexExplanation(indices[i])}` : ""}`}
+                aria-label={`${c}${categoryDetails?.[i] ? `, ${categoryDetailLabel} ${categoryDetails[i]}` : ""}: ${barLabel} ${fmtInt(bars[i])}${barUnit}${secondaryBars && secondaryBarLabel ? `, ${secondaryBarLabel} ${secondaryBars[i].toFixed(1)}${secondaryBarUnit}` : ""}${showLine ? `, ${lineLabel} ${line[i].toFixed(1)}${lineUnit}` : ""}${indices ? `, index ${indices[i]} — ${indexExplanation(indices[i])}` : ""}`}
                 className="absolute top-0 h-full focus:outline-none"
                 style={{
                   left: `${(i / n) * 100}%`,
@@ -510,7 +527,7 @@ export function ComboChart({
                     lines={[
                       { label: c },
                       ...(categoryDetails?.[i]
-                        ? [{ label: "Platform", value: categoryDetails[i] }]
+                        ? [{ label: categoryDetailLabel, value: categoryDetails[i] }]
                         : []),
                       { label: barLabel, value: `${fmtInt(bars[i])}${barUnit}` },
                       ...(secondaryBars && secondaryBarLabel
@@ -519,7 +536,9 @@ export function ComboChart({
                             value: `${secondaryBars[i].toFixed(1)}${secondaryBarUnit}`,
                           }]
                         : []),
-                      { label: lineLabel, value: `${line[i].toFixed(1)}${lineUnit}` },
+                      ...(showLine
+                        ? [{ label: lineLabel, value: `${line[i].toFixed(1)}${lineUnit}` }]
+                        : []),
                       ...(indices
                         ? [{ label: "Index", value: `${indices[i]} (${indexExplanation(indices[i])})` }]
                         : []),
@@ -555,14 +574,16 @@ export function ComboChart({
         </div>
 
         {/* Right axis */}
-        <div className="flex w-[58px] shrink-0 flex-col justify-between text-left" style={{ height: plotH }}>
-          {lineTickVals.map((t, i) => (
-            <span key={i} className="text-[length:var(--body-sm-regular-size,12px)]" style={{ color: AXIS_LABEL }}>
-              {t}
-              {lineUnit.trim()}
-            </span>
-          ))}
-        </div>
+        {(showLine || (secondaryBars && secondaryAxisSide === "right")) && (
+          <div className="flex w-[58px] shrink-0 flex-col justify-between text-left" style={{ height: plotH }}>
+            {(showLine ? lineTickVals : secondaryBarTickVals).map((t, i) => (
+              <span key={i} className="text-[length:var(--body-sm-regular-size,12px)]" style={{ color: AXIS_LABEL }}>
+                {t}
+                {(showLine ? lineUnit : secondaryBarUnit).trim()}
+              </span>
+            ))}
+          </div>
+        )}
         </div>
         </div>
       </div>
