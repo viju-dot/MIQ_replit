@@ -690,6 +690,8 @@ export function DualAxisBarChart({
   secondaryLabel: string;
 }) {
   const [hover, setHover] = useState<number | null>(null);
+  const primaryColor = CHART.qualitative1;
+  const secondaryColor = CHART.qualitative2;
   const plotW = 720;
   const plotH = 230;
   const ticks = 5;
@@ -714,11 +716,11 @@ export function DualAxisBarChart({
     >
       <div className="flex flex-wrap items-center justify-end gap-[var(--spacing-200,16px)]">
         <span className="flex items-center gap-[var(--spacing-75,6px)] text-[length:var(--body-md-regular-size,14px)]" style={{ color: BODY2 }}>
-          <span className="h-[12px] w-[12px] rounded-[var(--radius-25,2px)]" style={{ backgroundColor: CHART.tertiary }} aria-hidden />
+          <span className="h-[12px] w-[12px] rounded-[var(--radius-25,2px)]" style={{ backgroundColor: primaryColor }} aria-hidden />
           {primaryLabel}
         </span>
         <span className="flex items-center gap-[var(--spacing-75,6px)] text-[length:var(--body-md-regular-size,14px)]" style={{ color: BODY2 }}>
-          <span className="h-[12px] w-[12px] rounded-[var(--radius-25,2px)]" style={{ backgroundColor: CHART.quaternary }} aria-hidden />
+          <span className="h-[12px] w-[12px] rounded-[var(--radius-25,2px)]" style={{ backgroundColor: secondaryColor }} aria-hidden />
           {secondaryLabel}
         </span>
       </div>
@@ -726,11 +728,11 @@ export function DualAxisBarChart({
       <div className="w-full overflow-x-auto pb-[var(--spacing-100,8px)]">
         <div className="min-w-[680px]">
           <div className="flex items-end gap-[var(--spacing-50,4px)]">
-            <span className="w-[62px] shrink-0 text-right text-[10px] font-medium" style={{ color: CHART.tertiary }}>
+            <span className="w-[62px] shrink-0 text-right text-[10px] font-medium" style={{ color: primaryColor }}>
               {primaryLabel}
             </span>
             <span className="min-w-0 flex-1" />
-            <span className="w-[62px] shrink-0 text-left text-[10px] font-medium" style={{ color: CHART.quaternary }}>
+            <span className="w-[62px] shrink-0 text-left text-[10px] font-medium" style={{ color: secondaryColor }}>
               {secondaryLabel}
             </span>
           </div>
@@ -771,7 +773,7 @@ export function DualAxisBarChart({
                         width={barW}
                         height={height}
                         rx={1}
-                        fill={CHART.tertiary}
+                        fill={primaryColor}
                         opacity={hover == null || hover === i ? 1 : 0.45}
                       />
                     );
@@ -786,7 +788,7 @@ export function DualAxisBarChart({
                         width={barW}
                         height={height}
                         rx={1}
-                        fill={CHART.quaternary}
+                        fill={secondaryColor}
                         opacity={hover == null || hover === i ? 1 : 0.45}
                       />
                     );
