@@ -14,3 +14,17 @@ mtime_ms = 1787644449249
 storage_uri = "gcs://replit-rams-assets-spock/rams/assets/repl:85adb4f5-ad43-439c-b429-d15bb0ed940c/50a58bd5-1f43-4346-bd4c-388ec347c26d/08e6a63c-7084-40db-8488-40388e445b09"
 storage_version_token = "1787644456303080"
 content_type = "image/jpeg"
+
+[[outputs]]
+id = "sayn4sjdVH3UjMsp3Tz0w"
+uri = "file://TV_Audience_Content_Planner_Phase_1_Functional_Requirements.md"
+type = "text"
+title = "TV Audience Content Planner — Phase 1 Functional Requirements"
+description = "Production-ready Markdown specification derived from the complete V5 prototype, including KPI requirements, filters, charts, interactions, drilldowns, data requirements, acceptance criteria, traceability, and open clarifications."
+logical_id = "3c179040-4788-4fa7-ace5-92d7b845bd5e"
+content_hash = "sha256:fade98750d4e716be9a9d4899804a8094df1717bf9432372cf2256c445b0bcfa"
+size = 30374
+mtime_ms = 1788162969675
+storage_uri = "gcs://replit-rams-assets-spock/rams/assets/repl:85adb4f5-ad43-439c-b429-d15bb0ed940c/3c179040-4788-4fa7-ace5-92d7b845bd5e/e8e49272-9aff-4269-8732-2b3e92e68bb0"
+storage_version_token = "1788162984677171"
+content_type = "text/markdown"
