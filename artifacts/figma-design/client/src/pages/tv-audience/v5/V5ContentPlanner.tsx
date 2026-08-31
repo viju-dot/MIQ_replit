@@ -831,19 +831,23 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
       >
         {trendsView === "Shows" && (
           <div
-            className="mb-[var(--spacing-150,12px)] flex flex-col gap-[var(--spacing-100,8px)]"
+            className="mb-[var(--spacing-150,12px)] flex flex-col gap-[var(--spacing-100,8px)] md:flex-row md:items-start md:justify-between"
             data-annotate="Trends TV filters"
           >
-            <TabsBarUnderline
-              options={TAB_LABELS}
-              value={trendsTvTab}
-              onChange={setTrendsTvTab}
-              ariaLabel="Content viewership trends TV type"
-            />
-            <AlertInfo
-              title={`You're viewing the top 10 ${trendsTvTab} shows for this audience.`}
-              compact
-            />
+            <div className="shrink-0">
+              <TabsBarUnderline
+                options={TAB_LABELS}
+                value={trendsTvTab}
+                onChange={setTrendsTvTab}
+                ariaLabel="Content viewership trends TV type"
+              />
+            </div>
+            <div className="w-full md:ml-auto md:max-w-[520px]">
+              <AlertInfo
+                title={`You're viewing the top 10 ${trendsTvTab} shows for this audience.`}
+                compact
+              />
+            </div>
           </div>
         )}
         <CardBody
