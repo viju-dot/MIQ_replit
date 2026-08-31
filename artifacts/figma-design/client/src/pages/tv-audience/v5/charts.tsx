@@ -1019,6 +1019,7 @@ export function ShowTrendChart({
   data: { period: string; households: number; minutes: number }[];
 }) {
   const [hovered, setHovered] = useState<number | null>(null);
+  const householdsColor = CHART.qualitative1;
   const minutesColor = CHART.qualitative3;
   const width = 760;
   const height = 210;
@@ -1053,7 +1054,7 @@ export function ShowTrendChart({
         style={{ color: BODY2 }}
       >
         <span className="flex items-center gap-[var(--spacing-75,6px)] text-[length:var(--body-md-regular-size,14px)]">
-          <span className="size-[12px] rounded-[var(--radius-25,2px)]" style={{ backgroundColor: CHART.line }} aria-hidden />
+          <span className="size-[12px] rounded-[var(--radius-25,2px)]" style={{ backgroundColor: householdsColor }} aria-hidden />
           Households watching
         </span>
         <span className="flex items-center gap-[var(--spacing-75,6px)] text-[length:var(--body-md-regular-size,14px)]">
@@ -1084,7 +1085,7 @@ export function ShowTrendChart({
         })}
         <text x={left} y={11} fontSize="10" fill={AXIS_LABEL}>Avg mins / hh</text>
         <text x={width - right} y={11} textAnchor="end" fontSize="10" fill={AXIS_LABEL}>Households</text>
-        <polyline points={householdPoints} fill="none" stroke={CHART.line} strokeWidth="2" />
+        <polyline points={householdPoints} fill="none" stroke={householdsColor} strokeWidth="2" />
         <polyline points={minutesPoints} fill="none" stroke={minutesColor} strokeWidth="2" />
         {data.map((point, index) => (
           <g
@@ -1105,7 +1106,7 @@ export function ShowTrendChart({
               strokeDasharray="3 3"
             />
             <circle cx={x(index)} cy={yMinutes(point.minutes)} r="4" fill={minutesColor} />
-            <circle cx={x(index)} cy={yHouseholds(point.households)} r="4" fill={CHART.line} />
+            <circle cx={x(index)} cy={yHouseholds(point.households)} r="4" fill={householdsColor} />
             <rect
               x={x(index) - plotW / Math.max(data.length, 1) / 2}
               y={top}
