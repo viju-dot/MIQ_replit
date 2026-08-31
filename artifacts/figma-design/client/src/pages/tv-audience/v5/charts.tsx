@@ -8,7 +8,8 @@
  * hover/selected via local state + inline style. Meaningful tooltips per §19.
  * ========================================================================= */
 
-import { useState, type ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { ArrowUp, ArrowDown, Minus } from "@phosphor-icons/react";
 import {
   FONT,
@@ -36,27 +37,78 @@ const TOOLTIP_BG = "var(--surface-background-lvl6, #282833)";
 const TOOLTIP_FG = "var(--surface-foreground-static-neutral-inversed, #ffffff)";
 const TOOLTIP_FG2 = "var(--surface-foreground-static-neutral-lvl4, #c6c6cc)";
 
-/* Shared dark tooltip surface (Fiber tooltip style). */
+/* Shared dark tooltip surface (Fiber tooltip style).
+ * The visible surface is portalled to the viewport so card/scroll overflow
+ * cannot clip it. The local marker stays at the hovered datum and supplies
+ * collision-aware positioning at every chart edge. */
 function Tooltip({ lines }: { lines: { label: string; value?: string }[] }) {
+  const markerRef = useRef<HTMLSpanElement>(null);
+  const surfaceRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ left: 0, top: 0, visible: false });
+
+  useLayoutEffect(() => {
+    const positionSurface = () => {
+      const marker = markerRef.current;
+      const surface = surfaceRef.current;
+      if (!marker || !surface) return;
+      const anchor = marker.getBoundingClientRect();
+      const bounds = surface.getBoundingClientRect();
+      const gap = 8;
+      const edge = 8;
+      const anchorX = anchor.left + anchor.width / 2;
+      const above = anchor.top - bounds.height - gap;
+      const top = above >= edge
+        ? above
+        : Math.min(window.innerHeight - bounds.height - edge, anchor.bottom + gap);
+      const left = Math.min(
+        window.innerWidth - bounds.width - edge,
+        Math.max(edge, anchorX - bounds.width / 2),
+      );
+      setPosition({ left, top: Math.max(edge, top), visible: true });
+    };
+
+    positionSurface();
+    window.addEventListener("resize", positionSurface);
+    window.addEventListener("scroll", positionSurface, true);
+    return () => {
+      window.removeEventListener("resize", positionSurface);
+      window.removeEventListener("scroll", positionSurface, true);
+    };
+  }, [lines]);
+
   return (
-    <span
-      className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-[6px] flex -translate-x-1/2 flex-col gap-[2px] whitespace-nowrap rounded-[var(--radius-50,4px)] px-[var(--spacing-100,8px)] py-[var(--spacing-75,6px)] text-left"
-      style={{ backgroundColor: TOOLTIP_BG, boxShadow: CARD_SHADOW }}
-    >
-      {lines.map((l, i) => (
-        <span
-          key={i}
-          className={
-            i === 0
-              ? "text-[length:var(--body-sm-medium-size,12px)] font-medium"
-              : "text-[length:var(--body-sm-regular-size,12px)]"
-          }
-          style={{ color: i === 0 ? TOOLTIP_FG : TOOLTIP_FG2 }}
+    <>
+      <span ref={markerRef} className="pointer-events-none absolute left-1/2 top-1/2 size-px" aria-hidden />
+      {typeof document !== "undefined" && createPortal(
+        <div
+          ref={surfaceRef}
+          role="tooltip"
+          className="pointer-events-none fixed z-[1000] flex max-w-[min(320px,calc(100vw-16px))] flex-col gap-[2px] rounded-[var(--radius-50,4px)] px-[var(--spacing-100,8px)] py-[var(--spacing-75,6px)] text-left"
+          style={{
+            backgroundColor: TOOLTIP_BG,
+            boxShadow: CARD_SHADOW,
+            left: position.left,
+            top: position.top,
+            opacity: position.visible ? 1 : 0,
+          }}
         >
-          {l.value != null ? `${l.label}: ${l.value}` : l.label}
-        </span>
-      ))}
-    </span>
+          {lines.map((l, i) => (
+            <span
+              key={i}
+              className={
+                i === 0
+                  ? "text-[length:var(--body-sm-medium-size,12px)] font-medium"
+                  : "text-[length:var(--body-sm-regular-size,12px)]"
+              }
+              style={{ color: i === 0 ? TOOLTIP_FG : TOOLTIP_FG2 }}
+            >
+              {l.value != null ? `${l.label}: ${l.value}` : l.label}
+            </span>
+          ))}
+        </div>,
+        document.body,
+      )}
+    </>
   );
 }
 
@@ -82,6 +134,7 @@ export function DonutChart({
   vertical?: boolean;
 }) {
   const [hover, setHover] = useState<string | null>(null);
+  const [plotHover, setPlotHover] = useState<string | null>(null);
   const size = 200;
   const r = 78;
   const stroke = 30;
@@ -89,7 +142,7 @@ export function DonutChart({
   const cy = size / 2;
   const circ = 2 * Math.PI * r;
   let offset = 0;
-  const active = hover ?? selected;
+  const active = plotHover ?? hover ?? selected;
   const activeSeg = data.find((d) => d.key === active) ?? null;
 
   return (
@@ -137,10 +190,38 @@ export function DonutChart({
                 opacity={dim ? 0.35 : 1}
                 transform={`rotate(-90 ${cx} ${cy})`}
                 style={{ transition: "stroke-width 120ms ease, opacity 120ms ease" }}
+                 onMouseEnter={() => setPlotHover(d.key)}
+                 onMouseLeave={() => setPlotHover(null)}
+                 onClick={() => onSelect(d.key)}
               />
             );
           })}
         </svg>
+        {plotHover && activeSeg && (() => {
+          const activeIndex = data.findIndex((item) => item.key === plotHover);
+          const beforePct = data
+            .slice(0, Math.max(0, activeIndex))
+            .reduce((sum, item) => sum + item.pct, 0);
+          const midAngle = ((beforePct + activeSeg.pct / 2) / 100) * Math.PI * 2 - Math.PI / 2;
+          return (
+            <span
+              className="pointer-events-none absolute size-px"
+              style={{
+                left: cx + Math.cos(midAngle) * r,
+                top: cy + Math.sin(midAngle) * r,
+              }}
+            >
+              <Tooltip
+                lines={[
+                  { label: activeSeg.name },
+                  { label: "Legend", value: "Share of viewing" },
+                  { label: "Share of viewing", value: `${activeSeg.pct.toFixed(1)}%` },
+                  { label: "Est. minutes/hh", value: `${fmtInt(activeSeg.minutes)} min` },
+                ]}
+              />
+            </span>
+          );
+        })()}
         {/* Centre readout */}
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
           {activeSeg ? (
@@ -733,6 +814,7 @@ export function DualAxisBarChart({
                         lines={[
                           { label: category },
                           { label: "Index", value: `${indices[i]}%` },
+                           { label: "Highlight", value: indexExplanation(indices[i]) },
                           { label: primaryLabel, value: fmtInt(primary[i]) },
                           { label: secondaryLabel, value: `${secondary[i].toFixed(1)}%` },
                         ]}
@@ -1031,9 +1113,13 @@ export function ShowTrendChart({
       </svg>
       {hovered !== null && data[hovered] && (
         <span
-          className="pointer-events-none absolute top-[42px] z-20 -translate-x-1/2"
+          className="pointer-events-none absolute z-20 block size-px"
           style={{
             left: `${(x(hovered) / width) * 100}%`,
+            top: `${34 + Math.min(
+              yMinutes(data[hovered].minutes),
+              yHouseholds(data[hovered].households),
+            )}px`,
           }}
         >
           <Tooltip
@@ -1125,6 +1211,10 @@ export function TemporalHeatmap({
                           { label: `${cell.day} · ${cell.part}` },
                           { label: "Avg minutes/hh", value: `${cell.minutes}m` },
                           { label: "% households", value: `${cell.hhPct.toFixed(1)}%` },
+                         {
+                           label: "Heat intensity",
+                           value: `${cell.level + 1} of ${HEAT_RAMP.length} (low → high minutes)`,
+                         },
                         ]}
                       />
                     )}
@@ -1315,6 +1405,28 @@ export function RadarChart({
             );
           })}
         </svg>
+        {hover && (() => {
+          const index = data.findIndex((item) => item.name === hover);
+          if (index < 0) return null;
+          const datum = data[index];
+          const rr = (datum.index / maxIndex) * rMax;
+          const p = point(index, rr);
+          return (
+            <span
+              className="pointer-events-none absolute size-px"
+              style={{ left: p.x, top: p.y }}
+            >
+              <Tooltip
+                lines={[
+                  { label: datum.name },
+                  { label: "Index", value: `${datum.index}` },
+                  { label: "Highlight", value: indexExplanation(datum.index) },
+                  { label: "Baseline", value: "National average = 100" },
+                ]}
+              />
+            </span>
+          );
+        })()}
       </div>
       <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ color: MUTED }}>
         Dashed ring = national average (100). Select a parameter to view its details.
