@@ -1045,6 +1045,8 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
               showLine={false}
               secondaryAxisSide="right"
               categoryDetailLabel="Index"
+              barColor={CHART.qualitative3}
+              secondaryBarColor={CHART.qualitative1}
               legendRight={
                 <SearchableDropdown
                   id={controlId("show-jump")}
@@ -1083,6 +1085,8 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
               showLine={false}
               secondaryAxisSide="right"
               categoryDetailLabel="Index"
+              barColor={CHART.qualitative3}
+              secondaryBarColor={CHART.qualitative1}
               selectedIndex={
                 selectedGenre
                   ? genres.findIndex((genre) => genre.name === selectedGenre)

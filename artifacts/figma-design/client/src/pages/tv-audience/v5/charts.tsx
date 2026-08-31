@@ -349,6 +349,8 @@ export function ComboChart({
   showLine = true,
   secondaryAxisSide = "left",
   categoryDetailLabel = "Platform",
+  barColor = CHART.primary,
+  secondaryBarColor = CHART.secondary,
 }: {
   categories: string[];
   /** Optional secondary x-axis label, e.g. each show's platform/network. */
@@ -383,6 +385,9 @@ export function ComboChart({
   secondaryAxisSide?: "left" | "right";
   /** Accessible/tooltip label for the optional supporting x-axis text. */
   categoryDetailLabel?: string;
+  /** Optional Fiber token colors for scoped two-series chart variants. */
+  barColor?: string;
+  secondaryBarColor?: string;
 }) {
   const [hover, setHover] = useState<number | null>(null);
   const plotW = 720;
@@ -421,7 +426,7 @@ export function ComboChart({
           <div className="flex items-center gap-[var(--spacing-75,6px)]">
           <span
             className="block h-[12px] w-[12px] rounded-[var(--radius-25,2px)]"
-            style={{ backgroundColor: CHART.primary }}
+            style={{ backgroundColor: barColor }}
           />
           <span className="text-[length:var(--body-md-regular-size,14px)]" style={{ color: AXIS_LABEL }}>
             {barLabel}
@@ -431,7 +436,7 @@ export function ComboChart({
             <div className="flex items-center gap-[var(--spacing-75,6px)]">
             <span
               className="block h-[12px] w-[12px] rounded-[var(--radius-25,2px)]"
-              style={{ backgroundColor: CHART.secondary }}
+              style={{ backgroundColor: secondaryBarColor }}
             />
             <span className="text-[length:var(--body-md-regular-size,14px)]" style={{ color: AXIS_LABEL }}>
               {secondaryBarLabel}
@@ -465,14 +470,14 @@ export function ComboChart({
         <div className="flex w-full items-end gap-[var(--spacing-50,4px)]">
         <span
           className="w-[58px] shrink-0 text-right text-[10px] font-medium"
-          style={{ color: CHART.primary }}
+          style={{ color: barColor }}
         >
           {barAxisLabel ?? barLabel}
         </span>
         {secondaryBars && secondaryAxisSide === "left" && (
           <span
             className="w-[50px] shrink-0 text-right text-[10px] font-medium"
-            style={{ color: CHART.secondary }}
+            style={{ color: secondaryBarColor }}
           >
             {secondaryBarAxisLabel ?? secondaryBarLabel}
           </span>
@@ -481,7 +486,7 @@ export function ComboChart({
         {(showLine || (secondaryBars && secondaryAxisSide === "right")) && (
           <span
             className="w-[58px] shrink-0 text-left text-[10px] font-medium"
-            style={{ color: showLine ? CHART.line : CHART.secondary }}
+            style={{ color: showLine ? CHART.line : secondaryBarColor }}
           >
             {showLine
               ? (lineAxisLabel ?? lineLabel)
@@ -507,7 +512,7 @@ export function ComboChart({
               <span
                 key={i}
                 className="text-[length:var(--body-sm-regular-size,12px)]"
-                style={{ color: CHART.secondary }}
+                style={{ color: secondaryBarColor }}
               >
                 {t}
                 {secondaryBarUnit.trim()}
@@ -550,7 +555,7 @@ export function ComboChart({
                     width={colW}
                     height={h}
                     rx={1}
-                    fill={isSel ? CHART.selected : CHART.primary}
+                    fill={barColor}
                     opacity={hover == null || hover === i ? 1 : 0.5}
                   />
                 );
@@ -566,7 +571,7 @@ export function ComboChart({
                     width={colW}
                     height={h}
                     rx={1}
-                    fill={CHART.secondary}
+                    fill={secondaryBarColor}
                     opacity={hover == null || hover === i ? 1 : 0.5}
                   />
                 );
