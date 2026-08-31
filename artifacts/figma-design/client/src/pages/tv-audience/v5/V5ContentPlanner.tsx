@@ -845,7 +845,7 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
               ariaLabel="Content viewership trends TV type"
             />
           </div>
-          {trendsView === "Shows" && (
+          {trendsView === "Shows" && !selectedShow && (
             <div className="w-full md:ml-auto md:max-w-[520px]">
               <AlertInfo
                 title={`You're viewing the top 10 ${trendsTvTab} shows for this audience.`}
