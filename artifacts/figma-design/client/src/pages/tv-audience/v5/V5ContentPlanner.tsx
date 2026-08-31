@@ -26,7 +26,7 @@
  * ========================================================================= */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Info } from "@phosphor-icons/react";
+import { Info } from "@phosphor-icons/react";
 import { MetricsTile } from "@/components/ds/MetricsTile";
 import {
   FONT,
@@ -413,7 +413,7 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
 
   const showSelectOptions = useMemo(
     () => [
-      { value: "all", label: "Select a show…" },
+      { value: "all", label: "All shows" },
       ...Array.from(new Set(trendShows.map((show) => show.title))).map((title) => ({
         value: title,
         label: title,
@@ -863,19 +863,24 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
         >
           {trendsView === "Shows" && selectedShow ? (
             <div
-              className="flex flex-col gap-[var(--spacing-150,12px)]"
+              className="flex flex-col gap-[var(--spacing-100,8px)]"
               data-annotate="Top indexing show drilldown"
             >
-              <div className="flex flex-wrap items-center justify-between gap-[var(--spacing-100,8px)]">
-                <button
-                  type="button"
-                  onClick={() => setSelectedShow(null)}
-                  className="inline-flex items-center gap-[var(--spacing-75,6px)] rounded-[var(--radius-50,4px)] px-[var(--spacing-100,8px)] py-[var(--spacing-75,6px)] text-[length:var(--body-sm-medium-size,12px)] font-medium"
-                  style={{ color: CHART.selected }}
-                >
-                  <ArrowLeft size={14} aria-hidden />
-                  Back to overview
-                </button>
+              <div className="flex flex-wrap items-start justify-between gap-[var(--spacing-100,8px)]">
+                <div className="flex min-w-0 flex-col gap-[var(--spacing-25,2px)]">
+                  <h3
+                    className="truncate text-[length:var(--body-md-medium-size,14px)] font-semibold leading-[var(--body-md-medium-line-height,20px)]"
+                    style={{ color: TITLE }}
+                  >
+                    {selectedShow}
+                  </h3>
+                  <p
+                    className="text-[length:var(--body-sm-regular-size,12px)] leading-[var(--body-sm-regular-line-height,18px)]"
+                    style={{ color: MUTED }}
+                  >
+                    Selected audience consumption over time
+                  </p>
+                </div>
                 <SearchableDropdown
                   id={controlId("show-jump-detail")}
                   label=""
@@ -888,10 +893,6 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
                   align="right"
                 />
               </div>
-              <SectionHeading
-                title={selectedShow}
-                subtitle="Selected audience consumption over time"
-              />
               <ShowTrendChart data={showTrend} />
             </div>
           ) : trendsView === "Shows" ? (

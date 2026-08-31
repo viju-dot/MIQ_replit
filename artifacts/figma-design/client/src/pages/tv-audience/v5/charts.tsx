@@ -931,11 +931,11 @@ export function ShowTrendChart({
 }) {
   const [hovered, setHovered] = useState<number | null>(null);
   const width = 760;
-  const height = 270;
-  const left = 58;
-  const right = 66;
-  const top = 24;
-  const bottom = 40;
+  const height = 210;
+  const left = 48;
+  const right = 58;
+  const top = 20;
+  const bottom = 32;
   const plotW = width - left - right;
   const plotH = height - top - bottom;
   const maxMinutes = Math.max(1, ...data.map((point) => point.minutes)) * 1.15;
@@ -959,21 +959,21 @@ export function ShowTrendChart({
       aria-label="Selected show consumption over four weeks"
     >
       <div
-        className="mb-[var(--spacing-100,8px)] flex flex-wrap items-center gap-[var(--spacing-200,16px)] text-[length:var(--body-sm-regular-size,12px)]"
+        className="mb-[var(--spacing-75,6px)] flex flex-wrap items-center gap-[var(--spacing-200,16px)]"
         style={{ color: BODY2 }}
       >
-        <span className="flex items-center gap-[var(--spacing-75,6px)]">
-          <span className="h-[3px] w-[18px]" style={{ backgroundColor: CHART.line }} />
+        <span className="flex items-center gap-[var(--spacing-75,6px)] text-[length:var(--body-md-regular-size,14px)]">
+          <span className="size-[12px] rounded-[var(--radius-25,2px)]" style={{ backgroundColor: CHART.line }} aria-hidden />
           Households watching
         </span>
-        <span className="flex items-center gap-[var(--spacing-75,6px)]">
-          <span className="h-[3px] w-[18px]" style={{ backgroundColor: CHART.primary }} />
+        <span className="flex items-center gap-[var(--spacing-75,6px)] text-[length:var(--body-md-regular-size,14px)]">
+          <span className="size-[12px] rounded-[var(--radius-25,2px)]" style={{ backgroundColor: CHART.primary }} aria-hidden />
           Avg. minutes watched per household
         </span>
       </div>
       <svg
         viewBox={`0 0 ${width} ${height}`}
-        className="h-auto w-full overflow-visible"
+        className="h-auto max-h-[210px] w-full overflow-visible"
         role="img"
         aria-label="Four-week dual-axis line chart. Left axis average minutes per household; right axis households watching."
       >
@@ -982,19 +982,19 @@ export function ShowTrendChart({
           return (
             <g key={fraction}>
               <line x1={left} x2={width - right} y1={y} y2={y} stroke={GRID} />
-              <text x={left - 8} y={y + 4} textAnchor="end" fontSize="11" fill={AXIS_LABEL}>
+              <text x={left - 8} y={y + 3} textAnchor="end" fontSize="10" fill={AXIS_LABEL}>
                 {Math.round(maxMinutes * fraction)}
               </text>
-              <text x={width - right + 8} y={y + 4} textAnchor="start" fontSize="11" fill={AXIS_LABEL}>
+              <text x={width - right + 8} y={y + 3} textAnchor="start" fontSize="10" fill={AXIS_LABEL}>
                 {`${(maxHouseholds * fraction / 1_000_000).toFixed(1)}M`}
               </text>
             </g>
           );
         })}
-        <text x={left} y={12} fontSize="11" fill={AXIS_LABEL}>Avg mins / hh</text>
-        <text x={width - right} y={12} textAnchor="end" fontSize="11" fill={AXIS_LABEL}>Households</text>
-        <polyline points={householdPoints} fill="none" stroke={CHART.line} strokeWidth="3" />
-        <polyline points={minutesPoints} fill="none" stroke={CHART.primary} strokeWidth="3" />
+        <text x={left} y={11} fontSize="10" fill={AXIS_LABEL}>Avg mins / hh</text>
+        <text x={width - right} y={11} textAnchor="end" fontSize="10" fill={AXIS_LABEL}>Households</text>
+        <polyline points={householdPoints} fill="none" stroke={CHART.line} strokeWidth="2" />
+        <polyline points={minutesPoints} fill="none" stroke={CHART.primary} strokeWidth="2" />
         {data.map((point, index) => (
           <g
             key={point.period}
@@ -1013,8 +1013,8 @@ export function ShowTrendChart({
               stroke={hovered === index ? CHART.baseline : "transparent"}
               strokeDasharray="3 3"
             />
-            <circle cx={x(index)} cy={yMinutes(point.minutes)} r="5" fill={CHART.primary} />
-            <circle cx={x(index)} cy={yHouseholds(point.households)} r="5" fill={CHART.line} />
+            <circle cx={x(index)} cy={yMinutes(point.minutes)} r="4" fill={CHART.primary} />
+            <circle cx={x(index)} cy={yHouseholds(point.households)} r="4" fill={CHART.line} />
             <rect
               x={x(index) - plotW / Math.max(data.length, 1) / 2}
               y={top}
@@ -1022,7 +1022,7 @@ export function ShowTrendChart({
               height={plotH}
               fill="transparent"
             />
-            <text x={x(index)} y={height - 12} textAnchor="middle" fontSize="11" fill={AXIS_LABEL}>
+            <text x={x(index)} y={height - 9} textAnchor="middle" fontSize="10" fill={AXIS_LABEL}>
               {point.period}
             </text>
           </g>
