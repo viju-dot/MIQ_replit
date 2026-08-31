@@ -1019,6 +1019,7 @@ export function ShowTrendChart({
   data: { period: string; households: number; minutes: number }[];
 }) {
   const [hovered, setHovered] = useState<number | null>(null);
+  const minutesColor = CHART.qualitative3;
   const width = 760;
   const height = 210;
   const left = 48;
@@ -1056,7 +1057,7 @@ export function ShowTrendChart({
           Households watching
         </span>
         <span className="flex items-center gap-[var(--spacing-75,6px)] text-[length:var(--body-md-regular-size,14px)]">
-          <span className="size-[12px] rounded-[var(--radius-25,2px)]" style={{ backgroundColor: CHART.primary }} aria-hidden />
+          <span className="size-[12px] rounded-[var(--radius-25,2px)]" style={{ backgroundColor: minutesColor }} aria-hidden />
           Avg. minutes watched per household
         </span>
       </div>
@@ -1084,7 +1085,7 @@ export function ShowTrendChart({
         <text x={left} y={11} fontSize="10" fill={AXIS_LABEL}>Avg mins / hh</text>
         <text x={width - right} y={11} textAnchor="end" fontSize="10" fill={AXIS_LABEL}>Households</text>
         <polyline points={householdPoints} fill="none" stroke={CHART.line} strokeWidth="2" />
-        <polyline points={minutesPoints} fill="none" stroke={CHART.primary} strokeWidth="2" />
+        <polyline points={minutesPoints} fill="none" stroke={minutesColor} strokeWidth="2" />
         {data.map((point, index) => (
           <g
             key={point.period}
@@ -1103,7 +1104,7 @@ export function ShowTrendChart({
               stroke={hovered === index ? CHART.baseline : "transparent"}
               strokeDasharray="3 3"
             />
-            <circle cx={x(index)} cy={yMinutes(point.minutes)} r="4" fill={CHART.primary} />
+            <circle cx={x(index)} cy={yMinutes(point.minutes)} r="4" fill={minutesColor} />
             <circle cx={x(index)} cy={yHouseholds(point.households)} r="4" fill={CHART.line} />
             <rect
               x={x(index) - plotW / Math.max(data.length, 1) / 2}
