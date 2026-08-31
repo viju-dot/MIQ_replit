@@ -310,6 +310,84 @@ export function Toggle({
   );
 }
 
+/* ------------------------------------------------------- Fiber Buttons ----- */
+/* Fiber DS Button — solid (primary fill) and outline (primary) variants.
+ * Tokens mirror ds/ButtonPage exactly: brand bold fill #7c33b5 → hover
+ * #702ea3; outline brand border/foreground with a 8% brand hover tint;
+ * neutral disabled surface/foreground; 2px focus ring offset by the surface. */
+
+const BUTTON_FOCUS_RING =
+  "0 0 0 2px var(--surface-background-lvl1,#ffffff), 0 0 0 4px var(--border-dynamic-brand-selected,#7c33b5)";
+
+export function FiberButton({
+  variant,
+  children,
+  onClick,
+  disabled = false,
+  loading = false,
+  ariaLabel,
+}: {
+  variant: "solid" | "outline";
+  children: ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+  loading?: boolean;
+  ariaLabel?: string;
+}) {
+  const [hover, setHover] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const inactive = disabled || loading;
+  const style: CSSProperties = { fontFamily: FONT };
+  if (variant === "solid") {
+    style.backgroundColor = inactive
+      ? "var(--container-dynamic-neutral-subtle-background-disabled, #7171801a)"
+      : hover
+        ? "var(--container-dynamic-brand-bold-background-hover, #702ea3)"
+        : "var(--container-dynamic-brand-bold-background-default, #7c33b5)";
+    style.color = inactive
+      ? "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)"
+      : "var(--container-dynamic-brand-bold-foreground-default, #ffffff)";
+  } else {
+    style.border = `1px solid ${
+      inactive
+        ? "var(--border-dynamic-neutral-subtle-default, #c6c6cc)"
+        : "var(--border-dynamic-brand-default, #7c33b5)"
+    }`;
+    style.backgroundColor = !inactive && hover ? "#7c33b514" : "transparent";
+    style.color = inactive
+      ? "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)"
+      : "var(--surface-foreground-dynamic-brand-default, #7c33b5)";
+  }
+  if (focused && !inactive) style.boxShadow = BUTTON_FOCUS_RING;
+  return (
+    <button
+      type="button"
+      disabled={inactive}
+      aria-disabled={inactive}
+      aria-busy={loading || undefined}
+      aria-label={ariaLabel}
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onFocus={(e) => setFocused(e.currentTarget.matches(":focus-visible"))}
+      onBlur={() => setFocused(false)}
+      className={`inline-flex h-[var(--height-34,34px)] items-center justify-center gap-[var(--numbers-6,6px)] whitespace-nowrap rounded-[var(--radiuses-small,2px)] px-[var(--spacing-150,12px)] text-[length:var(--body-md-medium-size,14px)] font-medium [font-weight:var(--body-md-medium-weight,500)] leading-[var(--body-md-medium-line-height,20px)] outline-none transition-colors duration-150 ${
+        inactive ? "cursor-not-allowed" : "cursor-pointer active:brightness-95"
+      }`}
+      style={style}
+    >
+      {loading && (
+        <span
+          aria-hidden
+          className="size-[14px] shrink-0 animate-spin rounded-full border-2 border-solid"
+          style={{ borderColor: "currentColor", borderTopColor: "transparent" }}
+        />
+      )}
+      {children}
+    </button>
+  );
+}
+
 /* -------------------------------------------------------------- Chip ------- */
 
 export function Chip({
@@ -632,6 +710,8 @@ type SearchableDropdownCommonProps = {
   id: string;
   label: string;
   options: Option[];
+  /** Trigger text for an empty multi-selection when no "all" option exists. */
+  emptyLabel?: string;
   disabled?: boolean;
   compact?: boolean;
   align?: "left" | "right";
@@ -658,6 +738,7 @@ export function SearchableDropdown({
   value,
   options,
   onChange,
+  emptyLabel,
   disabled = false,
   compact = false,
   align = "left",
@@ -679,7 +760,7 @@ export function SearchableDropdown({
   const allOption = options.find((o) => o.value === "all");
   const triggerText = multiple
     ? selectedValues.length === 0
-      ? allOption?.label ?? "All"
+      ? emptyLabel ?? allOption?.label ?? "All"
       : selectedValues.length === 1
         ? selected?.label ?? "1 selected"
         : `${selectedValues.length} selected`

@@ -32,8 +32,10 @@ export const MOSAIC: Option[] = [
   { value: "rental-hubs", label: "Rental Hubs" },
   { value: "vintage-value", label: "Vintage Value" },
 ];
-export const AGE: Option[] = [
-  { value: "all", label: "All ages" },
+/* Combined Age & gender multi-select: All genders / Male / Female crossed
+ * with the six confirmed age bands (18 combinations). Empty selection means
+ * the inclusive "all audiences" default. */
+const AGE_BANDS: { value: string; label: string }[] = [
   { value: "16-24", label: "16–24" },
   { value: "25-34", label: "25–34" },
   { value: "35-44", label: "35–44" },
@@ -41,18 +43,28 @@ export const AGE: Option[] = [
   { value: "55-64", label: "55–64" },
   { value: "65plus", label: "65+" },
 ];
-export const GENDER: Option[] = [
-  { value: "all", label: "All genders" },
-  { value: "female", label: "Female" },
+const GENDER_GROUPS: { value: string; label: string }[] = [
+  { value: "allg", label: "All genders" },
   { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
 ];
+/* Exactly the 18 requested combinations — the inclusive "all audiences"
+ * state is the empty selection, not an extra option. */
+export const AGE_GENDER: Option[] = GENDER_GROUPS.flatMap((g) =>
+  AGE_BANDS.map((a) => ({
+    value: `${g.value}-${a.value}`,
+    label: `${g.label} ${a.label}`,
+  })),
+);
 export const CHILDREN: Option[] = [
-  { value: "all", label: "Any household" },
-  { value: "with", label: "Children in household" },
-  { value: "without", label: "No children" },
+  { value: "all", label: "All households" },
+  { value: "none", label: "No children" },
+  { value: "0-4", label: "Children 0–4" },
+  { value: "5-11", label: "Children 5–11" },
+  { value: "12-17", label: "Children 12–17" },
 ];
 
-/* EU markets: simpler Heavy / Medium / Light TV consumption classifications. */
+/* Heavy / Medium / Light TV consumption — available for all markets. */
 export const CONSUMPTION_TIER: Option[] = [
   { value: "all", label: "All viewers" },
   { value: "heavy", label: "Heavy TV" },
@@ -70,26 +82,36 @@ export const DATE_RANGE: Option[] = [
 
 export type Filters = {
   market: string;
-  // UK dimensions
   mosaic: string[];
-  age: string[];
-  gender: string[];
+  /** Combined Age & gender combos (empty = all audiences). */
+  ageGender: string[];
   children: string[];
-  // EU dimension
+  /** Heavy / Medium / Light TV consumption — all markets. */
   tier: string;
-  // shared
   dateRange: string;
 };
 
 export const DEFAULT_FILTERS: Filters = {
   market: "UK",
   mosaic: [],
-  age: [],
-  gender: [],
+  ageGender: [],
   children: [],
   tier: "all",
   dateRange: "l30d",
 };
+
+export function filtersEqual(a: Filters, b: Filters): boolean {
+  const same = (x: string[], y: string[]) =>
+    x.length === y.length && [...x].sort().join(",") === [...y].sort().join(",");
+  return (
+    a.market === b.market &&
+    a.tier === b.tier &&
+    a.dateRange === b.dateRange &&
+    same(a.mosaic, b.mosaic) &&
+    same(a.ageGender, b.ageGender) &&
+    same(a.children, b.children)
+  );
+}
 
 export function isUK(f: Filters): boolean {
   return f.market === "UK";
@@ -102,7 +124,7 @@ export function isEmptyCombo(f: Filters): boolean {
 
 export function seedKey(f: Filters, extra = ""): string {
   const selected = (values: string[]) => [...values].sort().join(",") || "all";
-  return `${f.market}|${selected(f.mosaic)}|${selected(f.age)}|${selected(f.gender)}|${selected(f.children)}|${f.tier}|${f.dateRange}|${extra}`;
+  return `${f.market}|${selected(f.mosaic)}|${selected(f.ageGender)}|${selected(f.children)}|${f.tier}|${f.dateRange}|${extra}`;
 }
 
 /* --------------------------------------------- coherent entity model ------ *

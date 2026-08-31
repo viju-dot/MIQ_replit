@@ -40,6 +40,7 @@ import {
   SmartCard,
   CardBody,
   Chip,
+  FiberButton,
   SearchableDropdown,
   Toggle,
   TabsBarRounded,
@@ -54,14 +55,13 @@ import { CHART } from "./chartTokens";
 import {
   MARKETS,
   MOSAIC,
-  AGE,
-  GENDER,
+  AGE_GENDER,
   CHILDREN,
   CONSUMPTION_TIER,
   DATE_RANGE,
   LOOKBACK,
   DEFAULT_FILTERS,
-  isUK,
+  filtersEqual,
   isEmptyCombo,
   seedKey,
   marketMult,
@@ -182,8 +182,22 @@ function EnvControl({
 
 export default function V5ContentPlanner({ instanceId }: { instanceId: string }) {
   const controlId = (name: string) => `${instanceId}-v5-${name}`;
+  // Staged (draft) vs applied filters: dropdown edits only stage changes;
+  // dashboard data re-derives exclusively from `filters` once Apply is hit.
+  const [draftFilters, setDraftFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [env, setEnv] = useState<"all" | "commercials">("all");
+  // PDF export lifecycle.
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+  const exportRef = useRef<HTMLDivElement>(null);
+  // Latest applied context, read at the exact moment the DOM is captured so
+  // the PDF header always matches the dashboard state in the capture (guards
+  // against Apply/environment changes while the export libraries load).
+  const exportContextRef = useRef<{ filters: Filters; commercials: boolean }>({
+    filters: DEFAULT_FILTERS,
+    commercials: false,
+  });
   const commercials = env === "commercials";
 
   // Cross-filter selections.
@@ -207,8 +221,8 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
   const [loading, setLoading] = useState(false);
   const firstRender = useRef(true);
 
-  const uk = isUK(filters);
   const empty = isEmptyCombo(filters);
+  exportContextRef.current = { filters, commercials };
   const mult = marketMult(filters.market);
   const market = filters.market;
 
@@ -262,31 +276,31 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [temporalTab, market, commercials]);
 
-  function updateFilter(
-    key: "market" | "tier" | "dateRange",
-    value: string,
-  ) {
-    setFilters((prev) => {
-      const next = { ...prev, [key]: value };
-      if (key === "market") {
-        if (value !== "UK") {
-          next.mosaic = [];
-          next.age = [];
-          next.gender = [];
-          next.children = [];
-        } else {
-          next.tier = "all";
-        }
-      }
-      return next;
-    });
+  // Draft-only updaters: nothing re-derives until Apply.
+  function updateDraft(key: "market" | "tier" | "dateRange", value: string) {
+    setDraftFilters((prev) => ({ ...prev, [key]: value }));
   }
-
-  function updateMultiFilter(
-    key: "mosaic" | "age" | "gender" | "children",
+  function updateDraftMulti(
+    key: "mosaic" | "ageGender" | "children",
     value: string[],
   ) {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    setDraftFilters((prev) => ({ ...prev, [key]: value }));
+  }
+
+  const hasPendingChanges = !filtersEqual(draftFilters, filters);
+  const appliedIsDefault = filtersEqual(filters, DEFAULT_FILTERS);
+  // Solid action: Apply while staged changes exist; Clear all filters once
+  // non-default filters are applied; disabled when everything is default.
+  const actionMode: "apply" | "clear" =
+    hasPendingChanges || appliedIsDefault ? "apply" : "clear";
+  const actionDisabled = !hasPendingChanges && appliedIsDefault;
+  function handleFilterAction() {
+    if (hasPendingChanges) {
+      setFilters({ ...draftFilters });
+    } else {
+      setDraftFilters({ ...DEFAULT_FILTERS });
+      setFilters({ ...DEFAULT_FILTERS });
+    }
   }
 
   const selectedTypeName = CONSUMPTION_TYPES.find((t) => t.key === selectedType)?.name ?? null;
@@ -642,18 +656,127 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
     ];
   }, [filters, commercials, mult]);
 
-  const hasGlobalFilterChanges =
-    filters.market !== DEFAULT_FILTERS.market ||
-    filters.dateRange !== DEFAULT_FILTERS.dateRange ||
-    filters.tier !== DEFAULT_FILTERS.tier ||
-    filters.mosaic.length > 0 ||
-    filters.age.length > 0 ||
-    filters.gender.length > 0 ||
-    filters.children.length > 0;
+  /* ---- Export PDF: capture the applied dashboard into a paginated A4 PDF.
+   * The sticky filter bar and any collaboration overlays are excluded from
+   * capture; the applied filter context is written as a text header instead
+   * (the on-screen dropdowns may show staged, not-yet-applied values). */
+  const optLabel = (opts: { value: string; label: string }[], v: string) =>
+    opts.find((o) => o.value === v)?.label ?? v;
+  const multiLabel = (
+    opts: { value: string; label: string }[],
+    values: string[],
+    allLabel: string,
+  ) =>
+    values.length === 0
+      ? allLabel
+      : values.map((v) => optLabel(opts, v)).join(", ");
+
+  async function handleExportPdf() {
+    if (exporting) return;
+    setExportError(null);
+    setExporting(true);
+    try {
+      const el = exportRef.current;
+      if (!el) throw new Error("Dashboard is not ready to export yet.");
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
+      // Let the two buttons repaint into their loading/disabled state first.
+      await new Promise((resolve) => setTimeout(resolve, 60));
+      // Snapshot the applied context at the same moment html2canvas clones the
+      // DOM, so the header/filename always match the captured dashboard even
+      // if filters were re-applied while the export libraries loaded.
+      const snapshot = exportContextRef.current;
+      const appliedFilters = snapshot.filters;
+      const appliedCommercials = snapshot.commercials;
+      const canvas = await html2canvas(el, {
+        scale: 2,
+        backgroundColor: "#f7f7fa",
+        useCORS: true,
+        logging: false,
+        windowWidth: el.scrollWidth,
+        ignoreElements: (node) =>
+          node instanceof Element &&
+          (node.hasAttribute("data-export-exclude") ||
+            node.hasAttribute("data-annotation-overlay") ||
+            node.hasAttribute("data-collab-overlay")),
+      });
+      if (!canvas.width || !canvas.height) {
+        throw new Error("Nothing could be captured from the dashboard.");
+      }
+      const pdf = new jsPDF({ unit: "pt", format: "a4", orientation: "portrait" });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 36;
+      const contentW = pageW - margin * 2;
+
+      // Header: title + applied filter context.
+      let y = margin;
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(14);
+      pdf.setTextColor(19, 19, 26);
+      pdf.text("TV Audience & Content Planner", margin, y + 4);
+      y += 22;
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9);
+      pdf.setTextColor(75, 75, 89);
+      const contextLines = [
+        `Country: ${optLabel(MARKETS, appliedFilters.market)}   ·   Date range: ${optLabel(DATE_RANGE, appliedFilters.dateRange)}   ·   Viewing environment: ${appliedCommercials ? "Addressable channels" : "All"}`,
+        `Mosaic group: ${multiLabel(MOSAIC, appliedFilters.mosaic, "All Mosaic groups")}`,
+        `Age & gender: ${multiLabel(AGE_GENDER, appliedFilters.ageGender, "All ages & genders")}`,
+        `TV consumption: ${optLabel(CONSUMPTION_TIER, appliedFilters.tier)}   ·   Children: ${multiLabel(CHILDREN, appliedFilters.children, "All households")}`,
+        `Exported ${new Date().toLocaleString("en-GB")} — figures are illustrative synthetic data.`,
+      ];
+      for (const line of contextLines) {
+        const wrapped = pdf.splitTextToSize(line, contentW) as string[];
+        pdf.text(wrapped, margin, y + 3);
+        y += wrapped.length * 12;
+      }
+      y += 8;
+      pdf.setDrawColor(225, 225, 232);
+      pdf.line(margin, y, pageW - margin, y);
+      y += 10;
+
+      // Paginate the capture: slice the canvas into page-height chunks.
+      const pxPerPt = canvas.width / contentW;
+      let offsetPx = 0;
+      let firstPage = true;
+      while (offsetPx < canvas.height - 1) {
+        if (!firstPage) {
+          pdf.addPage();
+          y = margin;
+        }
+        const availPt = pageH - margin - y;
+        const slicePx = Math.min(canvas.height - offsetPx, Math.floor(availPt * pxPerPt));
+        if (slicePx <= 0) break;
+        const slice = document.createElement("canvas");
+        slice.width = canvas.width;
+        slice.height = slicePx;
+        const ctx = slice.getContext("2d");
+        if (!ctx) throw new Error("Could not prepare the PDF page image.");
+        ctx.drawImage(canvas, 0, offsetPx, canvas.width, slicePx, 0, 0, canvas.width, slicePx);
+        pdf.addImage(slice.toDataURL("image/jpeg", 0.92), "JPEG", margin, y, contentW, slicePx / pxPerPt);
+        offsetPx += slicePx;
+        firstPage = false;
+      }
+
+      const stamp = new Date().toISOString().slice(0, 10);
+      pdf.save(`tv-audience-content-planner-${appliedFilters.market.toLowerCase()}-${stamp}.pdf`);
+    } catch (err) {
+      setExportError(
+        err instanceof Error && err.message
+          ? `Export failed: ${err.message}`
+          : "Export failed — please try again.",
+      );
+    } finally {
+      setExporting(false);
+    }
+  }
 
   /* ------------------------------------------------------------- render --- */
   return (
-    <div className="flex flex-col gap-[var(--spacing-300,24px)]" style={{ fontFamily: FONT }}>
+    <div className="flex flex-col gap-[var(--spacing-300,24px)]" style={{ fontFamily: FONT }} ref={exportRef}>
       {/* 1 — Header (compact) */}
       <header className="flex flex-col gap-[var(--spacing-25,2px)]">
         <h2
@@ -667,9 +790,12 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
         </p>
       </header>
 
-      {/* 2 — Global filters (sticky, market-configurable) */}
+      {/* 2 — Global filters (sticky; staged until Apply). Excluded from the
+          PDF capture — the applied filter context is written into the PDF
+          header instead, so staged edits never leak into an export. */}
       <div
         data-annotate="Global filters"
+        data-export-exclude
         className="sticky z-40 -mx-6 px-6 py-[var(--spacing-150,12px)] md:-mx-10 md:px-10"
         style={{ top: "var(--tv-filter-top, 0px)", backgroundColor: SURFACE2, borderBottom: `1px solid ${GRID}` }}
       >
@@ -677,32 +803,38 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
           data-annotate="Audience filter group"
           className="flex flex-wrap items-end gap-[var(--spacing-150,12px)]"
         >
-          <SearchableDropdown id={controlId("market")} label="Country" value={filters.market} options={MARKETS} onChange={(v) => updateFilter("market", v)} fullWidth />
-          {uk ? (
-            <>
-              <SearchableDropdown id={controlId("mosaic")} label="Mosaic group" value={filters.mosaic} options={MOSAIC} onChange={(v) => updateMultiFilter("mosaic", v)} multiple fullWidth />
-              <SearchableDropdown id={controlId("age")} label="Age" value={filters.age} options={AGE} onChange={(v) => updateMultiFilter("age", v)} multiple fullWidth />
-              <SearchableDropdown id={controlId("gender")} label="Gender" value={filters.gender} options={GENDER} onChange={(v) => updateMultiFilter("gender", v)} multiple fullWidth />
-              <SearchableDropdown id={controlId("children")} label="Children" value={filters.children} options={CHILDREN} onChange={(v) => updateMultiFilter("children", v)} multiple fullWidth />
-            </>
-          ) : (
-            <SearchableDropdown id={controlId("tier")} label="TV consumption" value={filters.tier} options={CONSUMPTION_TIER} onChange={(v) => updateFilter("tier", v)} fullWidth />
-          )}
-          <SearchableDropdown id={controlId("daterange")} label="Date range" value={filters.dateRange} options={DATE_RANGE} onChange={(v) => updateFilter("dateRange", v)} fullWidth />
-          <button
-            type="button"
-            disabled={!hasGlobalFilterChanges}
-            onClick={() => setFilters({ ...DEFAULT_FILTERS })}
-            className="h-[36px] whitespace-nowrap rounded-[var(--radius-50,4px)] px-[var(--spacing-150,12px)] text-[length:var(--body-md-medium-size,14px)] font-medium transition-colors hover:bg-[var(--container-dynamic-brand-subtle-background-hover,#ead7f7)] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
-            style={{ color: CHART.selected }}
-          >
-            Clear filter
-          </button>
+          <SearchableDropdown id={controlId("market")} label="Country" value={draftFilters.market} options={MARKETS} onChange={(v) => updateDraft("market", v)} fullWidth />
+          <SearchableDropdown id={controlId("mosaic")} label="Mosaic group" value={draftFilters.mosaic} options={MOSAIC} onChange={(v) => updateDraftMulti("mosaic", v)} multiple fullWidth />
+          <SearchableDropdown id={controlId("age-gender")} label="Age & gender" value={draftFilters.ageGender} options={AGE_GENDER} onChange={(v) => updateDraftMulti("ageGender", v)} emptyLabel="All ages & genders" multiple fullWidth />
+          <SearchableDropdown id={controlId("tier")} label="TV consumption" value={draftFilters.tier} options={CONSUMPTION_TIER} onChange={(v) => updateDraft("tier", v)} fullWidth />
+          <SearchableDropdown id={controlId("children")} label="Children" value={draftFilters.children} options={CHILDREN} onChange={(v) => updateDraftMulti("children", v)} multiple fullWidth />
+          <SearchableDropdown id={controlId("daterange")} label="Date range" value={draftFilters.dateRange} options={DATE_RANGE} onChange={(v) => updateDraft("dateRange", v)} fullWidth />
+          <div className="flex items-end gap-[var(--spacing-100,8px)]">
+            <FiberButton
+              variant="solid"
+              disabled={actionDisabled}
+              onClick={handleFilterAction}
+            >
+              {actionMode === "apply" ? "Apply" : "Clear all filters"}
+            </FiberButton>
+            <FiberButton
+              variant="outline"
+              loading={exporting}
+              onClick={handleExportPdf}
+              ariaLabel="Export the applied dashboard as a PDF"
+            >
+              {exporting ? "Exporting…" : "Export PDF"}
+            </FiberButton>
+          </div>
         </div>
-        <p className="mt-[var(--spacing-75,6px)] text-[length:var(--body-sm-regular-size,12px)]" style={{ color: MUTED }}>
-          {uk
-            ? "UK market: granular Mosaic group, Age, Gender and Children-in-household inputs."
-            : "EU markets use simpler Heavy / Medium / Light TV consumption. Mosaic / Age / Gender are UK-only."}
+        <p className="mt-[var(--spacing-75,6px)] text-[length:var(--body-sm-regular-size,12px)]" style={{ color: MUTED }} aria-live="polite">
+          {exportError ? (
+            <span style={{ color: ERROR_FG }} role="alert">{exportError}</span>
+          ) : hasPendingChanges ? (
+            "Filter changes are staged — press Apply to update the dashboard."
+          ) : (
+            "Filters apply to all markets. Selections update the dashboard only after Apply."
+          )}
         </p>
       </div>
 
