@@ -44,6 +44,7 @@ import {
   Toggle,
   TabsBarRounded,
   TabsBarUnderline,
+  AlertInfo,
   SectionHeading,
   fmtInt,
   fmtK,
@@ -59,7 +60,6 @@ import {
   CONSUMPTION_TIER,
   DATE_RANGE,
   LOOKBACK,
-  TOP_N,
   DEFAULT_FILTERS,
   isUK,
   isEmptyCombo,
@@ -196,8 +196,7 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
   const [channelTab, setChannelTab] = useState("Linear TV");
   // §6 Trends controls.
   const [trendsView, setTrendsView] = useState("Shows");
-  const [topN, setTopN] = useState("10");
-  const [showsFilter, setShowsFilter] = useState("all");
+  const [trendsTvTab, setTrendsTvTab] = useState("Linear TV");
   const [selectedShow, setSelectedShow] = useState<string | null>(null);
   const [migrationShow, setMigrationShow] = useState("all");
   // §7 Temporal controls.
@@ -240,13 +239,13 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
   // genre selected under "All" is cleared so the scoped pool is coherent and
   // reverting to All restores the full mix.
   useEffect(() => {
-    setShowsFilter("all");
     if (!scopeTvType) {
       // Reverted to All: leave tabs where the user left them.
       return;
     }
     const label = tvTypeToTabLabel(scopeTvType);
     setChannelTab(label);
+    setTrendsTvTab(label);
     setTemporalTab(label);
     setTemporalChannel("All");
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -397,26 +396,26 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
       .sort((a, b) => b.index - a.index);
   }, [filters, selectedGenre, commercials, market, mult, scopeTvType]);
 
-  const showFilterOptions = useMemo(() => {
-    const gset = Array.from(new Set(shows.map((s) => s.genre)));
-    return [{ value: "all", label: "All shows" }, ...gset.map((g) => ({ value: g, label: g }))];
-  }, [shows]);
+  const trendShows = useMemo(
+    () =>
+      shows.filter(
+        (show) =>
+          platformType(market, show.network) === tabToType(trendsTvTab),
+      ),
+    [shows, market, trendsTvTab],
+  );
 
-  const filteredShows = useMemo(() => {
-    let base = shows;
-    if (showsFilter !== "all") base = base.filter((s) => s.genre === showsFilter);
-    return base.slice(0, Number(topN));
-  }, [shows, showsFilter, topN]);
+  const filteredShows = useMemo(() => trendShows.slice(0, 10), [trendShows]);
 
   const showSelectOptions = useMemo(
     () => [
       { value: "all", label: "Select a show…" },
-      ...Array.from(new Set(shows.map((show) => show.title))).map((title) => ({
+      ...Array.from(new Set(trendShows.map((show) => show.title))).map((title) => ({
         value: title,
         label: title,
       })),
     ],
-    [shows],
+    [trendShows],
   );
   const migrationShowOptions = useMemo(
     () => [
@@ -432,12 +431,17 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
   // Downstream selections must always belong to the currently scoped show
   // universe. Consumption scope and audience filters can both shrink it.
   useEffect(() => {
-    const available = new Set(shows.map((show) => show.title));
-    if (selectedShow && !available.has(selectedShow)) setSelectedShow(null);
-    if (migrationShow !== "all" && !available.has(migrationShow)) {
+    const availableTrendShows = new Set(
+      trendShows.map((show) => show.title),
+    );
+    const availableShows = new Set(shows.map((show) => show.title));
+    if (selectedShow && !availableTrendShows.has(selectedShow)) {
+      setSelectedShow(null);
+    }
+    if (migrationShow !== "all" && !availableShows.has(migrationShow)) {
       setMigrationShow("all");
     }
-  }, [shows, selectedShow, migrationShow]);
+  }, [shows, trendShows, selectedShow, migrationShow]);
 
   const showTrend = useMemo(() => {
     if (!selectedShow) return [];
@@ -447,7 +451,7 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
         seeded(
           seedKey(
             filters,
-            `show-trend-households-${selectedShow}-${period}-${scopeTvType ?? "all"}`,
+            `show-trend-households-${selectedShow}-${period}-${tabToType(trendsTvTab)}`,
           ),
           650_000,
           4_800_000,
@@ -457,14 +461,14 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
         seeded(
           seedKey(
             filters,
-            `show-trend-minutes-${selectedShow}-${period}-${scopeTvType ?? "all"}`,
+            `show-trend-minutes-${selectedShow}-${period}-${tabToType(trendsTvTab)}`,
           ),
           18,
           96,
         ),
       ),
     }));
-  }, [filters, selectedShow, scopeTvType, mult]);
+  }, [filters, selectedShow, trendsTvTab, mult]);
 
   /* ---- §7 Temporal heatmap ---- */
   const temporalChannelOptions = useMemo(() => {
@@ -825,6 +829,22 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
           </div>
         }
       >
+        {trendsView === "Shows" && (
+          <div
+            className="mb-[var(--spacing-150,12px)] flex flex-col gap-[var(--spacing-100,8px)]"
+            data-annotate="Trends TV filters"
+          >
+            <TabsBarUnderline
+              options={TAB_LABELS}
+              value={trendsTvTab}
+              onChange={setTrendsTvTab}
+              ariaLabel="Content viewership trends TV type"
+            />
+            <AlertInfo
+              title={`You're viewing the top 10 ${trendsTvTab} shows for this audience.`}
+            />
+          </div>
+        )}
         <CardBody
           loading={loading}
           empty={empty || (trendsView === "Shows" && filteredShows.length === 0)}
@@ -881,33 +901,24 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
               barUnit=" min"
               secondaryBarUnit="%"
               legendRight={
-                <>
-                  <SearchableDropdown id={controlId("topn")} label="" value={topN} options={TOP_N} onChange={setTopN} compact align="right" />
-                  <SearchableDropdown id={controlId("showsfilter")} label="" value={showsFilter} options={showFilterOptions} onChange={setShowsFilter} compact align="right" />
-                  <SearchableDropdown
-                    id={controlId("show-jump")}
-                    label="Show"
-                    value="all"
-                    options={showSelectOptions}
-                    onChange={(value) =>
-                      setSelectedShow(value === "all" ? null : value)
-                    }
-                    compact
-                    align="right"
-                  />
-                </>
+                <SearchableDropdown
+                  id={controlId("show-jump")}
+                  label="Show"
+                  value="all"
+                  options={showSelectOptions}
+                  onChange={(value) =>
+                    setSelectedShow(value === "all" ? null : value)
+                  }
+                  compact
+                  align="right"
+                />
               }
               selectedIndex={null}
               onSelect={(index) => {
                 const show = filteredShows[index];
                 if (show) setSelectedShow(show.title);
               }}
-              minChartWidth={
-                filteredShows.length > 10
-                  ? filteredShows.length * 64 + 180
-                  : undefined
-              }
-              scrollAriaLabel={`Top ${filteredShows.length} shows chart. Scroll horizontally to view all shows.`}
+              scrollAriaLabel="Top 10 shows chart"
             />
           ) : (
             <ComboChart
