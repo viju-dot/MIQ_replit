@@ -12,6 +12,7 @@ export const CHART = {
   /* Explicit Fiber qualitative pair used by two-series bar charts. */
   qualitative1: "var(--datavis-qualitative-1, #fbbb3b)",
   qualitative2: "var(--datavis-qualitative-2, #ef8736)",
+  qualitative4: "var(--datavis-qualitative-4, #7c33b5)",
   /* Primary categorical / bar colour. */
   primary: "var(--datavis-qualitative-4, #7c33b5)",
   /* Secondary category (e.g. Streaming). */
