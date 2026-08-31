@@ -973,7 +973,8 @@ export function ShowTrendChart({
       </div>
       <svg
         viewBox={`0 0 ${width} ${height}`}
-        className="h-auto max-h-[210px] w-full overflow-visible"
+        preserveAspectRatio="none"
+        className="h-[210px] w-full overflow-visible"
         role="img"
         aria-label="Four-week dual-axis line chart. Left axis average minutes per household; right axis households watching."
       >
