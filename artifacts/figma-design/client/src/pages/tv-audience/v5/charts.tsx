@@ -690,7 +690,7 @@ export function DualAxisBarChart({
   secondaryLabel: string;
 }) {
   const [hover, setHover] = useState<number | null>(null);
-  const primaryColor = CHART.qualitative4;
+  const primaryColor = CHART.qualitative3;
   const secondaryColor = CHART.qualitative1;
   const plotW = 720;
   const plotH = 230;
