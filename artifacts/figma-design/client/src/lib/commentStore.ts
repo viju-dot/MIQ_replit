@@ -455,30 +455,6 @@ const commentMigrationKey = (prototypeId: string) =>
 const commentMigrationFailuresKey = (prototypeId: string) =>
   `fiber:collab:migration-failures:comments:${prototypeId}`;
 
-function commentMigrationComplete(prototypeId: string): boolean {
-  try {
-    return window.localStorage.getItem(commentMigrationKey(prototypeId)) === "true";
-  } catch {
-    return false;
-  }
-}
-
-function readCommentMigrationFailures(prototypeId: string): Set<string> {
-  try {
-    const raw = window.localStorage.getItem(
-      commentMigrationFailuresKey(prototypeId),
-    );
-    const parsed: unknown = raw ? JSON.parse(raw) : [];
-    return new Set(
-      Array.isArray(parsed)
-        ? parsed.filter((id): id is string => typeof id === "string")
-        : [],
-    );
-  } catch {
-    return new Set();
-  }
-}
-
 function finishCommentMigration(
   prototypeId: string,
   failedIds: string[],
@@ -528,9 +504,13 @@ function cacheComments(prototypeId: string, comments: PrototypeComment[]): void 
 }
 
 /**
- * Load the shared database state, then migrate browser-local records missing by
- * id. An unreachable API deliberately yields an empty live store: the database
- * is the source of truth and the prototype must remain usable without crashing.
+ * Load the shared database state, then reconcile every browser-local record
+ * missing by id. Reconciliation runs after every successful load so a comment
+ * whose initial background PUT failed is retried on the next visit, even when
+ * the older one-time migration had already completed.
+ *
+ * An unreachable API deliberately yields an empty live store: the database is
+ * the source of truth and the prototype must remain usable without crashing.
  */
 export async function hydrateComments(prototypeId: string): Promise<void> {
   try {
@@ -549,12 +529,10 @@ export async function hydrateComments(prototypeId: string): Promise<void> {
       (comment) =>
         comment.prototypeId === prototypeId && !remoteIds.has(comment.id),
     );
-    const previousFailures = readCommentMigrationFailures(prototypeId);
-    const migrationCandidates = commentMigrationComplete(prototypeId)
-      ? []
-      : previousFailures.size > 0
-        ? localMissing.filter((comment) => previousFailures.has(comment.id))
-        : localMissing;
+    // A completed historical migration must not suppress retries for comments
+    // added later whose background save failed. PUT is idempotent by comment id,
+    // so retrying every server-missing local record is safe.
+    const migrationCandidates = localMissing;
     const migrated: PrototypeComment[] = [];
     const migrationFailed: PrototypeComment[] = [];
     for (const comment of migrationCandidates) {
@@ -566,12 +544,10 @@ export async function hydrateComments(prototypeId: string): Promise<void> {
         console.warn("[prototype-comments] local migration failed", error);
       }
     }
-    if (!commentMigrationComplete(prototypeId)) {
-      finishCommentMigration(
-        prototypeId,
-        migrationFailed.map((comment) => comment.id),
-      );
-    }
+    finishCommentMigration(
+      prototypeId,
+      migrationFailed.map((comment) => comment.id),
+    );
     // Failed records stay both visible and cached so the next hydration retries
     // them instead of silently discarding browser-local collaboration data.
     cacheComments(prototypeId, [...remote, ...migrated, ...migrationFailed]);
