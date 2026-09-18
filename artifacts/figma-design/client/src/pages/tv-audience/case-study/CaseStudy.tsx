@@ -12,6 +12,8 @@ import {
   ZoomIn
 } from 'lucide-react';
 import './CaseStudy.css';
+import { EditorialMetrics, NarrativePivotBand } from './EditorialMetrics';
+import { UseCaseFlow } from './UseCaseFlow';
 
 const asset = (path: string) => {
   const base = import.meta.env.BASE_URL || '/';
@@ -76,8 +78,16 @@ export default function CaseStudy() {
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
     onScroll();
+    const initialAnchorFrame = requestAnimationFrame(() => {
+      const initialSection = NAV_ANCHORS.find(anchor => `#${anchor.id}` === window.location.hash);
+      if (initialSection) {
+        document.getElementById(initialSection.id)?.scrollIntoView({ behavior: 'auto' });
+        onScroll();
+      }
+    });
     
     return () => {
+      cancelAnimationFrame(initialAnchorFrame);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
       document.title = previousTitle;
@@ -164,24 +174,24 @@ export default function CaseStudy() {
           {/* 01. OVERVIEW */}
           <section id="overview" className="cs-section pt-12 md:pt-24 border-none">
             <p className="cs-eyebrow mb-5">Interactive UX case study · AI-assisted product prototype</p>
-            <h1 className="cs-h1 mb-6 text-gray-900">TV Audience & Content Planner</h1>
-            <p className="cs-p-large text-gray-600 mb-12 max-w-3xl">
+            <h1 className="cs-h1 mb-6">TV Audience &amp; Content Planner</h1>
+            <p className="cs-p-large mb-12 max-w-3xl">
               Turning complex TV audience behaviour into actionable media-planning insights.
             </p>
             
             <button 
-              className="w-full relative rounded-2xl overflow-hidden shadow-2xl mb-12 cursor-pointer group text-left block focus-visible" 
+              className="w-full relative overflow-hidden mb-12 cursor-pointer group text-left block focus-visible rounded-xl"
               onClick={() => openLightbox('/case-study/v5.jpg', 'V5', 'V5 Final Prototype')}
               aria-label="View V5 Final Prototype Screenshot"
             >
-              <div className="absolute inset-0 bg-indigo-900/5 group-hover:bg-transparent transition-colors z-10" />
-              <img src={asset('/case-study/v5.jpg')} alt="V5 Master Dashboard" className="w-full block" />
-              <div className="absolute bottom-4 right-4 z-20 bg-black/80 text-white text-sm font-bold px-4 py-2 rounded-full flex items-center gap-2 backdrop-blur-md">
+              <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors z-10" />
+              <img src={asset('/case-study/v5.jpg')} alt="V5 Master Dashboard" className="cs-hero-preview block" />
+              <div className="absolute bottom-4 right-4 z-20 bg-black text-white text-sm font-semibold px-4 py-2 flex items-center gap-2">
                 <ZoomIn size={16} aria-hidden="true" /> Expand V5 Result
               </div>
             </button>
 
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-6 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm text-sm">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-6 bg-white p-6 border border-gray-200 text-sm">
               <div><div className="text-gray-400 font-bold uppercase tracking-wider mb-1 text-xs">Role</div><div className="font-semibold text-gray-900">{contentData.context.role}</div></div>
               <div><div className="text-gray-400 font-bold uppercase tracking-wider mb-1 text-xs">Timeline</div><div className="font-semibold text-gray-900">{contentData.context.timeline}</div></div>
               <div><div className="text-gray-400 font-bold uppercase tracking-wider mb-1 text-xs">Users</div><div className="font-semibold text-gray-900">{contentData.context.users}</div></div>
@@ -189,8 +199,10 @@ export default function CaseStudy() {
               <div><div className="text-gray-400 font-bold uppercase tracking-wider mb-1 text-xs">Scope</div><div className="font-semibold text-gray-900">{contentData.context.scope} • {contentData.context.status}</div></div>
             </div>
 
-            <div className="mt-6 bg-orange-50 border border-orange-200 p-4 rounded-xl flex gap-3 text-orange-900 text-sm">
-              <Info className="shrink-0 text-orange-600 mt-0.5" size={18} />
+            <EditorialMetrics />
+
+            <div className="mt-6 bg-gray-50 border border-gray-200 p-4 flex gap-3 text-gray-700 text-sm">
+              <Info className="shrink-0 text-gray-500 mt-0.5" size={18} />
               <div>
                 <strong>Evidence Context:</strong> The case study uses available renderer captures of the prototype iterations utilizing synthetic deterministic data. No independent formal user-study outcomes or business impact metrics were documented for Phase 1.
               </div>
@@ -206,8 +218,23 @@ export default function CaseStudy() {
             </p>
 
             <ChallengeCards />
-            <h4 id="users" className="font-display font-bold text-2xl mb-6" style={{scrollMarginTop:120}}>Users & Core Use Cases</h4>
-            <div className="space-y-4">
+            <h4 id="users" className="font-display font-bold text-2xl mb-6 mt-12" style={{scrollMarginTop:120}}>Users & Core Use Cases</h4>
+
+            <UseCaseFlow
+              onExploreKpi={(id) => {
+                const kpi = contentData.kpis.find(k => k.id === id);
+                if(kpi) {
+                  setActiveKpi(kpi);
+                  const target = document.getElementById('kpi-explorer');
+                  if (target) {
+                    target.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+                    target.focus({ preventScroll: true });
+                  }
+                }
+              }}
+            />
+
+            <div className="space-y-4 mt-8">
               {contentData.useCases.map((uc, i) => (
                 <div key={uc.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
                   <button 
@@ -225,12 +252,15 @@ export default function CaseStudy() {
                     <div className="p-6 pt-0 border-t border-gray-100 bg-gray-50/50">
                       <p className="text-lg font-medium text-gray-800 italic mb-4">"{uc.question}"</p>
                       <p className="text-gray-600 mb-6">{uc.detail}</p>
-                      <div className="bg-white p-4 rounded-lg border border-gray-200">
+                      <div className="bg-white p-4 border border-gray-200">
                         <span className="text-xs font-bold uppercase text-gray-500 block mb-2">Required KPIs</span>
                         <div className="flex flex-wrap gap-2">
-                          {uc.kpis.map((kpi, kIdx) => (
-                            <span key={kIdx} className="cs-pill">{kpi}</span>
-                          ))}
+                          {uc.kpis.map((kpiId, kIdx) => {
+                            const kpiObj = contentData.kpis.find(k => k.id === kpiId);
+                            return (
+                              <span key={kIdx} className="cs-pill">{kpiObj ? kpiObj.title : kpiId}</span>
+                            );
+                          })}
                         </div>
                       </div>
                     </div>
@@ -321,12 +351,14 @@ export default function CaseStudy() {
             </div>
 
             {/* KPI EXPLORER */}
-            <h4 className="font-display font-bold text-2xl mb-6">KPI Explorer</h4>
+            <NarrativePivotBand />
+            <h4 id="kpi-explorer" tabIndex={-1} className="font-display font-bold text-2xl mb-6 mt-16 focus-visible:outline-none">KPI Explorer</h4>
             <div className="flex flex-col lg:flex-row gap-6">
               <div className="lg:w-1/3 flex flex-col gap-2">
                 {contentData.kpis.map((kpi) => (
                   <button
                     key={kpi.id}
+                    aria-pressed={activeKpi.id === kpi.id}
                     onClick={() => setActiveKpi(kpi)}
                     className={`text-left p-4 rounded-xl border font-bold transition-all flex items-center justify-between focus-visible ${
                       activeKpi?.id === kpi.id ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg' : 'bg-white border-gray-200 text-gray-700 hover:border-indigo-300 hover:bg-indigo-50'

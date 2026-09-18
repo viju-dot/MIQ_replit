@@ -1,0 +1,152 @@
+.cs-editorial-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin: 4rem 0;
+}
+
+@media (max-width: 820px) {
+  .cs-editorial-metrics {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.cs-insight-card {
+  background: var(--cs-surface);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
+}
+
+.cs-insight-label {
+  font-family: var(--cs-font-body);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--cs-fg-muted);
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+.cs-insight-value {
+  font-family: var(--cs-font-display);
+  font-size: 4rem;
+  font-weight: 500;
+  color: var(--cs-fg);
+  line-height: 1;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.03em;
+}
+
+.cs-insight-segments {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 2rem;
+  height: 30px;
+}
+
+.cs-insight-segment {
+  flex: 1;
+  --stripe-color: var(--cs-surface-alt);
+  background: repeating-linear-gradient(90deg, var(--stripe-color) 0 4px, transparent 4px 8px);
+  transition: background-color 0.3s ease;
+}
+
+.cs-insight-segments.cs-accent-purple .cs-insight-segment.filled {
+  --stripe-color: #6945cc;
+}
+
+.cs-insight-segments.cs-accent-lime .cs-insight-segment.filled {
+  --stripe-color: #b0e750;
+}
+
+.cs-insight-segments.cs-accent-violet .cs-insight-segment.filled {
+  --stripe-color: #ac91dd;
+}
+
+.cs-insight-segments .cs-insight-segment.empty {
+  --stripe-color: var(--cs-surface-alt);
+  opacity: 0.5;
+}
+
+.cs-insight-desc {
+  font-family: var(--cs-font-body);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--cs-fg-muted);
+}
+
+.cs-insight-footnote {
+  font-family: var(--cs-font-body);
+  font-size: 0.75rem;
+  color: var(--cs-fg-muted);
+  margin-top: 1rem;
+  font-style: italic;
+}
+
+/* Narrative Pivot Band */
+.cs-narrative-band {
+  background-color: #2E103C; /* Deep aubergine/purple */
+  color: #FFFFFF;
+  padding: 6rem 2rem;
+  margin: 6rem 0;
+  border-radius: 24px;
+}
+
+.cs-narrative-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.cs-narrative-title {
+  font-family: var(--cs-font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.cs-narrative-text {
+  font-family: var(--cs-font-body);
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 4rem;
+  max-width: 700px;
+}
+
+.cs-narrative-stats {
+  display: flex;
+  gap: 4rem;
+}
+
+@media (max-width: 820px) {
+  .cs-narrative-stats {
+    flex-direction: column;
+    gap: 2rem;
+  }
+}
+
+.cs-narrative-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.cs-narrative-number {
+  font-family: var(--cs-font-display);
+  font-size: 4rem;
+  font-weight: 500;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.cs-narrative-label {
+  font-family: var(--cs-font-body);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.7);
+}
