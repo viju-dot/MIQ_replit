@@ -46,6 +46,7 @@ const ScreenTemplateDetailPage = lazy(() =>
 // Standalone TV Audience Intelligence product page — rendered OUTSIDE the app
 // shell (it has its own Fiber navigation header).
 const TvAudienceApp = lazy(() => import("@/pages/TvAudienceApp"));
+const DoohApp = lazy(() => import("@/pages/DoohApp"));
 
 // Public shared-prototype view — no shell/global header.
 const SharePage = lazy(() => import("@/pages/app/SharePage"));
@@ -89,6 +90,15 @@ function Router() {
       </Route>
 
       {/* Welcome / module selection — standalone (no sidebar), launch screen. */}
+      <Route path="/dooh-planner">
+        <Suspense fallback={null}><DoohApp /></Suspense>
+      </Route>
+      <Route path="/geo-planner">
+        <Suspense fallback={null}><DoohApp /></Suspense>
+      </Route>
+      <Route path="/saved-audiences">
+        <Suspense fallback={null}><DoohApp /></Suspense>
+      </Route>
       <Route path="/">
         <Suspense fallback={null}>
           <DashboardPage />

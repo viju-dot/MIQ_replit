@@ -1,0 +1,61 @@
+/* DOOH Specific Overrides */
+
+.dooh-theme {
+  --dooh-purple: var(--surface-background-miq, #2b0030);
+  --dooh-accent: var(--colours-blue-300, #d194ff);
+}
+
+.dooh-theme .leaflet-container {
+  font-family: inherit;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+
+/* Red custom marker pulse effect or simple styling */
+.dooh-theme .custom-leaflet-marker {
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+}
+
+.dooh-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.dooh-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.dooh-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--surface-background-lvl4, #e1e1e8);
+  border-radius: 4px;
+}
+.dooh-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--surface-background-lvl5, #717180);
+}
+
+.dooh-theme { padding-bottom: 72px; }
+.dooh-theme button:focus-visible,
+.dooh-theme a:focus-visible {
+  outline: 2px solid var(--border-dynamic-brand-default, #7c33b5);
+  outline-offset: 3px;
+}
+.dooh-theme .dooh-map-pane { min-width: 0; min-height: 420px; }
+.dooh-theme .dooh-sidebar { flex-shrink: 0; }
+@media (max-width: 1100px) {
+  .dooh-theme .dooh-workspace { flex-wrap: wrap; overflow: visible; flex: none; }
+  .dooh-theme .dooh-sidebar { width: 300px; max-height: 600px; }
+  .dooh-theme .dooh-map-pane { flex: 1; height: 600px; }
+  .dooh-theme .dooh-overview { width: 100%; }
+  .dooh-theme .dooh-planner { height: auto; min-height: calc(100vh - 64px); overflow: visible; }
+  .dooh-theme .dooh-results { min-height: 320px; }
+  .dooh-header { height: auto; min-height: 64px; flex-wrap: wrap; gap: 12px; padding: 16px; }
+  .dooh-header > div:first-child { flex-wrap: wrap; gap: 12px; }
+}
+@media (max-width: 640px) {
+  .dooh-header { align-items: flex-start; }
+  .dooh-header > div:first-child { width: 100%; flex-direction: column; align-items: flex-start; }
+  .dooh-header nav { gap: 16px; font-size: 13px; flex-wrap: wrap; }
+  .dooh-theme .dooh-sidebar { width: 100%; max-height: none; }
+  .dooh-theme .dooh-map-pane { flex: none; width: 100%; height: 430px; }
+  .dooh-theme .dooh-results table { min-width: 780px; }
+  .dooh-theme main { overflow: visible; }
+}

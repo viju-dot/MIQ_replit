@@ -44,7 +44,7 @@ export interface PrototypeVersion {
   updatedAt: string;
   description?: string;
   /** Selects the functional React renderer independently of this version's id. */
-  rendererKey: "v3" | "v4" | "v5" | "dashboard";
+  rendererKey: "v3" | "v4" | "v5" | "dashboard" | "dooh";
   /** Archived versions remain persisted but are hidden from the active list. */
   status: "active" | "archived";
   metadata?: {
@@ -134,6 +134,29 @@ export function newPassword(): string {
 /* ---------------------------------------------------------------------- */
 
 const SEED: Prototype[] = [
+  {
+    id: "dooh",
+    name: "DOOH",
+    description: "Digital out-of-home planning: build and reuse audiences, find screens, and export campaign shortlists.",
+    status: "Live",
+    route: "/dooh-planner",
+    createdAt: "2026-09-18T00:00:00.000Z",
+    versions: [{
+      id: "dooh_v1",
+      name: "V1",
+      createdAt: "2026-09-18T00:00:00.000Z",
+      updatedAt: "2026-09-18T00:00:00.000Z",
+      description: "Interactive DOOH Planner with GeoPlanner and saved audiences.",
+      rendererKey: "dooh",
+      status: "active",
+      snapshot: {
+        description: "Audience-led DOOH screen discovery with eight filters, interactive UK map, and Excel shortlist export.",
+        status: "Live",
+        notes: "Demo inventory. Shared persisted audience library. Activation is outside this prototype.",
+      },
+    }],
+    share: { enabled: false, token: "", secured: false, password: "" },
+  },
   {
     id: "tv-audience-intelligence",
     name: "TV Audience Intelligence",
@@ -285,6 +308,7 @@ function coerceVersion(raw: unknown, fallbackTs: string): PrototypeVersion | nul
     r.rendererKey === "v3" ||
     r.rendererKey === "v4" ||
     r.rendererKey === "v5" ||
+    r.rendererKey === "dooh" ||
     r.rendererKey === "dashboard"
       ? r.rendererKey
       : fallbackRenderer;

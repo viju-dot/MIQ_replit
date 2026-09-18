@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: dooh-audiences
+    description: Shared saved audience operations for DOOH Planner
 paths:
   /healthz:
     get:
@@ -24,7 +26,126 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /dooh/audiences:
+    get:
+      operationId: listDoohAudiences
+      tags: [dooh-audiences]
+      summary: List active shared audiences
+      responses:
+        "200":
+          description: Active audiences, most recently updated first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Audience"
+    post:
+      operationId: createDoohAudience
+      tags: [dooh-audiences]
+      summary: Save a shared audience
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AudienceInput"
+      responses:
+        "201":
+          description: Audience created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Audience"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /dooh/audiences/{id}:
+    patch:
+      operationId: updateDoohAudience
+      tags: [dooh-audiences]
+      summary: Update an audience name or geography
+      parameters:
+        - $ref: "#/components/parameters/AudienceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AudienceUpdate"
+      responses:
+        "200":
+          description: Audience updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Audience"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    delete:
+      operationId: archiveDoohAudience
+      tags: [dooh-audiences]
+      summary: Soft archive an audience
+      parameters:
+        - $ref: "#/components/parameters/AudienceId"
+      responses:
+        "200":
+          description: Archived audience
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Audience"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /dooh/audiences/{id}/use:
+    post:
+      operationId: useDoohAudience
+      tags: [dooh-audiences]
+      summary: Record use of an audience
+      parameters:
+        - $ref: "#/components/parameters/AudienceId"
+      responses:
+        "200":
+          description: Audience with incremented usage count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Audience"
+        "404":
+          $ref: "#/components/responses/NotFound"
 components:
+  parameters:
+    AudienceId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Audience not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Conflict:
+      description: Audience name already exists
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +154,152 @@ components:
           type: string
       required:
         - status
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+    Coordinate:
+      type: object
+      additionalProperties: false
+      required: [lat, lng]
+      properties:
+        lat:
+          type: number
+          minimum: -90
+          maximum: 90
+        lng:
+          type: number
+          minimum: -180
+          maximum: 180
+        postcode:
+          type: string
+          minLength: 1
+          maxLength: 12
+        city:
+          type: string
+          minLength: 1
+          maxLength: 100
+    PolygonCoordinate:
+      type: object
+      additionalProperties: false
+      required: [lat, lng]
+      properties:
+        lat:
+          type: number
+          minimum: -90
+          maximum: 90
+        lng:
+          type: number
+          minimum: -180
+          maximum: 180
+    GeoDefinition:
+      type: object
+      additionalProperties: false
+      required: [points]
+      properties:
+        points:
+          type: array
+          maxItems: 1000
+          items:
+            $ref: "#/components/schemas/Coordinate"
+        radius:
+          type: number
+          exclusiveMinimum: 0
+          maximum: 100000
+        polygon:
+          type: array
+          minItems: 3
+          maxItems: 1000
+          items:
+            $ref: "#/components/schemas/PolygonCoordinate"
+        coverage:
+          type: string
+          maxLength: 200
+    Audience:
+      type: object
+      additionalProperties: false
+      required:
+        [id, name, createdBy, createdDate, updatedDate, geoType, geoDefinition,
+         coverage, accountId, usageCount, isActive]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        createdBy:
+          type: string
+        createdDate:
+          type: string
+          format: date-time
+        updatedDate:
+          type: string
+          format: date-time
+        geoType:
+          type: string
+          enum: [points, polygon, radius]
+        geoDefinition:
+          $ref: "#/components/schemas/GeoDefinition"
+        coverage:
+          type: string
+        accountId:
+          type: string
+        linkedBrief:
+          type: string
+        usageCount:
+          type: number
+          minimum: 0
+          multipleOf: 1
+        isActive:
+          type: boolean
+    AudienceInput:
+      type: object
+      additionalProperties: false
+      required: [name, geoType, geoDefinition, coverage]
+      properties:
+        name:
+          type: string
+          minLength: 5
+          maxLength: 50
+          pattern: "^[A-Za-z0-9_-]+$"
+        geoType:
+          type: string
+          enum: [points, polygon, radius]
+        geoDefinition:
+          $ref: "#/components/schemas/GeoDefinition"
+        coverage:
+          type: string
+          minLength: 1
+          maxLength: 200
+        createdBy:
+          type: string
+          minLength: 1
+          maxLength: 200
+        accountId:
+          type: string
+          minLength: 1
+          maxLength: 100
+        linkedBrief:
+          type: string
+          minLength: 1
+          maxLength: 200
+    AudienceUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 5
+          maxLength: 50
+          pattern: "^[A-Za-z0-9_-]+$"
+        geoType:
+          type: string
+          enum: [points, polygon, radius]
+        geoDefinition:
+          $ref: "#/components/schemas/GeoDefinition"
+        coverage:
+          type: string
+          minLength: 1
+          maxLength: 200
 
