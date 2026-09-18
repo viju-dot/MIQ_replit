@@ -1,0 +1,1328 @@
+TASK: Create an Interactive UX Case Study for the TV Audience & Content Planner
+
+I want to add a new interactive "Case Study" experience inside the existing TV Audience prototype.
+
+The existing prototype is the primary source of truth. Before making any changes, inspect the entire existing project, all available screens, components, prototype versions, previous iterations, comments/annotations, and any existing documentation/content related to the TV Audience & Content Planner.
+
+Do NOT create a generic portfolio template.
+
+The case study should tell the REAL story of how this product evolved from requirements and early exploration into the current V5 prototype through research, UX decisions, data-visualisation exploration, stakeholder feedback, iterations, and evaluation.
+
+==================================================
+1. ENTRY POINT
+==================================================
+
+Add a new action box/card called:
+
+"Case Study"
+
+Place it alongside the existing actions in the TV Audience prototype.
+
+Supporting copy:
+
+"Explore the problem, process, iterations, decisions and evolution behind the TV Audience & Content Planner."
+
+When the user clicks "Case Study", open a dedicated interactive case-study experience.
+
+This can be:
+- A full-page experience
+OR
+- A dedicated case-study workspace
+
+Choose whichever integrates best with the current prototype architecture.
+
+The Case Study must feel like part of the existing prototype but should have its own visual identity.
+
+IMPORTANT:
+There are NO MiQ brand restrictions for this case study.
+
+Do not force the existing MiQ brand colours, typography, or visual treatment.
+
+This is a portfolio-style UX case study and can use:
+- expressive typography
+- visual storytelling
+- large screenshots
+- annotations
+- timelines
+- cards
+- diagrams
+- interactive comparisons
+- before/after views
+- expandable sections
+- sticky navigation
+- scroll storytelling
+
+The experience should feel polished, modern and editorial rather than like a static documentation page.
+
+==================================================
+2. PRIMARY STORY
+==================================================
+
+The case study should answer these questions naturally throughout the story:
+
+WHY?
+What problem were we trying to solve?
+
+WHO?
+Who were the users and stakeholders?
+
+WHAT?
+What were we building?
+
+WHY WAS IT DIFFICULT?
+What made audience and TV-consumption data difficult to represent?
+
+HOW?
+How did we approach the problem?
+
+WHAT DID WE TRY?
+What different approaches and visualisations did we explore?
+
+WHAT DID WE LEARN?
+What did research, data-visualisation review and stakeholder feedback tell us?
+
+WHAT CHANGED?
+How did the design evolve across versions?
+
+WHY?
+Why did we make each important design decision?
+
+WHAT IS THE RESULT?
+What does the current V5 prototype solve?
+
+WHAT'S NEXT?
+What moves into the next phase?
+
+The story should not simply list activities.
+
+Every major section should explain:
+
+Problem → Exploration → Evidence/Feedback → Decision → Result
+
+==================================================
+3. CASE STUDY STRUCTURE
+==================================================
+
+Create the following storytelling structure.
+
+--------------------------------------------------
+01. HERO
+--------------------------------------------------
+
+Title:
+
+"TV Audience & Content Planner"
+
+Subtitle:
+
+"Turning complex TV audience behaviour into actionable media-planning insights."
+
+Include:
+- Large hero visual from the current prototype
+- Project type
+- Role
+- Scope
+- Timeline
+- Users
+- Markets
+- Current status
+
+Do not invent exact information that does not exist in the project.
+
+Use available project information.
+
+Possible project context:
+
+- Product: TV Audience & Content Planner
+- Role: Product / UX Design
+- Audience: Sales / Trader teams
+- Markets: UK + EU4
+- Phase 1
+- AI-assisted prototyping
+- Data visualisation exploration
+- Stakeholder collaboration
+
+--------------------------------------------------
+02. THE CHALLENGE
+--------------------------------------------------
+
+Create a strong problem statement.
+
+Explain that the product needed to help sales/trader teams understand:
+
+- How audiences consume TV
+- Streaming vs Linear vs FAST
+- Where viewing time is concentrated
+- Which genres audiences over-index on
+- Which shows attract specific audiences
+- When audiences watch
+- How audiences move between content
+- Which platforms are important
+- How audience behaviour can translate into media-planning decisions
+
+Explain the core UX challenge:
+
+"We had a large amount of audience and viewing data, but the challenge was turning that complexity into insights that users could understand, compare and act on."
+
+Show this visually.
+
+Create a "Why this was difficult" section with several complexity cards:
+
+1. Multiple TV consumption types
+2. Multiple metrics
+3. Large datasets
+4. Different audience dimensions
+5. Time-based behaviour
+6. Genre and show relationships
+7. Complex data visualisation
+8. Need for actionable insights
+
+--------------------------------------------------
+03. USERS & USE CASES
+--------------------------------------------------
+
+Explain the primary users.
+
+Primary use case:
+
+Sales / Trader teams need to understand audience consumption so they can make better media-planning and targeting decisions.
+
+Show the three core product use cases:
+
+A. VIEWING BEHAVIOUR
+"How does my audience consume TV?"
+
+B. MEDIA PLANNING
+"Where should I activate to reach this audience?"
+
+C. CONTENT TARGETING
+"What content and genres over-index for this audience?"
+
+Make these interactive cards.
+
+Clicking each card should reveal the related questions and KPIs.
+
+--------------------------------------------------
+04. FROM REQUIREMENTS TO INFORMATION ARCHITECTURE
+--------------------------------------------------
+
+Show how the product was broken into KPI areas.
+
+Use the current agreed Phase 1 KPI structure.
+
+Phase 1 includes:
+
+1. Consumption by Type & Time Spent
+2. Temporal Insights
+3. Viewership by Genre
+4. Top 10 Indexing Shows
+5. Share of Viewing Mins in Each Platform
+6. Cultural Affinity
+7. Migration Signals
+
+Important:
+
+Comparison Mode is NOT part of Phase 1.
+
+Show it separately as:
+
+"Phase 2 — Comparison Mode"
+
+Explain that it was intentionally kept outside the Phase 1 scope.
+
+Do not represent Comparison Mode as a completed Phase 1 feature.
+
+--------------------------------------------------
+05. THE DATA VISUALISATION CHALLENGE
+--------------------------------------------------
+
+This should be one of the strongest sections.
+
+Explain that choosing a chart was not simply a visual-design decision.
+
+The chart needed to communicate:
+
+- What is happening?
+- How much is happening?
+- How does this compare with the national average?
+- Where does viewing happen?
+- When does it happen?
+- What content is driving it?
+- Can the user drill into it?
+- Can the user use the insight for planning?
+
+Introduce the three important metrics:
+
+AVG MIN/WEEK
+Actual viewing time.
+
+% OF WATCH TIME
+Share of the audience's total viewing time.
+
+INDEX
+Relative performance compared with the national average.
+
+Clearly explain:
+
+Index 100 = national average
+Index >100 = over-index
+Index <100 = under-index
+
+IMPORTANT:
+Do not represent Index as "150%" when the value is 150.
+
+Use:
+
+"Index 150"
+
+because Index 150 means 50% above the national average.
+
+Create an interactive metric explainer.
+
+Click each metric to highlight how it is used in the charts.
+
+--------------------------------------------------
+06. EARLY EXPLORATION
+--------------------------------------------------
+
+Use the actual available prototype/version screenshots from the project.
+
+DO NOT invent screenshots.
+
+Find the available early versions and show them chronologically.
+
+For each version, show:
+
+VERSION
+WHAT WE TRIED
+WHY
+WHAT WE LEARNED
+WHAT CHANGED NEXT
+
+Use large screenshots.
+
+Allow the user to click a screenshot to open it in a larger viewer.
+
+If the project contains multiple versions such as V1, V2, V3, V4 and V5, create a visual timeline.
+
+If version names are different, use the actual names found in the project.
+
+Do not rename or fabricate versions.
+
+--------------------------------------------------
+07. VERSION EVOLUTION
+--------------------------------------------------
+
+Create a major interactive section:
+
+"How the design evolved"
+
+Build an interactive version timeline.
+
+Example structure:
+
+V1
+↓
+V2
+↓
+V3
+↓
+V4
+↓
+V5
+
+Each version should have:
+
+- Screenshot
+- Key change
+- Problem addressed
+- Feedback received
+- Decision
+- Result
+
+The user should be able to switch between versions.
+
+Include a "Compare" interaction where possible.
+
+For example:
+
+[Previous Version] → [Current Version]
+
+Use annotations to highlight what changed.
+
+IMPORTANT:
+
+Do not simply show screenshots.
+
+Point out the actual issue in the screenshot.
+
+Use visual callouts such as:
+
+"ISSUE"
+"WHY"
+"CHANGE"
+"RESULT"
+
+Example:
+
+ISSUE:
+Three metrics were competing for attention.
+
+WHY:
+Index, average minutes and percentage values were being interpreted as equivalent metrics.
+
+CHANGE:
+Index was removed from the chart axis and moved to the supporting label/hover.
+
+RESULT:
+The chart hierarchy became easier to understand.
+
+Use this storytelling format throughout the case study.
+
+--------------------------------------------------
+08. STAKEHOLDER FEEDBACK → DESIGN DECISIONS
+--------------------------------------------------
+
+Create an interactive "Feedback → Decision" section.
+
+Use the actual stakeholder feedback that exists in the project.
+
+Important feedback to include:
+
+FEEDBACK #17
+
+The team wanted to show how consumption of a particular TV show changes over time.
+
+Decision:
+Keep the Top Indexing Shows overview and introduce a show-specific drilldown.
+
+The drilldown uses a 2-line time-series chart:
+
+- Households watching
+- Average minutes watched per household
+
+X-axis:
+Time period
+
+Tooltip:
+Both metrics + period
+
+Allow the user to return to the overview.
+
+--------------------------------------------------
+
+FEEDBACK #19
+
+The dropdown should change depending on whether the user selects Genre or Show.
+
+Decision:
+
+View By = Genre
+→ second dropdown shows genres.
+
+View By = Show
+→ second dropdown shows shows.
+
+This becomes a dependent filter interaction.
+
+--------------------------------------------------
+
+FEEDBACK #20
+
+Three metrics/axes were creating confusion.
+
+Decision:
+
+Remove Index as a separate chart axis.
+
+Keep Index as supporting information underneath the category and in the hover state.
+
+Do not introduce a third axis.
+
+--------------------------------------------------
+
+FEEDBACK #22
+
+The secondary metric should be "% of total watch time".
+
+Decision:
+
+Primary metric:
+Avg min/week
+
+Secondary metric:
+% of total watch time
+
+Index:
+Supporting comparison information
+
+--------------------------------------------------
+
+FEEDBACK #18
+
+Index needed to be clearly visible if included.
+
+Decision:
+
+Make Index explicitly labelled and visible as supporting information, while retaining hover details.
+
+Do not create a separate Index axis.
+
+--------------------------------------------------
+
+For each feedback item create:
+
+STAKEHOLDER FEEDBACK
+↓
+UX PROBLEM
+↓
+DESIGN DECISION
+↓
+VISUAL CHANGE
+↓
+OUTCOME
+
+Use the actual wording from project comments where available, but keep quotes short.
+
+--------------------------------------------------
+09. KPI-BY-KPI DESIGN STORY
+--------------------------------------------------
+
+Create an interactive KPI explorer.
+
+Each KPI should have its own card.
+
+When clicked, reveal:
+
+- User question
+- Metric
+- Dimension
+- Chart type
+- Interaction
+- Design rationale
+- Final direction
+
+Use the following requirements.
+
+================================
+KPI 1
+Consumption by Type & Time Spent
+================================
+
+User question:
+
+"How much time does my audience spend watching streaming, FAST and linear TV, and which one should I activate on to reach them?"
+
+Show:
+- Linear
+- Streaming
+- FAST
+- Homescreen where applicable
+
+Explain index vs national average.
+
+The Consumption by Type visualisation acts as a secondary filter for subsequent visualisations where defined.
+
+For Time Spent by Channel/App:
+
+Show:
+- Channel/app name
+- Avg min/week
+- % of total watch time
+- Index
+
+Final V5 direction:
+
+- Fiber two-series chart
+- Vertical bars
+- X-axis = channel/app
+- Index displayed as supporting information
+- Primary Y-axis = Avg min/week
+- Secondary Y-axis = % of watch time
+- Index is NOT a third axis
+- Hover shows Index + Avg mins/week + % watch time
+- Use Fiber data-visualisation qualitative colours
+
+Explain why the Index was separated from the chart scale.
+
+================================
+KPI 2
+Temporal Insights
+================================
+
+User question:
+
+"When does my audience most watch TV, and what type of TV do they watch and when?"
+
+Show:
+- Avg minutes watched per household
+- % households watching
+- Time of day
+- Day of week
+- Linear / Streaming / FAST where applicable
+
+Use the final agreed visualisation from the prototype.
+
+Do not invent metrics not present in the final direction.
+
+================================
+KPI 3
+Viewership by Genre
+================================
+
+User question:
+
+"What genre is most popular with my audience and on what TV type do they most consume this genre?"
+
+Show:
+- Minutes watched per week
+- % total watch time
+- Index vs national average
+- Top genres
+
+Explain the distinction between:
+
+Popularity
+vs
+Affinity
+
+This visualisation answers:
+
+"What does my audience watch?"
+
+rather than:
+
+"What is disproportionately strong compared with the national average?"
+
+================================
+KPI 4
+Top 10 Indexing Shows
+================================
+
+Show:
+- Top indexing shows
+- Avg minutes watched per household
+- % households watching
+- Index/supporting information where applicable
+
+Explain the relationship with the genre selection.
+
+If a genre is selected, the show list can become relevant to that genre.
+
+Show the drilldown introduced through stakeholder feedback.
+
+================================
+KPI 5
+Share of Viewing Mins in Each Platform
+================================
+
+Show:
+
+Linear
+Streaming
+FAST
+
+Visualisation:
+Horizontal stacked bar
+
+Important:
+This is a platform distribution question.
+
+It answers:
+
+"Where does this audience's viewing time happen?"
+
+Explain that this is different from Cultural Affinity.
+
+================================
+KPI 6
+Cultural Affinity
+================================
+
+Show:
+- Selected genre
+- Related/high-index genres
+- Index
+- Top 5 related genres where applicable
+
+Visualisation:
+Star diagram
+
+Explain:
+
+This is about relationships between genres and relative affinity.
+
+It is NOT simply genre popularity.
+
+Allow the selected genre to act as the centre/north point.
+
+Where the prototype supports it, allow highly indexed genres to connect to their relevant shows.
+
+================================
+KPI 7
+Migration Signals
+================================
+
+Show:
+
+- Selected show
+- Next show watched
+- 1-hour timeframe
+- Top pathways
+- Maximum branches as defined in the prototype
+
+Visualisation:
+Sankey diagram
+
+Explain that this answers a behavioural journey question:
+
+"What does the audience watch next?"
+
+Do not replace this with a generic bar chart.
+
+--------------------------------------------------
+10. BEFORE / AFTER STORIES
+--------------------------------------------------
+
+Create several strong before/after examples from the actual prototype evolution.
+
+Each should contain:
+
+BEFORE SCREENSHOT
+
+Annotated issue.
+
+AFTER SCREENSHOT
+
+Annotated solution.
+
+Then explain:
+
+Why we changed it.
+
+Prioritise examples such as:
+
+1. Three metrics / axis confusion
+2. Index representation
+3. Genre vs Show dependent dropdown
+4. Show drilldown
+5. Chart hierarchy
+6. KPI grouping
+7. Migration visualisation
+8. Platform vs genre insight distinction
+
+Use arrows and callouts between screenshots.
+
+--------------------------------------------------
+11. INTERACTION DESIGN
+--------------------------------------------------
+
+Create a section showing how the dashboard became interactive rather than static.
+
+Document:
+
+- Global filters
+- Local filters
+- Dependent filters
+- Drilldowns
+- Hover states
+- KPI-to-KPI interactions
+- Genre → Show relationships
+- Consumption Type → downstream visualisations
+- Show → consumption-over-time drilldown
+
+Create a simple interaction map.
+
+Example:
+
+Audience Selection
+↓
+Consumption Type
+↓
+Genre / Show
+↓
+Detailed insight
+↓
+Drilldown
+
+Only include interactions that exist in the actual prototype.
+
+Do not invent functionality.
+
+--------------------------------------------------
+12. DESIGN SYSTEM
+--------------------------------------------------
+
+Explain how the prototype evolved toward the Fiber design system.
+
+Document:
+
+- Components
+- Typography
+- Spacing
+- Chart styling
+- Data visualisation colours
+- Axes
+- Tooltips
+- Cards
+- Filters
+- Interaction states
+
+Important:
+
+The AI prototype may use custom visualisation components where Fiber does not have the required chart.
+
+However, custom visualisations must follow the Fiber data-visualisation principles and colour system.
+
+Show examples of the evolution from exploration to systemised UI.
+
+--------------------------------------------------
+13. AI + REPLIT AS A DESIGN TOOL
+--------------------------------------------------
+
+This is an important part of the case study.
+
+Create a section:
+
+"Designing with AI"
+
+Explain how Replit was used as a design/prototyping environment.
+
+Do not present AI as replacing UX design.
+
+Explain the workflow:
+
+UX thinking
+↓
+Requirements
+↓
+User stories
+↓
+Low-fidelity exploration
+↓
+AI-assisted prototype
+↓
+Interaction testing
+↓
+Stakeholder feedback
+↓
+Iteration
+↓
+V5
+
+Show how the prototype helped make ideas tangible and testable before Hi-fi Figma design.
+
+Also show relevant Replit iterations/versions if they exist in the project.
+
+Explain what AI helped with:
+
+- Rapid exploration
+- Functional interactions
+- Testing chart concepts
+- Iterating layouts
+- Making feedback visible
+- Validating information architecture
+- Demonstrating interactions
+
+And what remained a UX/design responsibility:
+
+- Problem framing
+- KPI definition
+- User stories
+- Information hierarchy
+- Choosing meaningful metrics
+- Evaluating visualisations
+- Interpreting stakeholder feedback
+- Making design decisions
+
+--------------------------------------------------
+14. EVALUATION
+--------------------------------------------------
+
+Create a section:
+
+"How we evaluated the design"
+
+Include actual evaluation activities from the project.
+
+Possible evidence sources in the existing project include:
+
+- Stakeholder reviews
+- Data visualisation review
+- KPI/user-story validation
+- Prototype walkthroughs
+- Design annotations
+- Feedback iterations
+- Version comparisons
+
+IMPORTANT:
+
+Only include evaluations that actually happened.
+
+Do not invent usability-test results, participant counts, scores, percentages or conclusions.
+
+For each evaluation, show:
+
+METHOD
+WHAT WE LOOKED FOR
+FEEDBACK
+DESIGN RESPONSE
+
+--------------------------------------------------
+15. THE V5 RESULT
+--------------------------------------------------
+
+Create a strong "V5" section.
+
+Title:
+
+"V5 — Consolidating the direction"
+
+Show the current V5 prototype prominently.
+
+Explain that V5 consolidates:
+
+- Requirements
+- KPI definitions
+- User stories
+- Data visualisations
+- Filters
+- Interactions
+- Drilldowns
+- Stakeholder feedback
+- Visualisation refinements
+
+Show a visual map of how previous iterations contributed to V5.
+
+Example:
+
+Requirements
+      ↓
+Research
+      ↓
+Exploration
+      ↓
+Feedback
+      ↓
+Iteration
+      ↓
+Data Viz Review
+      ↓
+V5
+
+Make this interactive if possible.
+
+--------------------------------------------------
+16. WHAT WE SOLVED
+--------------------------------------------------
+
+Do not use unsupported quantitative claims.
+
+Instead, describe qualitative outcomes such as:
+
+- Complex audience data became structured into clear insight areas.
+- Metrics gained clearer hierarchy.
+- Index was separated from absolute viewing metrics.
+- Users can move from overview to specific show consumption.
+- Genre and Show filtering became context-aware.
+- Platform share and cultural affinity have distinct purposes.
+- The dashboard became more interactive and exploratory.
+- Data visualisations became more aligned with their underlying questions.
+
+Show these as outcome cards.
+
+--------------------------------------------------
+17. WHAT WE LEARNED
+--------------------------------------------------
+
+Create a reflective UX section.
+
+Possible learnings based on the actual project:
+
+1. A chart should start with the question, not the visual form.
+2. Different metrics need different visual hierarchy.
+3. Relative metrics such as Index should not compete with absolute metrics.
+4. Stakeholder feedback can reveal interaction problems that static screens hide.
+5. AI prototyping is most useful when guided by strong UX reasoning.
+6. Complex dashboards need progressive disclosure.
+7. Similar-looking KPIs can answer fundamentally different questions.
+8. Versioning makes design decisions easier to communicate.
+
+Phrase these as design learnings, not generic AI-generated statements.
+
+--------------------------------------------------
+18. NEXT PHASE
+--------------------------------------------------
+
+Explain what happens after this Phase 1 work.
+
+Current direction:
+
+V5 prototype
+↓
+Hi-fi Figma design
+↓
+Final implementation refinement
+
+Comparison Mode remains Phase 2.
+
+Do not imply that Comparison Mode is part of the completed Phase 1 scope.
+
+Also show that the designer's focus is moving to the next project/sprint work after this phase.
+
+--------------------------------------------------
+19. INTERACTIVE SCREENSHOT SYSTEM
+--------------------------------------------------
+
+This is VERY IMPORTANT.
+
+Screenshots should not just be placed as images.
+
+Build an annotation system.
+
+When a screenshot is clicked:
+
+Open a larger viewer.
+
+Show numbered annotation markers.
+
+Example:
+
+[01] Issue
+[02] Why it matters
+[03] Design change
+[04] Result
+
+Clicking an annotation should:
+
+- Highlight the relevant area
+- Show a short explanation
+- Identify the version
+- Explain the reason for the change
+
+Use different visual treatments for:
+
+ISSUE
+WHY
+DECISION
+RESULT
+
+Do not use excessive annotations.
+
+Only highlight meaningful UX decisions.
+
+--------------------------------------------------
+20. VERSION COMPARISON INTERACTION
+--------------------------------------------------
+
+Create a version selector:
+
+[V1] [V2] [V3] [V4] [V5]
+
+When the user selects a version:
+
+- Update the screenshot
+- Update the annotations
+- Update the description
+- Update "What changed"
+- Update "Why it changed"
+
+Add:
+
+"Compare with previous version"
+
+When enabled, show:
+
+LEFT:
+Previous
+
+RIGHT:
+Current
+
+Add visual change markers.
+
+IMPORTANT:
+Read the actual project/version information first.
+
+If a version does not exist, do not fabricate it.
+
+--------------------------------------------------
+21. CASE STUDY NAVIGATION
+--------------------------------------------------
+
+Add a sticky case-study navigation.
+
+Sections:
+
+Overview
+Problem
+Users
+Process
+Exploration
+Iterations
+Data Viz
+Feedback
+Interactions
+Evaluation
+V5
+Learnings
+
+The navigation should show the user's current position while scrolling.
+
+Add a progress indicator, but keep it subtle.
+
+--------------------------------------------------
+22. VISUAL STORYTELLING
+--------------------------------------------------
+
+The case study should feel like a story, not a requirements document.
+
+Use visual rhythm:
+
+Large statement
+↓
+Context
+↓
+Screenshot
+↓
+Issue
+↓
+Reason
+↓
+Design exploration
+↓
+Feedback
+↓
+Decision
+↓
+Result
+
+Avoid huge walls of text.
+
+Use:
+
+- Large headings
+- Short paragraphs
+- Pull quotes
+- Screenshot galleries
+- Before/after
+- Timeline
+- Annotation markers
+- Interactive cards
+- Diagrams
+- Metric explainers
+- Version comparisons
+
+--------------------------------------------------
+23. CONTENT RULES
+--------------------------------------------------
+
+VERY IMPORTANT:
+
+Use information already present in:
+
+1. Existing TV Audience prototype
+2. Existing prototype versions
+3. Existing Replit implementation
+4. Existing comments/annotations
+5. Existing requirements
+6. Existing stakeholder feedback
+7. Existing project documentation
+8. Existing conversation/context available to this project
+
+Do not invent:
+
+- Research findings
+- Participant numbers
+- User quotes
+- Business metrics
+- Conversion improvements
+- Time saved
+- Revenue impact
+- Accuracy percentages
+- Usability scores
+- Stakeholder opinions
+- Project dates
+- Version names
+
+If information cannot be verified, label it:
+
+"Requires confirmation"
+
+or omit it.
+
+--------------------------------------------------
+24. IMPORTANT DESIGN DECISIONS TO PRESERVE
+--------------------------------------------------
+
+Do not accidentally change or simplify these decisions:
+
+A. Comparison Mode
+Phase 2 only.
+
+B. Index
+Index is a relative comparison against the national average.
+
+Index 100 = national average.
+
+Do not represent Index 150 as 150%.
+
+C. Avg min/week
+Actual viewing time.
+
+D. % total watch time
+Share of the selected audience's total viewing time.
+
+E. Index should not become a third chart axis.
+
+F. Time Spent by Channel/App
+Final direction uses:
+- Avg min/week
+- % watch time
+- Index as supporting information
+
+G. Show drilldown
+Use a two-line time-series view:
+- Households watching
+- Avg minutes watched per household
+
+H. Genre / Show dropdown
+Dependent on View By selection.
+
+I. Migration Signals
+Sankey visualisation.
+
+J. Platform Share
+Horizontal stacked bar.
+
+K. Cultural Affinity
+Star diagram.
+
+L. Fiber
+Use Fiber components/design principles where applicable.
+
+M. Custom charts
+Allowed when Fiber does not provide the required visualisation, but use Fiber data-viz principles.
+
+--------------------------------------------------
+25. TECHNICAL EXPECTATIONS
+--------------------------------------------------
+
+This is an interactive FRONT-END CASE STUDY.
+
+Do not create only static HTML text.
+
+Create reusable components for:
+
+- CaseStudyHero
+- SectionHeader
+- StoryBlock
+- VersionTimeline
+- VersionSelector
+- ScreenshotViewer
+- ScreenshotAnnotation
+- BeforeAfter
+- FeedbackCard
+- DecisionCard
+- KPIExplorer
+- MetricExplainer
+- InteractionMap
+- EvaluationCard
+- OutcomeCard
+- LearningCard
+- StickyCaseStudyNav
+
+Use the existing project's framework and component architecture.
+
+Reuse existing components where appropriate.
+
+Do not unnecessarily rebuild the entire existing prototype.
+
+The new Case Study should not break any existing TV Audience functionality.
+
+--------------------------------------------------
+26. RESPONSIVE DESIGN
+--------------------------------------------------
+
+The case study should work on:
+
+Desktop
+Tablet
+Mobile
+
+Desktop is the primary experience because this is a design/product case study.
+
+Screenshots should maintain their aspect ratio.
+
+Large screenshots should support zoom/lightbox.
+
+--------------------------------------------------
+27. QUALITY BAR
+--------------------------------------------------
+
+Before considering this task complete:
+
+1. Inspect the existing TV Audience prototype.
+2. Inspect all available versions.
+3. Inspect the existing Replit implementation.
+4. Identify the actual evolution of the design.
+5. Use real screenshots.
+6. Map actual feedback to actual changes.
+7. Verify every KPI against the current V5.
+8. Verify Phase 1 vs Phase 2.
+9. Do not invent missing information.
+10. Make the case study visually compelling.
+11. Make the storytelling understandable to someone who knows nothing about the project.
+12. Make every major design change explain:
+    WHAT was wrong?
+    WHY was it a problem?
+    WHAT did we change?
+    WHY did we change it?
+    WHAT did we learn?
+
+--------------------------------------------------
+28. FINAL EXPERIENCE
+--------------------------------------------------
+
+The final experience should feel like someone is walking through the project with the designer.
+
+The storytelling should roughly feel like:
+
+"We had a complex audience-data problem."
+
+↓
+"We broke it into user questions."
+
+↓
+"We explored different ways to represent the data."
+
+↓
+"Some visualisations created confusion."
+
+↓
+"Stakeholder and data-viz feedback exposed the problems."
+
+↓
+"We changed the hierarchy and interactions."
+
+↓
+"We tested the ideas through an interactive AI prototype."
+
+↓
+"We iterated across multiple versions."
+
+↓
+"V5 consolidated the strongest direction."
+
+↓
+"The result is a clearer foundation for Hi-fi Figma design."
+
+The most important principle:
+
+DO NOT MAKE THIS LOOK LIKE A DOCUMENTATION PAGE.
+
+MAKE IT FEEL LIKE A UX STORY.
+
+The user should be able to understand not only WHAT was designed, but WHY every important design decision happened.
+
+Before implementing, inspect the existing project and generate the case-study content structure from the actual available evidence. Then build the interactive front-end.

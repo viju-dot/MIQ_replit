@@ -1,0 +1,21 @@
+.cs-comparison { border:1px solid #d8d7e0; border-radius:16px; padding:24px; background:#fff; }
+.cs-comparison-tabs { display:flex; flex-wrap:wrap; gap:8px; }
+.cs-comparison-tabs button { background:#eeedf7; color:#37304d; padding:10px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; }
+.cs-comparison-tabs button[aria-pressed="true"] { background:#3730a3; color:white; }
+.cs-comparison-note { font-size:11px; line-height:1.6; color:#666; margin:16px 0; }
+.cs-comparison-window { overflow:hidden; position:relative; border:1px solid #d8d7e0; background:#f7f7fa; }
+.cs-comparison-window img { width:100%; height:auto; display:block; position:absolute; top:0; left:0; }
+.cs-comparison-reveal { position:absolute; inset:0; overflow:hidden; }
+.cs-comparison-divider { position:absolute; top:0; bottom:0; width:3px; background:#3730a3; box-shadow:0 0 0 1px white; }
+.cs-comparison-labels { display:flex; justify-content:space-between; margin-top:10px; font-size:12px; font-weight:700; }
+.cs-comparison-range { display:grid; gap:8px; font-size:11px; color:#666; margin:20px 0; }
+.cs-comparison-range input { width:100%; accent-color:#3730a3; min-height:30px; cursor:ew-resize; }
+.cs-comparison-stories { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+.cs-comparison-stories article { background:#f5f4f9; border-left:3px solid #3730a3; padding:18px; }
+.cs-comparison-stories article:first-child { border-color:#b45309; background:#fff7ed; }
+.cs-comparison-stories span { font-size:10px; font-weight:800; letter-spacing:.07em; }
+.cs-comparison-stories p,.cs-comparison-reason { font-size:13px; line-height:1.7; margin:10px 0; }
+.cs-comparison-stories button { font-size:11px; color:#3730a3; text-align:left; font-weight:700; text-decoration:underline; cursor:pointer; }
+.cs-comparison-reason { margin-top:20px; }
+.cs-comparison :focus-visible { outline:3px solid #f59e0b; outline-offset:3px; }
+@media(max-width:640px) { .cs-comparison { padding:16px; } .cs-comparison-stories { grid-template-columns:1fr; } }

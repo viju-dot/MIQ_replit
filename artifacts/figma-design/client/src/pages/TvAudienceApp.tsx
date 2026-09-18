@@ -16,6 +16,7 @@
  * ========================================================================= */
 
 import { useState, useEffect } from "react";
+import { Link } from "wouter";
 import { Moon, Sun } from "lucide-react";
 import { CaretDown } from "@phosphor-icons/react";
 import { useTheme } from "@/lib/theme";
@@ -424,6 +425,20 @@ function PrototypeContentRegion() {
   return (
     // <main> is the positioned canvas. The dashboard's own filter bar padding
     // uses -mx-6 / -mx-10, so mirror that px-6 / px-10 here.
+    <>
+      <div className="mx-auto w-full max-w-[1440px] px-6 pt-6 md:px-24">
+      <Link href="/tv-audience-intelligence/case-study"
+        className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-4"
+        style={{ borderColor: "var(--border-static-subtle-neutral, #e1e1e8)", backgroundColor: "var(--surface-background-lvl1, #fff)", color: "var(--surface-foreground-static-neutral-lvl1, #13131a)" }}>
+        <span>
+          <span className="block text-sm font-semibold">Case Study</span>
+          <span className="mt-1 block text-xs" style={{ color: "var(--surface-foreground-static-neutral-lvl3, #717180)" }}>
+            Explore the problem, process, iterations, decisions and evolution behind the TV Audience &amp; Content Planner.
+          </span>
+        </span>
+        <span aria-hidden="true">↗</span>
+      </Link>
+      </div>
     <main className="relative mx-auto w-full max-w-[1440px] px-6 py-8 md:px-24">
       {/* Prototype body — imported, not duplicated. */}
       <div>
@@ -439,6 +454,7 @@ function PrototypeContentRegion() {
           nothing without collab context (e.g. /share). */}
       <DesignAnnotationLayer />
     </main>
+    </>
   );
 }
 

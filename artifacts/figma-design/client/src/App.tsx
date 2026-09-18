@@ -47,6 +47,8 @@ const ScreenTemplateDetailPage = lazy(() =>
 // shell (it has its own Fiber navigation header).
 const TvAudienceApp = lazy(() => import("@/pages/TvAudienceApp"));
 const DoohApp = lazy(() => import("@/pages/DoohApp"));
+const TvCaseStudyCapture = lazy(() => import("@/pages/tv-audience/CaseStudyCapture"));
+const TvCaseStudy = lazy(() => import("@/pages/tv-audience/case-study/CaseStudy"));
 
 // Public shared-prototype view — no shell/global header.
 const SharePage = lazy(() => import("@/pages/app/SharePage"));
@@ -83,6 +85,12 @@ function Router() {
       </Route>
 
       {/* Standalone product experience (outside the shell). */}
+      <Route path="/tv-audience-intelligence/case-study">
+        <Suspense fallback={null}><TvCaseStudy /></Suspense>
+      </Route>
+      <Route path="/tv-audience-intelligence/case-study/capture/:version">
+        <Suspense fallback={null}><TvCaseStudyCapture /></Suspense>
+      </Route>
       <Route path="/tv-audience-intelligence">
         <Suspense fallback={null}>
           <TvAudienceApp />

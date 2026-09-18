@@ -1,0 +1,209 @@
+@import url('https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,500,700,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+.case-study-root {
+  --cs-bg: #F4F4F2;
+  --cs-surface: #FFFFFF;
+  --cs-surface-alt: #EAEAE8;
+  --cs-fg: #111111;
+  --cs-fg-muted: #555555;
+  --cs-border: #DDDDD8;
+  
+  --cs-accent: #3730A3;
+  --cs-accent-light: #E0E7FF;
+  --cs-highlight: #EA580C;
+  
+  --cs-font-display: 'Cabinet Grotesk', sans-serif;
+  --cs-font-body: 'Plus Jakarta Sans', sans-serif;
+  
+  background-color: var(--cs-bg);
+  color: var(--cs-fg);
+  font-family: var(--cs-font-body);
+  min-height: 100dvh;
+  position: relative;
+  z-index: 0;
+  scroll-behavior: smooth;
+}
+
+.case-study-root * {
+  box-sizing: border-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case-study-root, .case-study-root * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--cs-accent);
+  outline-offset: 4px;
+}
+
+/* Scroll Progress */
+.cs-scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px;
+  background: var(--cs-accent);
+  z-index: 9999;
+  transform-origin: 0% 50%;
+  transition: transform 0.1s ease-out;
+}
+
+/* Typography */
+.cs-h1 { font-family: var(--cs-font-display); font-weight: 800; font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.05; letter-spacing: -0.03em; }
+.cs-h2 { font-family: var(--cs-font-display); font-weight: 700; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; letter-spacing: -0.02em; }
+.cs-h3 { font-family: var(--cs-font-display); font-weight: 700; font-size: clamp(1.5rem, 3vw, 2.25rem); line-height: 1.2; letter-spacing: -0.01em; }
+.cs-h4 { font-family: var(--cs-font-display); font-weight: 700; font-size: 1.25rem; line-height: 1.2; }
+.cs-eyebrow { font-family: var(--cs-font-body); font-weight: 700; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--cs-accent); }
+.cs-p { font-family: var(--cs-font-body); font-size: 1.125rem; line-height: 1.6; color: var(--cs-fg-muted); }
+.cs-p-large { font-family: var(--cs-font-body); font-size: 1.25rem; line-height: 1.5; color: var(--cs-fg); font-weight: 400; }
+
+/* Structural */
+.cs-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.cs-section {
+  padding: 6rem 0;
+  border-bottom: 1px solid var(--cs-border);
+  scroll-margin-top: 120px;
+}
+
+.cs-section:last-child {
+  border-bottom: none;
+}
+
+/* Nav */
+.cs-nav-wrapper {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 220px;
+  padding: 4rem 1.5rem 4rem 0;
+  border-right: 1px solid var(--cs-border);
+  display: flex;
+  flex-direction: column;
+}
+
+.cs-nav-mobile {
+  display: none;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--cs-bg);
+  border-bottom: 1px solid var(--cs-border);
+  padding: 1rem 0;
+  margin: 0 -2rem;
+  width: calc(100% + 4rem);
+}
+
+.cs-layout {
+  display: flex;
+  gap: 3rem;
+}
+
+.cs-main {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Components */
+.cs-card {
+  background: var(--cs-surface);
+  border: 1px solid var(--cs-border);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cs-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: var(--cs-surface-alt);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--cs-fg);
+}
+
+.cs-metric-schematic {
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  grid-template-rows: auto 40px;
+  gap: 1rem;
+  padding: 2rem;
+  background: var(--cs-surface);
+  border: 1px solid var(--cs-border);
+  border-radius: 1rem;
+  align-items: end;
+}
+
+.cs-metric-axis-left, .cs-metric-axis-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 200px;
+  font-size: 0.75rem;
+  font-family: monospace;
+  color: var(--cs-fg-muted);
+}
+
+.cs-metric-bars {
+  height: 200px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1rem;
+  border-bottom: 2px solid var(--cs-border);
+  position: relative;
+}
+
+.cs-metric-bar {
+  width: 40px;
+  background: var(--cs-border);
+  border-radius: 4px 4px 0 0;
+  transition: all 0.3s;
+}
+
+.cs-metric-label {
+  grid-column: 2;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding-top: 0.5rem;
+  transition: all 0.3s;
+}
+
+/* Interactive States */
+.cs-metric-active-avg .cs-metric-axis-left { color: var(--cs-accent); font-weight: bold; }
+.cs-metric-active-avg .cs-metric-bar:first-child { background: var(--cs-accent); }
+
+.cs-metric-active-pct .cs-metric-axis-right { color: var(--cs-highlight); font-weight: bold; }
+.cs-metric-active-pct .cs-metric-bar:last-child { background: var(--cs-highlight); }
+
+.cs-metric-active-idx .cs-metric-label { background: var(--cs-accent-light); color: var(--cs-accent); border-radius: 4px; }
+
+/* Grid Layouts */
+.cs-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+.cs-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+.cs-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+
+@media (max-width: 1024px) {
+  .cs-layout { flex-direction: column; gap: 0; }
+  .cs-nav-wrapper { display: none; }
+  .cs-nav-mobile { display: block; }
+  .cs-nav-mobile-list { display: flex; overflow-x: auto; gap: 0.5rem; padding: 0 2rem; scrollbar-width: none; }
+  .cs-nav-mobile-list::-webkit-scrollbar { display: none; }
+  .cs-grid-3, .cs-grid-2 { grid-template-columns: 1fr; gap: 1rem; }
+}

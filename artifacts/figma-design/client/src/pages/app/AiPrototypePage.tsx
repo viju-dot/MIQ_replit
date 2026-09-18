@@ -136,6 +136,16 @@ function PrototypeCard({
         </p>
       </div>
 
+      {prototype.id === "tv-audience-intelligence" && (
+        <Link href="/tv-audience-intelligence/case-study"
+          className="block rounded-md border p-4 text-left transition-colors"
+          style={{ borderColor: C.border, backgroundColor: C.brandSubtle, color: C.textPrimary }}>
+          <span className="block text-sm font-semibold">Case Study <span aria-hidden="true">↗</span></span>
+          <span className="mt-1 block text-xs leading-relaxed" style={{ color: C.textBody }}>
+            Explore the problem, process, iterations, decisions and evolution behind the TV Audience &amp; Content Planner.
+          </span>
+        </Link>
+      )}
       {/* Actions row — Open + Flow Chart + Usability Testing (siblings). */}
       <div
         className="mt-auto flex items-center justify-between border-t pt-[var(--spacing-150,12px)]"

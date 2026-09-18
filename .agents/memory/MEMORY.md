@@ -3,3 +3,4 @@
 - [Share backend & api-server quirks](share-backend.md) — figma-design server/ is dead scaffolding; backend work goes in shared api-server (/api, one-shot dev script → restart workflow after changes).
 - [E2E tester staleness](e2e-tester-staleness.md) — reused testers can false-FAIL on stale state; re-verify with a fresh tester + DOM-level assertions before looping fixes.
 - [Figma variable harvesting](figma-variables.md) — getVariableDefs works only on frame-level nodes, returns one resolved mode (no dark collection), and Effect()/Font() values need conversion to valid CSS.
+- [Case-study evidence](case-study-evidence.md) — distinguish requested direction from observed versions; no retrospective changes to the TV prototype to make the narrative fit.
