@@ -1,0 +1,914 @@
+REPLIT DOOH PLANNER V2 - IMPLEMENTATION PROMPT
+Build Instructions with Fiber Design System & Wireframe Specifications
+Status: Ready for Replit Build Version: 2.0 Design System: Fiber (MIQ Brand) Timeline: Phase 1 - MVP Minimal Level Focus: Base wireframe implementation without over-engineering
+
+🎯 IMPLEMENTATION OVERVIEW
+Build a React application in Replit that mirrors the wireframes provided:
+* Module 1: GeoPlanner with Save Audience functionality
+* Module 2: DOOH Planner with interactive map and filters
+* Design: Fiber design system for brand consistency
+* Navigation: Reports > Advanced > Modules
+
+📐 LAYOUT STRUCTURE
+Header (MIQ Branding)
+├─ Logo
+├─ Navigation breadcrumb: Reports > Advanced
+└─ User Profile
+
+Module Navigation
+├─ Instructions/Heading
+├─ Tab Navigation: [Geo Planner] [DOOH]
+│
+├─ MODULE 1 (Geo Planner)
+│  ├─ Left Sidebar: Filters Panel
+│  ├─ Center: Main Content Area
+│  └─ Bottom: "Save Audience" Action Button
+│
+└─ MODULE 2 (DOOH)
+   ├─ Left Sidebar: Filter Toggles
+   ├─ Center: Interactive Map
+   ├─ Right: Screen List / Plan Overview
+   └─ Top: Map/Screen List Tabs + Export Button
+
+
+📱 MODULE 1: GEO PLANNER (SAVE AUDIENCE)
+Screen Structure
+┌─────────────────────────────────────────────────┐
+│ 🎯 Geo Planner - Build Your Audience            │
+│ Select filters and intelligence to build        │
+│ your target audience, then save for reuse       │
+└─────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────┐
+│ Left Sidebar (Filters Panel)    │ Main Content   │
+│                                 │                │
+│ [+ Filters]                     │ Audience       │
+│                                 │ Definition:    │
+│ ✓ Market                        │                │
+│   └─ [UK ▼]                     │ • Filter 1     │
+│                                 │ • Filter 2     │
+│ ✓ Mode                          │ • Filter 3     │
+│   └─ [Brand ▼]                  │                │
+│                                 │ Coverage:      │
+│ ✓ Brand                         │ 2.3M people    │
+│   └─ [& OTHER STORIES ▼]        │                │
+│                                 │ [Submit]       │
+│ ✓ Category                      │                │
+│   └─ [Other ▼]                  │                │
+│                                 │                │
+│ [Additional Filters...]         │                │
+│                                 │                │
+│ ✓ Select Intelligence           │                │
+│   Audience, Commerce, TV, POI   │                │
+│                                 │                │
+│ ✓ Intelligence Filters:         │                │
+│   Category, Feature, Value      │                │
+│   Consumer Behaviour >          │                │
+│   Alcohol > Avg Spend...        │                │
+│                                 │                │
+│ ✓ Top Indexing Geos             │                │
+│   [15% ▼]                       │                │
+│                                 │                │
+│                                 │ [Submit Button]│
+└──────────────────────────────────────────────────┘
+
+Bottom Action Bar
+┌──────────────────────────────────────────────────┐
+│                 [💾 Save Audience]               │
+└──────────────────────────────────────────────────┘
+Module 1 Implementation Specs
+1. Left Sidebar - Filters
+Structure:
+<FilterPanel>
+  <FilterGroup label="Market">
+    <Dropdown 
+      options={['UK', 'EU', 'US']} 
+      defaultValue="UK"
+    />
+  </FilterGroup>
+
+  <FilterGroup label="Mode">
+    <Dropdown 
+      options={['Brand', 'Product', 'Category']} 
+      defaultValue="Brand"
+    />
+  </FilterGroup>
+
+  <FilterGroup label="Brand">
+    <Dropdown 
+      options={['& OTHER STORIES', 'Brand A', 'Brand B']} 
+      defaultValue="& OTHER STORIES"
+    />
+  </FilterGroup>
+
+  <FilterGroup label="Category">
+    <Dropdown 
+      options={['Other', 'Electronics', 'Fashion']} 
+      defaultValue="Other"
+    />
+  </FilterGroup>
+
+  <Divider />
+
+  <FilterGroup label="Select Intelligence">
+    <TabButtonGroup>
+      <TabButton>Audience</TabButton>
+      <TabButton>Commerce</TabButton>
+      <TabButton>TV</TabButton>
+      <TabButton>POI</TabButton>
+    </TabButtonGroup>
+  </FilterGroup>
+
+  <FilterGroup label="Intelligence Filters">
+    <Dropdown label="Category" options={['Consumer Behaviour']} />
+    <Dropdown label="Feature" options={['Alcohol']} />
+    <Dropdown label="Value" options={['Avg Spend On Beer Lager Ciders']} />
+    <Dropdown label="Logic" options={['None']} />
+  </FilterGroup>
+
+  <FilterGroup label="Top Indexing Geos">
+    <Dropdown options={['15%', '10%', '20%']} defaultValue="15%" />
+  </FilterGroup>
+
+  <Button variant="primary" fullWidth>
+    Submit
+  </Button>
+</FilterPanel>
+Styling:
+* Panel width: ~30% (left side)
+* Background: Fiber surface gray
+* Border: Light gray divider between filters
+* Spacing: MD (16px) between groups
+* Font: Body text in neutral gray
+2. Center Content Area
+Structure:
+<ContentArea>
+  <Card variant="outlined">
+    <Heading level={3}>Audience Definition</Heading>
+    <AudienceDetails>
+      <Detail>• 12 postcodes in London</Detail>
+      <Detail>• Budget tier only</Detail>
+      <Detail>• High consumer behaviour index</Detail>
+    </AudienceDetails>
+  </Card>
+
+  <Card variant="outlined">
+    <Heading level={3}>Coverage</Heading>
+    <StatValue>2.3M people</StatValue>
+  </Card>
+
+  <Card variant="outlined">
+    <Heading level={3}>Intelligence Summary</Heading>
+    <StatDetail>Average Spend: £250-500/month</StatDetail>
+    <StatDetail>Index: 145 (UK Average: 100)</StatDetail>
+  </Card>
+</ContentArea>
+Styling:
+* Width: ~70% (flex grow)
+* Cards: White background, light shadow, rounded corners
+* Padding: MD (16px) inside cards
+* Heading: Fiber heading 3
+* Body text: Neutral gray
+3. Save Audience Button & Modal
+Button Placement:
+<BottomActionBar>
+  <Button 
+    variant="primary" 
+    icon="save"
+    onClick={openSaveModal}
+    disabled={!isAudienceValid()}
+  >
+    💾 Save Audience
+  </Button>
+</BottomActionBar>
+Modal Structure:
+<Modal title="Save Audience" isOpen={showSaveModal}>
+  <ModalBody>
+    <InputGroup>
+      <Label>Audience Name *</Label>
+      <Input 
+        type="text"
+        placeholder="e.g., Cinema-Goers-London-Budget"
+        value={audienceName}
+        onChange={handleNameChange}
+        maxLength={50}
+        minLength={5}
+      />
+      <CharacterCount>{audienceName.length}/50</CharacterCount>
+      <HelperText>
+        Min 5 chars, max 50. Letters, numbers, hyphens only.
+      </HelperText>
+    </InputGroup>
+
+    <InputGroup>
+      <Label>Description (Optional)</Label>
+      <TextArea 
+        placeholder="e.g., High-income cinema-goers in Central London"
+        value={audienceDescription}
+        onChange={handleDescriptionChange}
+        maxLength={200}
+        rows={3}
+      />
+      <CharacterCount>{audienceDescription.length}/200</CharacterCount>
+    </InputGroup>
+
+    {duplicateWarning && (
+      <Alert variant="warning">
+        ⚠️ An audience with a similar name exists: 
+        "Cinema-Goers-London-Budget-v1"
+        Consider adding a version number or different criteria.
+      </Alert>
+    )}
+  </ModalBody>
+
+  <ModalFooter>
+    <Button variant="secondary" onClick={closeSaveModal}>
+      Cancel
+    </Button>
+    <Button 
+      variant="primary" 
+      onClick={confirmSave}
+      loading={isSaving}
+    >
+      💾 Save
+    </Button>
+  </ModalFooter>
+</Modal>
+Modal Styling (Fiber):
+* Backdrop: Semi-transparent dark overlay
+* Modal: White background, rounded corners (8px), shadow
+* Title: Fiber heading 2
+* Inputs: Fiber style with border on focus (purple)
+* Buttons: Primary purple, secondary gray
+* Spacing: LG (24px) between sections
+4. State Management
+// Module 1 State
+const [filters, setFilters] = useState({
+  market: 'UK',
+  mode: 'Brand',
+  brand: '& OTHER STORIES',
+  category: 'Other',
+  intelligenceTab: 'Audience',
+  intelligenceFilters: {
+    category: 'Consumer Behaviour',
+    feature: 'Alcohol',
+    value: 'Avg Spend On Beer Lager Ciders',
+    logic: 'None'
+  },
+  topIndexing: '15%'
+});
+
+const [audienceDefinition, setAudienceDefinition] = useState({
+  coverage: '2.3M people',
+  details: ['12 postcodes in London', 'Budget tier only']
+});
+
+const [showSaveModal, setShowSaveModal] = useState(false);
+const [audienceName, setAudienceName] = useState('');
+const [audienceDescription, setAudienceDescription] = useState('');
+const [savedAudiences, setSavedAudiences] = useState([]);
+const [isSaving, setIsSaving] = useState(false);
+
+// Validation
+const isAudienceValid = () => audienceDefinition.coverage !== null;
+const isDuplicateName = (name) => savedAudiences.some(a => a.name === name);
+
+// Save Handler
+const confirmSave = async () => {
+  if (!audienceName || audienceName.length < 5) {
+    showError('Name must be at least 5 characters');
+    return;
+  }
+
+  if (isDuplicateName(audienceName)) {
+    // Show warning but allow override
+  }
+
+  setIsSaving(true);
+  try {
+    const newAudience = {
+      id: `AUD_${Date.now()}`,
+      name: audienceName,
+      description: audienceDescription,
+      filters: filters,
+      coverage: audienceDefinition.coverage,
+      createdBy: 'Current User', // From Okta
+      createdDate: new Date().toISOString(),
+      isActive: true
+    };
+
+    // Mock backend save
+    setSavedAudiences([...savedAudiences, newAudience]);
+    
+    // Show success toast
+    showSuccess(`✓ "${audienceName}" saved successfully`);
+    
+    // Close modal
+    setShowSaveModal(false);
+    resetForm();
+  } catch (error) {
+    showError('Failed to save audience. Please try again.');
+  } finally {
+    setIsSaving(false);
+  }
+};
+
+📊 MODULE 2: DOOH PLANNER
+Screen Structure
+┌─────────────────────────────────────────────────┐
+│ 🎯 DOOH Planner - Find & Plan Screens          │
+│ Use saved audiences or upload data to find     │
+│ digital out-of-home screens                    │
+└─────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────┐
+│ Left Sidebar         │ Center Map              │ Right Panel
+│ Filter Toggles       │                         │ Screen List
+│                      │                         │ or Plan
+│ Location ⊙           │  [Interactive Map]     │ Overview
+│ Planning Zone ⊙      │  with screen pins      │
+│ Venue Type ⊙         │  +zoom controls        │ [Map] [List]
+│ Publisher ⊙          │                        │
+│ Day Part ⊙           │                        │ Matched: 45
+│ Budget ⊙             │                        │ Selected: 10
+│ Creative Type ⊙      │                        │
+│                      │                        │ Est. CPM:
+│                      │  [Collections]         │ £12.50
+│                      │  500 m                 │
+│                      │                        │ [Export]
+│                      │                        │ [Activate]
+└──────────────────────────────────────────────────┘
+Module 2 Implementation Specs
+1. Left Sidebar - Filter Toggles
+Structure:
+<FilterSidebar>
+  <FilterToggleGroup 
+    label="Location" 
+    isActive={filters.location.active}
+    onToggle={() => toggleFilter('location')}
+  >
+    {filters.location.active && (
+      <LocationFilterContent>
+        <TabBar>
+          <Tab active>Saved Audience</Tab>
+          <Tab>Postcode</Tab>
+          <Tab>POI</Tab>
+          <Tab>Lat/Long</Tab>
+        </TabBar>
+
+        <FilterContent>
+          <Label>Select Saved Audience</Label>
+          <Dropdown 
+            options={savedAudiences.map(a => a.name)}
+            placeholder="Choose an audience"
+            onChange={handleAudienceSelect}
+          />
+          <Button variant="tertiary" size="sm">
+            👁 Preview
+          </Button>
+
+          <Divider />
+
+          <Label>Radius (meters)</Label>
+          <InputGroup>
+            <Input 
+              type="number" 
+              value={filters.location.radius}
+              min={50}
+              max={10000}
+              onChange={handleRadiusChange}
+            />
+            <Select defaultValue="m">
+              <Option value="m">meters</Option>
+              <Option value="km">kilometers</Option>
+            </Select>
+          </InputGroup>
+        </FilterContent>
+      </LocationFilterContent>
+    )}
+  </FilterToggleGroup>
+
+  <FilterToggleGroup 
+    label="Planning Zone" 
+    isActive={filters.planningZone.active}
+    onToggle={() => toggleFilter('planningZone')}
+  >
+    {filters.planningZone.active && (
+      <PlanningZoneContent>
+        <Button variant="secondary" fullWidth>
+          🎨 Draw on Map
+        </Button>
+        <Select>
+          <Option value="circle">Circle</Option>
+          <Option value="polygon">Polygon</Option>
+        </Select>
+        <DrawnZonesList>
+          {/* List of drawn zones */}
+        </DrawnZonesList>
+      </PlanningZoneContent>
+    )}
+  </FilterToggleGroup>
+
+  <FilterToggleGroup 
+    label="Venue Type" 
+    isActive={filters.venueType.active}
+    onToggle={() => toggleFilter('venueType')}
+  >
+    {filters.venueType.active && (
+      <VenueTypeContent>
+        <MultiSelectCheckbox options={[
+          { id: 'mall', label: 'Malls' },
+          { id: 'roadside', label: 'Roadside' },
+          { id: 'transit', label: 'Transit' },
+          { id: 'airport', label: 'Airport' },
+          { id: 'conference', label: 'Conference' },
+          { id: 'gyms', label: 'Gyms' },
+          { id: 'bus', label: 'Bus Station' }
+        ]} />
+      </VenueTypeContent>
+    )}
+  </FilterToggleGroup>
+
+  <FilterToggleGroup 
+    label="Publisher" 
+    isActive={filters.publisher.active}
+    onToggle={() => toggleFilter('publisher')}
+  >
+    {filters.publisher.active && (
+      <PublisherContent>
+        <MultiSelectCheckbox options={[
+          { id: 'clear-channel', label: 'Clear Channel' },
+          { id: 'jc-decaux', label: 'JCDecaux' },
+          { id: 'soci', label: 'SOCi' },
+          { id: 'hivestack', label: 'Hivestack' }
+        ]} />
+      </PublisherContent>
+    )}
+  </FilterToggleGroup>
+
+  <FilterToggleGroup 
+    label="Day Part" 
+    isActive={filters.dayPart.active}
+    onToggle={() => toggleFilter('dayPart')}
+  >
+    {filters.dayPart.active && (
+      <DayPartContent>
+        <SegmentedControl>
+          <Segment>Presets</Segment>
+          <Segment>Custom</Segment>
+        </SegmentedControl>
+        {/* Content changes based on selected segment */}
+      </DayPartContent>
+    )}
+  </FilterToggleGroup>
+
+  <FilterToggleGroup 
+    label="Budget" 
+    isActive={filters.budget.active}
+    onToggle={() => toggleFilter('budget')}
+  >
+    {filters.budget.active && (
+      <BudgetContent>
+        <Select label="Currency">
+          <Option value="gbp">GBP</Option>
+          <Option value="eur">EUR</Option>
+          <Option value="usd">USD</Option>
+        </Select>
+        <Input label="Total Budget (£)" type="number" />
+        <Input label="CPM Ceiling (£)" type="number" />
+        <BudgetInfo>
+          Budget Used: £48,500 / £50,000 (97%)
+        </BudgetInfo>
+      </BudgetContent>
+    )}
+  </FilterToggleGroup>
+
+  <FilterToggleGroup 
+    label="Creative Type" 
+    isActive={filters.creativeType.active}
+    onToggle={() => toggleFilter('creativeType')}
+  >
+    {filters.creativeType.active && (
+      <CreativeTypeContent>
+        <Select label="Format">
+          <Option value="display">Display</Option>
+          <Option value="video">Video</Option>
+          <Option value="both">Display + Video</Option>
+        </Select>
+        <Select label="Resolution">
+          <Option value="1920x1080">1920 x 1080</Option>
+          <Option value="1280x720">1280 x 720</Option>
+        </Select>
+      </CreativeTypeContent>
+    )}
+  </FilterToggleGroup>
+</FilterSidebar>
+Styling:
+* Width: 25-30%
+* Background: Fiber surface
+* Toggles: Fiber switch component
+* Spacing: MD (16px) between groups
+* Borders: Light dividers between toggles
+* Font: Body text in neutral
+2. Center Map
+Structure:
+<MapContainer>
+  <MapControls>
+    <Button icon="plus" variant="secondary">+</Button>
+    <Button icon="minus" variant="secondary">-</Button>
+    <Button icon="target" variant="secondary">Reset</Button>
+  </MapControls>
+
+  <InteractiveMap
+    center={[54.0, -2.0]} // UK center
+    zoom={6}
+    onMapReady={initializeMap}
+  >
+    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+    
+    {/* Screen Pins */}
+    {screenPins.map(pin => (
+      <CircleMarker
+        key={pin.id}
+        center={[pin.lat, pin.lng]}
+        radius={8}
+        fillColor={getColorBySource(pin.source)}
+        color="#fff"
+        weight={2}
+        opacity={0.8}
+        fillOpacity={0.7}
+        onClick={() => highlightScreen(pin.id)}
+        onHover={() => showTooltip(pin)}
+      >
+        <Popup>
+          <PopupContent>
+            <Strong>{pin.id}</Strong>
+            <Detail>{pin.publisher}</Detail>
+            <Detail>{pin.city} • {pin.venue}</Detail>
+            <Detail>CPM: £{pin.cpm}</Detail>
+          </PopupContent>
+        </Popup>
+      </CircleMarker>
+    ))}
+
+    {/* Drawn Zones */}
+    {drawnZones.map(zone => (
+      zone.type === 'circle' ? (
+        <Circle
+          key={zone.id}
+          center={[zone.lat, zone.lng]}
+          radius={zone.radius}
+          fillColor="#3B82F6"
+          fillOpacity={0.2}
+          color="#3B82F6"
+          weight={2}
+        />
+      ) : (
+        <Polygon
+          key={zone.id}
+          positions={zone.coordinates}
+          fillColor="#3B82F6"
+          fillOpacity={0.2}
+          color="#3B82F6"
+          weight={2}
+        />
+      )
+    ))}
+  </InteractiveMap>
+
+  <MapLegend>
+    <LegendItem color="#10B981">Postcode Match</LegendItem>
+    <LegendItem color="#3B82F6">POI Match</LegendItem>
+    <LegendItem color="#7C3AED">GeoPlanner Match</LegendItem>
+    <ScaleInfo>500 m</ScaleInfo>
+  </MapLegend>
+</MapContainer>
+Styling:
+* Width: 45-50% (flex grow)
+* Background: Light map tiles
+* Controls: Fiber buttons in secondary style
+* Pins: Color-coded (3-4 colors max)
+* Zones: Semi-transparent overlays
+* Legend: Fiber card with icons
+3. Right Panel - Screen List & Plan Overview
+Structure:
+<RightPanel>
+  <TabBar>
+    <Tab active onClick={() => setView('map')}>
+      🗺️ Map
+    </Tab>
+    <Tab onClick={() => setView('list')}>
+      📋 Screen List
+    </Tab>
+  </TabBar>
+
+  {view === 'map' && (
+    <PlanOverview>
+      <StatCard>
+        <StatLabel>Matched Screens</StatLabel>
+        <StatValue>45</StatValue>
+      </StatCard>
+
+      <StatCard>
+        <StatLabel>Selected Screens</StatLabel>
+        <StatValue>10</StatValue>
+      </StatCard>
+
+      <Divider />
+
+      <StatCard>
+        <StatLabel>Est. CPM</StatLabel>
+        <StatValue>£12.50</StatValue>
+      </StatCard>
+
+      <StatCard>
+        <StatLabel>Est. Impressions</StatLabel>
+        <StatValue>3.2M</StatValue>
+      </StatCard>
+
+      <StatCard>
+        <StatLabel>Est. Total Spend</StatLabel>
+        <StatValue>£40,000</StatValue>
+        <BudgetBar value={80} />
+        <BudgetInfo>80% of £50,000</BudgetInfo>
+      </StatCard>
+
+      <ButtonGroup>
+        <Button variant="primary" fullWidth icon="download">
+          ↓ Export
+        </Button>
+        <Button variant="secondary" fullWidth>
+          ➜ Activate
+        </Button>
+      </ButtonGroup>
+    </PlanOverview>
+  )}
+
+  {view === 'list' && (
+    <ScreenListPanel>
+      <SearchInput placeholder="Search by ID, publisher, city..." />
+
+      <Table>
+        <TableHeader>
+          <TableCell>ID</TableCell>
+          <TableCell>Publisher</TableCell>
+          <TableCell>City</TableCell>
+          <TableCell>Venue</TableCell>
+          <TableCell>CPM</TableCell>
+        </TableHeader>
+
+        <TableBody>
+          {screenList.map(screen => (
+            <TableRow 
+              key={screen.id}
+              selected={selectedScreens.includes(screen.id)}
+              onClick={() => toggleScreenSelect(screen.id)}
+            >
+              <TableCell>
+                <Checkbox checked={selectedScreens.includes(screen.id)} />
+                {screen.id}
+              </TableCell>
+              <TableCell>{screen.publisher}</TableCell>
+              <TableCell>{screen.city}</TableCell>
+              <TableCell>{screen.venue}</TableCell>
+              <TableCell>£{screen.cpm}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      <TableFooter>
+        Showing {screenList.length} screens
+      </TableFooter>
+    </ScreenListPanel>
+  )}
+</RightPanel>
+Styling:
+* Width: 25-30% (fixed or flex)
+* Background: White or Fiber surface
+* Tabs: Fiber tab component
+* Stats: Cards with large values
+* Table: Scrollable with sticky header
+* Buttons: Primary purple, secondary gray
+4. Module 2 State Management
+// Module 2 State
+const [filters, setFilters] = useState({
+  location: { 
+    active: true, 
+    audience: null, 
+    radius: 500 
+  },
+  planningZone: { 
+    active: false, 
+    zones: [] 
+  },
+  venueType: { 
+    active: false, 
+    selected: [] 
+  },
+  publisher: { 
+    active: false, 
+    selected: [] 
+  },
+  dayPart: { 
+    active: false, 
+    presets: [], 
+    custom: null 
+  },
+  budget: { 
+    active: false, 
+    amount: 50000, 
+    cpm: null 
+  },
+  creativeType: { 
+    active: false, 
+    format: null, 
+    resolution: null 
+  }
+});
+
+const [screenData, setScreenData] = useState({
+  allScreens: [], // Mock 1000+ screens
+  matchedScreens: [],
+  selectedScreens: []
+});
+
+const [view, setView] = useState('map'); // 'map' or 'list'
+
+// Filter application
+const applyFilters = () => {
+  let matched = screenData.allScreens;
+
+  if (filters.location.active && filters.location.audience) {
+    // Filter by audience location
+  }
+
+  if (filters.venueType.active && filters.venueType.selected.length) {
+    // Filter by venue types
+  }
+
+  // ... apply other filters
+
+  setScreenData(prev => ({
+    ...prev,
+    matchedScreens: matched
+  }));
+};
+
+// Export handler
+const handleExport = () => {
+  const screensToExport = 
+    screenData.selectedScreens.length > 0 
+      ? screenData.selectedScreens 
+      : screenData.matchedScreens;
+
+  const csvData = generateCSV(screensToExport);
+  downloadFile(csvData, 'DOOH-Shortlist.csv');
+};
+
+🛠️ TECHNICAL SETUP FOR REPLIT
+Project Structure
+/src
+├── /components
+│   ├── Module1GeoPlanner.jsx
+│   ├── Module2DOOH.jsx
+│   ├── FilterPanel.jsx
+│   ├── InteractiveMap.jsx
+│   ├── ScreenTable.jsx
+│   ├── SaveAudienceModal.jsx
+│   └── /common
+│       ├── FilterToggle.jsx
+│       ├── Card.jsx
+│       └── Button.jsx
+├── /hooks
+│   ├── useFilters.js
+│   ├── useAudiences.js
+│   └── useScreens.js
+├── /utils
+│   ├── mockData.js
+│   ├── validation.js
+│   └── export.js
+├── /styles
+│   ├── fiber-theme.css (Fiber design tokens)
+│   ├── layout.css
+│   └── components.css
+├── App.jsx
+└── index.js
+Dependencies to Install
+npm install react react-dom
+npm install leaflet react-leaflet
+npm install lucide-react (for icons)
+npm install uuid (for unique IDs)
+Fiber Design System Integration
+// fiber-theme.css or as CSS variables
+:root {
+  --fiber-primary: #7C3AED;
+  --fiber-secondary: #3B82F6;
+  --fiber-success: #10B981;
+  --fiber-warning: #F59E0B;
+  --fiber-danger: #EF4444;
+  --fiber-neutral: #6B7280;
+  --fiber-bg: #FFFFFF;
+  --fiber-surface: #F3F4F6;
+  
+  --fiber-radius-sm: 4px;
+  --fiber-radius-md: 8px;
+  --fiber-radius-lg: 12px;
+  
+  --fiber-spacing-xs: 4px;
+  --fiber-spacing-sm: 8px;
+  --fiber-spacing-md: 16px;
+  --fiber-spacing-lg: 24px;
+  --fiber-spacing-xl: 32px;
+}
+
+📋 BUILD CHECKLIST
+Phase 1: Module 1 Setup
+* [ ] Create GeoPlanner component with filter panel
+* [ ] Implement filter dropdowns (Market, Mode, Brand, Category)
+* [ ] Implement Select Intelligence section
+* [ ] Implement Audience Definition display
+* [ ] Create Save Audience modal with:
+    * [ ] Name input (5-50 chars, validation)
+    * [ ] Description input (optional)
+    * [ ] Duplicate name warning
+    * [ ] Save/Cancel buttons
+* [ ] Implement audience state management
+* [ ] Mock data for filters and audiences
+* [ ] Fiber styling throughout
+* [ ] Test Module 1 end-to-end
+Phase 2: Module 2 Basic Setup
+* [ ] Create DOOH Planner component
+* [ ] Create filter toggle sidebar with all 7 filters
+* [ ] Implement Location filter with tab navigation
+* [ ] Create interactive map with Leaflet
+* [ ] Mock 1000+ screen data
+* [ ] Implement screen pins on map (basic colors)
+* [ ] Create right panel with plan overview
+* [ ] Fiber styling throughout
+* [ ] Test Module 2 basic flow
+Phase 3: Module 2 Refinement
+* [ ] Add search functionality to screen table
+* [ ] Implement filter logic (AND conditions)
+* [ ] Real-time map updates when filters change
+* [ ] Export to CSV functionality
+* [ ] Screen selection checkboxes
+* [ ] CPM calculations
+* [ ] Responsive layout (desktop first)
+* [ ] Error handling & empty states
+* [ ] Final testing
+
+🎨 FIBER COMPONENT EXAMPLES
+Button
+<Button 
+  variant="primary" | "secondary" | "tertiary"
+  size="sm" | "md" | "lg"
+  icon="icon-name"
+  disabled={false}
+  loading={false}
+  fullWidth={false}
+>
+  Button Text
+</Button>
+Input
+<Input 
+  label="Label"
+  type="text"
+  placeholder="Placeholder text"
+  value={value}
+  onChange={handleChange}
+  error={errorMessage}
+  disabled={false}
+  required={true}
+/>
+Dropdown/Select
+<Select 
+  label="Label"
+  options={[{ value: 'id', label: 'Display Label' }]}
+  value={selectedValue}
+  onChange={handleChange}
+/>
+Toggle/Switch
+<Toggle 
+  label="Feature Name"
+  checked={isActive}
+  onChange={handleChange}
+/>
+Card
+<Card variant="outlined" | "filled">
+  <CardHeader>Title</CardHeader>
+  <CardBody>Content</CardBody>
+  <CardFooter>Footer</CardFooter>
+</Card>
+
+💡 IMPLEMENTATION TIPS
+1. Start Simple: Focus on UI/layout first, wire up logic second
+2. Mock Data: Use realistic mock data (1000+ screens, 10+ audiences)
+3. State First: Plan component state before building
+4. Fiber Consistency: Use Fiber design tokens throughout
+5. Mobile Later: Build desktop first, responsive is nice-to-have
+6. Test as You Go: Test each major section before moving on
+
+🚀 SUCCESS CRITERIA
+✅ Module 1 save audience flow works end-to-end ✅ Module 2 shows map with screen pins ✅ All 7 filter toggles present and styled ✅ Fiber design system used consistently ✅ Mock data drives both modules ✅ No console errors ✅ Responsive layout (basic) ✅ Deploy to Replit public URL
+

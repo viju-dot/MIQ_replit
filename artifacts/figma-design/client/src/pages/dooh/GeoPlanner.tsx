@@ -135,7 +135,7 @@ export default function GeoPlanner() {
       }
       toast({ title: editId ? "Audience updated" : "Saved to library", description: `${data.name} contains ${data.geoDefinition.points?.length || data.geoDefinition.polygon?.length || 0} saved locations.` });
       setModalOpen(false);
-      setLocation("/saved-audiences");
+      setLocation("/saved-audiences?version=v1");
     } catch (error: any) {
       const message = error?.message || "Audience could not be saved.";
       setSaveError(message);

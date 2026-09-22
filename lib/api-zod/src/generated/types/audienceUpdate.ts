@@ -6,10 +6,13 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { AudienceUpdateGeoType } from './audienceUpdateGeoType';
+import type { AudienceUpdatePlannerVersion } from './audienceUpdatePlannerVersion';
 import type { GeoDefinition } from './geoDefinition';
+import type { GeoPlannerFilters } from './geoPlannerFilters';
 
 export interface AudienceUpdate {
   /**
+     * V1 also permits underscores; v2 audiences only permit ASCII letters, digits, and hyphens.
      * @minLength 5
      * @maxLength 50
      * @pattern ^[A-Za-z0-9_-]+$
@@ -22,4 +25,8 @@ export interface AudienceUpdate {
      * @maxLength 200
      */
   coverage?: string;
+  /** @maxLength 200 */
+  description?: string;
+  plannerVersion?: AudienceUpdatePlannerVersion;
+  plannerFilters?: GeoPlannerFilters;
 }

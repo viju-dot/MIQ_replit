@@ -19,6 +19,7 @@ const router: IRouter = Router();
 
 type GeoDefinition = AudienceData["geoDefinition"];
 type GeoType = AudienceData["geoType"];
+const V2_NAME_PATTERN = /^[A-Za-z0-9-]{5,50}$/;
 
 function geographyError(
   geoType: GeoType,
@@ -80,6 +81,14 @@ async function hasDuplicateName(name: string, excludedId?: string) {
   return rows.length > 0;
 }
 
+async function nextVersionedName(baseName: string): Promise<string> {
+  for (let version = 2; ; version += 1) {
+    const suffix = `-v${version}`;
+    const candidate = `${baseName.slice(0, 50 - suffix.length)}${suffix}`;
+    if (!(await hasDuplicateName(candidate))) return candidate;
+  }
+}
+
 function isUniqueViolation(error: unknown): boolean {
   return (
     typeof error === "object" &&
@@ -115,41 +124,70 @@ router.post("/dooh/audiences", async (req, res): Promise<void> => {
     return;
   }
 
-  if (await hasDuplicateName(parsed.data.name)) {
-    res.status(409).json({
-      error: `An audience named "${parsed.data.name}" already exists`,
+  if (
+    parsed.data.plannerVersion === "v2" &&
+    !V2_NAME_PATTERN.test(parsed.data.name)
+  ) {
+    res.status(400).json({
+      error:
+        "name: V2 audience names must be 5–50 characters using ASCII letters, digits, or hyphens only",
     });
     return;
   }
 
-  const data: AudienceData = {
-    name: parsed.data.name,
-    createdBy: parsed.data.createdBy ?? "DOOH Planner User",
-    geoType: parsed.data.geoType,
-    geoDefinition: parsed.data.geoDefinition,
-    coverage: parsed.data.coverage,
-    accountId: parsed.data.accountId ?? "ACC_SHARED",
-    ...(parsed.data.linkedBrief
-      ? { linkedBrief: parsed.data.linkedBrief }
-      : {}),
-    usageCount: 0,
-    isActive: true,
-  };
-
-  try {
-    const [created] = await db
-      .insert(savedAudiencesTable)
-      .values({ id: `AUD_${randomUUID()}`, data })
-      .returning();
-    res.status(201).json(CreateDoohAudienceResponse.parse(toAudience(created)));
-  } catch (error) {
-    if (isUniqueViolation(error)) {
+  const requestedName = parsed.data.name;
+  let savedName = requestedName;
+  if (await hasDuplicateName(savedName)) {
+    if (!parsed.data.allowDuplicate) {
       res.status(409).json({
-        error: `An audience named "${parsed.data.name}" already exists`,
+        error: `An audience named "${requestedName}" already exists`,
       });
       return;
     }
-    throw error;
+    savedName = await nextVersionedName(requestedName);
+  }
+
+  for (;;) {
+    const data: AudienceData = {
+      name: savedName,
+      createdBy: parsed.data.createdBy ?? "DOOH Planner User",
+      geoType: parsed.data.geoType,
+      geoDefinition: parsed.data.geoDefinition,
+      coverage: parsed.data.coverage,
+      accountId: parsed.data.accountId ?? "ACC_SHARED",
+      ...(parsed.data.linkedBrief !== undefined
+        ? { linkedBrief: parsed.data.linkedBrief }
+        : {}),
+      ...(parsed.data.description !== undefined
+        ? { description: parsed.data.description }
+        : {}),
+      ...(parsed.data.plannerVersion !== undefined
+        ? { plannerVersion: parsed.data.plannerVersion }
+        : {}),
+      ...(parsed.data.plannerFilters !== undefined
+        ? { plannerFilters: parsed.data.plannerFilters }
+        : {}),
+      usageCount: 0,
+      isActive: true,
+    };
+
+    try {
+      const [created] = await db
+        .insert(savedAudiencesTable)
+        .values({ id: `AUD_${randomUUID()}`, data })
+        .returning();
+      res.status(201).json(CreateDoohAudienceResponse.parse(toAudience(created)));
+      return;
+    } catch (error) {
+      if (!isUniqueViolation(error)) throw error;
+      if (!parsed.data.allowDuplicate) {
+        res.status(409).json({
+          error: `An audience named "${requestedName}" already exists`,
+        });
+        return;
+      }
+      savedName = await nextVersionedName(requestedName);
+    }
   }
 });
 
@@ -199,6 +237,16 @@ router.patch("/dooh/audiences/:id", async (req, res): Promise<void> => {
     geoDefinition:
       parsed.data.geoDefinition ?? existing.data.geoDefinition,
   };
+  if (
+    nextData.plannerVersion === "v2" &&
+    !V2_NAME_PATTERN.test(nextData.name)
+  ) {
+    res.status(400).json({
+      error:
+        "name: V2 audience names must be 5–50 characters using ASCII letters, digits, or hyphens only",
+    });
+    return;
+  }
   const geographyValidation = geographyError(
     nextData.geoType,
     nextData.geoDefinition,

@@ -16,6 +16,21 @@ export type AudiencePoint = {
   city?: string;
 };
 
+export type GeoPlannerFilters = {
+  market: "UK" | "EU" | "US";
+  mode: "Brand" | "Product" | "Category";
+  brand: string;
+  category: string;
+  intelligenceTab: "Audience" | "Commerce" | "TV" | "POI";
+  intelligenceFilters: {
+    category: string;
+    feature: string;
+    value: string;
+    logic: string;
+  };
+  topIndexing: "10%" | "15%" | "20%";
+};
+
 export type AudienceData = {
   name: string;
   createdBy: string;
@@ -29,6 +44,9 @@ export type AudienceData = {
   coverage: string;
   accountId: string;
   linkedBrief?: string;
+  description?: string;
+  plannerVersion?: "v2";
+  plannerFilters?: GeoPlannerFilters;
   usageCount: number;
   isActive: boolean;
 };

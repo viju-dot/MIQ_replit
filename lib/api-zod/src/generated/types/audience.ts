@@ -6,7 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { AudienceGeoType } from './audienceGeoType';
+import type { AudiencePlannerVersion } from './audiencePlannerVersion';
 import type { GeoDefinition } from './geoDefinition';
+import type { GeoPlannerFilters } from './geoPlannerFilters';
 
 export interface Audience {
   id: string;
@@ -19,6 +21,10 @@ export interface Audience {
   coverage: string;
   accountId: string;
   linkedBrief?: string;
+  /** @maxLength 200 */
+  description?: string;
+  plannerVersion?: AudiencePlannerVersion;
+  plannerFilters?: GeoPlannerFilters;
   /** @minimum 0 */
   usageCount: number;
   isActive: boolean;

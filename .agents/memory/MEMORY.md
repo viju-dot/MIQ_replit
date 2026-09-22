@@ -4,3 +4,4 @@
 - [E2E tester staleness](e2e-tester-staleness.md) — reused testers can false-FAIL on stale state; re-verify with a fresh tester + DOM-level assertions before looping fixes.
 - [Figma variable harvesting](figma-variables.md) — getVariableDefs works only on frame-level nodes, returns one resolved mode (no dark collection), and Effect()/Font() values need conversion to valid CSS.
 - [Case-study evidence](case-study-evidence.md) — distinguish requested direction from observed versions; no retrospective changes to the TV prototype to make the narrative fit.
+- [DOOH MVP boundaries](dooh-v2-decisions.md) — keep mock planning distinct from live activation; duplicate saves create confirmed new versions without overwriting existing audiences.

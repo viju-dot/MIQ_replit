@@ -83,6 +83,12 @@ export interface Prototype {
 
 const STORAGE_KEY = "fiber:ai-prototype:prototypes:v2";
 
+/** Canonical registry ids used to keep DOOH's URL shell and collaboration view aligned. */
+export const DOOH_VERSION_IDS = {
+  v1: "dooh_v1",
+  v2: "dooh_v2",
+} as const;
+
 /* ---------------------------------------------------------------------- */
 /* id + time helpers                                                       */
 /* ---------------------------------------------------------------------- */
@@ -141,20 +147,36 @@ const SEED: Prototype[] = [
     status: "Live",
     route: "/dooh-planner",
     createdAt: "2026-09-18T00:00:00.000Z",
-    versions: [{
-      id: "dooh_v1",
-      name: "V1",
-      createdAt: "2026-09-18T00:00:00.000Z",
-      updatedAt: "2026-09-18T00:00:00.000Z",
-      description: "Interactive DOOH Planner with GeoPlanner and saved audiences.",
-      rendererKey: "dooh",
-      status: "active",
-      snapshot: {
-        description: "Audience-led DOOH screen discovery with eight filters, interactive UK map, and Excel shortlist export.",
-        status: "Live",
-        notes: "Demo inventory. Shared persisted audience library. Activation is outside this prototype.",
+    versions: [
+      {
+        id: DOOH_VERSION_IDS.v1,
+        name: "V1",
+        createdAt: "2026-09-18T00:00:00.000Z",
+        updatedAt: "2026-09-18T00:00:00.000Z",
+        description: "Interactive DOOH Planner with GeoPlanner and saved audiences.",
+        rendererKey: "dooh",
+        status: "active",
+        snapshot: {
+          description: "Audience-led DOOH screen discovery with eight filters, interactive UK map, and Excel shortlist export.",
+          status: "Live",
+          notes: "Demo inventory. Shared persisted audience library. Activation is outside this prototype.",
+        },
       },
-    }],
+      {
+        id: DOOH_VERSION_IDS.v2,
+        name: "V2",
+        createdAt: "2026-10-02T00:00:00.000Z",
+        updatedAt: "2026-10-02T00:00:00.000Z",
+        description: "Updated DOOH planning experience with the V2 Geo Planner and DOOH workflow.",
+        rendererKey: "dooh",
+        status: "active",
+        snapshot: {
+          description: "Digital out-of-home planning: build and reuse audiences, find screens, and export campaign shortlists.",
+          status: "Live",
+          notes: "Current DOOH experience. Original V1 remains available from version history.",
+        },
+      },
+    ],
     share: { enabled: false, token: "", secured: false, password: "" },
   },
   {
@@ -406,16 +428,28 @@ function readLocal(): Prototype[] {
     const clean = parsed
       .map(coercePrototype)
       .filter((p): p is Prototype => p !== null);
-    // Permanently backfill new version fields on legacy local records.
-    if (JSON.stringify(clean) !== JSON.stringify(parsed)) {
+    // Permanently add the canonical DOOH versions to an existing local
+    // override. This is deliberately scoped to DOOH: it preserves the user's
+    // edited prototype fields, existing versions and their collaboration ids.
+    const doohSeed = SEED.find((prototype) => prototype.id === "dooh");
+    const migrated = clean.map((prototype) =>
+      prototype.id === "dooh" &&
+      doohSeed &&
+      !prototype.versions.some((version) => version.id === DOOH_VERSION_IDS.v2)
+        ? reconcileSeededVersions(prototype, doohSeed)
+        : prototype,
+    );
+    // Permanently backfill new version fields and the DOOH V2 seed on legacy
+    // local records. Once present, the migration is idempotent.
+    if (JSON.stringify(migrated) !== JSON.stringify(parsed)) {
       try {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(clean));
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
       } catch {
         // Reconciled values still remain available in memory when storage is
         // unavailable or full; a later read can retry the durable backfill.
       }
     }
-    return clean;
+    return migrated;
   } catch {
     return [];
   }

@@ -46,6 +46,8 @@ export const listDoohAudiencesResponseGeoDefinitionPolygonMax = 1000;
 
 export const listDoohAudiencesResponseGeoDefinitionCoverageMax = 200;
 
+export const listDoohAudiencesResponseDescriptionMax = 200;
+
 export const listDoohAudiencesResponseUsageCountMin = 0;
 export const listDoohAudiencesResponseUsageCountMultipleOf = 1;
 
@@ -75,6 +77,22 @@ export const ListDoohAudiencesResponseItem = zod.object({
   "coverage": zod.string(),
   "accountId": zod.string(),
   "linkedBrief": zod.string().optional(),
+  "description": zod.string().max(listDoohAudiencesResponseDescriptionMax).optional(),
+  "plannerVersion": zod.enum(['v2']).optional(),
+  "plannerFilters": zod.object({
+  "market": zod.enum(['UK', 'EU', 'US']),
+  "mode": zod.enum(['Brand', 'Product', 'Category']),
+  "brand": zod.string(),
+  "category": zod.string(),
+  "intelligenceTab": zod.enum(['Audience', 'Commerce', 'TV', 'POI']),
+  "intelligenceFilters": zod.object({
+  "category": zod.string(),
+  "feature": zod.string(),
+  "value": zod.string(),
+  "logic": zod.string()
+}),
+  "topIndexing": zod.enum(['10%', '15%', '20%'])
+}).optional(),
   "usageCount": zod.number().min(listDoohAudiencesResponseUsageCountMin).multipleOf(listDoohAudiencesResponseUsageCountMultipleOf),
   "isActive": zod.boolean()
 })
@@ -123,10 +141,12 @@ export const createDoohAudienceBodyAccountIdMax = 100;
 
 export const createDoohAudienceBodyLinkedBriefMax = 200;
 
+export const createDoohAudienceBodyDescriptionMax = 200;
+
 
 
 export const CreateDoohAudienceBody = zod.object({
-  "name": zod.string().min(createDoohAudienceBodyNameMin).max(createDoohAudienceBodyNameMax).regex(createDoohAudienceBodyNameRegExp),
+  "name": zod.string().min(createDoohAudienceBodyNameMin).max(createDoohAudienceBodyNameMax).regex(createDoohAudienceBodyNameRegExp).describe('V1 also permits underscores; when plannerVersion is v2 only ASCII letters, digits, and hyphens are permitted.'),
   "geoType": zod.enum(['points', 'polygon', 'radius']),
   "geoDefinition": zod.object({
   "points": zod.array(zod.object({
@@ -145,7 +165,24 @@ export const CreateDoohAudienceBody = zod.object({
   "coverage": zod.string().min(1).max(createDoohAudienceBodyCoverageMax),
   "createdBy": zod.string().min(1).max(createDoohAudienceBodyCreatedByMax).optional(),
   "accountId": zod.string().min(1).max(createDoohAudienceBodyAccountIdMax).optional(),
-  "linkedBrief": zod.string().min(1).max(createDoohAudienceBodyLinkedBriefMax).optional()
+  "linkedBrief": zod.string().min(1).max(createDoohAudienceBodyLinkedBriefMax).optional(),
+  "description": zod.string().max(createDoohAudienceBodyDescriptionMax).optional(),
+  "plannerVersion": zod.enum(['v2']).optional(),
+  "plannerFilters": zod.object({
+  "market": zod.enum(['UK', 'EU', 'US']),
+  "mode": zod.enum(['Brand', 'Product', 'Category']),
+  "brand": zod.string(),
+  "category": zod.string(),
+  "intelligenceTab": zod.enum(['Audience', 'Commerce', 'TV', 'POI']),
+  "intelligenceFilters": zod.object({
+  "category": zod.string(),
+  "feature": zod.string(),
+  "value": zod.string(),
+  "logic": zod.string()
+}),
+  "topIndexing": zod.enum(['10%', '15%', '20%'])
+}).optional(),
+  "allowDuplicate": zod.boolean().optional()
 })
 
 export const createDoohAudienceResponseGeoDefinitionPointsItemLatMin = -90;
@@ -173,6 +210,8 @@ export const createDoohAudienceResponseGeoDefinitionPolygonMin = 3;
 export const createDoohAudienceResponseGeoDefinitionPolygonMax = 1000;
 
 export const createDoohAudienceResponseGeoDefinitionCoverageMax = 200;
+
+export const createDoohAudienceResponseDescriptionMax = 200;
 
 export const createDoohAudienceResponseUsageCountMin = 0;
 export const createDoohAudienceResponseUsageCountMultipleOf = 1;
@@ -203,6 +242,22 @@ export const CreateDoohAudienceResponse = zod.object({
   "coverage": zod.string(),
   "accountId": zod.string(),
   "linkedBrief": zod.string().optional(),
+  "description": zod.string().max(createDoohAudienceResponseDescriptionMax).optional(),
+  "plannerVersion": zod.enum(['v2']).optional(),
+  "plannerFilters": zod.object({
+  "market": zod.enum(['UK', 'EU', 'US']),
+  "mode": zod.enum(['Brand', 'Product', 'Category']),
+  "brand": zod.string(),
+  "category": zod.string(),
+  "intelligenceTab": zod.enum(['Audience', 'Commerce', 'TV', 'POI']),
+  "intelligenceFilters": zod.object({
+  "category": zod.string(),
+  "feature": zod.string(),
+  "value": zod.string(),
+  "logic": zod.string()
+}),
+  "topIndexing": zod.enum(['10%', '15%', '20%'])
+}).optional(),
   "usageCount": zod.number().min(createDoohAudienceResponseUsageCountMin).multipleOf(createDoohAudienceResponseUsageCountMultipleOf),
   "isActive": zod.boolean()
 })
@@ -251,10 +306,12 @@ export const updateDoohAudienceBodyGeoDefinitionCoverageMax = 200;
 
 export const updateDoohAudienceBodyCoverageMax = 200;
 
+export const updateDoohAudienceBodyDescriptionMax = 200;
+
 
 
 export const UpdateDoohAudienceBody = zod.object({
-  "name": zod.string().min(updateDoohAudienceBodyNameMin).max(updateDoohAudienceBodyNameMax).regex(updateDoohAudienceBodyNameRegExp).optional(),
+  "name": zod.string().min(updateDoohAudienceBodyNameMin).max(updateDoohAudienceBodyNameMax).regex(updateDoohAudienceBodyNameRegExp).optional().describe('V1 also permits underscores; v2 audiences only permit ASCII letters, digits, and hyphens.'),
   "geoType": zod.enum(['points', 'polygon', 'radius']).optional(),
   "geoDefinition": zod.object({
   "points": zod.array(zod.object({
@@ -270,7 +327,23 @@ export const UpdateDoohAudienceBody = zod.object({
 })).min(updateDoohAudienceBodyGeoDefinitionPolygonMin).max(updateDoohAudienceBodyGeoDefinitionPolygonMax).optional(),
   "coverage": zod.string().max(updateDoohAudienceBodyGeoDefinitionCoverageMax).optional()
 }).optional(),
-  "coverage": zod.string().min(1).max(updateDoohAudienceBodyCoverageMax).optional()
+  "coverage": zod.string().min(1).max(updateDoohAudienceBodyCoverageMax).optional(),
+  "description": zod.string().max(updateDoohAudienceBodyDescriptionMax).optional(),
+  "plannerVersion": zod.enum(['v2']).optional(),
+  "plannerFilters": zod.object({
+  "market": zod.enum(['UK', 'EU', 'US']),
+  "mode": zod.enum(['Brand', 'Product', 'Category']),
+  "brand": zod.string(),
+  "category": zod.string(),
+  "intelligenceTab": zod.enum(['Audience', 'Commerce', 'TV', 'POI']),
+  "intelligenceFilters": zod.object({
+  "category": zod.string(),
+  "feature": zod.string(),
+  "value": zod.string(),
+  "logic": zod.string()
+}),
+  "topIndexing": zod.enum(['10%', '15%', '20%'])
+}).optional()
 })
 
 export const updateDoohAudienceResponseGeoDefinitionPointsItemLatMin = -90;
@@ -298,6 +371,8 @@ export const updateDoohAudienceResponseGeoDefinitionPolygonMin = 3;
 export const updateDoohAudienceResponseGeoDefinitionPolygonMax = 1000;
 
 export const updateDoohAudienceResponseGeoDefinitionCoverageMax = 200;
+
+export const updateDoohAudienceResponseDescriptionMax = 200;
 
 export const updateDoohAudienceResponseUsageCountMin = 0;
 export const updateDoohAudienceResponseUsageCountMultipleOf = 1;
@@ -328,6 +403,22 @@ export const UpdateDoohAudienceResponse = zod.object({
   "coverage": zod.string(),
   "accountId": zod.string(),
   "linkedBrief": zod.string().optional(),
+  "description": zod.string().max(updateDoohAudienceResponseDescriptionMax).optional(),
+  "plannerVersion": zod.enum(['v2']).optional(),
+  "plannerFilters": zod.object({
+  "market": zod.enum(['UK', 'EU', 'US']),
+  "mode": zod.enum(['Brand', 'Product', 'Category']),
+  "brand": zod.string(),
+  "category": zod.string(),
+  "intelligenceTab": zod.enum(['Audience', 'Commerce', 'TV', 'POI']),
+  "intelligenceFilters": zod.object({
+  "category": zod.string(),
+  "feature": zod.string(),
+  "value": zod.string(),
+  "logic": zod.string()
+}),
+  "topIndexing": zod.enum(['10%', '15%', '20%'])
+}).optional(),
   "usageCount": zod.number().min(updateDoohAudienceResponseUsageCountMin).multipleOf(updateDoohAudienceResponseUsageCountMultipleOf),
   "isActive": zod.boolean()
 })
@@ -369,6 +460,8 @@ export const archiveDoohAudienceResponseGeoDefinitionPolygonMax = 1000;
 
 export const archiveDoohAudienceResponseGeoDefinitionCoverageMax = 200;
 
+export const archiveDoohAudienceResponseDescriptionMax = 200;
+
 export const archiveDoohAudienceResponseUsageCountMin = 0;
 export const archiveDoohAudienceResponseUsageCountMultipleOf = 1;
 
@@ -398,6 +491,22 @@ export const ArchiveDoohAudienceResponse = zod.object({
   "coverage": zod.string(),
   "accountId": zod.string(),
   "linkedBrief": zod.string().optional(),
+  "description": zod.string().max(archiveDoohAudienceResponseDescriptionMax).optional(),
+  "plannerVersion": zod.enum(['v2']).optional(),
+  "plannerFilters": zod.object({
+  "market": zod.enum(['UK', 'EU', 'US']),
+  "mode": zod.enum(['Brand', 'Product', 'Category']),
+  "brand": zod.string(),
+  "category": zod.string(),
+  "intelligenceTab": zod.enum(['Audience', 'Commerce', 'TV', 'POI']),
+  "intelligenceFilters": zod.object({
+  "category": zod.string(),
+  "feature": zod.string(),
+  "value": zod.string(),
+  "logic": zod.string()
+}),
+  "topIndexing": zod.enum(['10%', '15%', '20%'])
+}).optional(),
   "usageCount": zod.number().min(archiveDoohAudienceResponseUsageCountMin).multipleOf(archiveDoohAudienceResponseUsageCountMultipleOf),
   "isActive": zod.boolean()
 })
@@ -439,6 +548,8 @@ export const useDoohAudienceResponseGeoDefinitionPolygonMax = 1000;
 
 export const useDoohAudienceResponseGeoDefinitionCoverageMax = 200;
 
+export const useDoohAudienceResponseDescriptionMax = 200;
+
 export const useDoohAudienceResponseUsageCountMin = 0;
 export const useDoohAudienceResponseUsageCountMultipleOf = 1;
 
@@ -468,6 +579,22 @@ export const UseDoohAudienceResponse = zod.object({
   "coverage": zod.string(),
   "accountId": zod.string(),
   "linkedBrief": zod.string().optional(),
+  "description": zod.string().max(useDoohAudienceResponseDescriptionMax).optional(),
+  "plannerVersion": zod.enum(['v2']).optional(),
+  "plannerFilters": zod.object({
+  "market": zod.enum(['UK', 'EU', 'US']),
+  "mode": zod.enum(['Brand', 'Product', 'Category']),
+  "brand": zod.string(),
+  "category": zod.string(),
+  "intelligenceTab": zod.enum(['Audience', 'Commerce', 'TV', 'POI']),
+  "intelligenceFilters": zod.object({
+  "category": zod.string(),
+  "feature": zod.string(),
+  "value": zod.string(),
+  "logic": zod.string()
+}),
+  "topIndexing": zod.enum(['10%', '15%', '20%'])
+}).optional(),
   "usageCount": zod.number().min(useDoohAudienceResponseUsageCountMin).multipleOf(useDoohAudienceResponseUsageCountMultipleOf),
   "isActive": zod.boolean()
 })

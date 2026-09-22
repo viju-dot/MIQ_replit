@@ -75,6 +75,67 @@ export const AudienceGeoType = {
   radius: 'radius',
 } as const;
 
+export type AudiencePlannerVersion = typeof AudiencePlannerVersion[keyof typeof AudiencePlannerVersion];
+
+
+export const AudiencePlannerVersion = {
+  v2: 'v2',
+} as const;
+
+export type GeoPlannerFiltersMarket = typeof GeoPlannerFiltersMarket[keyof typeof GeoPlannerFiltersMarket];
+
+
+export const GeoPlannerFiltersMarket = {
+  UK: 'UK',
+  EU: 'EU',
+  US: 'US',
+} as const;
+
+export type GeoPlannerFiltersMode = typeof GeoPlannerFiltersMode[keyof typeof GeoPlannerFiltersMode];
+
+
+export const GeoPlannerFiltersMode = {
+  Brand: 'Brand',
+  Product: 'Product',
+  Category: 'Category',
+} as const;
+
+export type GeoPlannerFiltersIntelligenceTab = typeof GeoPlannerFiltersIntelligenceTab[keyof typeof GeoPlannerFiltersIntelligenceTab];
+
+
+export const GeoPlannerFiltersIntelligenceTab = {
+  Audience: 'Audience',
+  Commerce: 'Commerce',
+  TV: 'TV',
+  POI: 'POI',
+} as const;
+
+export type GeoPlannerFiltersTopIndexing = typeof GeoPlannerFiltersTopIndexing[keyof typeof GeoPlannerFiltersTopIndexing];
+
+
+export const GeoPlannerFiltersTopIndexing = {
+  '10%': '10%',
+  '15%': '15%',
+  '20%': '20%',
+} as const;
+
+export type GeoPlannerFiltersIntelligenceFilters = {
+  category: string;
+  feature: string;
+  value: string;
+  logic: string;
+};
+
+export interface GeoPlannerFilters {
+  market: GeoPlannerFiltersMarket;
+  mode: GeoPlannerFiltersMode;
+  brand: string;
+  category: string;
+  intelligenceTab: GeoPlannerFiltersIntelligenceTab;
+  intelligenceFilters: GeoPlannerFiltersIntelligenceFilters;
+  topIndexing: GeoPlannerFiltersTopIndexing;
+}
+
 export interface Audience {
   id: string;
   name: string;
@@ -86,6 +147,10 @@ export interface Audience {
   coverage: string;
   accountId: string;
   linkedBrief?: string;
+  /** @maxLength 200 */
+  description?: string;
+  plannerVersion?: AudiencePlannerVersion;
+  plannerFilters?: GeoPlannerFilters;
   /** @minimum 0 */
   usageCount: number;
   isActive: boolean;
@@ -100,8 +165,16 @@ export const AudienceInputGeoType = {
   radius: 'radius',
 } as const;
 
+export type AudienceInputPlannerVersion = typeof AudienceInputPlannerVersion[keyof typeof AudienceInputPlannerVersion];
+
+
+export const AudienceInputPlannerVersion = {
+  v2: 'v2',
+} as const;
+
 export interface AudienceInput {
   /**
+     * V1 also permits underscores; when plannerVersion is v2 only ASCII letters, digits, and hyphens are permitted.
      * @minLength 5
      * @maxLength 50
      * @pattern ^[A-Za-z0-9_-]+$
@@ -129,6 +202,11 @@ export interface AudienceInput {
      * @maxLength 200
      */
   linkedBrief?: string;
+  /** @maxLength 200 */
+  description?: string;
+  plannerVersion?: AudienceInputPlannerVersion;
+  plannerFilters?: GeoPlannerFilters;
+  allowDuplicate?: boolean;
 }
 
 export type AudienceUpdateGeoType = typeof AudienceUpdateGeoType[keyof typeof AudienceUpdateGeoType];
@@ -140,8 +218,16 @@ export const AudienceUpdateGeoType = {
   radius: 'radius',
 } as const;
 
+export type AudienceUpdatePlannerVersion = typeof AudienceUpdatePlannerVersion[keyof typeof AudienceUpdatePlannerVersion];
+
+
+export const AudienceUpdatePlannerVersion = {
+  v2: 'v2',
+} as const;
+
 export interface AudienceUpdate {
   /**
+     * V1 also permits underscores; v2 audiences only permit ASCII letters, digits, and hyphens.
      * @minLength 5
      * @maxLength 50
      * @pattern ^[A-Za-z0-9_-]+$
@@ -154,6 +240,10 @@ export interface AudienceUpdate {
      * @maxLength 200
      */
   coverage?: string;
+  /** @maxLength 200 */
+  description?: string;
+  plannerVersion?: AudienceUpdatePlannerVersion;
+  plannerFilters?: GeoPlannerFilters;
 }
 
 /**

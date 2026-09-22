@@ -247,6 +247,14 @@ components:
           type: string
         linkedBrief:
           type: string
+        description:
+          type: string
+          maxLength: 200
+        plannerVersion:
+          type: string
+          enum: [v2]
+        plannerFilters:
+          $ref: "#/components/schemas/GeoPlannerFilters"
         usageCount:
           type: number
           minimum: 0
@@ -263,6 +271,7 @@ components:
           minLength: 5
           maxLength: 50
           pattern: "^[A-Za-z0-9_-]+$"
+          description: V1 also permits underscores; when plannerVersion is v2 only ASCII letters, digits, and hyphens are permitted.
         geoType:
           type: string
           enum: [points, polygon, radius]
@@ -284,6 +293,16 @@ components:
           type: string
           minLength: 1
           maxLength: 200
+        description:
+          type: string
+          maxLength: 200
+        plannerVersion:
+          type: string
+          enum: [v2]
+        plannerFilters:
+          $ref: "#/components/schemas/GeoPlannerFilters"
+        allowDuplicate:
+          type: boolean
     AudienceUpdate:
       type: object
       additionalProperties: false
@@ -293,6 +312,7 @@ components:
           minLength: 5
           maxLength: 50
           pattern: "^[A-Za-z0-9_-]+$"
+          description: V1 also permits underscores; v2 audiences only permit ASCII letters, digits, and hyphens.
         geoType:
           type: string
           enum: [points, polygon, radius]
@@ -302,4 +322,48 @@ components:
           type: string
           minLength: 1
           maxLength: 200
+        description:
+          type: string
+          maxLength: 200
+        plannerVersion:
+          type: string
+          enum: [v2]
+        plannerFilters:
+          $ref: "#/components/schemas/GeoPlannerFilters"
+    GeoPlannerFilters:
+      type: object
+      additionalProperties: false
+      required:
+        [market, mode, brand, category, intelligenceTab,
+         intelligenceFilters, topIndexing]
+      properties:
+        market:
+          type: string
+          enum: [UK, EU, US]
+        mode:
+          type: string
+          enum: [Brand, Product, Category]
+        brand:
+          type: string
+        category:
+          type: string
+        intelligenceTab:
+          type: string
+          enum: [Audience, Commerce, TV, POI]
+        intelligenceFilters:
+          type: object
+          additionalProperties: false
+          required: [category, feature, value, logic]
+          properties:
+            category:
+              type: string
+            feature:
+              type: string
+            value:
+              type: string
+            logic:
+              type: string
+        topIndexing:
+          type: string
+          enum: ["10%", "15%", "20%"]
 

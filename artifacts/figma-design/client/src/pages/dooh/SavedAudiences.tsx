@@ -22,6 +22,15 @@ function AudiencePreview({ audience, onUse, isUsing }: { audience: Audience; onU
         <div><strong className="block text-gray-500 mb-1 text-xs uppercase tracking-wide">Created by</strong><p>{audience.createdBy}</p><p className="text-gray-400 text-xs">{format(new Date(audience.createdDate), "PPP")}</p></div>
         <div><strong className="block text-gray-500 mb-1 text-xs uppercase tracking-wide">Geography</strong><p className="capitalize">{audience.geoType} · {metadataPoints.length} coordinate{metadataPoints.length === 1 ? "" : "s"}{audience.geoType === "radius" && audience.geoDefinition.radius ? ` · ${audience.geoDefinition.radius.toLocaleString()}m radius` : ""}</p></div>
         <div><strong className="block text-gray-500 mb-1 text-xs uppercase tracking-wide">Coverage</strong><p>{audience.coverage}</p></div>
+        {audience.description && <div><strong className="block text-gray-500 mb-1 text-xs uppercase tracking-wide">Description</strong><p className="break-words">{audience.description}</p></div>}
+        {audience.plannerFilters && <div>
+          <strong className="block text-gray-500 mb-1 text-xs uppercase tracking-wide">Submitted Geo Planner filters · V2</strong>
+          <p>{audience.plannerFilters.market} · {audience.plannerFilters.mode} · {audience.plannerFilters.brand}</p>
+          <p>{audience.plannerFilters.category} · {audience.plannerFilters.intelligenceTab} intelligence</p>
+          <p>{Object.values(audience.plannerFilters.intelligenceFilters).join(" › ")}</p>
+          <p>Top indexing geos: {audience.plannerFilters.topIndexing}</p>
+          <p className="text-xs text-gray-500 mt-1">Mock intelligence snapshot. Geographic matching does not imply live audience forecasts.</p>
+        </div>}
         <div><strong className="block text-gray-500 mb-1 text-xs uppercase tracking-wide">Usage</strong><p>Used {audience.usageCount} times</p></div>
         <div>
           <strong className="block text-gray-500 mb-1 text-xs uppercase tracking-wide">All saved coordinates</strong>
@@ -50,7 +59,7 @@ function AudiencePreview({ audience, onUse, isUsing }: { audience: Audience; onU
   );
 }
 
-export default function SavedAudiences() {
+export default function SavedAudiences({ version = "v2" }: { version?: "v1" | "v2" }) {
   const audiencesQuery = useAudiences();
   const [search, setSearch] = useState("");
   const [previewAudience, setPreviewAudience] = useState<Audience | null>(null);
@@ -65,7 +74,7 @@ export default function SavedAudiences() {
   const handleUse = async (id: string) => {
     try {
       await useAudience(id);
-      setLocation(`/dooh-planner?audience=${encodeURIComponent(id)}`);
+      setLocation(`/dooh-planner?version=${version}&audience=${encodeURIComponent(id)}`);
     } catch (error: any) {
       toast({ title: "Audience could not be used", description: error?.message || "Please try again.", variant: "destructive" });
     }
@@ -87,7 +96,7 @@ export default function SavedAudiences() {
       <div className="p-8 pb-4 shrink-0">
         <div className="flex flex-wrap gap-4 justify-between items-end mb-6">
           <div><h1 className="text-2xl font-bold text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]">Saved Audiences</h1><p className="text-gray-500 mt-1">Total saved: {audiences.filter(audience => audience.isActive).length} audiences</p></div>
-          <Link href="/geo-planner" className="bg-[var(--colours-blue-300,#d194ff)] text-[#2b0030] hover:bg-[#c178f7] h-10 px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center">+ Create New</Link>
+          <Link href={`/geo-planner?version=${version}`} className="bg-[var(--colours-blue-300,#d194ff)] text-[#2b0030] hover:bg-[#c178f7] h-10 px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center">+ Create New</Link>
         </div>
         <div className="relative max-w-md mb-6"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" /><Input value={search} onChange={event => setSearch(event.target.value)} placeholder="Type to filter by name..." className="pl-10" />{search && <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-blue-500">Clear</button>}</div>
       </div>
@@ -103,12 +112,17 @@ export default function SavedAudiences() {
               <tbody className="divide-y divide-gray-100">
                 {audiencesQuery.isLoading ? <tr><td colSpan={6} className="px-6 py-12 text-center text-gray-500"><Loader2 className="w-5 h-5 mx-auto mb-2 animate-spin" />Loading audiences…</td></tr> : filtered.length === 0 ? <tr><td colSpan={6} className="px-6 py-12 text-center text-gray-500">{search ? "No audiences match this search." : "No saved audiences yet."}</td></tr> : filtered.map(audience => (
                   <tr key={audience.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-gray-900">{audience.name}</td>
+                    <td className="px-6 py-4 font-medium text-gray-900">{audience.name}{audience.plannerVersion === "v2" && <span className="ml-2 text-xs text-purple-700">V2</span>}{audience.description && <p className="font-normal text-xs text-gray-500 mt-1 max-w-xs break-words">{audience.description}</p>}</td>
                     <td className="px-6 py-4 text-gray-600"><div className="flex items-center gap-1"><MapPin className="w-3 h-3" />{audience.geoType === "points" ? `${audience.geoDefinition.points?.length || 0} points` : audience.geoType === "polygon" ? `Polygon · ${audience.geoDefinition.polygon?.length || 0} vertices` : `Radius · ${audience.geoDefinition.radius?.toLocaleString() || "—"}m`}</div></td>
                     <td className="px-6 py-4 text-gray-600"><div className="flex items-center gap-1"><Users className="w-3 h-3" />{audience.coverage}</div></td>
                     <td className="px-6 py-4 text-gray-600"><span className="bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">{audience.usageCount}×</span></td>
                     <td className="px-6 py-4 text-gray-600">{format(new Date(audience.createdDate), "MMM d, yyyy")}<span className="block text-xs text-gray-400">by {audience.createdBy}</span></td>
-                    <td className="px-6 py-4 text-right space-x-2"><Button aria-label={`Preview ${audience.name}`} variant="ghost" size="sm" onClick={() => setPreviewAudience(audience)} className="h-8 px-2 text-gray-600"><Eye className="w-4 h-4" /></Button><Link aria-label={`Edit ${audience.name}`} href={`/geo-planner?edit=${encodeURIComponent(audience.id)}`} className="inline-flex items-center justify-center rounded-md hover:bg-accent h-8 px-2 text-gray-600"><Edit2 className="w-4 h-4" /></Link><Button aria-label={`Archive ${audience.name}`} variant="ghost" size="sm" onClick={() => setArchiveAudience(audience)} className="h-8 px-2 text-red-600 hover:bg-red-50"><Trash2 className="w-4 h-4" /></Button><Button onClick={() => handleUse(audience.id)} disabled={isUsing} size="sm" className="h-8 bg-[var(--surface-background-miq,#2b0030)] text-white hover:bg-[#440140]">Use</Button></td>
+                    <td className="px-6 py-4 text-right space-x-2">
+                      <Button aria-label={`Preview ${audience.name}`} variant="ghost" size="sm" onClick={() => setPreviewAudience(audience)} className="h-8 px-2 text-gray-600"><Eye className="w-4 h-4" /></Button>
+                      <Link aria-label={`Edit ${audience.name}`} href={`/geo-planner?version=${audience.plannerVersion === "v2" ? "v2" : "v1"}&edit=${encodeURIComponent(audience.id)}`} className="inline-flex items-center justify-center rounded-md hover:bg-accent h-8 px-2 text-gray-600"><Edit2 className="w-4 h-4" /></Link>
+                      <Button aria-label={`Archive ${audience.name}`} variant="ghost" size="sm" onClick={() => setArchiveAudience(audience)} className="h-8 px-2 text-red-600 hover:bg-red-50"><Trash2 className="w-4 h-4" /></Button>
+                      <Button onClick={() => handleUse(audience.id)} disabled={isUsing} size="sm" className="h-8 bg-[var(--surface-background-miq,#2b0030)] text-white hover:bg-[#440140]">Use</Button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
