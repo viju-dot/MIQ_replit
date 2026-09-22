@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useLocation, useSearch, Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { MapPin, Info, Save, ChevronRight, SlidersHorizontal, Network, Trash2 } from "lucide-react";
+import { MapPin, Info, Save, ChevronRight, Trash2 } from "lucide-react";
 import { CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
 import { useAudiences, GeoPlannerFilters } from "../api";
+import { SmartCard, SearchableDropdown, TabsBarUnderline, FiberButton, IconButton } from "./primitives";
 import { computeMockResults } from "./geoMock";
 import { SaveAudienceV2 } from "./SaveAudienceV2";
 import "./GeoPlannerV2.css";
@@ -185,169 +186,132 @@ export default function GeoPlannerV2() {
       )}
 
       {/* Filters Card */}
-      <div className="v2-card">
-        <div className="flex items-center gap-2 mb-6">
-          <SlidersHorizontal className="w-5 h-5 text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]" />
-          <h2 className="text-[16px] font-bold text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
-            Filters
-          </h2>
-        </div>
-        
+      <SmartCard title="Filters">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div>
-            <label className="v2-filter-label">Market</label>
-            <select 
-              value={filters.market} 
-              onChange={e => handleFilterChange('market', e.target.value)}
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-[var(--dooh-purple)] focus:ring-1 focus:ring-[var(--dooh-purple)] outline-none"
-            >
-              <option value="UK">UK</option>
-              <option value="EU">EU</option>
-              <option value="US">US</option>
-            </select>
-          </div>
-          <div>
-            <label className="v2-filter-label">Mode</label>
-            <select 
-              value={filters.mode} 
-              onChange={e => handleFilterChange('mode', e.target.value)}
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-[var(--dooh-purple)] focus:ring-1 focus:ring-[var(--dooh-purple)] outline-none"
-            >
-              <option value="Brand">Brand</option>
-              <option value="Product">Product</option>
-              <option value="Category">Category</option>
-            </select>
-          </div>
-          <div>
-            <label className="v2-filter-label">Brand</label>
-            <select 
-              value={filters.brand} 
-              onChange={e => handleFilterChange('brand', e.target.value)}
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-[var(--dooh-purple)] focus:ring-1 focus:ring-[var(--dooh-purple)] outline-none"
-            >
-              <option value="& OTHER STORIES">& OTHER STORIES</option>
-              <option value="Brand A">Brand A</option>
-              <option value="Brand B">Brand B</option>
-            </select>
-          </div>
-          <div>
-            <label className="v2-filter-label">Category</label>
-            <select 
-              value={filters.category} 
-              onChange={e => handleFilterChange('category', e.target.value)}
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-[var(--dooh-purple)] focus:ring-1 focus:ring-[var(--dooh-purple)] outline-none"
-            >
-              <option value="Other">Other</option>
-              <option value="Electronics">Electronics</option>
-              <option value="Fashion">Fashion</option>
-            </select>
-          </div>
+          <SearchableDropdown 
+            id="market-filter"
+            label="Market"
+            value={filters.market}
+            onChange={v => handleFilterChange('market', v)}
+            options={[
+              { value: "UK", label: "UK" },
+              { value: "EU", label: "EU" },
+              { value: "US", label: "US" }
+            ]}
+          />
+          <SearchableDropdown 
+            id="mode-filter"
+            label="Mode"
+            value={filters.mode}
+            onChange={v => handleFilterChange('mode', v)}
+            options={[
+              { value: "Brand", label: "Brand" },
+              { value: "Product", label: "Product" },
+              { value: "Category", label: "Category" }
+            ]}
+          />
+          <SearchableDropdown 
+            id="brand-filter"
+            label="Brand"
+            value={filters.brand}
+            onChange={v => handleFilterChange('brand', v)}
+            options={[
+              { value: "& OTHER STORIES", label: "& OTHER STORIES" },
+              { value: "Brand A", label: "Brand A" },
+              { value: "Brand B", label: "Brand B" }
+            ]}
+          />
+          <SearchableDropdown 
+            id="category-filter"
+            label="Category"
+            value={filters.category}
+            onChange={v => handleFilterChange('category', v)}
+            options={[
+              { value: "Other", label: "Other" },
+              { value: "Electronics", label: "Electronics" },
+              { value: "Fashion", label: "Fashion" }
+            ]}
+          />
         </div>
-      </div>
+      </SmartCard>
 
       {/* Select Intelligence Card */}
-      <div className="v2-card">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-200 pb-4 mb-6 gap-4">
-          <div className="flex items-center gap-2">
-            <Network className="w-5 h-5 text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]" />
-            <h2 className="text-[16px] font-bold text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
-              Select Intelligence
-            </h2>
-          </div>
-          
-          <div className="flex gap-6">
-            {['Audience', 'Commerce', 'TV', 'POI'].map(tab => (
-              <button
-                key={tab}
-                onClick={() => handleFilterChange('intelligenceTab', tab)}
-                className={`pb-4 -mb-[17px] text-[14px] font-medium transition-colors border-b-2 ${
-                  filters.intelligenceTab === tab 
-                    ? 'border-[var(--dooh-purple)] text-[var(--dooh-purple)]' 
-                    : 'border-transparent text-gray-500 hover:text-gray-900'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-        </div>
-        
+      <SmartCard 
+        title="Select Intelligence"
+        right={
+          <TabsBarUnderline 
+            options={['Audience', 'Commerce', 'TV', 'POI']}
+            value={filters.intelligenceTab}
+            onChange={v => handleFilterChange('intelligenceTab', v)}
+          />
+        }
+      >
         <div className="flex flex-col sm:flex-row gap-4 items-end">
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <div>
-              <label className="v2-filter-label">Category</label>
-              <select 
-                value={filters.intelligenceFilters.category} 
-                onChange={e => handleFilterChange('intelligenceFilters.category', e.target.value)}
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-[var(--dooh-purple)] outline-none"
-              >
-                <option value="Consumer Behaviour">Consumer Behaviour</option>
-              </select>
-            </div>
-            <div>
-              <label className="v2-filter-label">Feature</label>
-              <select 
-                value={filters.intelligenceFilters.feature} 
-                onChange={e => handleFilterChange('intelligenceFilters.feature', e.target.value)}
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-[var(--dooh-purple)] outline-none"
-              >
-                <option value="Alcohol">Alcohol</option>
-              </select>
-            </div>
-            <div>
-              <label className="v2-filter-label">Value</label>
-              <select 
-                value={filters.intelligenceFilters.value} 
-                onChange={e => handleFilterChange('intelligenceFilters.value', e.target.value)}
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-[var(--dooh-purple)] outline-none"
-              >
-                <option value="Avg Spend On Beer Lager Ciders">Average Spend On Beer Lager Ciders</option>
-              </select>
-            </div>
-            <div>
-              <label className="v2-filter-label">Logic</label>
-              <select 
-                value={filters.intelligenceFilters.logic} 
-                onChange={e => handleFilterChange('intelligenceFilters.logic', e.target.value)}
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-[var(--dooh-purple)] outline-none"
-              >
-                <option value="None">None</option>
-                <option value="AND">AND</option>
-                <option value="OR">OR</option>
-              </select>
-            </div>
+            <SearchableDropdown 
+              id="intelligence-category"
+              label="Category"
+              value={filters.intelligenceFilters.category}
+              onChange={v => handleFilterChange('intelligenceFilters.category', v)}
+              options={[{ value: "Consumer Behaviour", label: "Consumer Behaviour" }]}
+            />
+            <SearchableDropdown 
+              id="intelligence-feature"
+              label="Feature"
+              value={filters.intelligenceFilters.feature}
+              onChange={v => handleFilterChange('intelligenceFilters.feature', v)}
+              options={[{ value: "Alcohol", label: "Alcohol" }]}
+            />
+            <SearchableDropdown 
+              id="intelligence-value"
+              label="Value"
+              value={filters.intelligenceFilters.value}
+              onChange={v => handleFilterChange('intelligenceFilters.value', v)}
+              options={[{ value: "Avg Spend On Beer Lager Ciders", label: "Average Spend On Beer Lager Ciders" }]}
+            />
+            <SearchableDropdown 
+              id="intelligence-logic"
+              label="Logic"
+              value={filters.intelligenceFilters.logic}
+              onChange={v => handleFilterChange('intelligenceFilters.logic', v)}
+              options={[
+                { value: "None", label: "None" },
+                { value: "AND", label: "AND" },
+                { value: "OR", label: "OR" }
+              ]}
+            />
           </div>
-          <button 
-            onClick={handleClearIntelligence}
-            className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors shrink-0"
-            title="Clear filters"
-          >
-            <Trash2 className="w-5 h-5" />
-          </button>
+          <div className="mb-[2px]">
+            <IconButton 
+              icon={Trash2}
+              onClick={handleClearIntelligence}
+              ariaLabel="Clear filters"
+            />
+          </div>
         </div>
         
         <div className="mt-8 flex flex-col sm:flex-row items-end justify-between gap-4">
           <div className="w-full sm:w-64">
-            <label className="v2-filter-label">Top Indexing Geos</label>
-            <select 
-              value={filters.topIndexing} 
-              onChange={e => handleFilterChange('topIndexing', e.target.value)}
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-[var(--dooh-purple)] outline-none"
-            >
-              <option value="10%">10%</option>
-              <option value="15%">15%</option>
-              <option value="20%">20%</option>
-            </select>
+            <SearchableDropdown 
+              id="top-indexing"
+              label="Top Indexing Geos"
+              value={filters.topIndexing}
+              onChange={v => handleFilterChange('topIndexing', v)}
+              options={[
+                { value: "10%", label: "10%" },
+                { value: "15%", label: "15%" },
+                { value: "20%", label: "20%" }
+              ]}
+            />
           </div>
-          <Button 
+          <FiberButton 
             onClick={handleSubmit} 
-            className="w-full sm:w-auto bg-[#f4f4f5] hover:bg-[#e1e1e8] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] px-8 font-medium disabled:opacity-50 border border-gray-200"
             disabled={!isDirty}
           >
             Submit
-          </Button>
+          </FiberButton>
         </div>
-      </div>
+      </SmartCard>
 
       {/* Results Section */}
       {results && submittedFilters ? (
@@ -405,14 +369,14 @@ export default function GeoPlannerV2() {
       {/* Bottom Save Bar */}
       <div className="geo-save-bar">
         <div>
-          <Button 
+          <FiberButton 
+            variant="secondary"
             onClick={() => setModalOpen(true)}
-            className="bg-[#f4f4f5] hover:bg-[#e1e1e8] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] font-medium border border-gray-200"
             disabled={isDirty || !submittedFilters || isV1Audience}
           >
             <Save className="w-4 h-4 mr-2" />
             Save audience
-          </Button>
+          </FiberButton>
         </div>
       </div>
 

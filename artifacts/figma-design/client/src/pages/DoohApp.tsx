@@ -11,6 +11,7 @@ import GeoPlanner from "./dooh/GeoPlanner";
 import SavedAudiences from "./dooh/SavedAudiences";
 import GeoPlannerV2 from "./dooh/v2/GeoPlannerV2";
 import DoohPlannerV2 from "./dooh/v2/DoohPlannerV2";
+import { FiberButton } from "./dooh/v2/primitives";
 import "./dooh/styles.css";
 import "./dooh/versionShell.css";
 import "leaflet/dist/leaflet.css";
@@ -101,12 +102,9 @@ function DoohVersionedContent() {
                 Activation is not connected in this prototype.
                 <div className="absolute top-full right-4 -mt-1 border-4 border-transparent border-t-gray-800"></div>
               </div>
-              <button
-                disabled
-                className="px-4 py-1.5 text-[14px] font-medium text-gray-500 bg-gray-100 rounded-md cursor-not-allowed border border-gray-200"
-              >
+              <FiberButton variant="secondary" disabled>
                 Activate
-              </button>
+              </FiberButton>
             </div>
           )}
         </nav>
