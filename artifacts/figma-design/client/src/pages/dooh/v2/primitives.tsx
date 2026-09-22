@@ -13,12 +13,14 @@ export function SmartCard({
   title,
   subtitle,
   right,
+  rightOnDivider = false,
   children,
   ariaLabel,
 }: {
   title: string;
   subtitle?: string;
   right?: ReactNode;
+  rightOnDivider?: boolean;
   children: ReactNode;
   ariaLabel?: string;
 }) {
@@ -29,8 +31,10 @@ export function SmartCard({
       className="flex w-full flex-col rounded-[var(--radius-50,4px)]"
       style={{ backgroundColor: CARD_BG, boxShadow: CARD_SHADOW, overflow: "visible" }}
     >
-      <div className="flex flex-wrap items-center justify-between gap-[var(--spacing-100,8px)] p-[var(--spacing-200,16px)]">
-        <div className="flex min-w-0 flex-col gap-[var(--spacing-25,2px)]">
+      <div className="flex flex-wrap items-center justify-between gap-[var(--spacing-100,8px)] p-[var(--spacing-200,16px)]"
+        style={rightOnDivider ? { paddingBottom: 0, alignItems: "flex-end" } : undefined}>
+        <div className="flex min-w-0 flex-col gap-[var(--spacing-25,2px)]"
+          style={rightOnDivider ? { paddingBottom: "var(--spacing-200,16px)" } : undefined}>
           <p
             className="text-[length:var(--headline-xs-medium-size,16px)] font-bold leading-[var(--headline-xs-medium-line-height,24px)] tracking-[-0.08px]"
             style={{ fontFamily: FONT, color: TITLE }}
@@ -47,7 +51,8 @@ export function SmartCard({
           )}
         </div>
         {right && (
-          <div className="flex shrink-0 flex-wrap items-center justify-end gap-[var(--spacing-100,8px)]">
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-[var(--spacing-100,8px)]"
+            style={rightOnDivider ? { position: "relative", zIndex: 1, marginBottom: -1 } : undefined}>
             {right}
           </div>
         )}

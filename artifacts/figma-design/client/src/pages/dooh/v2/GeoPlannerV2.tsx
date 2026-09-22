@@ -238,6 +238,7 @@ export default function GeoPlannerV2() {
       {/* Select Intelligence Card */}
       <SmartCard 
         title="Select Intelligence"
+        rightOnDivider
         right={
           <TabsBarUnderline 
             options={['Audience', 'Commerce', 'TV', 'POI']}
