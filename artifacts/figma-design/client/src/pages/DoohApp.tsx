@@ -89,8 +89,8 @@ function DoohVersionedContent() {
       </header>
       <div className="dooh-page-content">
       <section className="dooh-page-intro" aria-labelledby="dooh-page-title">
-        <h1 id="dooh-page-title">{isGeo ? "Geo Planner" : isSaved ? "Saved Audiences" : "DOOH Planner – Find & Plan Screens"}</h1>
-        {!isSaved && <p>{isGeo ? "Select filters and intelligence to build your target audience, then save for reuse." : "Use saved audiences or upload data to find digital out-of-home screens."}</p>}
+        <h1 id="dooh-page-title">{isSaved ? "Saved Audiences" : "Audience & DOOH Planner"}</h1>
+        {!isSaved && <p>Build target audiences and plan digital out-of-home screens.</p>}
         <nav aria-label="DOOH navigation" className="dooh-fiber-tabs flex justify-between items-center w-full">
           <FiberRoundedTabsBar>
             <FiberTabLink rounded href={moduleLink("/geo-planner")} selected={isGeo} label="Geo Planner" />
