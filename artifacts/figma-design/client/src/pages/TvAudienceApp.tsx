@@ -237,7 +237,7 @@ function useMediaQuery(query: string): boolean {
  * full module list) renders at >=1024px; the "sm" variant (collapsed module
  * dropdown + logo) renders below 1024px. Both are 64px tall on the #2b0030 MiQ
  * surface with 24px padding, space-between, sharing the same right cluster. */
-function PrimaryNavigation() {
+export function PrimaryNavigation() {
   const isLarge = useMediaQuery("(min-width: 1024px)");
   return (
     <div
@@ -293,7 +293,7 @@ function PrimaryNavigation() {
 /* ------------------------------------------------- Secondary Navigation ---- */
 /* Reports module row. Anatomy/tokens and labels match the Reports variant in
  * NavigationPage.tsx SecondaryNavigation. */
-function SecondaryNavigation() {
+export function SecondaryNavigation({ activeSection = "Standard" }: { activeSection?: "Standard" | "Advanced" } = {}) {
   const activeColor = "text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]";
   const regularColor = "text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]";
   return (
@@ -311,10 +311,10 @@ function SecondaryNavigation() {
         className="absolute left-1/2 top-[calc(50%+0.5px)] flex -translate-x-1/2 -translate-y-1/2 items-center gap-[var(--spacing-24,24px)] whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] not-italic leading-[var(--body-md-regular-line-height,20px)]"
         style={{ fontFamily: FONT }}
       >
-        <a href="/tv-audience-intelligence" aria-current="page" className={`shrink-0 font-semibold ${activeColor}`}>
+        <a href="/tv-audience-intelligence" aria-current={activeSection === "Standard" ? "page" : undefined} className={`shrink-0 ${activeSection === "Standard" ? `font-semibold ${activeColor}` : `font-normal ${regularColor}`}`}>
           Standard
         </a>
-        <span className={`shrink-0 font-normal ${regularColor}`}>Advanced</span>
+        <span aria-current={activeSection === "Advanced" ? "page" : undefined} className={`shrink-0 ${activeSection === "Advanced" ? `font-semibold ${activeColor}` : `font-normal ${regularColor}`}`}>Advanced</span>
       </nav>
     </div>
   );

@@ -1,72 +1,12 @@
 import { useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig } from "@/components/playground/types";
+import { TabItem, type TabItemState } from "@/components/FiberTabItem";
 
 /* =========================================================================
  * Tab items (underline-style tab) — node 3412:7887
  * States: Default | Selected | Disabled | Hover | Hover-selected
  * ========================================================================= */
-
-type TabItemState =
-  | "Default"
-  | "Selected"
-  | "Disabled"
-  | "Hover"
-  | "Hover-selected";
-
-const tabItemTextColor: Record<TabItemState, string> = {
-  Default:
-    "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)",
-  Selected: "var(--surface-foreground-dynamic-brand-default, #7c33b5)",
-  Disabled: "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)",
-  Hover:
-    "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)",
-  "Hover-selected": "var(--surface-foreground-dynamic-brand-hover, #662994)",
-};
-
-const tabItemLineColor: Record<TabItemState, string> = {
-  Default: "var(--border-static-subtle-neutral, #e1e1e8)",
-  Selected: "var(--border-dynamic-brand-selected, #7c33b5)",
-  Disabled: "var(--border-static-subtle-neutral, #e1e1e8)",
-  Hover: "var(--border-static-subtle-neutral, #e1e1e8)",
-  "Hover-selected": "var(--border-dynamic-brand-hover, #662994)",
-};
-
-function TabItem({
-  label = "Tab",
-  state = "Default",
-}: {
-  label?: string;
-  state?: TabItemState;
-}) {
-  const isHoverBg = state === "Hover" || state === "Hover-selected";
-  return (
-    <div
-      className="flex flex-col items-start gap-2 transition-colors duration-150"
-      style={
-        isHoverBg
-          ? {
-              backgroundColor:
-                "var(--container-dynamic-neutral-subtle-background-hover, rgba(113,113,128,0.08))",
-            }
-          : undefined
-      }
-    >
-      <div className="flex items-center gap-2.5 px-4">
-        <p
-          className="whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)] font-normal font-['DM_Sans',Helvetica]"
-          style={{ color: tabItemTextColor[state] }}
-        >
-          {label}
-        </p>
-      </div>
-      <div
-        className="h-0 w-full border-t transition-colors duration-150"
-        style={{ borderColor: tabItemLineColor[state] }}
-      />
-    </div>
-  );
-}
 
 /* =========================================================================
  * Tab (rounded / pill-style tab) — node 3412:8347

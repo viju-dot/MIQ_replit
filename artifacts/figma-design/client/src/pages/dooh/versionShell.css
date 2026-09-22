@@ -1,20 +1,10 @@
-.dooh-version-header { background: var(--surface-background-miq, #2b0030); color: white; min-height: 64px; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; position: relative; z-index: 50; }
-.dooh-version-brand { display: flex; align-items: center; gap: 30px; }
-.dooh-version-brand > strong { font-size: 27px; letter-spacing: -1.5px; line-height: 1; }
-.dooh-version-brand > span { display: flex; gap: 14px; font-size: 13px; color: #e6dce9; }
-.dooh-version-actions { display: flex; align-items: center; gap: 20px; font-size: 12px; }
-.dooh-version-actions label { display: flex; gap: 8px; align-items: center; }
-.dooh-version-actions select { background: #fff; color: #35253d; padding: 6px 8px; border-radius: 4px; border: 1px solid #ded5e3; }
-.dooh-version-actions a { color: #d5abed; }
-.dooh-version-nav { display: flex; gap: 28px; align-items: stretch; padding: 0 24px; border-bottom: 1px solid var(--surface-background-lvl4, #e1e1e8); background: white; font-size: 13px; overflow-x: auto; flex-shrink: 0; }
-.dooh-version-nav a { display: flex; align-items: center; padding: 15px 0 12px; border-bottom: 3px solid transparent; color: #60546a; font-weight: 600; white-space: nowrap; }
-.dooh-version-nav a[aria-current="page"] { color: #7c33b5; border-bottom-color: #7c33b5; }
-.dooh-version-nav > span { margin-left: auto; align-self: center; font-size: 11px; white-space: nowrap; color: #7b7183; }
+.dooh-version-nav { display: flex; gap: 16px; align-items: center; padding: 12px 24px; border-bottom: 1px solid var(--border-static-subtle-neutral, #e1e1e8); background: var(--surface-background-lvl1, white); font-family: "DM Sans", Helvetica, sans-serif; flex-shrink: 0; flex-wrap: wrap; }
+.dooh-fiber-tabs { display: flex; min-width: 0; max-width: 100%; }
+.dooh-version-tools { margin-left: auto; display: flex; align-items: center; gap: 20px; }
+.dooh-version-tools > a { font-size: 12px; color: var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59); white-space: nowrap; }
+.dooh-version-tools > a:hover { text-decoration: underline; }
 @media (max-width: 680px) {
-  .dooh-version-header { padding: 12px 16px; flex-wrap: wrap; gap: 14px; }
-  .dooh-version-brand { gap: 20px; }
-  .dooh-demo-user { display: none; }
-  .dooh-version-actions { gap: 20px; justify-content: space-between; width: 100%; }
-  .dooh-version-nav { padding: 0 16px; gap: 24px; }
-  .dooh-version-nav > span { display: none; }
+  .dooh-version-nav { padding: 12px 16px; gap: 16px; }
+  .dooh-fiber-tabs { overflow-x: auto; padding-bottom: 4px; }
+  .dooh-version-tools { width: 100%; margin-left: 0; justify-content: space-between; }
 }

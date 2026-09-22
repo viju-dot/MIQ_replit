@@ -4,6 +4,9 @@ import { PrototypeCollabOverlay, PrototypeCommentLayer } from "@/components/Prot
 import { DesignAnnotationLayer } from "@/components/DesignAnnotationLayer";
 import { DOOH_VERSION_IDS } from "@/lib/prototypeStore";
 import { usePrototypeVersion } from "@/lib/prototypeVersionContext";
+import { PrimaryNavigation, SecondaryNavigation } from "./TvAudienceApp";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FiberTabLink } from "@/components/FiberTabItem";
 import DoohPlanner from "./dooh/DoohPlanner";
 import GeoPlanner from "./dooh/GeoPlanner";
 import SavedAudiences from "./dooh/SavedAudiences";
@@ -80,24 +83,28 @@ function DoohVersionedContent() {
 
   return (
     <div className="min-h-screen flex flex-col dooh-theme bg-[var(--surface-background-lvl2,#f7f7fa)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]">
-      <header className="dooh-version-header">
-        <div className="dooh-version-brand"><strong aria-label="MiQ">MiQ</strong><span>Reports <span aria-hidden="true">›</span> Advanced</span></div>
-        <div className="dooh-version-actions">
-          <label>Version <select aria-label="Planner version" value={version} onChange={event => {
-            const params = new URLSearchParams(search);
-            params.set("version", event.target.value);
-            params.delete("edit");
-            navigate(`${location}?${params}`);
-          }}><option value="v2">V2 · Current</option><option value="v1">V1 · Original</option></select></label>
-          <span className="dooh-demo-user">Demo user</span>
-          <Link href="/ai-prototype">Exit demo</Link>
-        </div>
+      <header className="relative z-50 shrink-0" aria-label="Fiber navigation">
+        <PrimaryNavigation />
+        <SecondaryNavigation activeSection="Advanced" />
       </header>
       <nav aria-label="DOOH navigation" className="dooh-version-nav">
-        <Link href={moduleLink("/geo-planner")} aria-current={isGeo ? "page" : undefined}>Geo Planner</Link>
-        <Link href={moduleLink("/dooh-planner")} aria-current={!isGeo && !isSaved ? "page" : undefined}>DOOH</Link>
-        <Link href={moduleLink("/saved-audiences")} aria-current={isSaved ? "page" : undefined}>Saved Audiences</Link>
-        <span>Planning prototype · Mock inventory</span>
+        <div className="dooh-fiber-tabs">
+          <FiberTabLink href={moduleLink("/geo-planner")} selected={isGeo} label="Geo Planner" />
+          <FiberTabLink href={moduleLink("/dooh-planner")} selected={!isGeo && !isSaved} label="DOOH" />
+          <FiberTabLink href={moduleLink("/saved-audiences")} selected={isSaved} label="Saved Audiences" />
+        </div>
+        <div className="dooh-version-tools">
+          <Select value={version} onValueChange={value => {
+            const params = new URLSearchParams(search);
+            params.set("version", value);
+            params.delete("edit");
+            navigate(`${location}?${params}`);
+          }}>
+            <SelectTrigger aria-label="Planner version" className="h-8 w-[140px] text-xs"><SelectValue /></SelectTrigger>
+            <SelectContent><SelectItem value="v2">V2 · Current</SelectItem><SelectItem value="v1">V1 · Original</SelectItem></SelectContent>
+          </Select>
+          <Link href="/ai-prototype">Exit demo</Link>
+        </div>
       </nav>
 
       <main className="flex-1 relative flex flex-col overflow-hidden">
