@@ -19,4 +19,10 @@ Use the TV Audience Planner's Fiber navigation as the reference for DOOH's produ
 
 **Why:** The user rejected a custom MiQ wordmark/breadcrumb/demo-controls header in favor of the existing Fiber primary and Reports secondary navigation.
 
-**How to apply:** Keep Reports / Advanced active for DOOH, and place planner-specific tabs and version controls below the product navigation rather than rebuilding the top bar. The user also rejected custom styling for the module tabs: reuse the actual Fiber catalogue component and its states, not a visually similar custom tab bar.
+**How to apply:** Keep Reports / Advanced active for DOOH, and place planner-specific tabs below the product navigation rather than rebuilding the top bar. The user also rejected custom styling for the module tabs: reuse the actual Fiber catalogue component and its states, not a visually similar custom tab bar.
+
+Keep the planner navigation limited to Geo Planner and DOOH, using Fiber rounded tabs below the page heading, without breadcrumbs or extra version/exit controls.
+
+**Why:** The user explicitly wants only these two modules in navigation and considers the bottom-right collaboration controls sufficient for version and exit actions.
+
+**How to apply:** Do not reintroduce a Saved Audiences navigation tab or duplicate toolbar controls when extending the planner. Preserve saved-audience data and reuse functionality.

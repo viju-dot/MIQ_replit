@@ -1,11 +1,10 @@
 import { useEffect, useRef } from "react";
-import { useLocation, useSearch, Link } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { PrototypeCollabOverlay, PrototypeCommentLayer } from "@/components/PrototypeCollabOverlay";
 import { DesignAnnotationLayer } from "@/components/DesignAnnotationLayer";
 import { DOOH_VERSION_IDS } from "@/lib/prototypeStore";
 import { usePrototypeVersion } from "@/lib/prototypeVersionContext";
 import { PrimaryNavigation, SecondaryNavigation } from "./TvAudienceApp";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FiberTabLink } from "@/components/FiberTabItem";
 import DoohPlanner from "./dooh/DoohPlanner";
 import GeoPlanner from "./dooh/GeoPlanner";
@@ -87,25 +86,14 @@ function DoohVersionedContent() {
         <PrimaryNavigation />
         <SecondaryNavigation activeSection="Advanced" />
       </header>
-      <nav aria-label="DOOH navigation" className="dooh-version-nav">
-        <div className="dooh-fiber-tabs">
-          <FiberTabLink href={moduleLink("/geo-planner")} selected={isGeo} label="Geo Planner" />
-          <FiberTabLink href={moduleLink("/dooh-planner")} selected={!isGeo && !isSaved} label="DOOH" />
-          <FiberTabLink href={moduleLink("/saved-audiences")} selected={isSaved} label="Saved Audiences" />
-        </div>
-        <div className="dooh-version-tools">
-          <Select value={version} onValueChange={value => {
-            const params = new URLSearchParams(search);
-            params.set("version", value);
-            params.delete("edit");
-            navigate(`${location}?${params}`);
-          }}>
-            <SelectTrigger aria-label="Planner version" className="h-8 w-[140px] text-xs"><SelectValue /></SelectTrigger>
-            <SelectContent><SelectItem value="v2">V2 · Current</SelectItem><SelectItem value="v1">V1 · Original</SelectItem></SelectContent>
-          </Select>
-          <Link href="/ai-prototype">Exit demo</Link>
-        </div>
-      </nav>
+      <section className="dooh-page-intro" aria-labelledby="dooh-page-title">
+        <h1 id="dooh-page-title">{isGeo ? "Geo Planner" : isSaved ? "Saved Audiences" : "DOOH Planner – Find & Plan Screens"}</h1>
+        {!isSaved && <p>{isGeo ? "Select filters and intelligence to build your target audience, then save for reuse." : "Use saved audiences or upload data to find digital out-of-home screens."}</p>}
+        <nav aria-label="DOOH navigation" className="dooh-fiber-tabs">
+          <FiberTabLink rounded href={moduleLink("/geo-planner")} selected={isGeo} label="Geo Planner" />
+          <FiberTabLink rounded href={moduleLink("/dooh-planner")} selected={!isGeo && !isSaved} label="DOOH" />
+        </nav>
+      </section>
 
       <main className="flex-1 relative flex flex-col overflow-hidden">
         <div key={`${location}?${search}`} className="flex-1 flex flex-col min-w-0">{content}</div>

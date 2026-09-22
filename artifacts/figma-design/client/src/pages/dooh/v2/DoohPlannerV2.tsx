@@ -161,18 +161,6 @@ export default function DoohPlannerV2() {
 
   return (
     <div className="dooh-v2-planner flex flex-col flex-1 h-full font-fiber">
-      <div className="dooh-v2-header px-6 py-4 flex flex-col bg-white border-b border-gray-200">
-        <div className="flex items-center text-xs text-gray-500 mb-1">
-          <span className="hover:underline cursor-pointer">Reports</span>
-          <span className="mx-2">›</span>
-          <span className="hover:underline cursor-pointer">Advanced</span>
-          <span className="mx-2">›</span>
-          <span className="hover:underline cursor-pointer">Modules</span>
-        </div>
-        <h1 className="text-xl font-semibold text-gray-900">🎯 DOOH Planner - Find & Plan Screens</h1>
-        <p className="text-sm text-gray-600 mt-1">Use saved audiences or upload data to find digital out-of-home screens</p>
-      </div>
-
       <div className="flex flex-1 overflow-hidden">
         <SidebarV2 filters={filters} setFilters={setFilters} />
         

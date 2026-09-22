@@ -34,7 +34,25 @@ export function TabItem({ label = "Tab", state = "Default" }: { label?: string; 
   );
 }
 
-export function FiberTabLink({ label, href, selected }: { label: string; href: string; selected: boolean }) {
+export type TabPillState = "Selected" | "Active" | "Disabled" | "Hover";
+
+/** Fiber rounded tab — Figma node 3412:8347. */
+export function TabPill({ label = "Tab 1", state = "Selected" }: { label?: string; state?: TabPillState }) {
+  const styles: Record<TabPillState, { bg?: string; color: string }> = {
+    Selected: { bg: "var(--container-dynamic-brand-subtle-background-selected, #f6ebff)", color: "var(--surface-foreground-dynamic-brand-default, #7c33b5)" },
+    Active: { color: "var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59)" },
+    Disabled: { color: "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)" },
+    Hover: { bg: "var(--container-dynamic-neutral-subtle-background-hover, rgba(113,113,128,0.08))", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" },
+  };
+  const s = styles[state];
+  return (
+    <div className="flex h-[30px] items-center rounded-[20px] px-4 py-[5px] transition-colors duration-150" style={{ backgroundColor: s.bg ?? "transparent" }}>
+      <p className="whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)] font-normal font-['DM_Sans',Helvetica]" style={{ color: s.color }}>{label}</p>
+    </div>
+  );
+}
+
+export function FiberTabLink({ label, href, selected, rounded = false }: { label: string; href: string; selected: boolean; rounded?: boolean }) {
   const [hovered, setHovered] = useState(false);
   const state: TabItemState = selected ? hovered ? "Hover-selected" : "Selected" : hovered ? "Hover" : "Default";
   return (
@@ -42,7 +60,7 @@ export function FiberTabLink({ label, href, selected }: { label: string; href: s
       className="shrink-0 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
       style={{ outlineColor: "var(--border-dynamic-brand-selected, #7c33b5)" }}
       onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-      <TabItem label={label} state={state} />
+      {rounded ? <TabPill label={label} state={selected ? "Selected" : hovered ? "Hover" : "Active"} /> : <TabItem label={label} state={state} />}
     </Link>
   );
 }

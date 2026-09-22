@@ -331,14 +331,6 @@ export default function GeoPlannerV2() {
 
       {/* Center - Main Content Area */}
       <div className="v2-main dooh-scrollbar">
-        <div className="mb-2">
-          <h1 className="text-2xl font-bold text-[var(--dooh-purple)] flex items-center">
-            <Activity className="w-6 h-6 mr-2 text-[var(--dooh-accent)]" />
-            Geo Planner
-          </h1>
-          <p className="text-gray-500 mt-1">Select filters and intelligence to build your target audience, then save for reuse.</p>
-        </div>
-
         {isV1Audience && (
           <div className="mb-6 rounded border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
             This audience was created in the original Geo Planner and lacks V2 filters.

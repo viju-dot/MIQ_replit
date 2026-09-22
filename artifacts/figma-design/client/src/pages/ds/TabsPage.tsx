@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig } from "@/components/playground/types";
-import { TabItem, type TabItemState } from "@/components/FiberTabItem";
+import { TabItem, TabPill, type TabItemState, type TabPillState } from "@/components/FiberTabItem";
 
 /* =========================================================================
  * Tab items (underline-style tab) — node 3412:7887
@@ -12,52 +12,6 @@ import { TabItem, type TabItemState } from "@/components/FiberTabItem";
  * Tab (rounded / pill-style tab) — node 3412:8347
  * States: Selected | Active | Disabled | Hover
  * ========================================================================= */
-
-type TabPillState = "Selected" | "Active" | "Disabled" | "Hover";
-
-function TabPill({
-  label = "Tab 1",
-  state = "Selected",
-}: {
-  label?: string;
-  state?: TabPillState;
-}) {
-  const styles: Record<
-    TabPillState,
-    { bg?: string; color: string }
-  > = {
-    Selected: {
-      bg: "var(--container-dynamic-brand-subtle-background-selected, #f6ebff)",
-      color: "var(--surface-foreground-dynamic-brand-default, #7c33b5)",
-    },
-    Active: {
-      color:
-        "var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59)",
-    },
-    Disabled: {
-      color: "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)",
-    },
-    Hover: {
-      bg: "var(--container-dynamic-neutral-subtle-background-hover, rgba(113,113,128,0.08))",
-      color:
-        "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)",
-    },
-  };
-  const s = styles[state];
-  return (
-    <div
-      className="flex h-[30px] items-center rounded-[20px] px-4 py-[5px] transition-colors duration-150"
-      style={{ backgroundColor: s.bg ?? "transparent" }}
-    >
-      <p
-        className="whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)] font-normal font-['DM_Sans',Helvetica]"
-        style={{ color: s.color }}
-      >
-        {label}
-      </p>
-    </div>
-  );
-}
 
 /* =========================================================================
  * Interactive underline Tabs bar (Amount = N Items, Rounded = No)

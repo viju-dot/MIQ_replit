@@ -1,10 +1,7 @@
-.dooh-version-nav { display: flex; gap: 16px; align-items: center; padding: 12px 24px; border-bottom: 1px solid var(--border-static-subtle-neutral, #e1e1e8); background: var(--surface-background-lvl1, white); font-family: "DM Sans", Helvetica, sans-serif; flex-shrink: 0; flex-wrap: wrap; }
-.dooh-fiber-tabs { display: flex; min-width: 0; max-width: 100%; }
-.dooh-version-tools { margin-left: auto; display: flex; align-items: center; gap: 20px; }
-.dooh-version-tools > a { font-size: 12px; color: var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59); white-space: nowrap; }
-.dooh-version-tools > a:hover { text-decoration: underline; }
+.dooh-page-intro { padding: 24px; background: var(--surface-background-lvl1, #fff); border-bottom: 1px solid var(--border-static-subtle-neutral, #e1e1e8); font-family: "DM Sans", Helvetica, sans-serif; }
+.dooh-page-intro h1 { margin: 0; font-size: 24px; line-height: 32px; font-weight: 600; color: var(--surface-foreground-static-neutral-lvl1, #13131a); }
+.dooh-page-intro > p { margin: 4px 0 0; font-size: 14px; line-height: 20px; color: var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59); }
+.dooh-fiber-tabs { display: flex; gap: 8px; margin-top: 20px; }
 @media (max-width: 680px) {
-  .dooh-version-nav { padding: 12px 16px; gap: 16px; }
-  .dooh-fiber-tabs { overflow-x: auto; padding-bottom: 4px; }
-  .dooh-version-tools { width: 100%; margin-left: 0; justify-content: space-between; }
+  .dooh-page-intro { padding: 20px 16px; }
 }
