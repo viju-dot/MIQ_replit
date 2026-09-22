@@ -90,11 +90,25 @@ function DoohVersionedContent() {
       <section className="dooh-page-intro" aria-labelledby="dooh-page-title">
         <h1 id="dooh-page-title">{isGeo ? "Geo Planner" : isSaved ? "Saved Audiences" : "DOOH Planner – Find & Plan Screens"}</h1>
         {!isSaved && <p>{isGeo ? "Select filters and intelligence to build your target audience, then save for reuse." : "Use saved audiences or upload data to find digital out-of-home screens."}</p>}
-        <nav aria-label="DOOH navigation" className="dooh-fiber-tabs">
+        <nav aria-label="DOOH navigation" className="dooh-fiber-tabs flex justify-between items-center w-full">
           <FiberRoundedTabsBar>
             <FiberTabLink rounded href={moduleLink("/geo-planner")} selected={isGeo} label="Geo Planner" />
             <FiberTabLink rounded href={moduleLink("/dooh-planner")} selected={!isGeo && !isSaved} label="DOOH" />
           </FiberRoundedTabsBar>
+          {isGeo && (
+            <div className="relative group ml-auto flex items-center">
+              <div className="absolute bottom-full right-0 mb-2 w-48 p-2 text-xs text-center text-white bg-gray-800 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                Activation is not connected in this prototype.
+                <div className="absolute top-full right-4 -mt-1 border-4 border-transparent border-t-gray-800"></div>
+              </div>
+              <button
+                disabled
+                className="px-4 py-1.5 text-[14px] font-medium text-gray-500 bg-gray-100 rounded-md cursor-not-allowed border border-gray-200"
+              >
+                Activate
+              </button>
+            </div>
+          )}
         </nav>
       </section>
 

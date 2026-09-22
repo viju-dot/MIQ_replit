@@ -1,36 +1,28 @@
 .v2-layout {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   width: 100%;
-  overflow: hidden;
-  background-color: var(--surface-background-lvl2, #f7f7fa);
-}
-
-.v2-sidebar {
-  width: 30%;
-  min-width: 300px;
-  max-width: 400px;
-  background-color: var(--surface-background-lvl1, #ffffff);
-  border-right: 1px solid var(--surface-background-lvl4, #e1e1e8);
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.v2-sidebar-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px;
-}
-
-.v2-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow-y: auto;
-  padding: 24px;
   gap: 24px;
+  padding-bottom: 96px; /* Space for the bottom sticky bar */
+}
+
+/* Keep the action usable alongside the fixed collaboration controls. */
+.geo-save-bar {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 40;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 16px 464px 16px 64px;
+  background: var(--surface-background-lvl1, #fff);
+  border-top: 1px solid var(--border-static-subtle-neutral, #e1e1e8);
+  box-shadow: 0 -2px 8px rgba(113, 113, 128, 0.06);
+}
+@media (max-width: 1023px) {
+  .geo-save-bar { padding: 16px 64px 88px; }
+  .v2-layout { padding-bottom: 168px; }
 }
 
 .v2-card {
@@ -39,22 +31,6 @@
   border-radius: var(--fiber-radius-md, 8px);
   padding: 24px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.v2-bottom-bar {
-  background-color: var(--surface-background-lvl1, #ffffff);
-  border-top: 1px solid var(--surface-background-lvl4, #e1e1e8);
-  padding: 16px 24px;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
-}
-
-.v2-filter-group {
-  margin-bottom: 24px;
 }
 
 .v2-filter-label {
