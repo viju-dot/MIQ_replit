@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig } from "@/components/playground/types";
-import { TabItem, TabPill, type TabItemState, type TabPillState } from "@/components/FiberTabItem";
+import { TabItem, TabPill, FiberRoundedTabsBar, type TabItemState, type TabPillState } from "@/components/FiberTabItem";
 
 /* =========================================================================
  * Tab items (underline-style tab) — node 3412:7887
@@ -78,7 +78,7 @@ function InteractiveRoundedTabs({
   const [active, setActive] = useState(0);
   const [hover, setHover] = useState<number | null>(null);
   return (
-    <div className="inline-flex flex-wrap items-center gap-1 rounded-[24px] bg-[var(--container-dynamic-neutral-subtle-background-hover,#71718014)] p-0.5">
+    <FiberRoundedTabsBar>
       {Array.from({ length: count }).map((_, i) => {
         const selected = i === active;
         const hovered = i === hover;
@@ -108,7 +108,7 @@ function InteractiveRoundedTabs({
           </button>
         );
       })}
-    </div>
+    </FiberRoundedTabsBar>
   );
 }
 

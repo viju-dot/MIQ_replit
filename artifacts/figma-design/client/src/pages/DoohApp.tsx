@@ -5,7 +5,7 @@ import { DesignAnnotationLayer } from "@/components/DesignAnnotationLayer";
 import { DOOH_VERSION_IDS } from "@/lib/prototypeStore";
 import { usePrototypeVersion } from "@/lib/prototypeVersionContext";
 import { PrimaryNavigation, SecondaryNavigation } from "./TvAudienceApp";
-import { FiberTabLink } from "@/components/FiberTabItem";
+import { FiberTabLink, FiberRoundedTabsBar } from "@/components/FiberTabItem";
 import DoohPlanner from "./dooh/DoohPlanner";
 import GeoPlanner from "./dooh/GeoPlanner";
 import SavedAudiences from "./dooh/SavedAudiences";
@@ -90,8 +90,10 @@ function DoohVersionedContent() {
         <h1 id="dooh-page-title">{isGeo ? "Geo Planner" : isSaved ? "Saved Audiences" : "DOOH Planner – Find & Plan Screens"}</h1>
         {!isSaved && <p>{isGeo ? "Select filters and intelligence to build your target audience, then save for reuse." : "Use saved audiences or upload data to find digital out-of-home screens."}</p>}
         <nav aria-label="DOOH navigation" className="dooh-fiber-tabs">
-          <FiberTabLink rounded href={moduleLink("/geo-planner")} selected={isGeo} label="Geo Planner" />
-          <FiberTabLink rounded href={moduleLink("/dooh-planner")} selected={!isGeo && !isSaved} label="DOOH" />
+          <FiberRoundedTabsBar>
+            <FiberTabLink rounded href={moduleLink("/geo-planner")} selected={isGeo} label="Geo Planner" />
+            <FiberTabLink rounded href={moduleLink("/dooh-planner")} selected={!isGeo && !isSaved} label="DOOH" />
+          </FiberRoundedTabsBar>
         </nav>
       </section>
 

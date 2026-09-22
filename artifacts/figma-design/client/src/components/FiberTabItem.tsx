@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Link } from "wouter";
 
 export type TabItemState = "Default" | "Selected" | "Disabled" | "Hover" | "Hover-selected";
@@ -35,6 +35,16 @@ export function TabItem({ label = "Tab", state = "Default" }: { label?: string; 
 }
 
 export type TabPillState = "Selected" | "Active" | "Disabled" | "Hover";
+
+/** Complete Fiber "Tabs Bar — rounded", including its shared neutral track. */
+export function FiberRoundedTabsBar({ children }: { children: ReactNode }) {
+  return (
+    <div className="inline-flex flex-wrap items-center gap-1 rounded-[24px] p-0.5"
+      style={{ backgroundColor: "var(--container-dynamic-neutral-subtle-background-hover, #71718014)" }}>
+      {children}
+    </div>
+  );
+}
 
 /** Fiber rounded tab — Figma node 3412:8347. */
 export function TabPill({ label = "Tab 1", state = "Selected" }: { label?: string; state?: TabPillState }) {

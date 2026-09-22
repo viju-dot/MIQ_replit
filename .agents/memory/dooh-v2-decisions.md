@@ -25,4 +25,4 @@ Keep the planner navigation limited to Geo Planner and DOOH, using Fiber rounded
 
 **Why:** The user explicitly wants only these two modules in navigation and considers the bottom-right collaboration controls sufficient for version and exit actions.
 
-**How to apply:** Do not reintroduce a Saved Audiences navigation tab or duplicate toolbar controls when extending the planner. Preserve saved-audience data and reuse functionality.
+**How to apply:** Do not reintroduce a Saved Audiences navigation tab or duplicate toolbar controls when extending the planner. Preserve saved-audience data and reuse functionality. “Tabs Bar — rounded” means the complete catalogue bar, including its shared neutral rounded track—not isolated pill items; the user explicitly rejected the latter.
