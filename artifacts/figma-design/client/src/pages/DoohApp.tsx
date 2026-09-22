@@ -86,6 +86,7 @@ function DoohVersionedContent() {
         <PrimaryNavigation />
         <SecondaryNavigation activeSection="Advanced" />
       </header>
+      <div className="dooh-page-content">
       <section className="dooh-page-intro" aria-labelledby="dooh-page-title">
         <h1 id="dooh-page-title">{isGeo ? "Geo Planner" : isSaved ? "Saved Audiences" : "DOOH Planner – Find & Plan Screens"}</h1>
         {!isSaved && <p>{isGeo ? "Select filters and intelligence to build your target audience, then save for reuse." : "Use saved audiences or upload data to find digital out-of-home screens."}</p>}
@@ -102,6 +103,7 @@ function DoohVersionedContent() {
         <PrototypeCommentLayer />
         <DesignAnnotationLayer />
       </main>
+      </div>
     </div>
   );
 }
