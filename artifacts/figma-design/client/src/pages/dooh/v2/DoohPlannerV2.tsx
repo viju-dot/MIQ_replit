@@ -4,12 +4,14 @@ import { useAudiences } from "../api";
 import { SidebarV2, FilterStateV2, DEFAULT_FILTERS_V2, EXCHANGE_RATES } from "./v2planner-sidebar";
 import { MapPanelV2 } from "./v2planner-map-panel";
 import { RightPanelV2 } from "./v2planner-right-panel";
+import { TabsBarUnderline } from "./primitives";
 import "./DoohPlannerV2.css";
 
 export default function DoohPlannerV2() {
   const [filters, setFilters] = useState<FilterStateV2>(DEFAULT_FILTERS_V2);
   const [selectedScreenIds, setSelectedScreenIds] = useState<Set<string>>(new Set());
   const [hoveredScreenId, setHoveredScreenId] = useState<string | null>(null);
+  const [view, setView] = useState<"map" | "list">("map");
 
   const { data: audiences } = useAudiences();
 
@@ -164,7 +166,18 @@ export default function DoohPlannerV2() {
       <div className="flex flex-1 overflow-hidden">
         <SidebarV2 filters={filters} setFilters={setFilters} />
         
-        <div className="flex-1 flex flex-col relative bg-gray-100">
+        <div className="flex-1 min-w-0 flex flex-col relative bg-gray-100">
+          <div className="shrink-0 flex items-end px-4 pt-4 bg-white border-b"
+            style={{ borderColor: "var(--border-static-subtle-neutral, #e1e1e8)" }}>
+            <div className="relative -mb-px">
+              <TabsBarUnderline
+                ariaLabel="Screen views"
+                options={["Map", "Screen List"]}
+                value={view === "map" ? "Map" : "Screen List"}
+                onChange={value => setView(value === "Map" ? "map" : "list")}
+              />
+            </div>
+          </div>
           <MapPanelV2 
             screens={matchedScreens}
             hoveredScreenId={hoveredScreenId}
@@ -178,6 +191,7 @@ export default function DoohPlannerV2() {
         </div>
 
         <RightPanelV2 
+          view={view}
           matchedScreens={matchedScreens}
           selectedScreens={matchedScreens.filter(s => selectedScreenIds.has(s.id))}
           selectedScreenIds={selectedScreenIds}

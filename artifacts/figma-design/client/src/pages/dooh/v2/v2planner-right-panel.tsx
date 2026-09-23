@@ -6,6 +6,7 @@ import { ScreenTableV2 } from "./v2planner-screen-table";
 import { EXCHANGE_RATES } from "./v2planner-sidebar";
 
 interface Props {
+  view: "map" | "list";
   matchedScreens: ScreenData[];
   selectedScreens: ScreenData[];
   selectedScreenIds: Set<string>;
@@ -32,6 +33,7 @@ const formatCurrencyZero = (amount: number, currency: "GBP" | "EUR" | "USD") => 
 };
 
 export function RightPanelV2({
+  view,
   matchedScreens,
   selectedScreens,
   selectedScreenIds,
@@ -42,7 +44,6 @@ export function RightPanelV2({
   onHover,
   highlightedScreenId
 }: Props) {
-  const [view, setView] = useState<"map" | "list">("map");
   const [csvDownload, setCsvDownload] = useState<{ url: string; count: number } | null>(null);
   useEffect(() => {
     return () => { if (csvDownload) URL.revokeObjectURL(csvDownload.url); };
@@ -111,22 +112,6 @@ export function RightPanelV2({
         CSV ready: {csvDownload.count.toLocaleString()} screen{csvDownload.count === 1 ? "" : "s"}.{" "}
         <a href={csvDownload.url} download="DOOH-Shortlist.csv" className="underline font-semibold">Download CSV again</a>
       </div>}
-      {/* Tabs */}
-      <div className="flex border-b border-gray-200 p-2 gap-2 bg-gray-50 shrink-0">
-        <button 
-          onClick={() => setView('map')} 
-          className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 text-sm font-medium rounded-md transition-colors ${view === 'map' ? 'bg-white shadow-sm text-gray-900 border border-gray-200' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'}`}
-        >
-          🗺️ Map
-        </button>
-        <button 
-          onClick={() => setView('list')} 
-          className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 text-sm font-medium rounded-md transition-colors ${view === 'list' ? 'bg-white shadow-sm text-gray-900 border border-gray-200' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'}`}
-        >
-          📋 Screen List
-        </button>
-      </div>
-
       <div className="flex-1 flex flex-col overflow-hidden">
         {view === 'map' && (
           <div className="flex-1 flex flex-col p-5 overflow-y-auto dooh-scrollbar">
