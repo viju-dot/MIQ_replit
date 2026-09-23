@@ -3,7 +3,7 @@ import { useLocation, useSearch, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { MapPin, Info, Save, ChevronRight, Trash2 } from "lucide-react";
 import { CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
-import { useAudiences, GeoPlannerFilters } from "../api";
+import { useAudiences, GeoPlannerFilters, type Audience } from "../api";
 import { SmartCard, SearchableDropdown, TabsBarUnderline, FiberButton, IconButton } from "./primitives";
 import { computeMockResults } from "./geoMock";
 import { SaveAudienceV2 } from "./SaveAudienceV2";
@@ -71,6 +71,7 @@ export default function GeoPlannerV2() {
   const [submittedFilters, setSubmittedFilters] = useState<GeoPlannerFilters | null>(null);
   
   const [modalOpen, setModalOpen] = useState(false);
+  const [savedAudience, setSavedAudience] = useState<Audience | null>(null);
   const audiencesQuery = useAudiences();
 
   const initializedEditId = useRef<string | null>(null);
@@ -134,9 +135,17 @@ export default function GeoPlannerV2() {
   };
 
   const isDirty = !submittedFilters || JSON.stringify(filters) !== JSON.stringify(submittedFilters);
+  const hasValidFilters = Boolean(
+    filters.market && filters.intelligenceTab && filters.topIndexing &&
+    (filters.mode === "Brand" ? filters.brand : filters.category) &&
+    Object.values(filters.intelligenceFilters).every(value => value.trim().length > 0)
+  );
 
   const handleSubmit = () => {
+    if (!hasValidFilters || isV1Audience) return;
+    setSavedAudience(null);
     setSubmittedFilters(filters);
+    setInitialGeography(null);
   };
 
   const results = useMemo(() => {
@@ -307,7 +316,7 @@ export default function GeoPlannerV2() {
           </div>
           <FiberButton 
             onClick={handleSubmit} 
-            disabled={!isDirty}
+            disabled={!isDirty || !hasValidFilters || isV1Audience}
           >
             Submit
           </FiberButton>
@@ -368,12 +377,18 @@ export default function GeoPlannerV2() {
       ) : null}
 
       {/* Bottom Save Bar */}
+      {savedAudience && (
+        <div role="status" className="p-4 text-sm" style={{ background: "var(--surface-background-lvl1, #ffffff)", color: "var(--surface-foreground-static-neutral-lvl1, #13131a)" }}>
+          <strong>{savedAudience.name}</strong> has been saved. It is now available in DOOH’s Saved Audience dropdown.{" "}
+          <Link href={`/dooh-planner?version=v2&audience=${encodeURIComponent(savedAudience.id)}`} className="underline font-medium">Use in DOOH</Link>
+        </div>
+      )}
       <div className="geo-save-bar">
         <div>
           <FiberButton 
             variant="secondary"
             onClick={() => setModalOpen(true)}
-            disabled={isDirty || !submittedFilters || isV1Audience}
+            disabled={isDirty || !submittedFilters || !hasValidFilters || !results?.points.length || isV1Audience}
           >
             <Save className="w-4 h-4 mr-2" />
             Save audience
@@ -388,6 +403,7 @@ export default function GeoPlannerV2() {
           editId={editId}
           geography={{ points: results.points, coverage: results.coverage }}
           filters={submittedFilters}
+          onSuccess={setSavedAudience}
         />
       )}
     </div>

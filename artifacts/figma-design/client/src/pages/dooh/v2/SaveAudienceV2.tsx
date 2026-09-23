@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
-import { useCreateAudience, useUpdateAudience, useAudiences, Audience, AudienceInput, AudienceUpdate } from "../api";
+import { useCreateAudience, useUpdateAudience, useAudiences, AudienceInput, AudienceUpdate, type Audience } from "../api";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { GeoPlannerFilters } from "../api";
+import { FiberModal, FiberInput, FiberTextarea, FiberGhostButton } from "./FiberModal";
+import { FiberButton } from "./primitives";
+import { Link } from "wouter";
 
 interface SaveAudienceV2Props {
   open: boolean;
@@ -18,14 +17,15 @@ interface SaveAudienceV2Props {
     coverage: string;
   };
   filters: GeoPlannerFilters;
+  onSuccess?: (audience: Audience) => void;
 }
 
-export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters }: SaveAudienceV2Props) {
+export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters, onSuccess }: SaveAudienceV2Props) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [saveError, setSaveError] = useState("");
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
+  const [locationStr, setLocation] = useLocation();
 
   const audiencesQuery = useAudiences();
   const { mutateAsync: createAudience, isPending: isCreating } = useCreateAudience();
@@ -33,6 +33,7 @@ export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters 
   const isPending = isCreating || isUpdating;
 
   const initializedId = useRef<string | null>(null);
+  const savingRef = useRef(false);
 
   useEffect(() => {
     if (open) {
@@ -78,7 +79,8 @@ export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters 
   const isExactDuplicate = duplicate && !editId;
 
   const handleSave = async () => {
-    if (!isValid) return;
+    if (!isValid || savingRef.current || isPending) return;
+    savingRef.current = true;
     setSaveError("");
     
     const data: AudienceInput = {
@@ -100,109 +102,172 @@ export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters 
         if (!audiencesQuery.data?.find(a => a.id === editId)) {
           throw new Error("The audience could not be found. Retry loading it before saving.");
         }
-        await updateAudience({ id: editId, data: data as AudienceUpdate });
-        toast({ title: "Audience updated", description: `${data.name} has been updated successfully.` });
+        const result = await updateAudience({ id: editId, data: data as AudienceUpdate });
+        toast({ 
+          title: "Audience updated", 
+          description: `${data.name} has been updated successfully.` 
+        });
+        onSuccess?.(result);
       } else {
         const result = await createAudience({ ...data, createdBy: "Demo user" });
         toast({ 
           title: "Saved to library", 
-          description: `${result.name || data.name} contains ${geography.points.length} saved locations.` 
+          description: (
+            <div className="flex flex-col gap-2 mt-1">
+              <div>{result.name || data.name} contains {geography.points.length} saved locations.</div>
+              <Link href={`/dooh-planner?version=v2&audience=${result.id}`} className="text-[var(--dooh-purple)] underline font-medium hover:text-[#400047]">
+                Plan DOOH with this audience
+              </Link>
+            </div>
+          )
         });
+        if (onSuccess) {
+          onSuccess(result);
+        } else {
+          setLocation(`${locationStr}?version=v2&edit=${result.id}`);
+        }
       }
       onOpenChange(false);
-      
-      setLocation(`/saved-audiences?version=v2`);
     } catch (error: any) {
       const message = error?.message || "Audience could not be saved.";
       setSaveError(message);
       toast({ title: "Save failed", description: message, variant: "destructive" });
+    } finally {
+      savingRef.current = false;
     }
   };
 
+  const footer = (
+    <>
+      <FiberGhostButton onClick={() => onOpenChange(false)} disabled={isPending}>
+        Cancel
+      </FiberGhostButton>
+      <FiberButton onClick={handleSave} disabled={!isValid || isPending} loading={isPending}>
+        {isExactDuplicate ? "Confirm new version" : "Confirm"}
+      </FiberButton>
+    </>
+  );
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md dooh-theme">
-        <DialogHeader>
-          <DialogTitle>{editId ? "Update Audience" : "Save Audience"}</DialogTitle>
-          <DialogDescription>
-            {editId ? "Update the details for this saved audience." : "Save this audience configuration to your library for DOOH planning."}
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="py-4 space-y-4">
-          <div>
-            <label htmlFor="audience-name" className="text-sm font-medium mb-1.5 block">Audience Name *</label>
-            <Input 
-              id="audience-name" 
-              value={name} 
-              maxLength={50} 
-              onChange={e => { setName(e.target.value); setSaveError(""); }} 
-              placeholder="e.g. Cinema-Goers-London" 
-              aria-invalid={!!validationError} 
-              className={validationError ? "border-red-500 focus-visible:ring-red-500" : ""} 
-            />
-            <div className="flex justify-between gap-3 mt-1 text-xs">
-              <span className={validationError ? "text-red-600" : "text-gray-500"}>
-                {validationError || "5–50 characters; letters, numbers, and hyphens only."}
-              </span>
-              <span className={name.length > 50 ? "text-red-600" : "text-gray-500"}>
-                {name.length}/50
-              </span>
-            </div>
-          </div>
-          
-          <div>
-            <label htmlFor="audience-desc" className="text-sm font-medium mb-1.5 block">Description (Optional)</label>
-            <Textarea 
-              id="audience-desc"
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              placeholder="e.g. High-income cinema-goers in Central London"
-              maxLength={200}
-              rows={3}
-              className="resize-none"
-            />
-            <div className="flex justify-end mt-1 text-xs text-gray-500">
-              {description.length}/200
-            </div>
-          </div>
+    <FiberModal 
+      open={open} 
+      onOpenChange={(nextOpen) => { if (!savingRef.current) onOpenChange(nextOpen); }}
+      busy={isPending}
+      description="Save your submitted filters, intelligence selections, and geographic results so you can reuse this audience in the DOOH Saved Audience dropdown."
+      title={editId ? "Update Audience" : "Save Audience"}
+      footer={footer}
+    >
+      <div className="flex flex-1 items-start relative mb-4">
+        <p className="[word-break:break-word] flex-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] min-w-px text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
+          {editId ? "Update this saved audience with your submitted filters, intelligence selections, and geographic results." : "Save your submitted filters, intelligence selections, and geographic results as a reusable audience."}{" "}
+          You can then select it from Saved Audience in DOOH planning.
+        </p>
+      </div>
 
-          {isExactDuplicate && (
-            <div className="rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-              Warning: An audience with this name already exists. Saving will create a new version (e.g. {name}-v2).
-            </div>
-          )}
-          {similar && (
-            <div className="rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
-              Advisory: A similarly named audience already exists. Consider using a distinct name.
-            </div>
-          )}
-          {duplicate && editId && (
-            <div className="rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-              Warning: Another audience already uses this name. This may fail unless the name is changed.
-            </div>
-          )}
-
-          {saveError && (
-            <div role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-              {saveError}
-              <Button variant="link" className="h-auto p-0 ml-2 text-red-700 underline" onClick={handleSave}>
-                Retry
-              </Button>
-            </div>
-          )}
+      <div className="w-full space-y-4">
+        <div className="w-full">
+          <label htmlFor="audience-name" className="text-[length:var(--body-sm-medium-size,12px)] font-medium leading-[var(--body-sm-medium-line-height,18px)] mb-[var(--spacing-50,4px)] block" style={{ fontFamily: '"DM Sans", Helvetica', color: "var(--surface-foreground-static-neutral-lvl3, #717180)" }}>
+            Audience Name *
+          </label>
+          <FiberInput 
+            id="audience-name" 
+            value={name} 
+            maxLength={50} 
+            onChange={e => { setName(e.target.value); setSaveError(""); }} 
+            placeholder="e.g. Cinema-Goers-London" 
+            aria-invalid={!!validationError} 
+            error={!!validationError}
+            disabled={isPending}
+          />
+          <div className="flex justify-between gap-3 mt-1 text-[11px] leading-snug">
+            <span className={validationError ? "text-[var(--surface-foreground-static-error,#da294b)]" : "text-[var(--surface-foreground-static-neutral-lvl3,#717180)]"}>
+              {validationError || "5–50 characters; letters, numbers, and hyphens only."}
+            </span>
+            <span className={name.length > 50 ? "text-[var(--surface-foreground-static-error,#da294b)]" : "text-[var(--surface-foreground-static-neutral-lvl3,#717180)]"}>
+              {name.length}/50
+            </span>
+          </div>
         </div>
         
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave} disabled={!isValid || isPending} className="bg-[var(--dooh-purple)] hover:bg-[#400047] text-white">
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isExactDuplicate ? "Save a new version" : (editId ? "Save changes" : "Save audience")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <div className="w-full">
+          <label htmlFor="audience-desc" className="text-[length:var(--body-sm-medium-size,12px)] font-medium leading-[var(--body-sm-medium-line-height,18px)] mb-[var(--spacing-50,4px)] block" style={{ fontFamily: '"DM Sans", Helvetica', color: "var(--surface-foreground-static-neutral-lvl3, #717180)" }}>
+            Description (Optional)
+          </label>
+          <FiberTextarea 
+            id="audience-desc"
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            placeholder="e.g. High-income cinema-goers in Central London"
+            maxLength={200}
+            rows={3}
+            disabled={isPending}
+          />
+          <div className="flex justify-end mt-1 text-[11px] leading-snug text-[var(--surface-foreground-static-neutral-lvl3,#717180)]">
+            {description.length}/200
+          </div>
+        </div>
+
+        {isExactDuplicate && (
+          <div className="relative flex flex-1 items-start gap-2 min-w-px rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-warning-default,#ffc000)] bg-[var(--surface-background-lvl1,#ffffff)] p-4 shadow-sm w-full mt-2">
+            <div className="flex w-full items-start gap-2 shrink-0">
+              <div className="flex flex-1 flex-col items-start min-w-px">
+                <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] w-full">
+                  Warning
+                </p>
+                <p className="[word-break:break-word] mt-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
+                  An audience with this name already exists. Confirming will create a new version (e.g. {name}-v2).
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+        {similar && (
+          <div className="relative flex flex-1 items-start gap-2 min-w-px rounded-[var(--radiuses-small,2px)] border border-solid border-[#4facfe] bg-[var(--surface-background-lvl1,#ffffff)] p-4 shadow-sm w-full mt-2">
+            <div className="flex w-full items-start gap-2 shrink-0">
+              <div className="flex flex-1 flex-col items-start min-w-px">
+                <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] w-full">
+                  Advisory
+                </p>
+                <p className="[word-break:break-word] mt-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
+                  A similarly named audience already exists. Consider using a distinct name.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+        {duplicate && editId && (
+          <div className="relative flex flex-1 items-start gap-2 min-w-px rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-warning-default,#ffc000)] bg-[var(--surface-background-lvl1,#ffffff)] p-4 shadow-sm w-full mt-2">
+            <div className="flex w-full items-start gap-2 shrink-0">
+              <div className="flex flex-1 flex-col items-start min-w-px">
+                <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] w-full">
+                  Warning
+                </p>
+                <p className="[word-break:break-word] mt-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
+                  Another audience already uses this name. This may fail unless the name is changed.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {saveError && (
+          <div className="relative flex flex-1 items-start gap-2 min-w-px rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-error-default,#da294b)] bg-[var(--surface-background-lvl1,#ffffff)] p-4 shadow-sm w-full mt-2">
+            <div className="flex w-full items-center gap-2 shrink-0">
+              <div className="flex flex-1 flex-col items-start min-w-px">
+                <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] w-full">
+                  Error
+                </p>
+                <p className="[word-break:break-word] mt-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
+                  {saveError}
+                </p>
+                <button type="button" onClick={handleSave} className="mt-2 text-[var(--surface-foreground-static-error,#da294b)] underline font-medium text-sm">
+                  Retry
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </FiberModal>
   );
 }
