@@ -13,6 +13,7 @@ import {
 } from "react-leaflet";
 import { ScreenData } from "../data";
 import { MapZone } from "../components/MapPanel";
+import { CARD_BG, CARD_SHADOW, GRID, MUTED, TITLE, FONT } from "./primitives";
 
 interface Props {
   screens: ScreenData[];
@@ -27,17 +28,17 @@ interface Props {
 
 const noop = () => undefined;
 
-// Colors mapping:
-// Postcode Match -> #10B981 (Green)
-// POI Match -> #3B82F6 (Blue)
-// GeoPlanner Match (Audience) -> #7C3AED (Purple)
+// Fiber Colors mapping:
+// Postcode Match -> Success Green
+// POI Match -> Info Blue
+// GeoPlanner Match (Audience) -> Brand Purple
 const getColorBySource = (source?: string | null) => {
   switch (source) {
-    case "postcode": return "#10B981";
-    case "poi": return "#3B82F6";
-    case "audience": return "#7C3AED";
-    case "latlng": return "#3B82F6"; // Treat LatLng similar to POI (Blue)
-    default: return "#dc2626"; // Default red if no location source
+    case "postcode": return "var(--surface-foreground-static-success, #059669)";
+    case "poi": return "var(--surface-foreground-static-info, #2563eb)";
+    case "audience": return "var(--container-dynamic-brand-bold-background-default, #7c33b5)";
+    case "latlng": return "var(--surface-foreground-static-info, #2563eb)";
+    default: return "var(--surface-foreground-static-error, #dc2626)";
   }
 };
 
@@ -46,7 +47,7 @@ const pinIcon = (active: boolean, color: string) =>
     className: "",
     iconSize: active ? [24, 24] : [18, 18],
     iconAnchor: active ? [12, 12] : [9, 9],
-    html: `<span style="display:block;width:100%;height:100%;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${active ? "#111827" : color};border:2px solid white;box-shadow:0 1px 5px rgba(0,0,0,.45)"></span>`,
+    html: `<span style="display:block;width:100%;height:100%;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${active ? "var(--surface-foreground-static-neutral-lvl1, #13131a)" : color};border:2px solid var(--surface-background-lvl1, #ffffff);box-shadow:0 2px 6px var(--shadow-lvl8, rgba(113,113,128,0.15));transition:all 0.2s ease;"></span>`,
   });
 
 const clusterIcon = (count: number, color: string) =>
@@ -54,7 +55,7 @@ const clusterIcon = (count: number, color: string) =>
     className: "",
     iconSize: [38, 38],
     iconAnchor: [19, 19],
-    html: `<span style="display:flex;width:38px;height:38px;align-items:center;justify-content:center;border-radius:999px;background:${color};color:white;border:3px solid rgba(255,255,255,.9);box-shadow:0 2px 7px rgba(0,0,0,.35);font:700 12px/1 sans-serif">${count}</span>`,
+    html: `<span style="display:flex;width:38px;height:38px;align-items:center;justify-content:center;border-radius:999px;background:${color};color:var(--container-dynamic-brand-bold-foreground-default, #ffffff);border:2px solid var(--surface-background-lvl1, #ffffff);box-shadow:0 2px 8px var(--shadow-lvl8, rgba(113,113,128,0.2));font-family:${FONT.replace(/"/g, "'")};font-weight:700;font-size:12px;transition:transform 0.2s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">${count}</span>`,
   });
 
 function InitialBounds({ screens }: { screens: ScreenData[] }) {
@@ -103,18 +104,19 @@ function MapControls({ screens }: { screens: ScreenData[] }) {
 
   return (
     <div
-      className="absolute right-4 top-4 z-[1000] flex flex-col overflow-hidden rounded-md border border-gray-200 bg-white shadow-md"
+      className="absolute right-[var(--spacing-200,16px)] top-[var(--spacing-200,16px)] z-[1000] flex flex-col overflow-hidden rounded-[var(--radius-50,4px)]"
+      style={{ backgroundColor: CARD_BG, boxShadow: CARD_SHADOW, border: `1px solid ${GRID}` }}
       onDoubleClick={(event) => event.stopPropagation()}
       onMouseDown={(event) => event.stopPropagation()}
     >
-      <button type="button" aria-label="Zoom in" className="h-9 w-9 text-xl font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-center" onClick={() => map.zoomIn()}>
-        +
+      <button type="button" aria-label="Zoom in" className="h-[34px] w-[34px] flex items-center justify-center transition-colors hover:bg-black/5" style={{ color: TITLE }} onClick={() => map.zoomIn()}>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 3.33334V12.6667M3.33334 8H12.6667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
       </button>
-      <button type="button" aria-label="Zoom out" className="h-9 w-9 border-t border-gray-200 text-xl font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-center" onClick={() => map.zoomOut()}>
-        −
+      <button type="button" aria-label="Zoom out" className="h-[34px] w-[34px] flex items-center justify-center transition-colors hover:bg-black/5" style={{ color: TITLE, borderTop: `1px solid ${GRID}` }} onClick={() => map.zoomOut()}>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.33334 8H12.6667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
       </button>
-      <button type="button" aria-label="Reset map view" title="Reset view" className="h-9 w-9 border-t border-gray-200 text-base text-gray-700 hover:bg-gray-50 flex items-center justify-center" onClick={reset}>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+      <button type="button" aria-label="Reset map view" title="Reset view" className="h-[34px] w-[34px] flex items-center justify-center transition-colors hover:bg-black/5" style={{ color: TITLE, borderTop: `1px solid ${GRID}` }} onClick={reset}>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.04858 10C2.6025 12.8362 4.88726 15 7.78857 15C11.2173 15 13.9972 12.2215 13.9972 8.79373C13.9972 5.36592 11.2173 2.58746 7.78857 2.58746C5.58079 2.58746 3.64234 3.73715 2.57141 5.48512M2.57141 5.48512H5.67713M2.57141 5.48512V2.38139" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
       </button>
     </div>
   );
@@ -130,7 +132,6 @@ function DynamicScale() {
       const center = map.getCenter();
       const edge = L.latLng(center.lat, bounds.getEast());
       const dist = center.distanceTo(edge);
-      // Rough estimation for map width scale:
       const quarterDist = dist / 4;
       if (quarterDist > 1000) {
         setScaleDistance(`${(quarterDist / 1000).toFixed(1)} km`);
@@ -144,7 +145,7 @@ function DynamicScale() {
   }, [map]);
 
   return (
-    <div className="text-[10px] text-gray-500 font-medium text-right mt-1 border-t border-gray-100 pt-1">
+    <div className="text-[length:var(--body-sm-medium-size,12px)] font-medium text-right mt-[var(--spacing-100,8px)] pt-[var(--spacing-100,8px)]" style={{ fontFamily: FONT, color: MUTED, borderTop: `1px solid ${GRID}` }}>
       Approx {scaleDistance}
     </div>
   );
@@ -152,20 +153,21 @@ function DynamicScale() {
 
 function MapLegend() {
   return (
-    <div className="absolute bottom-6 left-4 z-[1000] bg-white rounded-lg shadow-md border border-gray-200 p-3 text-xs w-48">
-      <h3 className="font-semibold text-gray-800 mb-2">Screen Match Source</h3>
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-[#10B981] border border-white shadow-sm"></div>
-          <span className="text-gray-600">Postcode Match</span>
+    <div className="absolute bottom-[var(--spacing-300,24px)] left-[var(--spacing-200,16px)] z-[1000] rounded-[var(--radius-50,4px)] p-[var(--spacing-200,16px)] w-[220px]"
+      style={{ backgroundColor: CARD_BG, boxShadow: CARD_SHADOW, border: `1px solid ${GRID}` }}>
+      <h3 className="text-[length:var(--body-md-medium-size,14px)] font-bold mb-[var(--spacing-150,12px)]" style={{ fontFamily: FONT, color: TITLE }}>Match Source</h3>
+      <div className="flex flex-col gap-[var(--spacing-100,8px)]">
+        <div className="flex items-center gap-[var(--spacing-100,8px)]">
+          <div className="w-[12px] h-[12px] rounded-full shadow-sm" style={{ backgroundColor: "var(--surface-foreground-static-success, #059669)", border: `1px solid ${CARD_BG}` }}></div>
+          <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ fontFamily: FONT, color: TITLE }}>Postcode Match</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-[#3B82F6] border border-white shadow-sm"></div>
-          <span className="text-gray-600">POI Match</span>
+        <div className="flex items-center gap-[var(--spacing-100,8px)]">
+          <div className="w-[12px] h-[12px] rounded-full shadow-sm" style={{ backgroundColor: "var(--surface-foreground-static-info, #2563eb)", border: `1px solid ${CARD_BG}` }}></div>
+          <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ fontFamily: FONT, color: TITLE }}>POI Match</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-[#7C3AED] border border-white shadow-sm"></div>
-          <span className="text-gray-600">GeoPlanner Match</span>
+        <div className="flex items-center gap-[var(--spacing-100,8px)]">
+          <div className="w-[12px] h-[12px] rounded-full shadow-sm" style={{ backgroundColor: "var(--container-dynamic-brand-bold-background-default, #7c33b5)", border: `1px solid ${CARD_BG}` }}></div>
+          <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ fontFamily: FONT, color: TITLE }}>GeoPlanner Match</span>
         </div>
       </div>
       <DynamicScale />
@@ -225,11 +227,11 @@ function ClusteredScreens({
         },
       }}
     >
-      <Tooltip direction="top" offset={[0, -10]} opacity={1}>
-        <div className="text-xs">
-          <strong>{screen.id}</strong>
-          <div>{screen.publisher}</div>
-          <div>CPM: £{screen.cpm.toFixed(2)}</div>
+      <Tooltip direction="top" offset={[0, -10]} opacity={1} className="fiber-tooltip">
+        <div className="flex flex-col gap-1 text-[length:var(--body-sm-regular-size,12px)] p-1" style={{ fontFamily: FONT, color: TITLE }}>
+          <strong className="text-[length:var(--body-sm-medium-size,12px)]">{screen.id}</strong>
+          <div style={{ color: MUTED }}>{screen.publisher}</div>
+          <div className="font-medium mt-1 pt-1" style={{ borderTop: `1px solid ${GRID}` }}>CPM: £{screen.cpm.toFixed(2)}</div>
         </div>
       </Tooltip>
     </Marker>
@@ -254,7 +256,7 @@ function ClusteredScreens({
                 ]);
                 return (
                   <Fragment key={screen.id}>
-                    <Polyline positions={[center, endpoint]} pathOptions={{ color: "#737373", weight: 1 }} />
+                    <Polyline positions={[center, endpoint]} pathOptions={{ color: "var(--border-static-subtle-neutral, #e1e1e8)", weight: 2 }} />
                     {screenMarker(screen, endpoint)}
                   </Fragment>
                 );
@@ -278,8 +280,8 @@ function ClusteredScreens({
               },
             }}
           >
-            <Tooltip direction="top" offset={[0, -18]}>
-              {cluster.screens.length} matched screens — click to expand
+            <Tooltip direction="top" offset={[0, -18]} className="fiber-tooltip">
+              <span style={{ fontFamily: FONT }}>{cluster.screens.length} matched screens — click to expand</span>
             </Tooltip>
           </Marker>
         );
@@ -296,10 +298,11 @@ function ZoneLayers({
   onZonesChange: (zones: MapZone[]) => void;
 }) {
   const removeButton = (zone: MapZone) => (
-    <Tooltip permanent direction="center" opacity={1} className="map-zone-label">
+    <Tooltip permanent direction="center" opacity={1} className="fiber-map-zone-label">
       <button
         type="button"
-        className="font-semibold text-blue-700 bg-white/80 px-1 py-0.5 rounded shadow-sm text-xs"
+        className="font-medium px-[var(--spacing-100,8px)] py-[var(--spacing-50,4px)] rounded-[var(--radius-25,2px)] transition-colors hover:bg-black/5"
+        style={{ fontFamily: FONT, color: "var(--container-dynamic-brand-bold-background-default, #7c33b5)", backgroundColor: CARD_BG, boxShadow: CARD_SHADOW, border: `1px solid ${GRID}`, fontSize: '12px' }}
         onClick={(event) => {
           L.DomEvent.stopPropagation(event.nativeEvent);
           onZonesChange(zones.filter((item) => item.id !== zone.id));
@@ -315,14 +318,14 @@ function ZoneLayers({
       {zones.map((zone) => {
         if (zone.type === "circle" && zone.center && zone.radius != null) {
           return (
-            <Circle key={zone.id} center={zone.center} radius={zone.radius} pathOptions={{ color: "#3B82F6", fillOpacity: 0.2, weight: 2 }}>
+            <Circle key={zone.id} center={zone.center} radius={zone.radius} pathOptions={{ color: "#7c33b5", fillOpacity: 0.15, weight: 2 }}>
               {removeButton(zone)}
             </Circle>
           );
         }
         if (zone.type === "polygon" && zone.points && zone.points.length >= 3) {
           return (
-            <Polygon key={zone.id} positions={zone.points} pathOptions={{ color: "#3B82F6", fillOpacity: 0.2, weight: 2 }}>
+            <Polygon key={zone.id} positions={zone.points} pathOptions={{ color: "#7c33b5", fillOpacity: 0.15, weight: 2 }}>
               {removeButton(zone)}
             </Polygon>
           );
@@ -397,23 +400,24 @@ function DrawingLayer({
   return (
     <>
       {mode === "circle" && points[0] && (
-        <Circle center={points[0]} radius={5} pathOptions={{ color: "#3B82F6", fillOpacity: 0.4 }} />
+        <Circle center={points[0]} radius={5} pathOptions={{ color: "#7c33b5", fillOpacity: 0.4 }} />
       )}
       {mode === "polygon" && points.length > 0 && (
         <>
-          <Polyline positions={points} pathOptions={{ color: "#3B82F6", dashArray: "6 5" }} />
+          <Polyline positions={points} pathOptions={{ color: "#7c33b5", dashArray: "6 5", weight: 2 }} />
           {points.map((point, index) => (
-            <Circle key={index} center={point} radius={5} pathOptions={{ color: "#3B82F6", fillOpacity: 1 }} />
+            <Circle key={index} center={point} radius={5} pathOptions={{ color: "#7c33b5", fillOpacity: 1, weight: 2 }} />
           ))}
         </>
       )}
       <div
-        className="absolute left-1/2 top-4 z-[1000] flex -translate-x-1/2 items-center gap-2 rounded-md border border-blue-200 bg-white px-3 py-2 text-sm shadow-md"
+        className="absolute left-1/2 top-[var(--spacing-200,16px)] z-[1000] flex -translate-x-1/2 items-center gap-[var(--spacing-100,8px)] rounded-[var(--radius-50,4px)] px-[var(--spacing-200,16px)] py-[var(--spacing-100,8px)]"
+        style={{ backgroundColor: CARD_BG, boxShadow: CARD_SHADOW, border: `1px solid ${GRID}` }}
         onClick={stopMapEvent}
         onDoubleClick={stopMapEvent}
         onMouseDown={stopMapEvent}
       >
-        <span className="font-medium text-gray-700">
+        <span className="text-[length:var(--body-sm-medium-size,12px)] font-medium mr-[var(--spacing-100,8px)]" style={{ fontFamily: FONT, color: TITLE }}>
           {mode === "circle"
             ? points.length ? "Click the circle edge" : "Click the circle centre"
             : `Click polygon vertices (${points.length})`}
@@ -422,20 +426,41 @@ function DrawingLayer({
           <button
             type="button"
             disabled={points.length < 3}
-            className="rounded bg-blue-600 px-2.5 py-1 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40 hover:bg-blue-700 transition-colors"
+            className="rounded-[var(--radius-25,2px)] px-[12px] py-[4px] font-medium text-[length:var(--body-sm-medium-size,12px)] disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+            style={{ 
+              backgroundColor: "var(--container-dynamic-brand-bold-background-default, #7c33b5)", 
+              color: "var(--container-dynamic-brand-bold-foreground-default, #ffffff)",
+              fontFamily: FONT 
+            }}
             onClick={finishPolygon}
           >
             Finish
           </button>
         )}
         {points.length > 0 && (
-          <button type="button" className="rounded border border-gray-300 px-2.5 py-1 hover:bg-gray-50 transition-colors" onClick={() => setPoints((current) => current.slice(0, -1))}>
+          <button 
+            type="button" 
+            className="rounded-[var(--radius-25,2px)] px-[12px] py-[4px] font-medium text-[length:var(--body-sm-medium-size,12px)] transition-colors hover:bg-black/5" 
+            style={{ 
+              backgroundColor: "transparent", 
+              color: TITLE,
+              border: `1px solid ${GRID}`,
+              fontFamily: FONT 
+            }} 
+            onClick={() => setPoints((current) => current.slice(0, -1))}
+          >
             Undo
           </button>
         )}
         <button
           type="button"
-          className="rounded border border-gray-300 px-2.5 py-1 hover:bg-gray-50 transition-colors"
+          className="rounded-[var(--radius-25,2px)] px-[12px] py-[4px] font-medium text-[length:var(--body-sm-medium-size,12px)] transition-colors hover:bg-black/5"
+          style={{ 
+            backgroundColor: "transparent", 
+            color: MUTED,
+            border: `1px solid ${GRID}`,
+            fontFamily: FONT 
+          }} 
           onClick={() => {
             setPoints([]);
             onDrawComplete();
@@ -461,11 +486,11 @@ export function MapPanelV2({
   const hoveredScreen = screens.find((screen) => screen.id === hoveredScreenId);
 
   return (
-    <div className="relative h-full w-full">
-      <MapContainer center={[54.5, -3.2]} zoom={6} minZoom={3} maxZoom={19} className="h-full w-full" zoomControl={false}>
+    <div className="fiber-dooh-map relative h-full w-full" style={{ backgroundColor: "var(--surface-background-lvl2, #f7f7fa)" }}>
+      <MapContainer center={[54.5, -3.2]} zoom={6} minZoom={3} maxZoom={19} className="h-full w-full" zoomControl={false} style={{ fontFamily: FONT }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <InitialBounds screens={screens} />
         <FocusHovered screen={hoveredScreen} />
