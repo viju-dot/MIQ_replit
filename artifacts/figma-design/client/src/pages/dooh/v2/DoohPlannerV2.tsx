@@ -5,7 +5,7 @@ import { SidebarV2, FilterStateV2, DEFAULT_FILTERS_V2, EXCHANGE_RATES, PlanningZ
 import { MapPanelV2 } from "./v2planner-map-panel";
 import { RightPanelV2 } from "./v2planner-right-panel";
 import { FiberButton, SmartCard, TabsBarUnderline } from "./primitives";
-import { Download, SlidersHorizontal } from "lucide-react";
+import { Download } from "lucide-react";
 import { useScreenExport } from "./useScreenExport";
 import "./DoohPlannerV2.css";
 
@@ -250,12 +250,6 @@ export default function DoohPlannerV2() {
       <div className="dooh-actions-bar" role="region" aria-label="Planner actions">
         <FiberButton variant="outline" onClick={handleExport} disabled={!matchedScreens.length}>
           <Download className="size-4" aria-hidden="true" /> Export
-        </FiberButton>
-        <FiberButton variant="secondary" disabled={!matchedScreens.length} onClick={() => {
-          setView("list");
-          requestAnimationFrame(() => document.getElementById("dooh-plan-overview")?.focus());
-        }}>
-          <SlidersHorizontal className="size-4" aria-hidden="true" /> Apply Filters
         </FiberButton>
       </div>
     </div>
