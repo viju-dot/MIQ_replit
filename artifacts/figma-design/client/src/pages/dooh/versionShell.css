@@ -4,12 +4,13 @@
 .dooh-page-intro > p { margin: 4px 0 0; font-size: 14px; line-height: 20px; color: var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59); }
 .dooh-fiber-tabs { display: flex; margin-top: 20px; }
 
-/* Only the V2 DOOH workspace is viewport-bound; other modules keep page scrolling. */
+/* Let expanded filters use page scrolling without squeezing the map. */
 .dooh-fixed-planner {
-  height: 100dvh;
-  min-height: 0;
-  overflow: hidden;
+  min-height: 100dvh;
   padding-bottom: 0;
+}
+.dooh-fixed-planner main {
+  overflow: visible;
 }
 .dooh-fixed-planner .dooh-page-content {
   min-height: 0;

@@ -171,10 +171,10 @@ export default function DoohPlannerV2() {
 
   return (
     <div className="dooh-v2-planner flex flex-col flex-1 min-h-0 font-fiber">
-      <div className="flex flex-1 min-h-0 gap-6 overflow-hidden">
+      <div className="flex flex-1 min-h-0 items-start gap-6">
         <SidebarV2 filters={filters} setFilters={setFilters} />
         
-        <div className="flex-1 min-w-0 min-h-0 flex flex-col relative bg-transparent">
+        <div className="flex-1 min-w-0 min-h-0 flex flex-col sticky top-4 self-start bg-transparent">
           <div className="shrink-0 flex flex-wrap items-center justify-between gap-4 pb-4">
             <div role="group" aria-label="Screen views">
               <FiberRoundedTabsBar>
