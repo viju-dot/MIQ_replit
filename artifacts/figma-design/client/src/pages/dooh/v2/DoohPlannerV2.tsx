@@ -163,7 +163,7 @@ export default function DoohPlannerV2() {
 
   return (
     <div className="dooh-v2-planner flex flex-col flex-1 h-full font-fiber">
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 gap-6 overflow-hidden">
         <SidebarV2 filters={filters} setFilters={setFilters} />
         
         <div className="flex-1 min-w-0 flex flex-col relative bg-gray-100">
@@ -178,7 +178,7 @@ export default function DoohPlannerV2() {
               />
             </div>
           </div>
-          <MapPanelV2 
+          {view === "map" && <MapPanelV2 
             screens={matchedScreens}
             hoveredScreenId={hoveredScreenId}
             onScreenClick={setHoveredScreenId}
@@ -187,11 +187,9 @@ export default function DoohPlannerV2() {
             drawMode={filters.planningZone.drawMode}
             onDrawComplete={() => setFilters(prev => ({ ...prev, planningZone: { ...prev.planningZone, drawMode: null } }))}
             locationSource={locationMethod}
-          />
-        </div>
+          />}
 
-        <RightPanelV2 
-          view={view}
+        {view === "list" && <RightPanelV2 
           matchedScreens={matchedScreens}
           selectedScreens={matchedScreens.filter(s => selectedScreenIds.has(s.id))}
           selectedScreenIds={selectedScreenIds}
@@ -210,7 +208,8 @@ export default function DoohPlannerV2() {
           }}
           onHover={setHoveredScreenId}
           highlightedScreenId={hoveredScreenId}
-        />
+        />}
+        </div>
       </div>
     </div>
   );

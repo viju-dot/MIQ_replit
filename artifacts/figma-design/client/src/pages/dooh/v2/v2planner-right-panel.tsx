@@ -6,7 +6,6 @@ import { ScreenTableV2 } from "./v2planner-screen-table";
 import { EXCHANGE_RATES } from "./v2planner-sidebar";
 
 interface Props {
-  view: "map" | "list";
   matchedScreens: ScreenData[];
   selectedScreens: ScreenData[];
   selectedScreenIds: Set<string>;
@@ -33,7 +32,6 @@ const formatCurrencyZero = (amount: number, currency: "GBP" | "EUR" | "USD") => 
 };
 
 export function RightPanelV2({
-  view,
   matchedScreens,
   selectedScreens,
   selectedScreenIds,
@@ -106,18 +104,17 @@ export function RightPanelV2({
   };
 
   return (
-    <div className="w-[320px] xl:w-[400px] shrink-0 bg-white flex flex-col shadow-[-4px_0_15px_rgba(0,0,0,0.03)] z-20 border-l border-gray-200">
+    <div className="w-full min-w-0 flex-1 bg-white flex flex-col">
       
       {csvDownload && <div role="status" className="px-4 py-2 text-xs bg-purple-50 text-purple-900">
         CSV ready: {csvDownload.count.toLocaleString()} screen{csvDownload.count === 1 ? "" : "s"}.{" "}
         <a href={csvDownload.url} download="DOOH-Shortlist.csv" className="underline font-semibold">Download CSV again</a>
       </div>}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {view === 'map' && (
-          <div className="flex-1 flex flex-col p-5 overflow-y-auto dooh-scrollbar">
+      <div className="flex-1 flex flex-col min-h-0">
+          <section className="shrink-0 p-5 border-b border-gray-200" aria-label="Plan Overview">
             <h2 className="font-semibold text-lg text-gray-900 mb-5">Plan Overview</h2>
             
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 items-start">
               <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
                 <p className="text-xs text-gray-500 mb-1 font-medium">Matched Screens</p>
                 <p className="text-2xl font-bold text-gray-900">{matchedScreens.length}</p>
@@ -126,11 +123,6 @@ export function RightPanelV2({
                 <p className="text-xs text-purple-600 mb-1 font-medium">Selected Screens</p>
                 <p className="text-2xl font-bold text-purple-700">{selectedScreens.length}</p>
               </div>
-            </div>
-            
-            <div className="border-t border-gray-100 my-2"></div>
-            
-            <div className="space-y-4 py-4">
               <div>
                 <p className="text-xs text-gray-500 mb-1 font-medium">Est. Average CPM</p>
                 <p className="text-xl font-semibold text-gray-900">{formatCurrency(totalCpm, currency)}</p>
@@ -161,11 +153,9 @@ export function RightPanelV2({
                 )}
               </div>
             </div>
-          </div>
-        )}
+          </section>
 
-        {view === 'list' && (
-          <div className="flex-1 overflow-hidden flex flex-col">
+          <div className="flex-1 overflow-hidden flex flex-col" style={{ height: 400, minHeight: 320, maxHeight: 600 }}>
             <ScreenTableV2 
               screens={matchedScreens}
               selectedScreenIds={selectedScreenIds}
@@ -176,7 +166,6 @@ export function RightPanelV2({
               highlightedScreenId={highlightedScreenId}
             />
           </div>
-        )}
       </div>
       
       {/* Global Actions - Always visible at bottom */}
