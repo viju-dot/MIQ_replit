@@ -24,6 +24,27 @@ const DEFAULT_FILTERS: GeoPlannerFilters = {
   topIndexing: '15%'
 };
 
+type DraftFilters = Omit<GeoPlannerFilters, "market" | "mode" | "topIndexing"> & {
+  market: GeoPlannerFilters["market"] | "";
+  mode: GeoPlannerFilters["mode"] | "";
+  topIndexing: GeoPlannerFilters["topIndexing"] | "";
+};
+
+const EMPTY_FILTERS: DraftFilters = {
+  market: "", mode: "", brand: "", category: "",
+  intelligenceTab: "Audience",
+  intelligenceFilters: { category: "", feature: "", value: "", logic: "" },
+  topIndexing: "",
+};
+
+function completeFilters(filters: DraftFilters): filters is GeoPlannerFilters {
+  return Boolean(
+    filters.market && filters.mode && filters.intelligenceTab && filters.topIndexing &&
+    (filters.mode === "Brand" ? filters.brand : filters.category) &&
+    Object.values(filters.intelligenceFilters).every(value => value.trim().length > 0)
+  );
+}
+
 function MapView({ points, market }: { points: any[], market: string }) {
   const centerLat = market === 'UK' ? 51.5074 : market === 'US' ? 40.7128 : 48.8566;
   const centerLng = market === 'UK' ? -0.1278 : market === 'US' ? -74.0060 : 2.3522;
@@ -67,7 +88,9 @@ export default function GeoPlannerV2() {
   const search = useSearch();
   const editId = useMemo(() => new URLSearchParams(search).get("edit"), [search]);
   
-  const [filters, setFilters] = useState<GeoPlannerFilters>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<DraftFilters>(() =>
+    new URLSearchParams(search).get("reset") === "1" ? EMPTY_FILTERS : DEFAULT_FILTERS
+  );
   const [submittedFilters, setSubmittedFilters] = useState<GeoPlannerFilters | null>(null);
   
   const [modalOpen, setModalOpen] = useState(false);
@@ -135,14 +158,23 @@ export default function GeoPlannerV2() {
   };
 
   const isDirty = !submittedFilters || JSON.stringify(filters) !== JSON.stringify(submittedFilters);
-  const hasValidFilters = Boolean(
-    filters.market && filters.intelligenceTab && filters.topIndexing &&
-    (filters.mode === "Brand" ? filters.brand : filters.category) &&
-    Object.values(filters.intelligenceFilters).every(value => value.trim().length > 0)
-  );
+  const hasValidFilters = completeFilters(filters);
+  const filtersApplied = !!submittedFilters && !isDirty;
+
+  const handleClearAll = () => {
+    setFilters(EMPTY_FILTERS);
+    setSubmittedFilters(null);
+    setInitialGeography(null);
+    setSavedAudience(null);
+    setModalOpen(false);
+    setIsV1Audience(false);
+    initializedEditId.current = null;
+    // Start a new draft rather than accidentally updating a saved audience.
+    if (editId) setLocation("/geo-planner?version=v2&reset=1");
+  };
 
   const handleSubmit = () => {
-    if (!hasValidFilters || isV1Audience) return;
+    if (!completeFilters(filters) || isV1Audience) return;
     setSavedAudience(null);
     setSubmittedFilters(filters);
     setInitialGeography(null);
@@ -315,10 +347,10 @@ export default function GeoPlannerV2() {
             />
           </div>
           <FiberButton 
-            onClick={handleSubmit} 
-            disabled={!isDirty || !hasValidFilters || isV1Audience}
+            onClick={filtersApplied ? handleClearAll : handleSubmit}
+            disabled={isV1Audience || (!filtersApplied && !hasValidFilters)}
           >
-            Submit
+            {filtersApplied ? "Clear all" : "Apply filter"}
           </FiberButton>
         </div>
       </SmartCard>
