@@ -4,8 +4,9 @@ import { useAudiences } from "../api";
 import { SidebarV2, FilterStateV2, DEFAULT_FILTERS_V2, EXCHANGE_RATES } from "./v2planner-sidebar";
 import { MapPanelV2 } from "./v2planner-map-panel";
 import { RightPanelV2 } from "./v2planner-right-panel";
-import { FiberButton, TabsBarUnderline } from "./primitives";
-import { Download, ChartNoAxesCombined } from "lucide-react";
+import { FiberButton } from "./primitives";
+import { FiberRoundedTabsBar, FiberTabButton } from "@/components/FiberTabItem";
+import { Download, SlidersHorizontal } from "lucide-react";
 import { useScreenExport } from "./useScreenExport";
 import "./DoohPlannerV2.css";
 
@@ -173,26 +174,23 @@ export default function DoohPlannerV2() {
       <div className="flex flex-1 gap-6 overflow-hidden">
         <SidebarV2 filters={filters} setFilters={setFilters} />
         
-        <div className="flex-1 min-w-0 flex flex-col relative bg-gray-100">
-          <div className="shrink-0 flex flex-wrap items-end justify-between gap-4 px-4 pt-4 bg-white border-b"
-            style={{ borderColor: "var(--border-static-subtle-neutral, #e1e1e8)" }}>
-            <div className="relative -mb-px">
-              <TabsBarUnderline
-                ariaLabel="Screen views"
-                options={["Map", "Screen List"]}
-                value={view === "map" ? "Map" : "Screen List"}
-                onChange={value => setView(value === "Map" ? "map" : "list")}
-              />
+        <div className="flex-1 min-w-0 flex flex-col relative bg-transparent">
+          <div className="shrink-0 flex flex-wrap items-center justify-between gap-4 pb-4">
+            <div role="group" aria-label="Screen views">
+              <FiberRoundedTabsBar>
+                <FiberTabButton label="Map" selected={view === "map"} onClick={() => setView("map")} />
+                <FiberTabButton label="Screen List" selected={view === "list"} onClick={() => setView("list")} />
+              </FiberRoundedTabsBar>
             </div>
-            <div className="ml-auto mb-2 flex items-center gap-2">
-              <FiberButton variant="outline" onClick={handleExport} disabled={!matchedScreens.length}>
+            <div className="ml-auto flex items-center gap-2">
+              <FiberButton size="compact" variant="outline" onClick={handleExport} disabled={!matchedScreens.length}>
                 <Download className="size-4" aria-hidden="true" /> Export
               </FiberButton>
-              <FiberButton disabled={!matchedScreens.length} onClick={() => {
+              <FiberButton size="compact" disabled={!matchedScreens.length} onClick={() => {
                 setView("list");
                 requestAnimationFrame(() => document.getElementById("dooh-plan-overview")?.focus());
               }}>
-                <ChartNoAxesCombined className="size-4" aria-hidden="true" /> Load Insights
+                <SlidersHorizontal className="size-4" aria-hidden="true" /> Apply Filters
               </FiberButton>
             </div>
           </div>

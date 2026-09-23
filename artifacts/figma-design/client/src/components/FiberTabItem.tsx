@@ -74,3 +74,15 @@ export function FiberTabLink({ label, href, selected, rounded = false }: { label
     </Link>
   );
 }
+
+export function FiberTabButton({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <button type="button" aria-pressed={selected} onClick={onClick}
+      className="shrink-0 rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+      style={{ outlineColor: "var(--border-dynamic-brand-selected, #7c33b5)" }}
+      onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+      <TabPill label={label} state={selected ? "Selected" : hovered ? "Hover" : "Active"} />
+    </button>
+  );
+}

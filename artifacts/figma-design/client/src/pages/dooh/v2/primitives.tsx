@@ -117,6 +117,7 @@ const BUTTON_FOCUS_RING =
 
 export function FiberButton({
   variant = "solid",
+  size = "default",
   children,
   onClick,
   disabled = false,
@@ -125,6 +126,7 @@ export function FiberButton({
   className = "",
 }: {
   variant?: "solid" | "outline" | "secondary";
+  size?: "default" | "compact";
   children: ReactNode;
   onClick?: () => void;
   disabled?: boolean;
@@ -179,7 +181,11 @@ export function FiberButton({
       onMouseLeave={() => setHover(false)}
       onFocus={(e) => setFocused(e.currentTarget.matches(":focus-visible"))}
       onBlur={() => setFocused(false)}
-      className={`inline-flex h-[var(--height-34,34px)] items-center justify-center gap-[var(--numbers-6,6px)] whitespace-nowrap rounded-[var(--radiuses-small,2px)] px-[var(--spacing-150,12px)] text-[length:var(--body-md-medium-size,14px)] font-medium leading-[var(--body-md-medium-line-height,20px)] outline-none transition-colors duration-150 ${
+      className={`inline-flex items-center justify-center gap-[var(--numbers-6,6px)] whitespace-nowrap rounded-[var(--radiuses-small,2px)] font-medium outline-none transition-colors duration-150 ${
+        size === "compact"
+          ? "h-[24px] px-[var(--spacing-100,8px)] py-[3px] text-[length:var(--body-sm-medium-size,12px)] leading-[var(--body-sm-medium-line-height,18px)]"
+          : "h-[var(--height-34,34px)] px-[var(--spacing-150,12px)] text-[length:var(--body-md-medium-size,14px)] leading-[var(--body-md-medium-line-height,20px)]"
+      } ${
         inactive ? "cursor-not-allowed" : "cursor-pointer active:brightness-95"
       } ${className}`}
       style={style}
