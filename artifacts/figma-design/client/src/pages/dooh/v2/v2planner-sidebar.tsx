@@ -122,7 +122,7 @@ export function SidebarV2({ filters, setFilters }: Props) {
   };
 
   return (
-    <div className="w-[300px] xl:w-[340px] shrink-0 bg-white flex flex-col h-full overflow-hidden z-20 border-r border-gray-200">
+    <div data-annotate="DOOH filter panel" className="w-[300px] xl:w-[340px] shrink-0 bg-white flex flex-col h-full overflow-hidden z-20 border-r border-gray-200">
       <div className="flex-1 overflow-y-auto dooh-scrollbar">
         
         {/* 1. Location Filter */}
@@ -373,7 +373,7 @@ function ScalarFacet({ title, icon, enabled, values, selected, onToggle, onSelec
 
 function FilterCard({ title, icon, enabled, onToggle, children }: { title: string; icon: ReactNode; enabled: boolean; onToggle: (enabled: boolean) => void; children: ReactNode }) {
   return (
-    <section className="border-b border-gray-200">
+    <section data-annotate={`DOOH filters: ${title}`} className="border-b border-gray-200">
       <header className="px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors">
         <div className="flex items-center gap-2.5 text-gray-700">
           {icon}

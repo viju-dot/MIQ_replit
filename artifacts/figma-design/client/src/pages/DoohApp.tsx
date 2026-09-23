@@ -111,7 +111,8 @@ function DoohVersionedContent() {
       </section>
 
       <main className="flex-1 relative flex flex-col overflow-hidden">
-        <div key={`${location}?${search}`} className="flex-1 flex flex-col min-w-0">{content}</div>
+        {/* Keep planner stacking (sidebar/map) below both feedback layers. */}
+        <div key={`${location}?${search}`} className="relative isolate flex-1 flex flex-col min-w-0">{content}</div>
         <PrototypeCommentLayer />
         <DesignAnnotationLayer />
       </main>
