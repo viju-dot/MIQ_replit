@@ -192,7 +192,7 @@ export default function DoohPlannerV2() {
               <FiberButton size="compact" variant="outline" onClick={handleExport} disabled={!matchedScreens.length}>
                 <Download className="size-4" aria-hidden="true" /> Export
               </FiberButton>
-              <FiberButton size="compact" disabled={!matchedScreens.length} onClick={() => {
+              <FiberButton size="compact" variant="secondary" disabled={!matchedScreens.length} onClick={() => {
                 setView("list");
                 requestAnimationFrame(() => document.getElementById("dooh-plan-overview")?.focus());
               }}>
