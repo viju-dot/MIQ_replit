@@ -503,7 +503,7 @@ export function MapPanelV2({
   const hoveredScreen = screens.find((screen) => screen.id === hoveredScreenId);
 
   return (
-    <div className="fiber-dooh-map relative shrink-0 w-full" style={{ height: "max(720px, calc(100dvh - 460px))", backgroundColor: "var(--surface-background-lvl2, #f7f7fa)" }}>
+    <div className="fiber-dooh-map relative shrink-0 w-full" style={{ height: "max(690px, calc(100dvh - 490px))", backgroundColor: "var(--surface-background-lvl2, #f7f7fa)" }}>
       <MapContainer center={[54.5, -3.2]} zoom={6} minZoom={3} maxZoom={19} className="h-full w-full" zoomControl={false} style={{ fontFamily: FONT }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
