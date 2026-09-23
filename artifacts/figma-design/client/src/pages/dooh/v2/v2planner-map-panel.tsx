@@ -58,6 +58,23 @@ const clusterIcon = (count: number, color: string) =>
     html: `<span style="display:flex;width:38px;height:38px;align-items:center;justify-content:center;border-radius:999px;background:${color};color:var(--container-dynamic-brand-bold-foreground-default, #ffffff);border:2px solid var(--surface-background-lvl1, #ffffff);box-shadow:0 2px 8px var(--shadow-lvl8, rgba(113,113,128,0.2));font-family:${FONT.replace(/"/g, "'")};font-weight:700;font-size:12px;transition:transform 0.2s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">${count}</span>`,
   });
 
+function MapSizeSync() {
+  const map = useMap();
+  useEffect(() => {
+    let frame = 0;
+    const observer = new ResizeObserver(() => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => map.invalidateSize({ pan: false }));
+    });
+    observer.observe(map.getContainer());
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, [map]);
+  return null;
+}
+
 function InitialBounds({ screens }: { screens: ScreenData[] }) {
   const map = useMap();
   const didRun = useRef(false);
@@ -486,12 +503,13 @@ export function MapPanelV2({
   const hoveredScreen = screens.find((screen) => screen.id === hoveredScreenId);
 
   return (
-    <div className="fiber-dooh-map relative h-full w-full" style={{ backgroundColor: "var(--surface-background-lvl2, #f7f7fa)" }}>
+    <div className="fiber-dooh-map relative flex-1 min-h-0 w-full" style={{ backgroundColor: "var(--surface-background-lvl2, #f7f7fa)" }}>
       <MapContainer center={[54.5, -3.2]} zoom={6} minZoom={3} maxZoom={19} className="h-full w-full" zoomControl={false} style={{ fontFamily: FONT }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <MapSizeSync />
         <InitialBounds screens={screens} />
         <FocusHovered screen={hoveredScreen} />
         <MapControls screens={screens} />

@@ -170,11 +170,11 @@ export default function DoohPlannerV2() {
   );
 
   return (
-    <div className="dooh-v2-planner flex flex-col flex-1 h-full font-fiber">
-      <div className="flex flex-1 gap-6 overflow-hidden">
+    <div className="dooh-v2-planner flex flex-col flex-1 min-h-0 font-fiber">
+      <div className="flex flex-1 min-h-0 gap-6 overflow-hidden">
         <SidebarV2 filters={filters} setFilters={setFilters} />
         
-        <div className="flex-1 min-w-0 flex flex-col relative bg-transparent">
+        <div className="flex-1 min-w-0 min-h-0 flex flex-col relative bg-transparent">
           <div className="shrink-0 flex flex-wrap items-center justify-between gap-4 pb-4">
             <div role="group" aria-label="Screen views">
               <FiberRoundedTabsBar>
@@ -194,7 +194,7 @@ export default function DoohPlannerV2() {
               </FiberButton>
             </div>
           </div>
-          {csvDownload && <div role="status" className="px-4 py-2 text-xs bg-purple-50 text-purple-900">
+          {csvDownload && <div role="status" className="shrink-0 px-4 py-2 text-xs bg-purple-50 text-purple-900">
             CSV ready: {csvDownload.count.toLocaleString()} screen{csvDownload.count === 1 ? "" : "s"}.{" "}
             <a href={csvDownload.url} download="DOOH-Shortlist.csv" className="underline font-semibold">Download CSV again</a>
           </div>}
@@ -209,7 +209,7 @@ export default function DoohPlannerV2() {
             locationSource={locationMethod}
           />}
 
-        {view === "list" && <RightPanelV2 
+        {view === "list" && <div className="flex-1 min-h-0 overflow-y-auto"><RightPanelV2 
           matchedScreens={matchedScreens}
           selectedScreens={selectedScreens}
           selectedScreenIds={selectedScreenIds}
@@ -228,7 +228,7 @@ export default function DoohPlannerV2() {
           }}
           onHover={setHoveredScreenId}
           highlightedScreenId={hoveredScreenId}
-        />}
+        /></div>}
         </div>
       </div>
     </div>

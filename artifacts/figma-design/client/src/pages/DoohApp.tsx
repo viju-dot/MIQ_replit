@@ -82,7 +82,7 @@ function DoohVersionedContent() {
     : version === "v2" ? <DoohPlannerV2 /> : <DoohPlanner />;
 
   return (
-    <div className="min-h-screen flex flex-col dooh-theme bg-[var(--surface-background-lvl2,#f7f7fa)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]">
+    <div className={`min-h-screen flex flex-col dooh-theme bg-[var(--surface-background-lvl2,#f7f7fa)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)] ${!isGeo && !isSaved && version === "v2" ? "dooh-fixed-planner" : ""}`}>
       <header className="relative z-50 shrink-0" aria-label="Fiber navigation">
         <PrimaryNavigation />
         <SecondaryNavigation activeSection="Advanced" />
@@ -110,9 +110,9 @@ function DoohVersionedContent() {
         </nav>
       </section>
 
-      <main className="flex-1 relative flex flex-col overflow-hidden">
+      <main className="flex-1 min-h-0 relative flex flex-col overflow-hidden">
         {/* Keep planner stacking (sidebar/map) below both feedback layers. */}
-        <div key={`${location}?${search}`} className="relative isolate flex-1 flex flex-col min-w-0">{content}</div>
+        <div key={`${location}?${search}`} className="relative isolate flex-1 flex flex-col min-w-0 min-h-0">{content}</div>
         <PrototypeCommentLayer />
         <DesignAnnotationLayer />
       </main>

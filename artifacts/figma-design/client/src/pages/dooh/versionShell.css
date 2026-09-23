@@ -3,3 +3,18 @@
 .dooh-page-intro h1 { margin: 0; font-size: 24px; line-height: 32px; font-weight: 600; color: var(--surface-foreground-static-neutral-lvl1, #13131a); }
 .dooh-page-intro > p { margin: 4px 0 0; font-size: 14px; line-height: 20px; color: var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59); }
 .dooh-fiber-tabs { display: flex; margin-top: 20px; }
+
+/* Only the V2 DOOH workspace is viewport-bound; other modules keep page scrolling. */
+.dooh-fixed-planner {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+.dooh-fixed-planner .dooh-page-content {
+  min-height: 0;
+  padding-bottom: 56px; /* Keep map attribution clear of the feedback toolbar. */
+}
+.dooh-fixed-planner .dooh-page-intro {
+  flex-shrink: 0;
+}

@@ -123,7 +123,7 @@ export function SidebarV2({ filters, setFilters }: Props) {
 
   return (
     <div data-annotate="DOOH filter panel" className="w-[300px] xl:w-[340px] shrink-0 bg-white flex flex-col h-full overflow-hidden z-20 border-r border-gray-200">
-      <div className="flex-1 overflow-y-auto dooh-scrollbar">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain dooh-scrollbar">
         
         {/* 1. Location Filter */}
         <FilterCard title="Location" icon={<MapPin className="w-4 h-4" />} enabled={filters.location.enabled} onToggle={enabled => updateSection("location", { enabled })}>
