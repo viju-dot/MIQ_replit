@@ -4,8 +4,7 @@ import { useAudiences } from "../api";
 import { SidebarV2, FilterStateV2, DEFAULT_FILTERS_V2, EXCHANGE_RATES, PlanningZone } from "./v2planner-sidebar";
 import { MapPanelV2 } from "./v2planner-map-panel";
 import { RightPanelV2 } from "./v2planner-right-panel";
-import { FiberButton } from "./primitives";
-import { FiberRoundedTabsBar, FiberTabButton } from "@/components/FiberTabItem";
+import { FiberButton, SmartCard, TabsBarUnderline } from "./primitives";
 import { Download, SlidersHorizontal } from "lucide-react";
 import { useScreenExport } from "./useScreenExport";
 import "./DoohPlannerV2.css";
@@ -181,25 +180,18 @@ export default function DoohPlannerV2() {
         <SidebarV2 filters={filters} setFilters={setFilters} />
         
         <div className="flex-1 min-w-0 min-h-0 flex flex-col sticky top-4 self-start bg-transparent">
-          <div className="shrink-0 flex flex-wrap items-center justify-between gap-4 pb-4">
-            <div role="group" aria-label="Screen views">
-              <FiberRoundedTabsBar>
-                <FiberTabButton label="Map" selected={view === "map"} onClick={() => setView("map")} />
-                <FiberTabButton label="Screen List" selected={view === "list"} onClick={() => setView("list")} />
-              </FiberRoundedTabsBar>
-            </div>
-            <div className="ml-auto flex items-center gap-2">
-              <FiberButton size="compact" variant="outline" onClick={handleExport} disabled={!matchedScreens.length}>
-                <Download className="size-4" aria-hidden="true" /> Export
-              </FiberButton>
-              <FiberButton size="compact" variant="secondary" disabled={!matchedScreens.length} onClick={() => {
-                setView("list");
-                requestAnimationFrame(() => document.getElementById("dooh-plan-overview")?.focus());
-              }}>
-                <SlidersHorizontal className="size-4" aria-hidden="true" /> Apply Filters
-              </FiberButton>
-            </div>
-          </div>
+          <SmartCard
+            title="Billboard Explorer"
+            rightOnDivider
+            right={
+              <TabsBarUnderline
+                options={["Map", "Screen List"]}
+                value={view === "map" ? "Map" : "Screen List"}
+                onChange={value => setView(value === "Map" ? "map" : "list")}
+                ariaLabel="Screen views"
+              />
+            }
+          >
           {csvDownload && <div role="status" className="shrink-0 px-4 py-2 text-xs bg-purple-50 text-purple-900">
             CSV ready: {csvDownload.count.toLocaleString()} screen{csvDownload.count === 1 ? "" : "s"}.{" "}
             <a href={csvDownload.url} download="DOOH-Shortlist.csv" className="underline font-semibold">Download CSV again</a>
@@ -252,7 +244,19 @@ export default function DoohPlannerV2() {
           onHover={setHoveredScreenId}
           highlightedScreenId={hoveredScreenId}
         /></div>}
+          </SmartCard>
         </div>
+      </div>
+      <div className="dooh-actions-bar" role="region" aria-label="Planner actions">
+        <FiberButton variant="outline" onClick={handleExport} disabled={!matchedScreens.length}>
+          <Download className="size-4" aria-hidden="true" /> Export
+        </FiberButton>
+        <FiberButton variant="secondary" disabled={!matchedScreens.length} onClick={() => {
+          setView("list");
+          requestAnimationFrame(() => document.getElementById("dooh-plan-overview")?.focus());
+        }}>
+          <SlidersHorizontal className="size-4" aria-hidden="true" /> Apply Filters
+        </FiberButton>
       </div>
     </div>
   );

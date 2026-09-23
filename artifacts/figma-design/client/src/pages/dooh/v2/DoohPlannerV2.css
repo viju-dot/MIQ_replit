@@ -15,6 +15,28 @@
 
 .dooh-v2-planner {
   background-color: #f9fafb;
+  padding-bottom: 96px;
+}
+
+/* Match Geo Planner's floating actions, leaving space for collaboration controls. */
+.dooh-actions-bar {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 40;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-100, 8px);
+  padding: 16px 464px 16px 64px;
+  background: var(--surface-background-lvl1, #fff);
+  border-top: 1px solid var(--border-static-subtle-neutral, #e1e1e8);
+  box-shadow: 0 -2px 8px rgba(113, 113, 128, 0.06);
+}
+
+@media (max-width: 1023px) {
+  .dooh-actions-bar { padding: 16px 24px 88px; flex-wrap: wrap; }
+  .dooh-v2-planner { padding-bottom: 168px; }
 }
 
 /* Base font logic */
