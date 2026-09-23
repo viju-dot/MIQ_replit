@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { useAudiences, useIncrementAudienceUse } from "../api";
 import { CREATIVE_FORMATS, DAYPART_PRESETS, MOCK_POIS, PUBLISHERS, RESOLUTIONS, VENUES } from "../data";
 import { parseCoordinateCsv, parsePostcodeCsv, type UploadReport } from "../uploadHelpers";
-import { TabsBarUnderline, FiberSlider } from "./primitives";
+import { FiberSlider } from "./primitives";
+import { FiberRoundedTabsBar, FiberTabButton } from "@/components/FiberTabItem";
 import { PoiSearch } from "./PoiSearch";
 
 export interface PlanningZone {
@@ -127,25 +128,21 @@ export function SidebarV2({ filters, setFilters }: Props) {
         
         {/* 1. Location Filter */}
         <FilterCard title="Location" icon={<MapPin className="w-4 h-4" />} enabled={filters.location.enabled} onToggle={enabled => updateSection("location", { enabled })}>
-          <div className="mb-4 pt-1 overflow-x-auto">
-            <TabsBarUnderline 
-              wrap={false}
-              ariaLabel="Location filter method"
-              options={["Saved Audience", "Postcode", "POI", "Lat/Long"]}
-              value={
-                filters.location.method === "audience" ? "Saved Audience" :
-                filters.location.method === "postcode" ? "Postcode" :
-                filters.location.method === "poi" ? "POI" : "Lat/Long"
-              }
-              onChange={val => {
-                const method = val === "Saved Audience" ? "audience" :
-                               val === "Postcode" ? "postcode" :
-                               val === "POI" ? "poi" : "latlng";
-                updateSection("location", { method, uploadedPoints: [] });
-                setLocationReport(null);
-                setUploadError("");
-              }}
-            />
+          <div className="mb-4 pt-1" role="group" aria-label="Location filter method">
+            <FiberRoundedTabsBar>
+              {(["audience", "postcode", "poi", "latlng"] as const).map(method => (
+                <FiberTabButton
+                  key={method}
+                  label={method === "audience" ? "Saved Audience" : method === "postcode" ? "Postcode" : method === "poi" ? "POI" : "Lat/Long"}
+                  selected={filters.location.method === method}
+                  onClick={() => {
+                    updateSection("location", { method, uploadedPoints: [] });
+                    setLocationReport(null);
+                    setUploadError("");
+                  }}
+                />
+              ))}
+            </FiberRoundedTabsBar>
           </div>
           {filters.location.method === "audience" && <div className="space-y-3">
             {!selectedAudience ? (
