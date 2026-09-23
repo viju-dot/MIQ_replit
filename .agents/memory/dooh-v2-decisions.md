@@ -3,6 +3,12 @@ name: DOOH prototype scope and duplicate safety
 description: Why DOOH's MVP keeps mock intelligence, existing persistence, and additive duplicate versions
 ---
 
+Smart selection should infer geography only, not independent commercial or audience preferences.
+
+**Why:** The user wants map captures reflected in relevant sidebar filters while keeping settings such as budget an individual choice.
+
+**How to apply:** Represent captured circles as visible, removable geographic constraints. Preserve manually chosen facets; do not infer budget, publishers, or venue selections from whichever billboards happen to fall inside a circle.
+
 Treat the DOOH V2 brief as a minimal mock-data planning prototype, not authorization to connect a DSP or make live campaign bookings.
 
 **Why:** The brief explicitly requested mock screens/intelligence and a minimal Phase 1 implementation. Saved audiences already had real persistence, which should not be replaced with browser-only state just because the example brief used React state.

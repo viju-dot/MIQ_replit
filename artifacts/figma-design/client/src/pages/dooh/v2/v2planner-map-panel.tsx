@@ -11,27 +11,31 @@ import {
   useMap,
   useMapEvents,
 } from "react-leaflet";
-import { ScreenData } from "../data";
-import { MapZone } from "../components/MapPanel";
-import { CARD_BG, CARD_SHADOW, GRID, MUTED, TITLE, FONT } from "./primitives";
+import { Target, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { ScreenData, getDistance } from "../data";
+import { PlanningZone } from "./v2planner-sidebar";
+import { CARD_BG, CARD_SHADOW, GRID, MUTED, TITLE, FONT, FiberButton, FiberSlider } from "./primitives";
+import { SmartSelectionMapEvents, SmartPreviewCircle, SmartSelectionControl } from "./v2planner-smart-selection";
 
 interface Props {
   screens: ScreenData[];
+  smartCandidates?: ScreenData[];
   hoveredScreenId: string | null;
   onScreenClick: (id: string) => void;
-  zones?: MapZone[];
-  onZonesChange?: (zones: MapZone[]) => void;
+  zones?: PlanningZone[];
+  onZonesChange?: (zones: PlanningZone[]) => void;
   drawMode?: "circle" | "polygon" | null;
   onDrawComplete?: () => void;
   locationSource?: string | null; // "audience", "postcode", "poi", "latlng", etc.
+  selectedScreenIds?: Set<string>;
+  onSmartSelectionCapture?: (zone: PlanningZone, selectedIds: string[]) => void;
 }
 
 const noop = () => undefined;
 
 // Fiber Colors mapping:
-// Postcode Match -> Success Green
-// POI Match -> Info Blue
-// GeoPlanner Match (Audience) -> Brand Purple
 const getColorBySource = (source?: string | null) => {
   switch (source) {
     case "postcode": return "var(--surface-foreground-static-success, #059669)";
@@ -42,21 +46,27 @@ const getColorBySource = (source?: string | null) => {
   }
 };
 
-const pinIcon = (active: boolean, color: string) =>
-  L.divIcon({
+const pinIcon = (active: boolean, color: string, isSelected: boolean = false, isCandidate: boolean = false) => {
+  const borderColor = isCandidate ? '#7c33b5' : (isSelected ? '#13131a' : 'var(--surface-background-lvl1, #ffffff)');
+  const glow = isCandidate ? ', 0 0 0 4px rgba(124, 51, 181, 0.3)' : '';
+  return L.divIcon({
     className: "",
     iconSize: active ? [24, 24] : [18, 18],
     iconAnchor: active ? [12, 12] : [9, 9],
-    html: `<span style="display:block;width:100%;height:100%;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${active ? "var(--surface-foreground-static-neutral-lvl1, #13131a)" : color};border:2px solid var(--surface-background-lvl1, #ffffff);box-shadow:0 2px 6px var(--shadow-lvl8, rgba(113,113,128,0.15));transition:all 0.2s ease;"></span>`,
+    html: `<span style="display:block;width:100%;height:100%;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${active ? "var(--surface-foreground-static-neutral-lvl1, #13131a)" : color};border:2px solid ${borderColor};box-shadow:0 2px 6px var(--shadow-lvl8, rgba(113,113,128,0.15))${glow};transition:all 0.2s ease;"></span>`,
   });
+};
 
-const clusterIcon = (count: number, color: string) =>
-  L.divIcon({
+const clusterIcon = (count: number, color: string, isSelected: boolean = false, isCandidate: boolean = false) => {
+  const borderColor = isCandidate ? '#7c33b5' : (isSelected ? '#13131a' : 'var(--surface-background-lvl1, #ffffff)');
+  const glow = isCandidate ? ', 0 0 0 4px rgba(124, 51, 181, 0.3)' : '';
+  return L.divIcon({
     className: "",
     iconSize: [38, 38],
     iconAnchor: [19, 19],
-    html: `<span style="display:flex;width:38px;height:38px;align-items:center;justify-content:center;border-radius:999px;background:${color};color:var(--container-dynamic-brand-bold-foreground-default, #ffffff);border:2px solid var(--surface-background-lvl1, #ffffff);box-shadow:0 2px 8px var(--shadow-lvl8, rgba(113,113,128,0.2));font-family:${FONT.replace(/"/g, "'")};font-weight:700;font-size:12px;transition:transform 0.2s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">${count}</span>`,
+    html: `<span style="display:flex;width:38px;height:38px;align-items:center;justify-content:center;border-radius:999px;background:${color};color:var(--container-dynamic-brand-bold-foreground-default, #ffffff);border:2px solid ${borderColor};box-shadow:0 2px 8px var(--shadow-lvl8, rgba(113,113,128,0.2))${glow};font-family:${FONT.replace(/"/g, "'")};font-weight:700;font-size:12px;transition:transform 0.2s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">${count}</span>`,
   });
+};
 
 function MapSizeSync() {
   const map = useMap();
@@ -91,11 +101,7 @@ function InitialBounds({ screens }: { screens: ScreenData[] }) {
   return null;
 }
 
-function FocusHovered({
-  screen,
-}: {
-  screen: ScreenData | undefined;
-}) {
+function FocusHovered({ screen }: { screen: ScreenData | undefined; }) {
   const map = useMap();
   useEffect(() => {
     if (!screen) return;
@@ -170,8 +176,9 @@ function DynamicScale() {
 
 function MapLegend() {
   return (
-    <div className="absolute bottom-[var(--spacing-300,24px)] left-[var(--spacing-200,16px)] z-[1000] rounded-[var(--radius-50,4px)] p-[var(--spacing-200,16px)] w-[220px]"
-      style={{ backgroundColor: CARD_BG, boxShadow: CARD_SHADOW, border: `1px solid ${GRID}` }}>
+    <div className="absolute bottom-[40px] right-[var(--spacing-200,16px)] z-[1000] rounded-[var(--radius-50,4px)] p-[var(--spacing-200,16px)] w-[220px]"
+      style={{ backgroundColor: CARD_BG, boxShadow: CARD_SHADOW, border: `1px solid ${GRID}` }}
+      onDoubleClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}>
       <h3 className="text-[length:var(--body-md-medium-size,14px)] font-bold mb-[var(--spacing-150,12px)]" style={{ fontFamily: FONT, color: TITLE }}>Match Source</h3>
       <div className="flex flex-col gap-[var(--spacing-100,8px)]">
         <div className="flex items-center gap-[var(--spacing-100,8px)]">
@@ -192,13 +199,20 @@ function MapLegend() {
   );
 }
 
-
 function ClusteredScreens({
   screens,
   hoveredScreenId,
   onScreenClick,
   locationSource,
-}: Pick<Props, "screens" | "hoveredScreenId" | "onScreenClick" | "locationSource">) {
+  selectedScreenIds = new Set(),
+  candidateIds = new Set(),
+  smartSelectionActive = false,
+  onSmartCapture
+}: Pick<Props, "screens" | "hoveredScreenId" | "onScreenClick" | "locationSource" | "selectedScreenIds"> & {
+  candidateIds?: Set<string>;
+  smartSelectionActive?: boolean;
+  onSmartCapture?: (latlng: L.LatLng) => void;
+}) {
   const map = useMap();
   const [revision, setRevision] = useState(0);
   const [spiderCluster, setSpiderCluster] = useState<string | null>(null);
@@ -231,28 +245,37 @@ function ClusteredScreens({
     }));
   }, [screens, hoveredScreenId, map, revision]);
 
-  const screenMarker = (screen: ScreenData, position?: LatLngExpression) => (
-    <Marker
-      key={screen.id}
-      position={position ?? [screen.lat, screen.lng]}
-      icon={pinIcon(screen.id === hoveredScreenId, pinColor)}
-      zIndexOffset={screen.id === hoveredScreenId ? 1000 : 0}
-      eventHandlers={{
-        click: () => {
-          map.setView(position ?? [screen.lat, screen.lng], Math.max(map.getZoom(), 15));
-          onScreenClick(screen.id);
-        },
-      }}
-    >
-      <Tooltip direction="top" offset={[0, -10]} opacity={1} className="fiber-tooltip">
-        <div className="flex flex-col gap-1 text-[length:var(--body-sm-regular-size,12px)] p-1" style={{ fontFamily: FONT, color: TITLE }}>
-          <strong className="text-[length:var(--body-sm-medium-size,12px)]">{screen.id}</strong>
-          <div style={{ color: MUTED }}>{screen.publisher}</div>
-          <div className="font-medium mt-1 pt-1" style={{ borderTop: `1px solid ${GRID}` }}>CPM: £{screen.cpm.toFixed(2)}</div>
-        </div>
-      </Tooltip>
-    </Marker>
-  );
+  const screenMarker = (screen: ScreenData, position?: LatLngExpression) => {
+    const isSelected = selectedScreenIds.has(screen.id);
+    const isCandidate = candidateIds.has(screen.id);
+    return (
+      <Marker
+        key={screen.id}
+        position={position ?? [screen.lat, screen.lng]}
+        icon={pinIcon(screen.id === hoveredScreenId, pinColor, isSelected, isCandidate)}
+        zIndexOffset={screen.id === hoveredScreenId ? 1000 : (isCandidate ? 600 : (isSelected ? 500 : 0))}
+        eventHandlers={{
+          click: (e) => {
+            if (smartSelectionActive && onSmartCapture) {
+              L.DomEvent.stopPropagation(e);
+              onSmartCapture(L.latLng(screen.lat, screen.lng));
+              return;
+            }
+            map.setView(position ?? [screen.lat, screen.lng], Math.max(map.getZoom(), 15));
+            onScreenClick(screen.id);
+          },
+        }}
+      >
+        <Tooltip direction="top" offset={[0, -10]} opacity={1} className="fiber-tooltip">
+          <div className="flex flex-col gap-1 text-[length:var(--body-sm-regular-size,12px)] p-1" style={{ fontFamily: FONT, color: TITLE }}>
+            <strong className="text-[length:var(--body-sm-medium-size,12px)]">{screen.id}</strong>
+            <div style={{ color: MUTED }}>{screen.publisher}</div>
+            <div className="font-medium mt-1 pt-1" style={{ borderTop: `1px solid ${GRID}` }}>CPM: £{screen.cpm.toFixed(2)}</div>
+          </div>
+        </Tooltip>
+      </Marker>
+    );
+  };
 
   return (
     <>
@@ -282,13 +305,21 @@ function ClusteredScreens({
           );
         }
 
+        const isSelected = cluster.screens.some(s => selectedScreenIds.has(s.id));
+        const isCandidate = cluster.screens.some(s => candidateIds.has(s.id));
         return (
           <Marker
             key={cluster.key}
             position={[cluster.lat, cluster.lng]}
-            icon={clusterIcon(cluster.screens.length, pinColor)}
+            icon={clusterIcon(cluster.screens.length, pinColor, isSelected, isCandidate)}
+            zIndexOffset={isCandidate ? 600 : (isSelected ? 500 : 0)}
             eventHandlers={{
-              click: () => {
+              click: (e) => {
+                if (smartSelectionActive && onSmartCapture) {
+                   L.DomEvent.stopPropagation(e);
+                   onSmartCapture(L.latLng(cluster.lat, cluster.lng));
+                   return;
+                }
                 if (map.getZoom() < map.getMaxZoom()) {
                   map.setView([cluster.lat, cluster.lng], Math.min(map.getZoom() + 2, map.getMaxZoom()));
                 } else {
@@ -298,7 +329,7 @@ function ClusteredScreens({
             }}
           >
             <Tooltip direction="top" offset={[0, -18]} className="fiber-tooltip">
-              <span style={{ fontFamily: FONT }}>{cluster.screens.length} matched screens — click to expand</span>
+              <span style={{ fontFamily: FONT }}>{cluster.screens.length} matched screens — {smartSelectionActive ? "click to capture area" : "click to expand"}</span>
             </Tooltip>
           </Marker>
         );
@@ -311,10 +342,10 @@ function ZoneLayers({
   zones,
   onZonesChange,
 }: {
-  zones: MapZone[];
-  onZonesChange: (zones: MapZone[]) => void;
+  zones: PlanningZone[];
+  onZonesChange: (zones: PlanningZone[]) => void;
 }) {
-  const removeButton = (zone: MapZone) => (
+  const removeButton = (zone: PlanningZone) => (
     <Tooltip permanent direction="center" opacity={1} className="fiber-map-zone-label">
       <button
         type="button"
@@ -360,8 +391,8 @@ function DrawingLayer({
   onDrawComplete,
 }: {
   mode: "circle" | "polygon";
-  zones: MapZone[];
-  onZonesChange: (zones: MapZone[]) => void;
+  zones: PlanningZone[];
+  onZonesChange: (zones: PlanningZone[]) => void;
   onDrawComplete: () => void;
 }) {
   const map = useMap();
@@ -492,15 +523,83 @@ function DrawingLayer({
 
 export function MapPanelV2({
   screens,
+  smartCandidates,
   hoveredScreenId,
   onScreenClick,
   zones = [],
   onZonesChange = noop,
   drawMode = null,
   onDrawComplete = noop,
-  locationSource = null
+  locationSource = null,
+  selectedScreenIds = new Set(),
+  onSmartSelectionCapture
 }: Props) {
   const hoveredScreen = screens.find((screen) => screen.id === hoveredScreenId);
+
+  const [smartSelectionActive, setSmartSelectionActive] = useState(false);
+  const [smartRadius, setSmartRadius] = useState<number>(500);
+  const [smartRadiusUnit, setSmartRadiusUnit] = useState<"m" | "km">("m");
+  const [previewCenter, setPreviewCenter] = useState<L.LatLng | null>(null);
+  const [smartError, setSmartError] = useState<string | null>(null);
+
+  const displayScreens = smartSelectionActive ? (smartCandidates || screens) : screens;
+  const activeRadiusMeters = smartRadiusUnit === "km" ? smartRadius * 1000 : smartRadius;
+
+  useEffect(() => {
+    if (drawMode) {
+      setSmartSelectionActive(false);
+      setSmartError(null);
+    }
+  }, [drawMode]);
+
+  const handleActivateSmart = (active: boolean) => {
+    setSmartSelectionActive(active);
+    if (active) {
+      setSmartError(null);
+      if (drawMode) onDrawComplete();
+    }
+  };
+
+  const candidateIds = useMemo(() => {
+    if (!smartSelectionActive || !previewCenter) return new Set<string>();
+    const ids = new Set<string>();
+    displayScreens.forEach(s => {
+      if (getDistance(s.lat, s.lng, previewCenter.lat, previewCenter.lng) <= activeRadiusMeters) {
+         ids.add(s.id);
+      }
+    });
+    return ids;
+  }, [smartSelectionActive, previewCenter, activeRadiusMeters, displayScreens]);
+
+  const handleSmartCapture = (center: L.LatLng) => {
+    if (!smartSelectionActive) return;
+    const ids: string[] = [];
+    displayScreens.forEach(s => {
+      if (getDistance(s.lat, s.lng, center.lat, center.lng) <= activeRadiusMeters) {
+         ids.push(s.id);
+      }
+    });
+
+    if (ids.length === 0) {
+      setSmartError("No screens found within this radius.");
+      return;
+    }
+    
+    setSmartError(null);
+
+    const zoneId = `smart-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const newZone: PlanningZone = {
+      id: zoneId,
+      type: "circle",
+      center: { lat: center.lat, lng: center.lng },
+      radius: activeRadiusMeters,
+      label: `Smart Selection (${activeRadiusMeters >= 1000 ? (activeRadiusMeters / 1000).toFixed(1) + 'km' : Math.round(activeRadiusMeters) + 'm'})`
+    };
+
+    onSmartSelectionCapture?.(newZone, ids);
+    setSmartSelectionActive(false);
+    setPreviewCenter(null);
+  };
 
   return (
     <div className="fiber-dooh-map relative shrink-0 w-full" style={{ height: "max(690px, calc(100dvh - 490px))", backgroundColor: "var(--surface-background-lvl2, #f7f7fa)" }}>
@@ -510,11 +609,20 @@ export function MapPanelV2({
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MapSizeSync />
-        <InitialBounds screens={screens} />
+        <InitialBounds screens={displayScreens} />
         <FocusHovered screen={hoveredScreen} />
-        <MapControls screens={screens} />
+        <MapControls screens={displayScreens} />
         <ZoneLayers zones={zones} onZonesChange={onZonesChange} />
-        <ClusteredScreens screens={screens} hoveredScreenId={hoveredScreenId} onScreenClick={onScreenClick} locationSource={locationSource} />
+        <ClusteredScreens 
+           screens={displayScreens} 
+           hoveredScreenId={hoveredScreenId} 
+           onScreenClick={onScreenClick} 
+           locationSource={locationSource} 
+           selectedScreenIds={selectedScreenIds}
+           candidateIds={candidateIds}
+           smartSelectionActive={smartSelectionActive}
+           onSmartCapture={handleSmartCapture}
+        />
         {drawMode && (
           <DrawingLayer
             key={drawMode}
@@ -524,8 +632,26 @@ export function MapPanelV2({
             onDrawComplete={onDrawComplete}
           />
         )}
+        <SmartSelectionMapEvents 
+          active={smartSelectionActive} 
+          setPreviewCenter={setPreviewCenter} 
+          onCapture={handleSmartCapture} 
+        />
+        {smartSelectionActive && <SmartPreviewCircle center={previewCenter} radius={activeRadiusMeters} />}
         <MapLegend />
       </MapContainer>
+      
+      <SmartSelectionControl 
+        active={smartSelectionActive}
+        setActive={handleActivateSmart}
+        radius={smartRadius}
+        setRadius={setSmartRadius}
+        unit={smartRadiusUnit}
+        setUnit={setSmartRadiusUnit}
+        candidateCount={candidateIds.size}
+        hasCenter={!!previewCenter}
+        error={smartError}
+      />
     </div>
   );
 }

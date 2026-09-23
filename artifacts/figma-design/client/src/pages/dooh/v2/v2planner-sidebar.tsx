@@ -17,6 +17,7 @@ export interface PlanningZone {
   center?: { lat: number; lng: number };
   radius?: number;
   points?: Array<{ lat: number; lng: number }>;
+  label?: string;
 }
 
 export interface FilterStateV2 {
@@ -272,8 +273,10 @@ export function SidebarV2({ filters, setFilters }: Props) {
             </Select>
             <div className="space-y-1">
               {filters.planningZone.zones.map((zone, index) => <div key={zone.id} className="flex items-center justify-between rounded bg-gray-50 p-2 text-xs border border-gray-100">
-                <span className="text-gray-600">Zone {index + 1}: {zone.type === "circle" ? `${Math.round(zone.radius ?? 0)}m circle` : `${zone.points?.length ?? 0}-pt poly`}</span>
-                <button aria-label={`Remove zone ${index + 1}`} className="text-gray-400 hover:text-red-500" onClick={() => updateSection("planningZone", { zones: filters.planningZone.zones.filter(z => z.id !== zone.id) })}><X className="h-3 w-3" /></button>
+                <span className="text-gray-600 truncate mr-2" title={zone.label || `Zone ${index + 1}`}>
+                  {zone.label || `Zone ${index + 1}: ${zone.type === "circle" ? `${Math.round(zone.radius ?? 0)}m circle` : `${zone.points?.length ?? 0}-pt poly`}`}
+                </span>
+                <button aria-label={`Remove zone ${index + 1}`} className="text-gray-400 hover:text-red-500 shrink-0" onClick={() => updateSection("planningZone", { zones: filters.planningZone.zones.filter(z => z.id !== zone.id) })}><X className="h-3 w-3" /></button>
               </div>)}
             </div>
           </div>

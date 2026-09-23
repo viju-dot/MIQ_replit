@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { SCREENS, MOCK_POIS, DAYPART_RANGES, getDistance, isPointInPolygon, ScreenData } from "../data";
 import { useAudiences } from "../api";
-import { SidebarV2, FilterStateV2, DEFAULT_FILTERS_V2, EXCHANGE_RATES } from "./v2planner-sidebar";
+import { SidebarV2, FilterStateV2, DEFAULT_FILTERS_V2, EXCHANGE_RATES, PlanningZone } from "./v2planner-sidebar";
 import { MapPanelV2 } from "./v2planner-map-panel";
 import { RightPanelV2 } from "./v2planner-right-panel";
 import { FiberButton } from "./primitives";
@@ -30,7 +30,7 @@ export default function DoohPlannerV2() {
     }
   }, []);
 
-  const matchedScreens = useMemo(() => {
+  const { matchedScreens, smartCandidates } = useMemo(() => {
     const method = filters.location.method;
     const radius = Number(filters.location.radius) * (filters.location.radiusUnit === "km" ? 1000 : 1);
     const selectedAudience = method === "audience"
@@ -57,47 +57,30 @@ export default function DoohPlannerV2() {
     }
 
     if (!filters.location.enabled) targetPoints = [];
-    const hasZones = filters.planningZone.enabled && filters.planningZone.zones.length > 0;
     
-    let results = SCREENS;
+    let baseResults = SCREENS;
 
     // 1. Location filter
     if (filters.location.enabled) {
       if (targetPoints.length === 0 && !audiencePolygon?.length) {
-        // An unconfigured location is not a filter. Keep the mock inventory
-        // visible on first visit, but never ignore a missing requested audience.
-        if (method === "audience" && filters.location.audienceId) results = [];
+        if (method === "audience" && filters.location.audienceId) baseResults = [];
       } else if (audiencePolygon && audiencePolygon.length >= 3) {
-        results = results.filter(s => isPointInPolygon({ lat: s.lat, lng: s.lng }, audiencePolygon));
+        baseResults = baseResults.filter(s => isPointInPolygon({ lat: s.lat, lng: s.lng }, audiencePolygon));
       } else if (targetPoints.length > 0) {
-        results = Number.isFinite(radius) && radius >= 50 && radius <= 10000 ? results.filter(s => {
+        baseResults = Number.isFinite(radius) && radius >= 50 && radius <= 10000 ? baseResults.filter(s => {
           return targetPoints.some(tp => getDistance(s.lat, s.lng, tp.lat, tp.lng) <= radius);
         }) : [];
       }
     }
 
-    // 2. Planning Zone
-    if (filters.planningZone.enabled && filters.planningZone.zones.length > 0) {
-      results = results.filter(s => {
-        return filters.planningZone.zones.some(z => {
-          if (z.type === "circle" && z.radius && z.center) {
-            return getDistance(s.lat, s.lng, z.center.lat, z.center.lng) <= z.radius;
-          } else if (z.type === "polygon" && z.points) {
-            return isPointInPolygon({ lat: s.lat, lng: s.lng }, z.points);
-          }
-          return false;
-        });
-      });
-    }
-
     // 3. Venue Type
     if (filters.venueType.enabled && filters.venueType.venues.length > 0) {
-      results = results.filter(s => filters.venueType.venues.includes(s.venue));
+      baseResults = baseResults.filter(s => filters.venueType.venues.includes(s.venue));
     }
 
     // 4. Publisher
     if (filters.publishers.enabled && filters.publishers.publishers.length > 0) {
-      results = results.filter(s => filters.publishers.publishers.includes(s.publisher));
+      baseResults = baseResults.filter(s => filters.publishers.publishers.includes(s.publisher));
     }
 
     // 5. Day Part
@@ -113,7 +96,7 @@ export default function DoohPlannerV2() {
             return hours * 60 + minutes;
           }) as [number, number]];
       if (ranges.length > 0) {
-        results = results.filter(screen => dayMatches(screen.availability.days) &&
+        baseResults = baseResults.filter(screen => dayMatches(screen.availability.days) &&
           ranges.some(([start, end]) => end > start && screen.availability.start <= start && screen.availability.end >= end));
       }
     }
@@ -121,7 +104,7 @@ export default function DoohPlannerV2() {
     // 6. Creative Type
     if (filters.creativeType.enabled) {
       if (filters.creativeType.format) {
-        results = results.filter(s => s.creativeFormat === filters.creativeType.format);
+        baseResults = baseResults.filter(s => s.creativeFormat === filters.creativeType.format);
       }
       if (filters.creativeType.resolution === "custom") {
         const width = Number(filters.creativeType.customWidth);
@@ -129,10 +112,27 @@ export default function DoohPlannerV2() {
         const valid = /^\d+$/.test(filters.creativeType.customWidth) &&
           /^\d+$/.test(filters.creativeType.customHeight) &&
           width >= 1 && width <= 16384 && height >= 1 && height <= 16384;
-        results = valid ? results.filter(s => s.creativeRes === `${width}x${height}`) : [];
+        baseResults = valid ? baseResults.filter(s => s.creativeRes === `${width}x${height}`) : [];
       } else if (filters.creativeType.resolution) {
-        results = results.filter(s => s.creativeRes === filters.creativeType.resolution);
+        baseResults = baseResults.filter(s => s.creativeRes === filters.creativeType.resolution);
       }
+    }
+
+    let finalMatched = baseResults;
+    let finalSmartCandidates = baseResults;
+
+    // 2. Planning Zone (Apply to finalMatched, ignore for finalSmartCandidates to allow picking anywhere matching other filters)
+    if (filters.planningZone.enabled && filters.planningZone.zones.length > 0) {
+      finalMatched = finalMatched.filter(s => {
+        return filters.planningZone.zones.some(z => {
+          if (z.type === "circle" && z.radius && z.center) {
+            return getDistance(s.lat, s.lng, z.center.lat, z.center.lng) <= z.radius;
+          } else if (z.type === "polygon" && z.points) {
+            return isPointInPolygon({ lat: s.lat, lng: s.lng }, z.points);
+          }
+          return false;
+        });
+      });
     }
 
     // 7. Budget
@@ -141,17 +141,23 @@ export default function DoohPlannerV2() {
       const budgetTotalGBP = Number(filters.budget.total) / rate;
       const budgetCpmGBP = filters.budget.cpm === null || filters.budget.cpm === "" ? null : Number(filters.budget.cpm) / rate;
 
-      if (budgetCpmGBP != null) results = results.filter(screen => screen.cpm <= budgetCpmGBP);
-      let cumulativeSpend = 0;
-      results = [...results].sort((a, b) => a.id.localeCompare(b.id)).filter(screen => {
-        const spend = screen.impressions / 1000 * screen.cpm; // in GBP
-        if (cumulativeSpend + spend > budgetTotalGBP) return false;
-        cumulativeSpend += spend;
-        return true;
-      });
+      const applyBudget = (arr: ScreenData[]) => {
+        let res = arr;
+        if (budgetCpmGBP != null) res = res.filter(screen => screen.cpm <= budgetCpmGBP);
+        let cumulativeSpend = 0;
+        return [...res].sort((a, b) => a.id.localeCompare(b.id)).filter(screen => {
+          const spend = screen.impressions / 1000 * screen.cpm; // in GBP
+          if (cumulativeSpend + spend > budgetTotalGBP) return false;
+          cumulativeSpend += spend;
+          return true;
+        });
+      };
+      
+      finalMatched = applyBudget(finalMatched);
+      finalSmartCandidates = applyBudget(finalSmartCandidates);
     }
 
-    return results;
+    return { matchedScreens: finalMatched, smartCandidates: finalSmartCandidates };
   }, [filters, audiences]);
 
   useEffect(() => {
@@ -200,6 +206,7 @@ export default function DoohPlannerV2() {
           </div>}
           {view === "map" && <MapPanelV2 
             screens={matchedScreens}
+            smartCandidates={smartCandidates}
             hoveredScreenId={hoveredScreenId}
             onScreenClick={setHoveredScreenId}
             zones={filters.planningZone.zones}
@@ -207,6 +214,22 @@ export default function DoohPlannerV2() {
             drawMode={filters.planningZone.drawMode}
             onDrawComplete={() => setFilters(prev => ({ ...prev, planningZone: { ...prev.planningZone, drawMode: null } }))}
             locationSource={locationMethod}
+            selectedScreenIds={selectedScreenIds}
+            onSmartSelectionCapture={(zone: PlanningZone, screenIds: string[]) => {
+              setFilters(prev => ({
+                ...prev,
+                planningZone: {
+                  ...prev.planningZone,
+                  enabled: true,
+                  zones: [...prev.planningZone.zones, zone]
+                }
+              }));
+              setSelectedScreenIds(prev => {
+                const next = new Set(prev);
+                screenIds.forEach((id: string) => next.add(id));
+                return next;
+              });
+            }}
           />}
 
         {view === "list" && <div className="flex-1 min-h-0 overflow-y-auto"><RightPanelV2 
