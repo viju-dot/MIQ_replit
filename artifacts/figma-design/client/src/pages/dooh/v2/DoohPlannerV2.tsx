@@ -181,7 +181,7 @@ export default function DoohPlannerV2() {
         
         <div className="flex-1 min-w-0 min-h-0 flex flex-col sticky top-4 self-start bg-transparent">
           <SmartCard
-            title="Billboard Explorer"
+            title="Explorer"
             rightOnDivider
             right={
               <TabsBarUnderline
