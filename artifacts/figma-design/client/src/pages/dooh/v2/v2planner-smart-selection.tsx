@@ -86,7 +86,7 @@ export function SmartSelectionControl({
 
   if (!active) {
     return (
-      <div className="absolute bottom-[var(--spacing-300,24px)] left-[var(--spacing-200,16px)] z-[1000]"
+      <div className="absolute top-[var(--spacing-200,16px)] left-[var(--spacing-200,16px)] z-[1000]"
         onDoubleClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}>
          <FiberButton onClick={() => setActive(true)} variant="solid" className="shadow-lg" ariaLabel="Start Smart Selection">
            <Target className="w-4 h-4" /> Smart Selection
@@ -99,7 +99,7 @@ export function SmartSelectionControl({
   const min = unit === "km" ? 0.05 : 50;
 
   return (
-    <div className="absolute bottom-[var(--spacing-300,24px)] left-[var(--spacing-200,16px)] z-[1000] w-[320px] rounded-[var(--radius-50,4px)] p-[var(--spacing-200,16px)] animate-in slide-in-from-bottom-4"
+    <div className="absolute top-[var(--spacing-200,16px)] left-[var(--spacing-200,16px)] z-[1000] w-[320px] rounded-[var(--radius-50,4px)] p-[var(--spacing-200,16px)] animate-in slide-in-from-top-4"
       style={{ backgroundColor: CARD_BG, boxShadow: CARD_SHADOW, border: `1px solid ${GRID}`, fontFamily: FONT }}
       onDoubleClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onClick={e => e.stopPropagation()}>
       <div className="flex justify-between items-center mb-[var(--spacing-100,8px)]">
