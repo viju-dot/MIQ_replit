@@ -1,16 +1,17 @@
-import { useState, type ChangeEvent, type ReactNode } from "react";
+import { useState, useRef, type ReactNode } from "react";
 import { Link } from "wouter";
-import { Clock, Info, LayoutDashboard, Map, MapPin, MonitorPlay, Target, Upload, Wallet, X } from "lucide-react";
+import { Clock, Download, LayoutDashboard, List, Map, MapPin, MonitorPlay, Target, Wallet, X } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAudiences, useIncrementAudienceUse } from "../api";
-import { CREATIVE_FORMATS, DAYPART_PRESETS, MOCK_POIS, PUBLISHERS, RESOLUTIONS, VENUES } from "../data";
-import { parseCoordinateCsv, parsePostcodeCsv, type UploadReport } from "../uploadHelpers";
+import { CREATIVE_FORMATS, DAYPART_PRESETS, PUBLISHERS, RESOLUTIONS, SCREENS, VENUES } from "../data";
+import { downloadScreenTemplate, parseCoordinateCsv, parsePostcodeCsv, parseScreenList, type UploadReport } from "../uploadHelpers";
 import { FiberSlider } from "./primitives";
 import { FiberRoundedTabsBar, FiberTabButton } from "@/components/FiberTabItem";
 import { PoiSearch } from "./PoiSearch";
+import { FiberDropZone } from "@/components/FiberDropZone";
 
 export interface PlanningZone {
   id: string;
@@ -45,6 +46,7 @@ export interface FilterStateV2 {
   };
   budget: { enabled: boolean; currency: "GBP" | "EUR" | "USD"; total: number | ""; cpm: number | "" | null };
   creativeType: { enabled: boolean; format: string; resolution: string; customWidth: string; customHeight: string };
+  screenList: { enabled: boolean; ids: string[]; configured: boolean };
 }
 
 export const DEFAULT_FILTERS_V2: FilterStateV2 = {
@@ -55,6 +57,7 @@ export const DEFAULT_FILTERS_V2: FilterStateV2 = {
   daypart: { enabled: false, applies: "Every Day", mode: "presets", presets: [], customStart: "09:00", customEnd: "17:00" },
   budget: { enabled: false, currency: "GBP", total: 50000, cpm: null },
   creativeType: { enabled: false, format: "", resolution: "", customWidth: "", customHeight: "" },
+  screenList: { enabled: false, ids: [], configured: false },
 };
 
 export const EXCHANGE_RATES = { GBP: 1, EUR: 1.17, USD: 1.25 };
@@ -64,28 +67,17 @@ interface Props {
   setFilters: React.Dispatch<React.SetStateAction<FilterStateV2>>;
 }
 
-function Report({ report }: { report: UploadReport | null }) {
+function Report({ report, screenList = false }: { report: UploadReport | null; screenList?: boolean }) {
   if (!report) return null;
   return (
     <div className="rounded bg-gray-50 p-2 text-[11px] space-y-1" role="status">
-      <p className="font-medium text-green-700">{report.valid} valid row{report.valid === 1 ? "" : "s"}</p>
+      <p className="font-medium text-green-700">
+        {report.valid} {screenList ? `matched screen ID${report.valid === 1 ? "" : "s"}` : `valid row${report.valid === 1 ? "" : "s"}`}
+      </p>
       {!!report.unknown.length && <p className="text-amber-700">Unknown: {report.unknown.slice(0, 6).join(", ")}{report.unknown.length > 6 ? "…" : ""}</p>}
       {!!report.malformed.length && <p className="text-red-600">Malformed: {report.malformed.slice(0, 6).join(", ")}{report.malformed.length > 6 ? "…" : ""}</p>}
       {!!report.duplicates.length && <p className="text-amber-700">Duplicates: {report.duplicates.slice(0, 6).join(", ")}{report.duplicates.length > 6 ? "…" : ""}</p>}
     </div>
-  );
-}
-
-function FilePicker({ accept, label, onFile }: { accept: string; label: string; onFile: (file: File) => void }) {
-  return (
-    <label className="flex cursor-pointer items-center justify-center gap-2 rounded border-2 border-dashed border-gray-200 p-3 text-xs text-gray-600 hover:border-purple-300">
-      <Upload className="h-4 w-4" /> {label}
-      <input className="sr-only" type="file" accept={accept} onChange={e => {
-        const file = e.target.files?.[0];
-        if (file) onFile(file);
-        e.currentTarget.value = "";
-      }} />
-    </label>
   );
 }
 
@@ -94,6 +86,15 @@ export function SidebarV2({ filters, setFilters }: Props) {
   const incrementUse = useIncrementAudienceUse();
   const [uploadError, setUploadError] = useState("");
   const [locationReport, setLocationReport] = useState<UploadReport | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileState, setFileState] = useState<"Uploading" | "Uploaded">("Uploading");
+  const [screenListError, setScreenListError] = useState("");
+  const [screenListReport, setScreenListReport] = useState<UploadReport | null>(null);
+  const [screenListFile, setScreenListFile] = useState<File | null>(null);
+  const [screenListFileState, setScreenListFileState] = useState<"Uploading" | "Uploaded">("Uploading");
+
+  const uploadIdRef = useRef(0);
+  const screenListUploadIdRef = useRef(0);
 
   const updateSection = <K extends keyof FilterStateV2>(section: K, data: Partial<FilterStateV2[K]>) => {
     setFilters(prev => ({ ...prev, [section]: { ...prev[section], ...data } }));
@@ -106,20 +107,83 @@ export function SidebarV2({ filters, setFilters }: Props) {
     Number(filters.creativeType.customHeight) < 1 || Number(filters.creativeType.customHeight) > 16384
   );
 
-  const readUpload = async (event: ChangeEvent<HTMLInputElement>, parser: (file: File) => Promise<{ points: Array<{lat: number; lng: number}>; report: UploadReport }>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const cancelUpload = () => {
+    uploadIdRef.current++;
+    setSelectedFile(null);
+    setUploadError("");
+    setLocationReport(null);
+    updateSection("location", { uploadedPoints: [] });
+  };
+
+  const handleLocationFileError = (error: string) => {
+    setUploadError(error);
+    if (!error) return;
+    uploadIdRef.current++;
+    setSelectedFile(null);
+    setLocationReport(null);
+    updateSection("location", { uploadedPoints: [] });
+  };
+
+  const readUpload = async (file: File, parser: (file: File) => Promise<{ points: Array<{lat: number; lng: number}>; report: UploadReport }>) => {
+    const currentUploadId = ++uploadIdRef.current;
+    setSelectedFile(file);
+    setFileState("Uploading");
+    setUploadError("");
     try {
-      setUploadError("");
       const result = await parser(file);
+      if (uploadIdRef.current !== currentUploadId) return;
       updateSection("location", { uploadedPoints: result.points });
       setLocationReport(result.report);
+      setFileState("Uploaded");
     } catch (error) {
+      if (uploadIdRef.current !== currentUploadId) return;
       setUploadError(error instanceof Error ? error.message : "Could not read this file.");
       setLocationReport(null);
       updateSection("location", { uploadedPoints: [] });
+      setSelectedFile(null);
     }
-    event.target.value = "";
+  };
+
+  const removeScreenListUpload = () => {
+    screenListUploadIdRef.current++;
+    setScreenListFile(null);
+    setScreenListError("");
+    setScreenListReport(null);
+    updateSection("screenList", { ids: [], configured: false });
+  };
+
+  const handleScreenListFileError = (error: string) => {
+    setScreenListError(error);
+    if (!error) return;
+    screenListUploadIdRef.current++;
+    setScreenListFile(null);
+    setScreenListReport(null);
+    updateSection("screenList", { ids: [], configured: true });
+  };
+
+  const readScreenListUpload = async (file: File) => {
+    const currentUploadId = ++screenListUploadIdRef.current;
+    setScreenListFile(file);
+    setScreenListFileState("Uploading");
+    setScreenListError("");
+    setScreenListReport(null);
+    updateSection("screenList", { enabled: true, ids: [], configured: true });
+    try {
+      const result = await parseScreenList(file, SCREENS);
+      if (screenListUploadIdRef.current !== currentUploadId) return;
+      updateSection("screenList", { ids: result.ids, configured: true });
+      setScreenListReport(result.report);
+      setScreenListFileState("Uploaded");
+      if (!result.ids.length) {
+        setScreenListError("No screen IDs in this file match the current inventory.");
+      }
+    } catch (error) {
+      if (screenListUploadIdRef.current !== currentUploadId) return;
+      setScreenListError(error instanceof Error ? error.message : "Could not read this file.");
+      setScreenListReport(null);
+      updateSection("screenList", { ids: [], configured: true });
+      setScreenListFile(null);
+    }
   };
 
   return (
@@ -136,9 +200,8 @@ export function SidebarV2({ filters, setFilters }: Props) {
                   label={method === "audience" ? "Saved Audience" : method === "postcode" ? "Postcode" : method === "poi" ? "POI" : "Lat/Long"}
                   selected={filters.location.method === method}
                   onClick={() => {
-                    updateSection("location", { method, uploadedPoints: [] });
-                    setLocationReport(null);
-                    setUploadError("");
+                    updateSection("location", { method });
+                    cancelUpload();
                   }}
                 />
               ))}
@@ -169,14 +232,19 @@ export function SidebarV2({ filters, setFilters }: Props) {
                 {selectedAudience.description && <p className="text-xs text-purple-700 mt-1">{selectedAudience.description}</p>}
                 <p className="text-[11px] text-purple-600 mt-2 font-medium">Coverage: {selectedAudience.coverage}</p>
               </div>
-            )}
-          </div>}
+             )}
+           </div>}
           
           {filters.location.method === "postcode" && <div className="space-y-2">
-            <FilePicker accept=".csv,text/csv" label="Upload postcode CSV" onFile={file => {
-              const target = { files: [file], value: "" } as unknown as HTMLInputElement;
-              void readUpload({ target } as ChangeEvent<HTMLInputElement>, parsePostcodeCsv);
-            }} />
+            <FiberDropZone
+              accept=".csv,text/csv"
+              acceptLabel="(Only .csv files supported)"
+              file={selectedFile}
+              fileState={fileState}
+              onFileSelect={(file) => void readUpload(file, parsePostcodeCsv)}
+              onFileRemove={cancelUpload}
+              onFileError={handleLocationFileError}
+            />
             <Report report={locationReport} />
           </div>}
           
@@ -185,21 +253,18 @@ export function SidebarV2({ filters, setFilters }: Props) {
           </div>}
           
           {filters.location.method === "latlng" && <div className="space-y-2">
-            <FilePicker accept=".csv,text/csv" label="Upload coordinate CSV" onFile={async file => {
-              try {
-                setUploadError("");
-                const result = await parseCoordinateCsv(file);
-                updateSection("location", { uploadedPoints: result.points });
-                setLocationReport(result.report);
-              } catch (error) {
-                setUploadError(error instanceof Error ? error.message : "Could not read this file.");
-                updateSection("location", { uploadedPoints: [] });
-                setLocationReport(null);
-              }
-            }} />
+            <FiberDropZone
+              accept=".csv,text/csv"
+              acceptLabel="(Only .csv files supported)"
+              file={selectedFile}
+              fileState={fileState}
+              onFileSelect={(file) => void readUpload(file, parseCoordinateCsv)}
+              onFileRemove={cancelUpload}
+              onFileError={handleLocationFileError}
+            />
             <Report report={locationReport} />
           </div>}
-          
+
           {uploadError && <p className="text-[11px] text-red-600 mt-2" role="alert">{uploadError}</p>}
           
           <div className="mt-4 pt-4 border-t border-gray-100">
@@ -253,9 +318,9 @@ export function SidebarV2({ filters, setFilters }: Props) {
                    }} 
                    className="h-7 text-xs px-2" 
                  />
-               </div>
-             </div>
-          </div>
+              </div>
+           </div>
+            </div>
         </FilterCard>
 
         {/* 2. Planning Zone */}
@@ -378,6 +443,26 @@ export function SidebarV2({ filters, setFilters }: Props) {
             </div>}
           </div>
         </FilterCard>
+
+         {/* 8. Screen List */}
+         <FilterCard title="Screen List" icon={<List className="w-4 h-4" />} enabled={filters.screenList.enabled} onToggle={enabled => updateSection("screenList", { enabled })}>
+           <div className="space-y-2">
+             <FiberDropZone
+               accept=".csv,text/csv"
+               acceptLabel="CSV with a Screen ID column"
+               file={screenListFile}
+               fileState={screenListFileState}
+               onFileSelect={(file) => void readScreenListUpload(file)}
+               onFileRemove={removeScreenListUpload}
+               onFileError={handleScreenListFileError}
+             />
+             <Report report={screenListReport} screenList />
+             {screenListError && <p className="text-[11px] text-red-600" role="alert">{screenListError}</p>}
+             <Button type="button" variant="outline" size="sm" className="w-full" onClick={downloadScreenTemplate}>
+               <Download className="h-3 w-3 mr-2" />Download sample CSV
+             </Button>
+           </div>
+         </FilterCard>
 
         <div className="h-8" />
       </div>

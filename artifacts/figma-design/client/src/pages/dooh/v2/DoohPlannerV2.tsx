@@ -72,6 +72,12 @@ export default function DoohPlannerV2() {
       }
     }
 
+    // 2. Screen List
+    if (filters.screenList.enabled && filters.screenList.configured) {
+      const uploadedIds = new Set(filters.screenList.ids);
+      baseResults = baseResults.filter(screen => uploadedIds.has(screen.id));
+    }
+
     // 3. Venue Type
     if (filters.venueType.enabled && filters.venueType.venues.length > 0) {
       baseResults = baseResults.filter(s => filters.venueType.venues.includes(s.venue));
@@ -167,7 +173,16 @@ export default function DoohPlannerV2() {
     });
   }, [matchedScreens]);
 
-  const locationMethod = filters.location.enabled ? filters.location.method : null;
+  const locationConfigured = filters.location.enabled && (
+    (filters.location.method === "audience" && !!filters.location.audienceId) ||
+    (filters.location.method === "poi" && !!filters.location.poiId) ||
+    ((filters.location.method === "postcode" || filters.location.method === "latlng") && filters.location.uploadedPoints.length > 0)
+  );
+  const locationMethod = locationConfigured
+    ? filters.location.method
+    : filters.screenList.enabled && filters.screenList.configured
+      ? "screenlist"
+      : null;
   const selectedScreens = matchedScreens.filter(screen => selectedScreenIds.has(screen.id));
   const { csvDownload, handleExport } = useScreenExport(
     selectedScreens.length ? selectedScreens : matchedScreens,

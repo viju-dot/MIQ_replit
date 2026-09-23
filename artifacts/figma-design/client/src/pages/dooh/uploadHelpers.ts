@@ -1,5 +1,5 @@
 import * as XLSX from "xlsx";
-import { MOCK_POSTCODES, ScreenData } from "./data";
+import { MOCK_POSTCODES, SCREENS, type ScreenData } from "./data";
 
 export interface UploadReport {
   valid: number;
@@ -89,28 +89,40 @@ export async function parseScreenList(file: File, screens: ScreenData[]) {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     rows = XLSX.utils.sheet_to_json<(string | number)[]>(sheet, { header: 1, raw: false }).map(r => r.map(String));
   }
+  return parseScreenListRows(rows, screens);
+}
+
+export function parseScreenListCsvText(text: string, screens: ScreenData[]) {
+  return parseScreenListRows(rowsFromCsv(text), screens);
+}
+
+function parseScreenListRows(rows: string[][], screens: ScreenData[]) {
   if (!rows.length) throw new Error("The file is empty.");
-  const header = rows[0].map(v => String(v).toLowerCase().replace(/[\s_-]/g, ""));
+  const header = rows[0].map(v => String(v).toLocaleLowerCase().replace(/[\s_-]/g, ""));
   const idColumn = header.findIndex(v => v === "screenid" || v === "id");
   if (idColumn < 0) throw new Error('Missing required "screen_id" header.');
-  const known = new Set(screens.map(s => s.id));
+  const known = new Map(screens.map(screen => [screen.id.toLocaleLowerCase(), screen.id]));
   const ids: string[] = [];
   const report: UploadReport = { valid: 0, unknown: [], malformed: [], duplicates: [] };
   const seen = new Set<string>();
   rows.slice(1).forEach((row, index) => {
-    const id = String(row[idColumn] ?? "").trim().toUpperCase();
-    if (!/^S\d{4}$/.test(id)) return report.malformed.push(id || `Row ${index + 2}`);
-    if (seen.has(id)) return report.duplicates.push(id);
-    seen.add(id);
-    if (!known.has(id)) return report.unknown.push(id);
-    ids.push(id);
+    const suppliedId = String(row[idColumn] ?? "").trim();
+    if (!suppliedId) return report.malformed.push(`Row ${index + 2}`);
+    const matchKey = suppliedId.toLocaleLowerCase();
+    const canonicalId = known.get(matchKey);
+    const displayId = canonicalId ?? suppliedId;
+    if (seen.has(matchKey)) return report.duplicates.push(displayId);
+    seen.add(matchKey);
+    if (!canonicalId) return report.unknown.push(suppliedId);
+    ids.push(canonicalId);
     report.valid++;
   });
   return { ids, report };
 }
 
 export function downloadScreenTemplate() {
-  const blob = new Blob(["screen_id\nS0001\nS0002\n"], { type: "text/csv;charset=utf-8" });
+  const sampleIds = SCREENS.slice(0, 3).map(screen => screen.id);
+  const blob = new Blob([["Screen ID", ...sampleIds].join("\n")], { type: "text/csv;charset=utf-8" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
   link.download = "dooh-screen-list-template.csv";

@@ -28,7 +28,7 @@ interface Props {
   onZonesChange?: (zones: PlanningZone[]) => void;
   drawMode?: "circle" | "polygon" | null;
   onDrawComplete?: () => void;
-  locationSource?: string | null; // "audience", "postcode", "poi", "latlng", etc.
+  locationSource?: string | null; // "audience", "postcode", "poi", "latlng", "screenlist", etc.
   selectedScreenIds?: Set<string>;
   onSmartSelectionCapture?: (zone: PlanningZone, selectedIds: string[]) => void;
 }
@@ -42,6 +42,7 @@ const getColorBySource = (source?: string | null) => {
     case "poi": return "var(--surface-foreground-static-info, #2563eb)";
     case "audience": return "var(--container-dynamic-brand-bold-background-default, #7c33b5)";
     case "latlng": return "var(--surface-foreground-static-info, #2563eb)";
+    case "screenlist": return "var(--surface-foreground-static-warning, #b45309)";
     default: return "var(--surface-foreground-static-error, #dc2626)";
   }
 };
@@ -174,7 +175,15 @@ function DynamicScale() {
   );
 }
 
-function MapLegend() {
+function MapLegend({ locationSource }: { locationSource?: string | null }) {
+  const labels: Record<string, string> = {
+    audience: "Saved Audience Match",
+    postcode: "Postcode Match",
+    poi: "POI Match",
+    latlng: "Lat/Long Match",
+    screenlist: "Screen List Match",
+  };
+  const label = locationSource ? labels[locationSource] : "All Inventory";
   return (
     <div className="absolute bottom-[40px] right-[var(--spacing-200,16px)] z-[1000] rounded-[var(--radius-50,4px)] p-[var(--spacing-200,16px)] w-[220px]"
       style={{ backgroundColor: CARD_BG, boxShadow: CARD_SHADOW, border: `1px solid ${GRID}` }}
@@ -182,16 +191,8 @@ function MapLegend() {
       <h3 className="text-[length:var(--body-md-medium-size,14px)] font-bold mb-[var(--spacing-150,12px)]" style={{ fontFamily: FONT, color: TITLE }}>Match Source</h3>
       <div className="flex flex-col gap-[var(--spacing-100,8px)]">
         <div className="flex items-center gap-[var(--spacing-100,8px)]">
-          <div className="w-[12px] h-[12px] rounded-full shadow-sm" style={{ backgroundColor: "var(--surface-foreground-static-success, #059669)", border: `1px solid ${CARD_BG}` }}></div>
-          <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ fontFamily: FONT, color: TITLE }}>Postcode Match</span>
-        </div>
-        <div className="flex items-center gap-[var(--spacing-100,8px)]">
-          <div className="w-[12px] h-[12px] rounded-full shadow-sm" style={{ backgroundColor: "var(--surface-foreground-static-info, #2563eb)", border: `1px solid ${CARD_BG}` }}></div>
-          <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ fontFamily: FONT, color: TITLE }}>POI Match</span>
-        </div>
-        <div className="flex items-center gap-[var(--spacing-100,8px)]">
-          <div className="w-[12px] h-[12px] rounded-full shadow-sm" style={{ backgroundColor: "var(--container-dynamic-brand-bold-background-default, #7c33b5)", border: `1px solid ${CARD_BG}` }}></div>
-          <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ fontFamily: FONT, color: TITLE }}>GeoPlanner Match</span>
+          <div className="w-[12px] h-[12px] rounded-full shadow-sm" style={{ backgroundColor: getColorBySource(locationSource), border: `1px solid ${CARD_BG}` }}></div>
+          <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ fontFamily: FONT, color: TITLE }}>{label}</span>
         </div>
       </div>
       <DynamicScale />
@@ -638,7 +639,7 @@ export function MapPanelV2({
           onCapture={handleSmartCapture} 
         />
         {smartSelectionActive && <SmartPreviewCircle center={previewCenter} radius={activeRadiusMeters} />}
-        <MapLegend />
+        <MapLegend locationSource={locationSource} />
       </MapContainer>
       
       <SmartSelectionControl 
