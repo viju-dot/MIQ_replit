@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import L from "leaflet";
 import { Circle, useMapEvents } from "react-leaflet";
-import { Target, X, AlertCircle } from "lucide-react";
+import { X, AlertCircle } from "lucide-react";
+import { Sparkle } from "@phosphor-icons/react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { FiberButton, FiberSlider, CARD_BG, CARD_SHADOW, GRID, FONT } from "./primitives";
@@ -86,10 +87,10 @@ export function SmartSelectionControl({
 
   if (!active) {
     return (
-      <div className="absolute top-[var(--spacing-200,16px)] left-[var(--spacing-200,16px)] z-[1000]"
+      <div title="Smart Selection" className="absolute top-[var(--spacing-200,16px)] left-[var(--spacing-200,16px)] z-[1000]"
         onDoubleClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}>
-         <FiberButton onClick={() => setActive(true)} variant="solid" className="shadow-lg" ariaLabel="Start Smart Selection">
-           <Target className="w-4 h-4" /> Smart Selection
+         <FiberButton onClick={() => setActive(true)} variant="solid" className="shadow-lg w-[34px] !px-0" ariaLabel="Start Smart Selection">
+           <Sparkle size={20} weight="regular" aria-hidden="true" />
          </FiberButton>
       </div>
     );
@@ -104,7 +105,7 @@ export function SmartSelectionControl({
       onDoubleClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onClick={e => e.stopPropagation()}>
       <div className="flex justify-between items-center mb-[var(--spacing-100,8px)]">
          <h3 className="font-bold text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] flex items-center gap-2">
-           <Target className="w-4 h-4 text-[#7c33b5]" /> Smart Selection
+           <Sparkle size={20} weight="regular" aria-hidden="true" /> Smart Selection
          </h3>
          <button onClick={() => setActive(false)} className="text-[var(--surface-foreground-static-neutral-lvl3,#717180)] hover:text-black transition-colors" aria-label="Cancel Smart Selection">
            <X className="w-4 h-4" />
