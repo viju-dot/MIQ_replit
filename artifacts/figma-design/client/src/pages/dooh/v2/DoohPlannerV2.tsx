@@ -4,7 +4,9 @@ import { useAudiences } from "../api";
 import { SidebarV2, FilterStateV2, DEFAULT_FILTERS_V2, EXCHANGE_RATES } from "./v2planner-sidebar";
 import { MapPanelV2 } from "./v2planner-map-panel";
 import { RightPanelV2 } from "./v2planner-right-panel";
-import { TabsBarUnderline } from "./primitives";
+import { FiberButton, TabsBarUnderline } from "./primitives";
+import { Download, ChartNoAxesCombined } from "lucide-react";
+import { useScreenExport } from "./useScreenExport";
 import "./DoohPlannerV2.css";
 
 export default function DoohPlannerV2() {
@@ -160,6 +162,11 @@ export default function DoohPlannerV2() {
   }, [matchedScreens]);
 
   const locationMethod = filters.location.enabled ? filters.location.method : null;
+  const selectedScreens = matchedScreens.filter(screen => selectedScreenIds.has(screen.id));
+  const { csvDownload, handleExport } = useScreenExport(
+    selectedScreens.length ? selectedScreens : matchedScreens,
+    filters.budget.currency,
+  );
 
   return (
     <div className="dooh-v2-planner flex flex-col flex-1 h-full font-fiber">
@@ -167,7 +174,7 @@ export default function DoohPlannerV2() {
         <SidebarV2 filters={filters} setFilters={setFilters} />
         
         <div className="flex-1 min-w-0 flex flex-col relative bg-gray-100">
-          <div className="shrink-0 flex items-end px-4 pt-4 bg-white border-b"
+          <div className="shrink-0 flex flex-wrap items-end justify-between gap-4 px-4 pt-4 bg-white border-b"
             style={{ borderColor: "var(--border-static-subtle-neutral, #e1e1e8)" }}>
             <div className="relative -mb-px">
               <TabsBarUnderline
@@ -177,7 +184,22 @@ export default function DoohPlannerV2() {
                 onChange={value => setView(value === "Map" ? "map" : "list")}
               />
             </div>
+            <div className="ml-auto mb-2 flex items-center gap-2">
+              <FiberButton variant="outline" onClick={handleExport} disabled={!matchedScreens.length}>
+                <Download className="size-4" aria-hidden="true" /> Export
+              </FiberButton>
+              <FiberButton disabled={!matchedScreens.length} onClick={() => {
+                setView("list");
+                requestAnimationFrame(() => document.getElementById("dooh-plan-overview")?.focus());
+              }}>
+                <ChartNoAxesCombined className="size-4" aria-hidden="true" /> Load Insights
+              </FiberButton>
+            </div>
           </div>
+          {csvDownload && <div role="status" className="px-4 py-2 text-xs bg-purple-50 text-purple-900">
+            CSV ready: {csvDownload.count.toLocaleString()} screen{csvDownload.count === 1 ? "" : "s"}.{" "}
+            <a href={csvDownload.url} download="DOOH-Shortlist.csv" className="underline font-semibold">Download CSV again</a>
+          </div>}
           {view === "map" && <MapPanelV2 
             screens={matchedScreens}
             hoveredScreenId={hoveredScreenId}
@@ -191,7 +213,7 @@ export default function DoohPlannerV2() {
 
         {view === "list" && <RightPanelV2 
           matchedScreens={matchedScreens}
-          selectedScreens={matchedScreens.filter(s => selectedScreenIds.has(s.id))}
+          selectedScreens={selectedScreens}
           selectedScreenIds={selectedScreenIds}
           budget={filters.budget.enabled ? Number(filters.budget.total) : null}
           currency={filters.budget.currency}

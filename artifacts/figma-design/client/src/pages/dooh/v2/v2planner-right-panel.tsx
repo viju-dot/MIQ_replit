@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
 import { ScreenData } from "../data";
 import { Button } from "@/components/ui/button";
-import { Download, Target } from "lucide-react";
 import { ScreenTableV2 } from "./v2planner-screen-table";
 import { EXCHANGE_RATES } from "./v2planner-sidebar";
 
@@ -42,13 +40,7 @@ export function RightPanelV2({
   onHover,
   highlightedScreenId
 }: Props) {
-  const [csvDownload, setCsvDownload] = useState<{ url: string; count: number } | null>(null);
-  useEffect(() => {
-    return () => { if (csvDownload) URL.revokeObjectURL(csvDownload.url); };
-  }, [csvDownload]);
-
   const rate = EXCHANGE_RATES[currency] || 1;
-  const currencySymbol = currency === "EUR" ? "€" : currency === "USD" ? "$" : "£";
 
   const screensToCalculate = selectedScreens.length > 0 ? selectedScreens : matchedScreens;
   
@@ -59,60 +51,12 @@ export function RightPanelV2({
   
   const budgetUtilization = budget ? (totalSpend / budget) * 100 : 0;
 
-  const handleExport = () => {
-    if (!screensToCalculate.length) return;
-    
-    const headers = [
-      "Screen ID", "Publisher", "City", "Venue", "Impressions", "Format", "Resolution", "Latitude", "Longitude",
-      "Currency", `CPM (${currencySymbol})`
-    ];
-    
-    const escapeCsv = (str: string | number) => {
-      const s = String(str);
-      if (s.includes(',') || s.includes('"') || s.includes('\n')) {
-        return `"${s.replace(/"/g, '""')}"`;
-      }
-      return s;
-    };
-    
-    const rows = screensToCalculate.map(s => [
-      escapeCsv(s.id),
-      escapeCsv(s.publisher),
-      escapeCsv(s.city),
-      escapeCsv(s.venue),
-      escapeCsv(s.impressions),
-      escapeCsv(s.creativeFormat),
-      escapeCsv(s.creativeRes),
-      escapeCsv(s.lat),
-      escapeCsv(s.lng),
-      currency,
-      escapeCsv((s.cpm * rate).toFixed(2))
-    ].join(','));
-    
-    const csvContent = [headers.join(','), ...rows].join('\n');
-    
-    const blob = new Blob(["\ufeff", csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    setCsvDownload({ url, count: screensToCalculate.length });
-    link.setAttribute("href", url);
-    link.setAttribute("download", "DOOH-Shortlist.csv");
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   return (
     <div className="w-full min-w-0 flex-1 bg-white flex flex-col">
       
-      {csvDownload && <div role="status" className="px-4 py-2 text-xs bg-purple-50 text-purple-900">
-        CSV ready: {csvDownload.count.toLocaleString()} screen{csvDownload.count === 1 ? "" : "s"}.{" "}
-        <a href={csvDownload.url} download="DOOH-Shortlist.csv" className="underline font-semibold">Download CSV again</a>
-      </div>}
       <div className="flex-1 flex flex-col min-h-0">
           <section className="shrink-0 p-5 border-b border-gray-200" aria-label="Plan Overview">
-            <h2 className="font-semibold text-lg text-gray-900 mb-5">Plan Overview</h2>
+            <h2 id="dooh-plan-overview" tabIndex={-1} className="font-semibold text-lg text-gray-900 mb-5">Plan Overview</h2>
             
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 items-start">
               <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
@@ -171,9 +115,6 @@ export function RightPanelV2({
       {/* Global Actions - Always visible at bottom */}
       <div className="p-4 border-t border-gray-200 bg-gray-50 shrink-0 space-y-3">
         <div className="flex gap-3">
-          <Button onClick={handleExport} disabled={!screensToCalculate.length} variant="outline" className="flex-1 flex items-center justify-center gap-2 bg-white text-gray-700 border-gray-300 hover:bg-gray-50">
-            <Download className="w-4 h-4" /> ↓ Export CSV
-          </Button>
           <Button disabled title="Activation not connected" className="flex-1 flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:bg-gray-400">
             ➜ Activate
           </Button>
