@@ -128,8 +128,8 @@ export function SidebarV2({ filters, setFilters }: Props) {
         
         {/* 1. Location Filter */}
         <FilterCard title="Location" icon={<MapPin className="w-4 h-4" />} enabled={filters.location.enabled} onToggle={enabled => updateSection("location", { enabled })}>
-          <div className="mb-4 pt-1" role="group" aria-label="Location filter method">
-            <FiberRoundedTabsBar>
+          <div className="mb-4 pt-1 pb-1 max-w-full overflow-x-auto" role="group" aria-label="Location filter method">
+            <FiberRoundedTabsBar wrap={false}>
               {(["audience", "postcode", "poi", "latlng"] as const).map(method => (
                 <FiberTabButton
                   key={method}
