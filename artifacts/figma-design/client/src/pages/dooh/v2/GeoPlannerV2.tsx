@@ -418,11 +418,11 @@ export default function GeoPlannerV2() {
       <div className="geo-save-bar">
         <div>
           <FiberButton 
-            variant="secondary"
+            variant="solid"
             onClick={() => setModalOpen(true)}
-            disabled={isDirty || !submittedFilters || !hasValidFilters || !results?.points.length || isV1Audience}
+            disabled={modalOpen || isDirty || !submittedFilters || !hasValidFilters || !results?.points.length || isV1Audience}
           >
-            <Save className="w-4 h-4 mr-2" />
+            <Save className="w-4 h-4" aria-hidden="true" />
             Save audience
           </FiberButton>
         </div>
