@@ -5,11 +5,11 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAudiences, useIncrementAudienceUse } from "../api";
 import { CREATIVE_FORMATS, DAYPART_PRESETS, MOCK_POIS, PUBLISHERS, RESOLUTIONS, VENUES } from "../data";
 import { parseCoordinateCsv, parsePostcodeCsv, type UploadReport } from "../uploadHelpers";
-import { convertRadiusUnit } from "./v2planner-units";
+import { TabsBarUnderline, FiberSlider } from "./primitives";
+import { PoiSearch } from "./PoiSearch";
 
 export interface PlanningZone {
   id: string;
@@ -90,7 +90,6 @@ function FilePicker({ accept, label, onFile }: { accept: string; label: string; 
 export function SidebarV2({ filters, setFilters }: Props) {
   const { data: audiences, isError } = useAudiences();
   const incrementUse = useIncrementAudienceUse();
-  const [previewOpen, setPreviewOpen] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [locationReport, setLocationReport] = useState<UploadReport | null>(null);
 
@@ -127,28 +126,52 @@ export function SidebarV2({ filters, setFilters }: Props) {
         
         {/* 1. Location Filter */}
         <FilterCard title="Location" icon={<MapPin className="w-4 h-4" />} enabled={filters.location.enabled} onToggle={enabled => updateSection("location", { enabled })}>
-          <div className="flex rounded-md bg-gray-100 p-1 mb-4 overflow-x-auto">
-            {(["audience", "postcode", "poi", "latlng"] as const).map(method => (
-              <button key={method} onClick={() => { updateSection("location", { method, uploadedPoints: [] }); setLocationReport(null); setUploadError(""); }}
-                className={`whitespace-nowrap flex-1 text-[11px] font-medium py-1.5 px-2 rounded ${filters.location.method === method ? "bg-white shadow-sm" : "text-gray-500"}`}>
-                {method === "audience" ? "Saved Audience" : method === "latlng" ? "Lat/Long" : method === "poi" ? "POI" : "Postcode"}
-              </button>
-            ))}
+          <div className="mb-4 pt-1 overflow-x-auto">
+            <TabsBarUnderline 
+              wrap={false}
+              ariaLabel="Location filter method"
+              options={["Saved Audience", "Postcode", "POI", "Lat/Long"]}
+              value={
+                filters.location.method === "audience" ? "Saved Audience" :
+                filters.location.method === "postcode" ? "Postcode" :
+                filters.location.method === "poi" ? "POI" : "Lat/Long"
+              }
+              onChange={val => {
+                const method = val === "Saved Audience" ? "audience" :
+                               val === "Postcode" ? "postcode" :
+                               val === "POI" ? "poi" : "latlng";
+                updateSection("location", { method, uploadedPoints: [] });
+                setLocationReport(null);
+                setUploadError("");
+              }}
+            />
           </div>
           {filters.location.method === "audience" && <div className="space-y-3">
-            <label className="text-xs font-medium block text-gray-700">Select Saved Audience</label>
-            <Select value={filters.location.audienceId} onValueChange={id => { updateSection("location", { audienceId: id }); incrementUse.mutate(id); }}>
-              <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="Choose an audience" /></SelectTrigger>
-              <SelectContent>
-                {isError && <SelectItem value="error" disabled>Error loading audiences</SelectItem>}
-                {audiences?.map(a => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <div className="flex gap-3">
-              <Button type="button" variant="secondary" size="sm" disabled={!selectedAudience} onClick={() => setPreviewOpen(true)} className="text-xs font-medium w-full">
-                👁 Preview
-              </Button>
-            </div>
+            {!selectedAudience ? (
+              <>
+                <label className="text-xs font-medium block text-gray-700">Select Saved Audience</label>
+                <Select value={filters.location.audienceId} onValueChange={id => { updateSection("location", { audienceId: id }); incrementUse.mutate(id); }}>
+                  <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="Choose an audience" /></SelectTrigger>
+                  <SelectContent>
+                    {isError && <SelectItem value="error" disabled>Error loading audiences</SelectItem>}
+                    {audiences?.map(a => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </>
+            ) : (
+              <div className="rounded border border-purple-200 bg-purple-50 p-3 relative">
+                <button 
+                  onClick={() => updateSection("location", { audienceId: "" })}
+                  className="absolute top-2 right-2 text-gray-400 hover:text-red-500"
+                  aria-label="Remove audience selection"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+                <h4 className="text-sm font-medium text-purple-900 pr-4">{selectedAudience.name}</h4>
+                {selectedAudience.description && <p className="text-xs text-purple-700 mt-1">{selectedAudience.description}</p>}
+                <p className="text-[11px] text-purple-600 mt-2 font-medium">Coverage: {selectedAudience.coverage}</p>
+              </div>
+            )}
           </div>}
           
           {filters.location.method === "postcode" && <div className="space-y-2">
@@ -160,11 +183,7 @@ export function SidebarV2({ filters, setFilters }: Props) {
           </div>}
           
           {filters.location.method === "poi" && <div className="space-y-2">
-             <label className="text-xs font-medium block text-gray-700">Select POI</label>
-             <Select value={filters.location.poiId} onValueChange={poiId => updateSection("location", { poiId })}>
-              <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="Search malls, arenas..." /></SelectTrigger>
-              <SelectContent>{MOCK_POIS.map(p => <SelectItem key={p.id} value={p.id}>{p.name} ({p.city})</SelectItem>)}</SelectContent>
-            </Select>
+            <PoiSearch value={filters.location.poiId} onChange={poiId => updateSection("location", { poiId })} />
           </div>}
           
           {filters.location.method === "latlng" && <div className="space-y-2">
@@ -185,37 +204,59 @@ export function SidebarV2({ filters, setFilters }: Props) {
           
           {uploadError && <p className="text-[11px] text-red-600 mt-2" role="alert">{uploadError}</p>}
           
-          <div className="mt-4 pt-3 border-t border-gray-100">
-             <label className="text-xs font-medium block text-gray-700 mb-1">Radius</label>
-             <div className="flex gap-2">
-               <Input 
-                 type="number" 
-                 min={filters.location.radiusUnit === "km" ? 0.05 : 50}
-                 max={filters.location.radiusUnit === "km" ? 10 : 10000}
-                 step="any"
-                 value={filters.location.radius} 
-                 onChange={e => updateSection("location", { radius: e.target.value === "" ? "" : Number(e.target.value) })} 
-                 className="h-8 text-sm flex-1" 
-               />
-               <Select value={filters.location.radiusUnit} onValueChange={(val: "m"|"km") => updateSection("location", {
-                 radiusUnit: val,
-                 radius: convertRadiusUnit(filters.location.radius, filters.location.radiusUnit, val),
-               })}>
-                 <SelectTrigger className="h-8 w-24"><SelectValue /></SelectTrigger>
+          <div className="mt-4 pt-4 border-t border-gray-100">
+             <div className="flex items-center justify-between mb-3">
+               <label className="text-xs font-medium text-gray-700">Radius around points</label>
+               <Select value={filters.location.radiusUnit} onValueChange={(val: "m"|"km") => {
+                 let current = Number(filters.location.radius) || (val === "km" ? 0.5 : 500);
+                 if (val === "km" && filters.location.radiusUnit === "m") {
+                   current = Math.min(10, Math.max(0.05, current / 1000));
+                 } else if (val === "m" && filters.location.radiusUnit === "km") {
+                   current = Math.min(10000, Math.max(50, current * 1000));
+                 }
+                 updateSection("location", { radiusUnit: val, radius: current });
+               }}>
+                 <SelectTrigger className="h-6 w-[85px] text-[11px]"><SelectValue /></SelectTrigger>
                  <SelectContent>
-                   <SelectItem value="m">meters</SelectItem>
-                   <SelectItem value="km">kilometers</SelectItem>
+                   <SelectItem value="m" className="text-[11px]">meters</SelectItem>
+                   <SelectItem value="km" className="text-[11px]">kilometers</SelectItem>
                  </SelectContent>
                </Select>
              </div>
-             {(() => {
-               const r = Number(filters.location.radius);
-               const m = r * (filters.location.radiusUnit === "km" ? 1000 : 1);
-               if (filters.location.radius === "" || m < 50 || m > 10000) {
-                 return <p className="text-[10px] text-red-600 mt-1">Radius must be between 50m and 10,000m.</p>;
-               }
-               return null;
-             })()}
+             
+             <div className="flex items-center gap-4">
+               <div className="flex-1 mt-1">
+                 <FiberSlider 
+                   value={Number(filters.location.radius) || (filters.location.radiusUnit === "km" ? 0.05 : 50)} 
+                   min={filters.location.radiusUnit === "km" ? 0.05 : 50} 
+                   max={filters.location.radiusUnit === "km" ? 10 : 10000} 
+                   step={filters.location.radiusUnit === "km" ? 0.05 : 50} 
+                   onChange={v => updateSection("location", { radius: v })} 
+                   ariaLabel="Radius slider"
+                 />
+               </div>
+               <div className="w-[60px]">
+                 <Input 
+                   type="number" 
+                   aria-label="Exact radius"
+                   min={filters.location.radiusUnit === "km" ? 0.05 : 50}
+                   max={filters.location.radiusUnit === "km" ? 10 : 10000}
+                   step="any"
+                   value={filters.location.radius} 
+                   onChange={e => {
+                     const v = e.target.value;
+                     if (v === "") {
+                       updateSection("location", { radius: "" });
+                     } else {
+                       const max = filters.location.radiusUnit === "km" ? 10 : 10000;
+                       const min = filters.location.radiusUnit === "km" ? 0.05 : 50;
+                       updateSection("location", { radius: Math.max(min, Math.min(max, Number(v))) });
+                     }
+                   }} 
+                   className="h-7 text-xs px-2" 
+                 />
+               </div>
+             </div>
           </div>
         </FilterCard>
 
@@ -223,7 +264,7 @@ export function SidebarV2({ filters, setFilters }: Props) {
         <FilterCard title="Planning Zone" icon={<Map className="w-4 h-4" />} enabled={filters.planningZone.enabled} onToggle={enabled => updateSection("planningZone", { enabled, drawMode: enabled ? filters.planningZone.drawMode : null })}>
           <div className="space-y-3">
              <Button size="sm" variant="secondary" className="w-full bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200" onClick={() => updateSection("planningZone", { drawMode: filters.planningZone.drawMode ? null : "circle" })}>
-              {filters.planningZone.drawMode ? "Cancel Drawing" : "🎨 Draw on Map"}
+              {filters.planningZone.drawMode ? "Cancel Drawing" : "Draw on Map"}
             </Button>
             <Select value={filters.planningZone.drawMode ?? "circle"} onValueChange={(value: "circle" | "polygon") => updateSection("planningZone", { drawMode: value })}>
               <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
@@ -341,18 +382,6 @@ export function SidebarV2({ filters, setFilters }: Props) {
         <div className="h-8" />
       </div>
 
-      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>{selectedAudience?.name ?? "Audience preview"}</DialogTitle></DialogHeader>
-          {selectedAudience && <div className="space-y-2 text-sm">
-            <p><strong>Coverage:</strong> {selectedAudience.coverage}</p>
-            <p><strong>Geography:</strong> {selectedAudience.geoType}</p>
-            <p><strong>Points:</strong> {selectedAudience.geoDefinition.points?.length ?? 0}</p>
-            <p><strong>Created by:</strong> {selectedAudience.createdBy}</p>
-            <div className="max-h-44 overflow-auto rounded bg-gray-50 p-2 text-xs">{selectedAudience.geoDefinition.points?.map((point, index) => <p key={`${point.lat}-${point.lng}-${index}`}>{point.postcode || point.city || `Point ${index + 1}`} — {point.lat.toFixed(4)}, {point.lng.toFixed(4)}</p>)}</div>
-          </div>}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
