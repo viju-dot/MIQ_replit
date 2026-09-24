@@ -62,3 +62,9 @@ For deterministic stakeholder demo presets, derive uploaded screen IDs from the 
 **Why:** Hardcoded or independently generated IDs can produce an apparently populated upload card that parses to zero usable screens. Native time inputs also reject `24:00`, even when inventory availability uses minute 1440 for an all-day endpoint.
 
 **How to apply:** Anchor the preset to an in-radius real screen, select IDs from the shared `SCREENS` data, and clamp displayed all-day end times to `23:59` while preserving a non-empty interval.
+
+Keep Postcode and Lat/Long uploads as separate location-method states.
+
+**Why:** Switching location methods should not destroy a previously uploaded file, but it must not show a Postcode preview under Lat/Long or apply the wrong points to the active method.
+
+**How to apply:** Render only the selected method's upload state, restore that state's records when switching back, and let explicit file removal clear only the active method.

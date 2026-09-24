@@ -196,16 +196,45 @@ interface Props {
   demoView?: boolean;
 }
 
+type LocationUploadMethod = "postcode" | "latlng";
+
+interface LocationUploadState {
+  file: File | null;
+  fileState: "Uploading" | "Uploaded";
+  report: UploadReport | null;
+  records: UploadedLocationRecord[];
+  selectedKeys: Set<string>;
+}
+
+function emptyLocationUpload(): LocationUploadState {
+  return {
+    file: null,
+    fileState: "Uploading",
+    report: null,
+    records: [],
+    selectedKeys: new Set(),
+  };
+}
+
+function demoLocationUpload(): LocationUploadState {
+  return {
+    file: createDemoFile(DEMO_UPLOADS.location.fileName, DEMO_UPLOADS.location.content),
+    fileState: "Uploaded",
+    report: DEMO_UPLOADS.location.report,
+    records: DEMO_UPLOADS.location.records,
+    selectedKeys: new Set(DEMO_UPLOADS.location.records.map(record => record.key)),
+  };
+}
+
 export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
   const { data: audiences, isError } = useAudiences();
   const incrementUse = useIncrementAudienceUse();
   const [uploadError, setUploadError] = useState("");
   const [drawError, setDrawError] = useState("");
-  const [locationReport, setLocationReport] = useState<UploadReport | null>(() => demoView ? DEMO_UPLOADS.location.report : null);
-  const [locationRecords, setLocationRecords] = useState<UploadedLocationRecord[]>(() => demoView ? DEMO_UPLOADS.location.records : []);
-  const [selectedLocationKeys, setSelectedLocationKeys] = useState<Set<string>>(() => demoView ? new Set(DEMO_UPLOADS.location.records.map(record => record.key)) : new Set());
-  const [selectedFile, setSelectedFile] = useState<File | null>(() => demoView ? createDemoFile(DEMO_UPLOADS.location.fileName, DEMO_UPLOADS.location.content) : null);
-  const [fileState, setFileState] = useState<"Uploading" | "Uploaded">(demoView ? "Uploaded" : "Uploading");
+  const [locationUploads, setLocationUploads] = useState<Record<LocationUploadMethod, LocationUploadState>>(() => ({
+    postcode: demoView ? demoLocationUpload() : emptyLocationUpload(),
+    latlng: emptyLocationUpload(),
+  }));
   const [screenListError, setScreenListError] = useState("");
   const [screenListReport, setScreenListReport] = useState<UploadReport | null>(() => demoView ? DEMO_UPLOADS.screenList.report : null);
   const [screenListRecords, setScreenListRecords] = useState<UploadedScreenRecord[]>(() => demoView ? DEMO_UPLOADS.screenList.records : []);
@@ -213,60 +242,91 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
   const [screenListFile, setScreenListFile] = useState<File | null>(() => demoView ? createDemoFile(DEMO_UPLOADS.screenList.fileName, DEMO_UPLOADS.screenList.content) : null);
   const [screenListFileState, setScreenListFileState] = useState<"Uploading" | "Uploaded">(demoView ? "Uploaded" : "Uploading");
 
-  const uploadIdRef = useRef(0);
+  const uploadIdRef = useRef<Record<LocationUploadMethod, number>>({ postcode: 0, latlng: 0 });
   const screenListUploadIdRef = useRef(0);
 
   const updateSection = <K extends keyof FilterStateV2>(section: K, data: Partial<FilterStateV2[K]>) => {
     setFilters(prev => ({ ...prev, [section]: { ...prev[section], ...data } }));
   };
   const selectedAudience = audiences?.find(a => a.id === filters.location.audienceId);
-  
-  const cancelUpload = () => {
-    uploadIdRef.current++;
-    setSelectedFile(null);
-    setUploadError("");
-    setLocationReport(null);
-    setLocationRecords([]);
-    setSelectedLocationKeys(new Set());
-    updateSection("location", { uploadedPoints: [] });
+
+  const activeLocationMethod: LocationUploadMethod = filters.location.method === "latlng" ? "latlng" : "postcode";
+  const activeLocationUpload = locationUploads[activeLocationMethod];
+  const updateLocationUpload = (method: LocationUploadMethod, data: Partial<LocationUploadState>) => {
+    setLocationUploads(prev => ({ ...prev, [method]: { ...prev[method], ...data } }));
   };
 
-  const handleLocationFileError = (error: string) => {
+  const selectLocationMethod = (method: "audience" | "postcode" | "poi" | "latlng") => {
+    updateSection("location", { method });
+    setUploadError("");
+    if (method === "postcode" || method === "latlng") {
+      const upload = locationUploads[method];
+      updateSection("location", {
+        uploadedPoints: upload.records
+          .filter(record => upload.selectedKeys.has(record.key))
+          .map(record => record.point),
+      });
+    } else {
+      updateSection("location", { uploadedPoints: [] });
+    }
+  };
+
+  const cancelUpload = (method: LocationUploadMethod) => {
+    uploadIdRef.current[method]++;
+    updateLocationUpload(method, emptyLocationUpload());
+    setUploadError("");
+    if (filters.location.method === method) {
+      updateSection("location", { uploadedPoints: [] });
+    }
+  };
+
+  const handleLocationFileError = (method: LocationUploadMethod, error: string) => {
     setUploadError(error);
     if (!error) return;
-    uploadIdRef.current++;
-    setSelectedFile(null);
-    setLocationReport(null);
-    setLocationRecords([]);
-    setSelectedLocationKeys(new Set());
-    updateSection("location", { uploadedPoints: [] });
+    uploadIdRef.current[method]++;
+    updateLocationUpload(method, emptyLocationUpload());
+    if (filters.location.method === method) {
+      updateSection("location", { uploadedPoints: [] });
+    }
   };
 
-  const readUpload = async (file: File, parser: (file: File) => Promise<{ points: Array<{lat: number; lng: number}>; records: UploadedLocationRecord[]; report: UploadReport }>) => {
-    const currentUploadId = ++uploadIdRef.current;
-    setSelectedFile(file);
-    setFileState("Uploading");
+  const readUpload = async (
+    file: File,
+    method: LocationUploadMethod,
+    parser: (file: File) => Promise<{ points: Array<{lat: number; lng: number}>; records: UploadedLocationRecord[]; report: UploadReport }>,
+  ) => {
+    const currentUploadId = ++uploadIdRef.current[method];
+    updateLocationUpload(method, {
+      file,
+      fileState: "Uploading",
+      report: null,
+      records: [],
+      selectedKeys: new Set(),
+    });
     setUploadError("");
-    setLocationReport(null);
-    setLocationRecords([]);
-    setSelectedLocationKeys(new Set());
-    updateSection("location", { uploadedPoints: [] });
+    if (filters.location.method === method) {
+      updateSection("location", { uploadedPoints: [] });
+    }
     try {
       const result = await parser(file);
-      if (uploadIdRef.current !== currentUploadId) return;
-      updateSection("location", { uploadedPoints: result.points });
-      setLocationRecords(result.records);
-      setSelectedLocationKeys(new Set(result.records.map(record => record.key)));
-      setLocationReport(result.report);
-      setFileState("Uploaded");
+      if (uploadIdRef.current[method] !== currentUploadId) return;
+      updateLocationUpload(method, {
+        file,
+        fileState: "Uploaded",
+        report: result.report,
+        records: result.records,
+        selectedKeys: new Set(result.records.map(record => record.key)),
+      });
+      if (filters.location.method === method) {
+        updateSection("location", { uploadedPoints: result.points });
+      }
     } catch (error) {
-      if (uploadIdRef.current !== currentUploadId) return;
+      if (uploadIdRef.current[method] !== currentUploadId) return;
       setUploadError(error instanceof Error ? error.message : "Could not read this file.");
-      setLocationReport(null);
-      setLocationRecords([]);
-      setSelectedLocationKeys(new Set());
-      updateSection("location", { uploadedPoints: [] });
-      setSelectedFile(null);
+      updateLocationUpload(method, emptyLocationUpload());
+      if (filters.location.method === method) {
+        updateSection("location", { uploadedPoints: [] });
+      }
     }
   };
 
@@ -323,12 +383,12 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
   };
 
   const toggleLocationRecord = (key: string) => {
-    const next = new Set(selectedLocationKeys);
+    const next = new Set(activeLocationUpload.selectedKeys);
     if (next.has(key)) next.delete(key);
     else next.add(key);
-    setSelectedLocationKeys(next);
+    updateLocationUpload(activeLocationMethod, { selectedKeys: next });
     updateSection("location", {
-      uploadedPoints: locationRecords
+      uploadedPoints: activeLocationUpload.records
         .filter(record => next.has(record.key))
         .map(record => record.point),
     });
@@ -360,10 +420,7 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
                   key={method}
                   label={method === "audience" ? "Saved Audience" : method === "postcode" ? "Postcode" : method === "poi" ? "POI" : "Lat/Long"}
                   selected={filters.location.method === method}
-                  onClick={() => {
-                    updateSection("location", { method });
-                    cancelUpload();
-                  }}
+                  onClick={() => selectLocationMethod(method)}
                 />
               ))}
             </FiberRoundedTabsBar>
@@ -399,14 +456,14 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
           {filters.location.method === "postcode" && <div className="space-y-2">
             <LocationUpload
               method="postcode"
-              report={locationReport}
-               records={locationRecords.map(record => ({ key: record.key, label: record.label, detail: `${record.point.lat}, ${record.point.lng}` }))}
-               selectedKeys={selectedLocationKeys}
-              file={selectedFile}
-              fileState={fileState}
-              onSelect={(file) => void readUpload(file, parsePostcodeCsv)}
-              onRemove={cancelUpload}
-              onError={handleLocationFileError}
+              report={activeLocationUpload.report}
+               records={activeLocationUpload.records.map(record => ({ key: record.key, label: record.label, detail: `${record.point.lat}, ${record.point.lng}` }))}
+               selectedKeys={activeLocationUpload.selectedKeys}
+              file={activeLocationUpload.file}
+              fileState={activeLocationUpload.fileState}
+              onSelect={(file) => void readUpload(file, "postcode", parsePostcodeCsv)}
+              onRemove={() => cancelUpload("postcode")}
+              onError={(error) => handleLocationFileError("postcode", error)}
                onToggleRecord={toggleLocationRecord}
             />
           </div>}
@@ -418,14 +475,14 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
           {filters.location.method === "latlng" && <div className="space-y-2">
             <LocationUpload
               method="latlng"
-              report={locationReport}
-               records={locationRecords.map(record => ({ key: record.key, label: record.label, detail: `${record.point.lat}, ${record.point.lng}` }))}
-               selectedKeys={selectedLocationKeys}
-              file={selectedFile}
-              fileState={fileState}
-              onSelect={(file) => void readUpload(file, parseCoordinateCsv)}
-              onRemove={cancelUpload}
-              onError={handleLocationFileError}
+              report={activeLocationUpload.report}
+               records={activeLocationUpload.records.map(record => ({ key: record.key, label: record.label, detail: `${record.point.lat}, ${record.point.lng}` }))}
+               selectedKeys={activeLocationUpload.selectedKeys}
+              file={activeLocationUpload.file}
+              fileState={activeLocationUpload.fileState}
+              onSelect={(file) => void readUpload(file, "latlng", parseCoordinateCsv)}
+              onRemove={() => cancelUpload("latlng")}
+              onError={(error) => handleLocationFileError("latlng", error)}
                onToggleRecord={toggleLocationRecord}
             />
           </div>}
