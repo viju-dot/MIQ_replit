@@ -171,11 +171,14 @@ export function FiberDropZone({
 
   const handleFile = (selectedFile: File) => {
     if (inputRef.current) inputRef.current.value = "";
-    if (accept === ".csv" || accept.includes("csv")) {
-      if (!selectedFile.name.toLowerCase().endsWith(".csv")) {
-        onFileError?.("Please select a valid CSV file.");
-        return;
-      }
+    const acceptedExtensions = accept
+      .split(",")
+      .map(value => value.trim().toLowerCase())
+      .filter(value => value.startsWith("."));
+    if (acceptedExtensions.length > 0 && !acceptedExtensions.some(extension => selectedFile.name.toLowerCase().endsWith(extension))) {
+      const extensionLabel = acceptedExtensions.join(" or ");
+      onFileError?.(`Please select a supported file type (${extensionLabel}).`);
+      return;
     }
     onFileError?.("");
     onFileSelect?.(selectedFile);

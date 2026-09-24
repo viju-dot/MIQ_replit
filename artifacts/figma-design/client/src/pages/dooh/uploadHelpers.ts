@@ -8,6 +8,18 @@ export interface UploadReport {
   duplicates: string[];
 }
 
+export interface UploadedLocationRecord {
+  key: string;
+  label: string;
+  point: { lat: number; lng: number };
+}
+
+export interface UploadedScreenRecord {
+  key: string;
+  label: string;
+  id: string;
+}
+
 function rowsFromCsv(text: string): string[][] {
   return text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(Boolean).map(line => {
     const cells: string[] = [];
@@ -37,6 +49,7 @@ export async function parsePostcodeCsv(file: File) {
   const column = header.findIndex(v => v === "postcode" || v === "postalcode");
   if (column < 0) throw new Error('Missing required "postcode" header.');
   const points: Array<{ lat: number; lng: number }> = [];
+  const records: UploadedLocationRecord[] = [];
   const report: UploadReport = { valid: 0, unknown: [], malformed: [], duplicates: [] };
   const seen = new Set<string>();
   rows.slice(1).forEach((row, index) => {
@@ -46,10 +59,12 @@ export async function parsePostcodeCsv(file: File) {
     seen.add(postcode);
     const match = MOCK_POSTCODES[postcode];
     if (!match) return report.unknown.push(postcode);
-    points.push({ lat: match.lat, lng: match.lng });
+    const point = { lat: match.lat, lng: match.lng };
+    points.push(point);
+    records.push({ key: postcode, label: postcode, point });
     report.valid++;
   });
-  return { points, report };
+  return { points, records, report };
 }
 
 export async function parseCoordinateCsv(file: File) {
@@ -61,6 +76,7 @@ export async function parseCoordinateCsv(file: File) {
   const lngColumn = header.findIndex(v => v === "lng" || v === "lon" || v === "long" || v === "longitude");
   if (latColumn < 0 || lngColumn < 0) throw new Error('Missing required "lat" and "lng" headers.');
   const points: Array<{ lat: number; lng: number }> = [];
+  const records: UploadedLocationRecord[] = [];
   const malformed: string[] = [];
   const duplicates: string[] = [];
   const seen = new Set<string>();
@@ -74,9 +90,11 @@ export async function parseCoordinateCsv(file: File) {
     const key = `${lat},${lng}`;
     if (seen.has(key)) return duplicates.push(key);
     seen.add(key);
-    points.push({ lat, lng });
+    const point = { lat, lng };
+    points.push(point);
+    records.push({ key, label: key, point });
   });
-  return { points, report: { valid: points.length, unknown: [], malformed, duplicates } as UploadReport };
+  return { points, records, report: { valid: points.length, unknown: [], malformed, duplicates } as UploadReport };
 }
 
 export async function parseScreenList(file: File, screens: ScreenData[]) {
@@ -103,6 +121,7 @@ function parseScreenListRows(rows: string[][], screens: ScreenData[]) {
   if (idColumn < 0) throw new Error('Missing required "screen_id" header.');
   const known = new Map(screens.map(screen => [screen.id.toLocaleLowerCase(), screen.id]));
   const ids: string[] = [];
+  const records: UploadedScreenRecord[] = [];
   const report: UploadReport = { valid: 0, unknown: [], malformed: [], duplicates: [] };
   const seen = new Set<string>();
   rows.slice(1).forEach((row, index) => {
@@ -115,9 +134,10 @@ function parseScreenListRows(rows: string[][], screens: ScreenData[]) {
     seen.add(matchKey);
     if (!canonicalId) return report.unknown.push(suppliedId);
     ids.push(canonicalId);
+    records.push({ key: canonicalId, label: canonicalId, id: canonicalId });
     report.valid++;
   });
-  return { ids, report };
+  return { ids, records, report };
 }
 
 export function downloadScreenTemplate() {

@@ -6,3 +6,4 @@
 - [Case-study evidence](case-study-evidence.md) — distinguish requested direction from observed versions; no retrospective changes to the TV prototype to make the narrative fit.
 - [DOOH MVP boundaries](dooh-v2-decisions.md) — keep mock planning distinct from live activation; duplicate saves create confirmed new versions without overwriting existing audiences.
 - [Map tile services](map-tile-services.md) — visually verify tile responses; CARTO's legacy Positron endpoint can return API-key-required watermarks.
+- [Mixed upload accept rules](mixed-upload-accept.md) — FiberDropZone must validate each declared extension; CSV plus XLSX accept strings must not become CSV-only.

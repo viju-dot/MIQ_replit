@@ -3,6 +3,7 @@ import { FiberDropZone } from "@/components/FiberDropZone";
 import { MOCK_POSTCODES } from "../data";
 import type { UploadReport } from "../uploadHelpers";
 import { FiberButton } from "./primitives";
+import { UploadPreview, type UploadPreviewRecord } from "./UploadPreview";
 
 type Method = "postcode" | "latlng";
 
@@ -22,17 +23,19 @@ function downloadSample(method: Method) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function LocationUpload({ method, file, fileState, report, onSelect, onRemove, onError }: {
+export function LocationUpload({ method, file, fileState, report, records, selectedKeys, onSelect, onRemove, onError, onToggleRecord }: {
   method: Method;
   file: File | null;
   fileState: "Uploading" | "Uploaded";
   report: UploadReport | null;
+  records: UploadPreviewRecord[];
+  selectedKeys: Set<string>;
   onSelect: (file: File) => void;
   onRemove: () => void;
   onError: (message: string) => void;
+  onToggleRecord: (key: string) => void;
 }) {
   const label = method === "postcode" ? "postcodes" : "coordinate pairs";
-  const total = report ? report.valid + report.unknown.length + report.malformed.length + report.duplicates.length : 0;
   return <div className="space-y-2" style={{ fontFamily: "var(--font-family-body, 'DM Sans', sans-serif)", color: "var(--surface-foreground-static-neutral-lvl1, #13131a)" }}>
     <p className="text-xs" style={{ color: "var(--surface-foreground-static-neutral-lvl3, #717180)" }}>
       {method === "postcode" ? "CSV with a postcode column, one postcode per row. This prototype recognises demo postcodes only; the sample contains supported examples." : "CSV with lat and lng columns, one coordinate pair per row. Latitude: −90 to 90; longitude: −180 to 180."}
@@ -53,15 +56,16 @@ export function LocationUpload({ method, file, fileState, report, onSelect, onRe
       onFileRemove={onRemove}
       onFileError={onError}
     />
-    {file && report && fileState === "Uploaded" && <div role="status" aria-live="polite" className="rounded border p-3 text-xs space-y-2" style={{ borderColor: "var(--border-static-subtle-neutral, #e1e1e8)", background: "var(--surface-background-lvl2, #f7f7fa)" }}>
-      <p className="font-medium">Upload preview</p>
-      <p className="break-all">{file.name}</p>
-      <p>{total} {total === 1 ? "entry" : "entries"} read · {report.valid} usable {label}</p>
-      {report.valid === 0 && <p>No usable locations found. Check the sample format and upload a corrected file.</p>}
-      {report.unknown.length > 0 && <p>Unrecognised ({report.unknown.length}): {report.unknown.slice(0, 6).join(", ")}{report.unknown.length > 6 ? "…" : ""}</p>}
-      {report.malformed.length > 0 && <p>Invalid ({report.malformed.length}): {report.malformed.slice(0, 6).join(", ")}{report.malformed.length > 6 ? "…" : ""}</p>}
-      {report.duplicates.length > 0 && <p>Duplicates skipped: {report.duplicates.length}</p>}
-      <FiberButton variant="outline" size="compact" onClick={onRemove}>Remove file</FiberButton>
-    </div>}
+    {file && report && fileState === "Uploaded" && (
+      <UploadPreview
+        fileName={file.name}
+        records={records}
+        selectedKeys={selectedKeys}
+        report={report}
+        noun={label}
+        onToggle={onToggleRecord}
+        onRemoveFile={onRemove}
+      />
+    )}
   </div>;
 }

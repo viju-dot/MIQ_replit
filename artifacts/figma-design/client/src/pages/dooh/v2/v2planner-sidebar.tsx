@@ -7,13 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAudiences, useIncrementAudienceUse } from "../api";
 import { CREATIVE_FORMATS, DAYPART_PRESETS, PUBLISHERS, RESOLUTIONS, SCREENS, VENUES } from "../data";
-import { downloadScreenTemplate, parseCoordinateCsv, parsePostcodeCsv, parseScreenList, type UploadReport } from "../uploadHelpers";
+import { downloadScreenTemplate, parseCoordinateCsv, parsePostcodeCsv, parseScreenList, type UploadedLocationRecord, type UploadedScreenRecord, type UploadReport } from "../uploadHelpers";
 import { FiberSlider, FiberRadio, FiberButton, SmartCard } from "./primitives";
 import { FiberRoundedTabsBar, FiberTabButton } from "@/components/FiberTabItem";
 import { PoiSearch } from "./PoiSearch";
 import { FiberDropZone } from "@/components/FiberDropZone";
 import { LocationUpload } from "./LocationUpload";
 import { FacetDropdown } from "./FacetDropdown";
+import { UploadPreview } from "./UploadPreview";
 
 // Theme the control itself, not SelectValue's inner span. Fiber uses
 // data-theme, whereas the underlying headless control's defaults use .dark.
@@ -83,30 +84,20 @@ interface Props {
   setFilters: React.Dispatch<React.SetStateAction<FilterStateV2>>;
 }
 
-function Report({ report, screenList = false }: { report: UploadReport | null; screenList?: boolean }) {
-  if (!report) return null;
-  return (
-    <div className="rounded bg-[var(--surface-background-lvl2,#f7f7fa)] p-2 text-[11px] space-y-1" role="status">
-      <p className="font-medium text-[var(--container-static-success-subtle-foreground-variation,#115639)]">
-        {report.valid} {screenList ? `matched screen ID${report.valid === 1 ? "" : "s"}` : `valid row${report.valid === 1 ? "" : "s"}`}
-      </p>
-      {!!report.unknown.length && <p className="text-[var(--surface-foreground-static-warning,#b45309)]">Unknown: {report.unknown.slice(0, 6).join(", ")}{report.unknown.length > 6 ? "…" : ""}</p>}
-      {!!report.malformed.length && <p className="text-[var(--surface-foreground-dynamic-error-default,#da294b)]">Malformed: {report.malformed.slice(0, 6).join(", ")}{report.malformed.length > 6 ? "…" : ""}</p>}
-      {!!report.duplicates.length && <p className="text-[var(--surface-foreground-static-warning,#b45309)]">Duplicates: {report.duplicates.slice(0, 6).join(", ")}{report.duplicates.length > 6 ? "…" : ""}</p>}
-    </div>
-  );
-}
-
 export function SidebarV2({ filters, setFilters }: Props) {
   const { data: audiences, isError } = useAudiences();
   const incrementUse = useIncrementAudienceUse();
   const [uploadError, setUploadError] = useState("");
   const [drawError, setDrawError] = useState("");
   const [locationReport, setLocationReport] = useState<UploadReport | null>(null);
+  const [locationRecords, setLocationRecords] = useState<UploadedLocationRecord[]>([]);
+  const [selectedLocationKeys, setSelectedLocationKeys] = useState<Set<string>>(new Set());
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileState, setFileState] = useState<"Uploading" | "Uploaded">("Uploading");
   const [screenListError, setScreenListError] = useState("");
   const [screenListReport, setScreenListReport] = useState<UploadReport | null>(null);
+  const [screenListRecords, setScreenListRecords] = useState<UploadedScreenRecord[]>([]);
+  const [selectedScreenListKeys, setSelectedScreenListKeys] = useState<Set<string>>(new Set());
   const [screenListFile, setScreenListFile] = useState<File | null>(null);
   const [screenListFileState, setScreenListFileState] = useState<"Uploading" | "Uploaded">("Uploading");
 
@@ -123,6 +114,8 @@ export function SidebarV2({ filters, setFilters }: Props) {
     setSelectedFile(null);
     setUploadError("");
     setLocationReport(null);
+    setLocationRecords([]);
+    setSelectedLocationKeys(new Set());
     updateSection("location", { uploadedPoints: [] });
   };
 
@@ -132,26 +125,34 @@ export function SidebarV2({ filters, setFilters }: Props) {
     uploadIdRef.current++;
     setSelectedFile(null);
     setLocationReport(null);
+    setLocationRecords([]);
+    setSelectedLocationKeys(new Set());
     updateSection("location", { uploadedPoints: [] });
   };
 
-  const readUpload = async (file: File, parser: (file: File) => Promise<{ points: Array<{lat: number; lng: number}>; report: UploadReport }>) => {
+  const readUpload = async (file: File, parser: (file: File) => Promise<{ points: Array<{lat: number; lng: number}>; records: UploadedLocationRecord[]; report: UploadReport }>) => {
     const currentUploadId = ++uploadIdRef.current;
     setSelectedFile(file);
     setFileState("Uploading");
     setUploadError("");
     setLocationReport(null);
+    setLocationRecords([]);
+    setSelectedLocationKeys(new Set());
     updateSection("location", { uploadedPoints: [] });
     try {
       const result = await parser(file);
       if (uploadIdRef.current !== currentUploadId) return;
       updateSection("location", { uploadedPoints: result.points });
+      setLocationRecords(result.records);
+      setSelectedLocationKeys(new Set(result.records.map(record => record.key)));
       setLocationReport(result.report);
       setFileState("Uploaded");
     } catch (error) {
       if (uploadIdRef.current !== currentUploadId) return;
       setUploadError(error instanceof Error ? error.message : "Could not read this file.");
       setLocationReport(null);
+      setLocationRecords([]);
+      setSelectedLocationKeys(new Set());
       updateSection("location", { uploadedPoints: [] });
       setSelectedFile(null);
     }
@@ -162,6 +163,8 @@ export function SidebarV2({ filters, setFilters }: Props) {
     setScreenListFile(null);
     setScreenListError("");
     setScreenListReport(null);
+    setScreenListRecords([]);
+    setSelectedScreenListKeys(new Set());
     updateSection("screenList", { ids: [], configured: false });
   };
 
@@ -171,6 +174,8 @@ export function SidebarV2({ filters, setFilters }: Props) {
     screenListUploadIdRef.current++;
     setScreenListFile(null);
     setScreenListReport(null);
+    setScreenListRecords([]);
+    setSelectedScreenListKeys(new Set());
     updateSection("screenList", { ids: [], configured: true });
   };
 
@@ -180,11 +185,15 @@ export function SidebarV2({ filters, setFilters }: Props) {
     setScreenListFileState("Uploading");
     setScreenListError("");
     setScreenListReport(null);
+    setScreenListRecords([]);
+    setSelectedScreenListKeys(new Set());
     updateSection("screenList", { enabled: true, ids: [], configured: true });
     try {
       const result = await parseScreenList(file, SCREENS);
       if (screenListUploadIdRef.current !== currentUploadId) return;
       updateSection("screenList", { ids: result.ids, configured: true });
+      setScreenListRecords(result.records);
+      setSelectedScreenListKeys(new Set(result.records.map(record => record.key)));
       setScreenListReport(result.report);
       setScreenListFileState("Uploaded");
       if (!result.ids.length) {
@@ -194,9 +203,36 @@ export function SidebarV2({ filters, setFilters }: Props) {
       if (screenListUploadIdRef.current !== currentUploadId) return;
       setScreenListError(error instanceof Error ? error.message : "Could not read this file.");
       setScreenListReport(null);
+      setScreenListRecords([]);
+      setSelectedScreenListKeys(new Set());
       updateSection("screenList", { ids: [], configured: true });
       setScreenListFile(null);
     }
+  };
+
+  const toggleLocationRecord = (key: string) => {
+    const next = new Set(selectedLocationKeys);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    setSelectedLocationKeys(next);
+    updateSection("location", {
+      uploadedPoints: locationRecords
+        .filter(record => next.has(record.key))
+        .map(record => record.point),
+    });
+  };
+
+  const toggleScreenListRecord = (key: string) => {
+    const next = new Set(selectedScreenListKeys);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    setSelectedScreenListKeys(next);
+    updateSection("screenList", {
+      ids: screenListRecords
+        .filter(record => next.has(record.key))
+        .map(record => record.id),
+      configured: true,
+    });
   };
 
   return (
@@ -252,11 +288,14 @@ export function SidebarV2({ filters, setFilters }: Props) {
             <LocationUpload
               method="postcode"
               report={locationReport}
+               records={locationRecords.map(record => ({ key: record.key, label: record.label, detail: `${record.point.lat}, ${record.point.lng}` }))}
+               selectedKeys={selectedLocationKeys}
               file={selectedFile}
               fileState={fileState}
               onSelect={(file) => void readUpload(file, parsePostcodeCsv)}
               onRemove={cancelUpload}
               onError={handleLocationFileError}
+               onToggleRecord={toggleLocationRecord}
             />
           </div>}
           
@@ -268,11 +307,14 @@ export function SidebarV2({ filters, setFilters }: Props) {
             <LocationUpload
               method="latlng"
               report={locationReport}
+               records={locationRecords.map(record => ({ key: record.key, label: record.label, detail: `${record.point.lat}, ${record.point.lng}` }))}
+               selectedKeys={selectedLocationKeys}
               file={selectedFile}
               fileState={fileState}
               onSelect={(file) => void readUpload(file, parseCoordinateCsv)}
               onRemove={cancelUpload}
               onError={handleLocationFileError}
+               onToggleRecord={toggleLocationRecord}
             />
           </div>}
 
@@ -532,15 +574,25 @@ export function SidebarV2({ filters, setFilters }: Props) {
          <FilterCard title="Screen List" icon={<List className="w-4 h-4" />} enabled={filters.screenList.enabled} onToggle={enabled => updateSection("screenList", { enabled })}>
            <div className="space-y-2">
              <FiberDropZone
-               accept=".csv,text/csv"
-               acceptLabel="CSV with a Screen ID column"
+                accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                acceptLabel="CSV or XLSX with a Screen ID column"
                file={screenListFile}
                fileState={screenListFileState}
                onFileSelect={(file) => void readScreenListUpload(file)}
                onFileRemove={removeScreenListUpload}
                onFileError={handleScreenListFileError}
              />
-             <Report report={screenListReport} screenList />
+              {screenListFile && screenListReport && screenListFileState === "Uploaded" && (
+                <UploadPreview
+                  fileName={screenListFile.name}
+                  records={screenListRecords}
+                  selectedKeys={selectedScreenListKeys}
+                  report={screenListReport}
+                  noun="screen IDs"
+                  onToggle={toggleScreenListRecord}
+                  onRemoveFile={removeScreenListUpload}
+                />
+              )}
              {screenListError && <p className="text-[11px] text-[var(--surface-foreground-dynamic-error-default,#da294b)]" role="alert">{screenListError}</p>}
              <Button type="button" variant="outline" size="sm" className="w-full" onClick={downloadScreenTemplate}>
                <Download className="h-3 w-3 mr-2" />Download sample CSV
