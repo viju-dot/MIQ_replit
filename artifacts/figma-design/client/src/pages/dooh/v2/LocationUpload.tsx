@@ -37,9 +37,6 @@ export function LocationUpload({ method, file, fileState, report, records, selec
 }) {
   const label = method === "postcode" ? "postcodes" : "coordinate pairs";
   return <div className="space-y-2" style={{ fontFamily: "var(--font-family-body, 'DM Sans', sans-serif)", color: "var(--surface-foreground-static-neutral-lvl1, #13131a)" }}>
-    <p className="text-xs" style={{ color: "var(--surface-foreground-static-neutral-lvl3, #717180)" }}>
-      {method === "postcode" ? "CSV with a postcode column, one postcode per row. This prototype recognises demo postcodes only; the sample contains supported examples." : "CSV with lat and lng columns, one coordinate pair per row. Latitude: −90 to 90; longitude: −180 to 180."}
-    </p>
     {file && report && fileState === "Uploaded" && (
       <UploadPreview
         fileName={file.name}

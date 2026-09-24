@@ -25,7 +25,6 @@ export function FacetDropdown({ title, values, selected, onSelected }: {
       <SearchStandard background label={`Search ${title === "Venue Type" ? "venue types" : "publishers"}`} value={query} onValueChange={setQuery} />
       <div className="pb-2 border-b" style={{ borderColor: "var(--border-static-subtle-neutral, #e1e1e8)" }}>
         <Checkbox labelValue="All" variant={all ? "Checked" : "Unchecked"} onToggle={() => onSelected([])} />
-        <p className="text-xs mt-1" style={{ color: "var(--surface-foreground-static-neutral-lvl3, #717180)" }}>Includes every {title === "Venue Type" ? "venue type" : "publisher"}. No individual selection needed.</p>
       </div>
       <div className="space-y-2" aria-label={`Selected ${title === "Venue Type" ? "venue types" : "publishers"}`}>
         <p role="status" className="text-xs">{all ? "All included" : `${selected.length} selected`}</p>

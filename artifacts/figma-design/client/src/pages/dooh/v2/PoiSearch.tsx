@@ -19,9 +19,6 @@ export function PoiSearch({ values, onChange }: { values: string[]; onChange: (v
     <SearchStandard background label="Search points of interest" value={query} onValueChange={setQuery} />
     <div className="space-y-2">
       <p className="text-xs font-medium">{query.trim() ? "Matching sample POIs" : "Preset points of interest"}</p>
-      <p className="text-xs" style={{ color: "var(--surface-foreground-static-neutral-lvl3, #717180)" }}>
-        Select multiple demo locations. Search by name or city to find and add POIs.
-      </p>
       <div className="max-h-60 overflow-y-auto space-y-2" role="group" aria-label="Sample points of interest">
         {filtered.map(poi => <div key={poi.id} className="rounded border p-2" style={{ borderColor: "var(--border-static-subtle-neutral, #e1e1e8)" }}>
           <Checkbox labelValue={poi.name} variant={values.includes(poi.id) ? "Checked" : "Unchecked"} onToggle={() => toggle(poi.id)} />
@@ -51,7 +48,7 @@ export function PoiSearch({ values, onChange }: { values: string[]; onChange: (v
         </div>
         <p className="text-xs">Screens within the chosen radius of any selected POI are included.</p>
         <FiberButton variant="outline" size="compact" onClick={() => onChange([])}>Clear all POIs</FiberButton>
-      </> : <p className="text-xs">Choose presets or search above to add POIs. No POI location restriction is applied yet.</p>}
+      </> : null}
     </section>
   </div>;
 }
