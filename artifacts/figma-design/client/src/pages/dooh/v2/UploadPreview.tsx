@@ -74,15 +74,20 @@ export function UploadPreview({
         className="space-y-2 rounded border p-3 text-xs"
         style={{ borderColor, background: cardColor, color: textColor }}
       >
-        <div className="flex items-center justify-between gap-2">
-          <p className="font-medium">Upload preview</p>
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <p className="font-medium">Overall preview</p>
+            <p className="mt-0.5 text-[11px]" style={{ color: mutedColor }}>
+              Upload and selection summary
+            </p>
+          </div>
           <FiberButton
             variant="outline"
             size="compact"
             onClick={() => setOpen(true)}
             ariaLabel={`Preview ${fileName}`}
           >
-            Preview full list
+            Full preview
           </FiberButton>
         </div>
         <p className="break-all" style={{ color: mutedColor }}>{fileName}</p>
