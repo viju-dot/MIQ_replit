@@ -30,7 +30,7 @@ export interface FilterStateV2 {
     method: "audience" | "postcode" | "poi" | "latlng";
     audienceId: string;
     postcode: string;
-    poiId: string;
+    poiIds: string[];
     radius: number | "";
     radiusUnit: "m" | "km";
     uploadedPoints: Array<{ lat: number; lng: number }>;
@@ -52,7 +52,7 @@ export interface FilterStateV2 {
 }
 
 export const DEFAULT_FILTERS_V2: FilterStateV2 = {
-  location: { enabled: true, method: "audience", audienceId: "", postcode: "", poiId: "", radius: 500, radiusUnit: "m", uploadedPoints: [] },
+  location: { enabled: true, method: "audience", audienceId: "", postcode: "", poiIds: [], radius: 500, radiusUnit: "m", uploadedPoints: [] },
   planningZone: { enabled: false, zones: [], drawMode: null },
   venueType: { enabled: false, venues: [] },
   publishers: { enabled: false, publishers: [] },
@@ -246,7 +246,7 @@ export function SidebarV2({ filters, setFilters }: Props) {
           </div>}
           
           {filters.location.method === "poi" && <div className="space-y-2">
-            <PoiSearch value={filters.location.poiId} onChange={poiId => updateSection("location", { poiId })} />
+            <PoiSearch values={filters.location.poiIds} onChange={poiIds => updateSection("location", { poiIds })} />
           </div>}
           
           {filters.location.method === "latlng" && <div className="space-y-2">

@@ -48,9 +48,10 @@ export default function DoohPlannerV2() {
       }
     } else if (method === "postcode") {
       targetPoints = filters.location.uploadedPoints;
-    } else if (method === "poi" && filters.location.poiId) {
-      const poi = MOCK_POIS.find(p => p.id === filters.location.poiId);
-      if (poi) targetPoints = [{ lat: poi.lat, lng: poi.lng }];
+    } else if (method === "poi") {
+      targetPoints = MOCK_POIS
+        .filter(poi => filters.location.poiIds.includes(poi.id))
+        .map(poi => ({ lat: poi.lat, lng: poi.lng }));
     } else if (method === "latlng") {
       targetPoints = filters.location.uploadedPoints;
     }
@@ -168,7 +169,7 @@ export default function DoohPlannerV2() {
 
   const locationConfigured = filters.location.enabled && (
     (filters.location.method === "audience" && !!filters.location.audienceId) ||
-    (filters.location.method === "poi" && !!filters.location.poiId) ||
+    (filters.location.method === "poi" && filters.location.poiIds.length > 0) ||
     ((filters.location.method === "postcode" || filters.location.method === "latlng") && filters.location.uploadedPoints.length > 0)
   );
   const locationMethod = locationConfigured
