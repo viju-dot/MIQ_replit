@@ -104,14 +104,14 @@ export function SmartSelectionControl({
       style={{ backgroundColor: CARD_BG, boxShadow: CARD_SHADOW, border: `1px solid ${GRID}`, fontFamily: FONT }}
       onDoubleClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()} onClick={e => e.stopPropagation()}>
       <div className="flex justify-between items-center mb-[var(--spacing-100,8px)]">
-         <h3 className="font-bold text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] flex items-center gap-2">
+         <h3 className="font-bold text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)] flex items-center gap-2">
            <Sparkle size={20} weight="regular" aria-hidden="true" /> Smart Selection
          </h3>
-         <button onClick={() => setActive(false)} className="text-[var(--surface-foreground-static-neutral-lvl3,#717180)] hover:text-black transition-colors" aria-label="Cancel Smart Selection">
+         <button onClick={() => setActive(false)} className="text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)] hover:text-black transition-colors" aria-label="Cancel Smart Selection">
            <X className="w-4 h-4" />
          </button>
       </div>
-      <p className="text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-static-neutral-lvl3,#717180)] mb-[var(--spacing-150,12px)] leading-tight">
+      <p className="text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)] mb-[var(--spacing-150,12px)] leading-tight">
         Move cursor over map to preview. Click to capture area and select screens inside.
       </p>
       
@@ -160,15 +160,15 @@ export function SmartSelectionControl({
       </div>
       
       {error && (
-        <div className="flex items-center gap-1 mb-[var(--spacing-100,8px)] text-[length:var(--body-sm-medium-size,12px)] text-[var(--surface-foreground-static-error,#dc2626)]">
+        <div className="flex items-center gap-1 mb-[var(--spacing-100,8px)] text-[length:var(--body-sm-medium-size,12px)] text-[var(--surface-foreground-dynamic-error-default,#dc2626)]">
           <AlertCircle className="w-3 h-3" />
           <span>{error}</span>
         </div>
       )}
 
-      <div className="text-[length:var(--body-sm-medium-size,12px)] font-medium pt-[var(--spacing-100,8px)]" style={{ color: "var(--surface-foreground-static-neutral-lvl1,#13131a)", borderTop: `1px solid ${GRID}` }}>
+      <div className="text-[length:var(--body-sm-medium-size,12px)] font-medium pt-[var(--spacing-100,8px)]" style={{ color: "var(--surface-foreground-dynamic-neutral-default-variation,#13131a)", borderTop: `1px solid ${GRID}` }}>
          {hasCenter ? (
-           <span className={candidateCount > 0 ? "text-[#7c33b5]" : "text-[var(--surface-foreground-static-neutral-lvl3,#717180)]"}>
+           <span className={candidateCount > 0 ? "text-[#7c33b5]" : "text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)]"}>
              {candidateCount} screen{candidateCount !== 1 ? 's' : ''} in area
            </span>
          ) : "Move cursor over map"}

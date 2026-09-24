@@ -1,8 +1,8 @@
-import { useState, useRef, type ReactNode } from "react";
+import { useState, useRef, forwardRef, type ComponentPropsWithoutRef, type ElementRef, type ReactNode } from "react";
 import { Link } from "wouter";
 import { Clock, Download, LayoutDashboard, List, Map, MapPin, MonitorPlay, Target, Wallet, X } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger as BaseSelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAudiences, useIncrementAudienceUse } from "../api";
@@ -14,6 +14,20 @@ import { PoiSearch } from "./PoiSearch";
 import { FiberDropZone } from "@/components/FiberDropZone";
 import { LocationUpload } from "./LocationUpload";
 import { FacetDropdown } from "./FacetDropdown";
+
+// Theme the control itself, not SelectValue's inner span. Fiber uses
+// data-theme, whereas the underlying headless control's defaults use .dark.
+const SelectTrigger = forwardRef<ElementRef<typeof BaseSelectTrigger>, ComponentPropsWithoutRef<typeof BaseSelectTrigger>>(
+  ({ style, ...props }, ref) => (
+    <BaseSelectTrigger {...props} ref={ref} style={{
+      backgroundColor: "var(--surface-background-lvl2, #f7f7fa)",
+      borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)",
+      color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)",
+      ...style,
+    }} />
+  ),
+);
+SelectTrigger.displayName = "FiberPlannerSelectTrigger";
 
 export interface PlanningZone {
   id: string;
@@ -77,7 +91,7 @@ function Report({ report, screenList = false }: { report: UploadReport | null; s
         {report.valid} {screenList ? `matched screen ID${report.valid === 1 ? "" : "s"}` : `valid row${report.valid === 1 ? "" : "s"}`}
       </p>
       {!!report.unknown.length && <p className="text-[var(--surface-foreground-static-warning,#b45309)]">Unknown: {report.unknown.slice(0, 6).join(", ")}{report.unknown.length > 6 ? "…" : ""}</p>}
-      {!!report.malformed.length && <p className="text-[var(--surface-foreground-static-error,#da294b)]">Malformed: {report.malformed.slice(0, 6).join(", ")}{report.malformed.length > 6 ? "…" : ""}</p>}
+      {!!report.malformed.length && <p className="text-[var(--surface-foreground-dynamic-error-default,#da294b)]">Malformed: {report.malformed.slice(0, 6).join(", ")}{report.malformed.length > 6 ? "…" : ""}</p>}
       {!!report.duplicates.length && <p className="text-[var(--surface-foreground-static-warning,#b45309)]">Duplicates: {report.duplicates.slice(0, 6).join(", ")}{report.duplicates.length > 6 ? "…" : ""}</p>}
     </div>
   );
@@ -185,7 +199,7 @@ export function SidebarV2({ filters, setFilters }: Props) {
   };
 
   return (
-    <div data-annotate="DOOH filter panel" className="w-[300px] xl:w-[340px] shrink-0 bg-[var(--surface-background-lvl1,#ffffff)] flex flex-col z-20 border-r border-[var(--border-static-subtle-neutral,#e1e1e8)]">
+    <div data-annotate="DOOH filter panel" className="w-[300px] xl:w-[340px] shrink-0 bg-[var(--surface-background-lvl1,#ffffff)] flex flex-col z-20 border-r border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)]">
       <div className="flex-1">
         
         {/* 1. Location Filter */}
@@ -208,20 +222,20 @@ export function SidebarV2({ filters, setFilters }: Props) {
           {filters.location.method === "audience" && <div className="space-y-3">
             {!selectedAudience ? (
               <>
-                <label className="text-xs font-medium block text-[var(--surface-foreground-static-neutral-lvl2,#282833)]">Select Saved Audience</label>
+                <label className="text-xs font-medium block text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Select Saved Audience</label>
                 <Select value={filters.location.audienceId} onValueChange={id => { updateSection("location", { audienceId: id }); incrementUse.mutate(id); }}>
-                  <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="Choose an audience" /></SelectTrigger>
-                  <SelectContent>
+                  <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="Choose an audience" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }} /></SelectTrigger>
+                  <SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>
                     {isError && <SelectItem value="error" disabled>Error loading audiences</SelectItem>}
                     {audiences?.map(a => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </>
             ) : (
-              <div className="rounded border border-[var(--border-dynamic-brand-subtle-default,#d7bced)] bg-[var(--container-dynamic-brand-subtle-background-default-regular,#f0e6f7)] p-3 relative">
+              <div className="rounded border border-[var(--border-dynamic-brand-subtle-default,#d7bced)] bg-[var(--container-dynamic-brand-subtle-background-default,#f0e6f7)] p-3 relative">
                 <button 
                   onClick={() => updateSection("location", { audienceId: "" })}
-                  className="absolute top-2 right-2 text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)] hover:text-[var(--surface-foreground-static-error,#da294b)]"
+                  className="absolute top-2 right-2 text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)] hover:text-[var(--surface-foreground-dynamic-error-default,#da294b)]"
                   aria-label="Remove audience selection"
                 >
                   <X className="h-3 w-3" />
@@ -261,11 +275,11 @@ export function SidebarV2({ filters, setFilters }: Props) {
             />
           </div>}
 
-          {uploadError && <p className="text-[11px] text-[var(--surface-foreground-static-error,#da294b)] mt-2" role="alert">{uploadError}</p>}
+          {uploadError && <p className="text-[11px] text-[var(--surface-foreground-dynamic-error-default,#da294b)] mt-2" role="alert">{uploadError}</p>}
           
-          <div className="mt-4 pt-4 border-t border-[var(--border-static-subtle-neutral,#e1e1e8)]">
+          <div className="mt-4 pt-4 border-t border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)]">
              <div className="flex items-center justify-between mb-3">
-               <label className="text-xs font-medium text-[var(--surface-foreground-static-neutral-lvl2,#282833)]">Radius around points</label>
+               <label className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Radius around points</label>
                <Select value={filters.location.radiusUnit} onValueChange={(val: "m"|"km") => {
                  let current = Number(filters.location.radius) || (val === "km" ? 0.5 : 500);
                  if (val === "km" && filters.location.radiusUnit === "m") {
@@ -275,8 +289,8 @@ export function SidebarV2({ filters, setFilters }: Props) {
                  }
                  updateSection("location", { radiusUnit: val, radius: current });
                }}>
-                 <SelectTrigger className="h-6 w-[85px] text-[11px]"><SelectValue /></SelectTrigger>
-                 <SelectContent>
+                 <SelectTrigger className="h-6 w-[85px] text-[11px]" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectValue /></SelectTrigger>
+                 <SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>
                    <SelectItem value="m" className="text-[11px]">meters</SelectItem>
                    <SelectItem value="km" className="text-[11px]">kilometers</SelectItem>
                  </SelectContent>
@@ -295,7 +309,7 @@ export function SidebarV2({ filters, setFilters }: Props) {
                  />
                </div>
                <div className="w-[60px]">
-                 <Input 
+                 <Input style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }} 
                    type="number" 
                    aria-label="Exact radius"
                    min={filters.location.radiusUnit === "km" ? 0.05 : 50}
@@ -322,19 +336,19 @@ export function SidebarV2({ filters, setFilters }: Props) {
         {/* 2. Planning Zone */}
         <FilterCard title="Planning Zone" icon={<Map className="w-4 h-4" />} enabled={filters.planningZone.enabled} onToggle={enabled => updateSection("planningZone", { enabled, drawMode: enabled ? filters.planningZone.drawMode : null })}>
           <div className="space-y-3">
-             <Button size="sm" variant="secondary" className="w-full bg-[var(--surface-background-lvl1,#ffffff)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] hover:bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))] border-[var(--border-static-subtle-neutral,#e1e1e8)]" onClick={() => updateSection("planningZone", { drawMode: filters.planningZone.drawMode ? null : "circle" })}>
+             <Button size="sm" variant="secondary" className="w-full bg-[var(--surface-background-lvl1,#ffffff)] text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)] hover:bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))] border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)]" onClick={() => updateSection("planningZone", { drawMode: filters.planningZone.drawMode ? null : "circle" })}>
               {filters.planningZone.drawMode ? "Cancel Drawing" : "Draw on Map"}
             </Button>
             <Select value={filters.planningZone.drawMode ?? "circle"} onValueChange={(value: "circle" | "polygon") => updateSection("planningZone", { drawMode: value })}>
-              <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
-              <SelectContent><SelectItem value="circle">Circle</SelectItem><SelectItem value="polygon">Polygon</SelectItem></SelectContent>
+              <SelectTrigger className="h-8 text-sm" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectValue /></SelectTrigger>
+              <SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectItem value="circle">Circle</SelectItem><SelectItem value="polygon">Polygon</SelectItem></SelectContent>
             </Select>
             <div className="space-y-1">
-              {filters.planningZone.zones.map((zone, index) => <div key={zone.id} className="flex items-center justify-between rounded bg-[var(--surface-background-lvl2,#f7f7fa)] p-2 text-xs border border-[var(--border-static-subtle-neutral,#e1e1e8)]">
-                <span className="text-[var(--surface-foreground-static-neutral-lvl3,#717180)] truncate mr-2" title={zone.label || `Zone ${index + 1}`}>
+              {filters.planningZone.zones.map((zone, index) => <div key={zone.id} className="flex items-center justify-between rounded bg-[var(--surface-background-lvl2,#f7f7fa)] p-2 text-xs border border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)]">
+                <span className="text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)] truncate mr-2" title={zone.label || `Zone ${index + 1}`}>
                   {zone.label || `Zone ${index + 1}: ${zone.type === "circle" ? `${Math.round(zone.radius ?? 0)}m circle` : `${zone.points?.length ?? 0}-pt poly`}`}
                 </span>
-                <button aria-label={`Remove zone ${index + 1}`} className="text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)] hover:text-[var(--surface-foreground-static-error,#da294b)] shrink-0" onClick={() => updateSection("planningZone", { zones: filters.planningZone.zones.filter(z => z.id !== zone.id) })}><X className="h-3 w-3" /></button>
+                <button aria-label={`Remove zone ${index + 1}`} className="text-[var(--surface-foreground-dynamic-neutral-disabled,#a8a8b2)] hover:text-[var(--surface-foreground-dynamic-error-default,#da294b)] shrink-0" onClick={() => updateSection("planningZone", { zones: filters.planningZone.zones.filter(z => z.id !== zone.id) })}><X className="h-3 w-3" /></button>
               </div>)}
             </div>
           </div>
@@ -351,22 +365,22 @@ export function SidebarV2({ filters, setFilters }: Props) {
         {/* 5. Day Part */}
         <FilterCard title="Day Part" icon={<Clock className="w-4 h-4" />} enabled={filters.daypart.enabled} onToggle={enabled => updateSection("daypart", { enabled })}>
           <div className="space-y-3">
-            <div className="flex rounded bg-[var(--surface-background-lvl3,#ebebf0)] p-1">{(["presets", "custom"] as const).map(mode => <button key={mode} onClick={() => updateSection("daypart", { mode })} className={`flex-1 rounded py-1 text-xs font-medium ${filters.daypart.mode === mode ? "bg-[var(--surface-background-lvl1,#ffffff)] shadow text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]" : "text-[var(--surface-foreground-static-neutral-lvl3,#717180)]"}`}>{mode === "presets" ? "Presets" : "Custom"}</button>)}</div>
-            {filters.daypart.mode === "presets" ? <div className="grid grid-cols-2 gap-2">{DAYPART_PRESETS.map(preset => <button key={preset} onClick={() => updateSection("daypart", { presets: filters.daypart.presets.includes(preset) ? filters.daypart.presets.filter(p => p !== preset) : [...filters.daypart.presets, preset] })} className={`rounded border py-1.5 text-[11px] transition-colors ${filters.daypart.presets.includes(preset) ? "border-[var(--border-dynamic-brand-default,#7c33b5)] bg-[var(--container-dynamic-brand-subtle-background-default-regular,#f0e6f7)] text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)] font-medium" : "border-[var(--border-static-subtle-neutral,#e1e1e8)] text-[var(--surface-foreground-static-neutral-lvl3,#717180)] hover:border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]"}`}>{preset}</button>)}</div>
+            <div className="flex rounded bg-[var(--surface-background-lvl3,#ebebf0)] p-1">{(["presets", "custom"] as const).map(mode => <button key={mode} onClick={() => updateSection("daypart", { mode })} className={`flex-1 rounded py-1 text-xs font-medium ${filters.daypart.mode === mode ? "bg-[var(--surface-background-lvl1,#ffffff)] shadow text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)]" : "text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)]"}`}>{mode === "presets" ? "Presets" : "Custom"}</button>)}</div>
+            {filters.daypart.mode === "presets" ? <div className="grid grid-cols-2 gap-2">{DAYPART_PRESETS.map(preset => <button key={preset} onClick={() => updateSection("daypart", { presets: filters.daypart.presets.includes(preset) ? filters.daypart.presets.filter(p => p !== preset) : [...filters.daypart.presets, preset] })} className={`rounded border py-1.5 text-[11px] transition-colors ${filters.daypart.presets.includes(preset) ? "border-[var(--border-dynamic-brand-default,#7c33b5)] bg-[var(--container-dynamic-brand-subtle-background-default,#f0e6f7)] text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)] font-medium" : "border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)] text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)] hover:border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]"}`}>{preset}</button>)}</div>
               : (
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <Input aria-label="Start time" type="time" value={filters.daypart.customStart} onChange={e => updateSection("daypart", { customStart: e.target.value })} className="h-8 text-sm" />
+                    <Input style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }} aria-label="Start time" type="time" value={filters.daypart.customStart} onChange={e => updateSection("daypart", { customStart: e.target.value })} className="h-8 text-sm" />
                     <span>to</span>
-                    <Input aria-label="End time" type="time" value={filters.daypart.customEnd} onChange={e => updateSection("daypart", { customEnd: e.target.value })} className="h-8 text-sm" />
+                    <Input style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }} aria-label="End time" type="time" value={filters.daypart.customEnd} onChange={e => updateSection("daypart", { customEnd: e.target.value })} className="h-8 text-sm" />
                   </div>
                   {filters.daypart.customStart >= filters.daypart.customEnd && (
-                    <p className="text-[10px] text-[var(--surface-foreground-static-error,#da294b)] mt-1">Start time must be before end time. Overnight ranges not supported.</p>
+                    <p className="text-[10px] text-[var(--surface-foreground-dynamic-error-default,#da294b)] mt-1">Start time must be before end time. Overnight ranges not supported.</p>
                   )}
                 </div>
               )}
             <Select value={filters.daypart.applies} onValueChange={(applies: "Every Day" | "Weekdays" | "Weekends") => updateSection("daypart", { applies })}>
-              <SelectTrigger className="h-8"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Every Day">Every day</SelectItem><SelectItem value="Weekdays">Weekdays</SelectItem><SelectItem value="Weekends">Weekends</SelectItem></SelectContent>
+              <SelectTrigger className="h-8"><SelectValue /></SelectTrigger><SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectItem value="Every Day">Every day</SelectItem><SelectItem value="Weekdays">Weekdays</SelectItem><SelectItem value="Weekends" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>Weekends</SelectItem></SelectContent>
             </Select>
           </div>
         </FilterCard>
@@ -375,8 +389,8 @@ export function SidebarV2({ filters, setFilters }: Props) {
         <FilterCard title="Budget" icon={<Wallet className="w-4 h-4" />} enabled={filters.budget.enabled} onToggle={enabled => updateSection("budget", { enabled })}>
           <div className="space-y-3">
              <div>
-               <label htmlFor="dooh-budget" className="text-xs font-medium text-[var(--surface-foreground-static-neutral-lvl2,#282833)]">Total Budget (£)</label>
-               <Input 
+               <label htmlFor="dooh-budget" className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Total Budget (£)</label>
+               <Input style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }} 
                  id="dooh-budget"
                  type="number" min={0} step="100" 
                  value={filters.budget.total} 
@@ -385,8 +399,8 @@ export function SidebarV2({ filters, setFilters }: Props) {
                />
              </div>
              <div>
-               <label htmlFor="dooh-cpm" className="text-xs font-medium text-[var(--surface-foreground-static-neutral-lvl2,#282833)]">CPM Ceiling (£, Optional)</label>
-               <Input 
+               <label htmlFor="dooh-cpm" className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">CPM Ceiling (£, Optional)</label>
+               <Input style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }} 
                  id="dooh-cpm"
                  type="number" min={0} step=".01" 
                  value={filters.budget.cpm ?? ""} 
@@ -401,15 +415,15 @@ export function SidebarV2({ filters, setFilters }: Props) {
         <FilterCard title="Creative Type" icon={<MonitorPlay className="w-4 h-4" />} enabled={filters.creativeType.enabled} onToggle={enabled => updateSection("creativeType", { enabled })}>
           <div className="space-y-3">
             <div>
-              <label className="text-xs font-medium text-[var(--surface-foreground-static-neutral-lvl2,#282833)]">Format</label>
+              <label className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Format</label>
               <Select value={filters.creativeType.format || "any"} onValueChange={format => updateSection("creativeType", { format: format === "any" ? "" : format })}>
-                <SelectTrigger className="h-8 mt-1"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="any">Display + Video (Both)</SelectItem>{CREATIVE_FORMATS.map(f => <SelectItem value={f} key={f}>{f}</SelectItem>)}</SelectContent>
+                <SelectTrigger className="h-8 mt-1"><SelectValue /></SelectTrigger><SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectItem value="any" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>Display + Video (Both)</SelectItem>{CREATIVE_FORMATS.map(f => <SelectItem value={f} key={f}>{f}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-xs font-medium text-[var(--surface-foreground-static-neutral-lvl2,#282833)]">Resolution</label>
+              <label className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Resolution</label>
               <Select value={filters.creativeType.resolution || "any"} onValueChange={resolution => updateSection("creativeType", { resolution: resolution === "any" ? "" : resolution })}>
-                <SelectTrigger className="h-8 mt-1"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="any">Any</SelectItem>{RESOLUTIONS.map(r => <SelectItem value={r} key={r}>{r}</SelectItem>)}</SelectContent>
+                <SelectTrigger className="h-8 mt-1"><SelectValue /></SelectTrigger><SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectItem value="any" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>Any</SelectItem>{RESOLUTIONS.map(r => <SelectItem value={r} key={r}>{r}</SelectItem>)}</SelectContent>
               </Select>
             </div>
           </div>
@@ -428,7 +442,7 @@ export function SidebarV2({ filters, setFilters }: Props) {
                onFileError={handleScreenListFileError}
              />
              <Report report={screenListReport} screenList />
-             {screenListError && <p className="text-[11px] text-[var(--surface-foreground-static-error,#da294b)]" role="alert">{screenListError}</p>}
+             {screenListError && <p className="text-[11px] text-[var(--surface-foreground-dynamic-error-default,#da294b)]" role="alert">{screenListError}</p>}
              <Button type="button" variant="outline" size="sm" className="w-full" onClick={downloadScreenTemplate}>
                <Download className="h-3 w-3 mr-2" />Download sample CSV
              </Button>
@@ -453,13 +467,13 @@ function ScalarFacet({ title, icon, enabled, values, selected, onToggle, onSelec
 
 function FilterCard({ title, icon, enabled, onToggle, children }: { title: string; icon: ReactNode; enabled: boolean; onToggle: (enabled: boolean) => void; children: ReactNode }) {
   return (
-    <section data-annotate={`DOOH filters: ${title}`} className="border-b border-[var(--border-static-subtle-neutral,#e1e1e8)]">
+    <section data-annotate={`DOOH filters: ${title}`} className="border-b border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)]">
       <header className="px-4 py-3 flex items-center justify-between hover:bg-[var(--surface-background-lvl2,#f7f7fa)] transition-colors">
-        <div className="flex items-center gap-2.5 text-[var(--surface-foreground-static-neutral-lvl2,#282833)]">
+        <div className="flex items-center gap-2.5 text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">
           {icon}
           <span className="font-medium text-sm">{title}</span>
         </div>
-        <Switch checked={enabled} onCheckedChange={onToggle} className="data-[state=checked]:bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)]" />
+        <Switch checked={enabled} onCheckedChange={onToggle} style={{ backgroundColor: enabled ? "var(--container-dynamic-brand-bold-background-default, #7c33b5)" : "var(--controls-background-inactive, #4b4b59)" }} />
       </header>
       {enabled && <div className="px-4 pb-5 pt-1 animate-in slide-in-from-top-2">{children}</div>}
     </section>

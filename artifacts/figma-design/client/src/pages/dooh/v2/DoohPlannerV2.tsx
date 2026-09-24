@@ -202,7 +202,7 @@ export default function DoohPlannerV2() {
               />
             }
           >
-          {csvDownload && <div role="status" className="shrink-0 px-4 py-2 text-xs bg-[var(--container-dynamic-brand-subtle-background-default-regular,#f0e6f7)] text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]">
+          {csvDownload && <div role="status" className="shrink-0 px-4 py-2 text-xs bg-[var(--container-dynamic-brand-subtle-background-default,#f0e6f7)] text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]">
             CSV ready: {csvDownload.count.toLocaleString()} screen{csvDownload.count === 1 ? "" : "s"}.{" "}
             <a href={csvDownload.url} download="DOOH-Shortlist.csv" className="underline font-semibold">Download CSV again</a>
           </div>}
@@ -263,11 +263,25 @@ export default function DoohPlannerV2() {
             </div>
           )}
 
-        {view === "list" && <div className="flex-1 min-h-0 overflow-y-auto"><RightPanelV2 
+        {view === "list" && <div className="flex-1 flex flex-col min-h-0"><RightPanelV2 
           matchedScreens={matchedScreens}
           selectedScreens={selectedScreens}
           budget={filters.budget.enabled ? Number(filters.budget.total) : null}
           currency={filters.budget.currency}
+          selectedScreenIds={selectedScreenIds}
+          onSelect={(id, checked) => setSelectedScreenIds(prev => {
+            const next = new Set(prev);
+            if (checked) next.add(id);
+            else next.delete(id);
+            return next;
+          })}
+          onSelectMany={(ids, checked) => setSelectedScreenIds(prev => {
+            const next = new Set(prev);
+            ids.forEach(id => checked ? next.add(id) : next.delete(id));
+            return next;
+          })}
+          onHover={setHoveredScreenId}
+          highlightedScreenId={hoveredScreenId}
         /></div>}
           </SmartCard>
         </div>

@@ -3,12 +3,18 @@ import { Button } from "@/components/ui/button";
 import { EXCHANGE_RATES } from "./v2planner-sidebar";
 import { MetricsTile } from "@/components/ds/MetricsTile";
 import { SmartCard } from "./primitives";
+import { ScreenTableV2 } from "./v2planner-screen-table";
 
 interface Props {
   matchedScreens: ScreenData[];
   selectedScreens: ScreenData[];
   budget: number | null;
   currency: "GBP" | "EUR" | "USD";
+  selectedScreenIds: Set<string>;
+  onSelect: (id: string, checked: boolean) => void;
+  onSelectMany: (ids: string[], checked: boolean) => void;
+  onHover: (id: string | null) => void;
+  highlightedScreenId?: string | null;
 }
 
 const formatCurrency = (amount: number, currency: "GBP" | "EUR" | "USD") => {
@@ -91,30 +97,35 @@ export function RightPanelV2({
   matchedScreens,
   selectedScreens,
   budget,
-  currency
+  currency,
+  selectedScreenIds,
+  onSelect,
+  onSelectMany,
+  onHover,
+  highlightedScreenId
 }: Props) {
   return (
     <div className="w-full min-w-0 flex-1 bg-[var(--surface-background-lvl1,#ffffff)] flex flex-col">
-      <div className="flex-1 flex flex-col min-h-0 overflow-y-auto dooh-scrollbar p-6">
-        <SmartCard title="Plan Overview" ariaLabel="Plan Overview">
-          <PlanOverviewCards 
-            matchedScreens={matchedScreens} 
-            selectedScreens={selectedScreens} 
-            budget={budget} 
-            currency={currency} 
-            layout="horizontal" 
-          />
-        </SmartCard>
+      <div className="flex-1 flex flex-col min-h-0">
+        <ScreenTableV2 
+          screens={matchedScreens}
+          selectedScreenIds={selectedScreenIds}
+          currency={currency}
+          onSelect={onSelect}
+          onSelectMany={onSelectMany}
+          onHover={onHover}
+          highlightedScreenId={highlightedScreenId}
+        />
       </div>
       
       {/* Global Actions - Always visible at bottom */}
-      <div className="p-4 border-t border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--surface-background-lvl2,#f7f7fa)] shrink-0 space-y-3">
+      <div className="p-4 border-t border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)] bg-[var(--surface-background-lvl2,#f7f7fa)] shrink-0 space-y-3">
         <div className="flex gap-3">
           <Button disabled title="Activation not connected" className="flex-1 flex items-center justify-center gap-2 bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)] hover:bg-[var(--container-dynamic-brand-bold-background-hover,#702ea3)] text-[var(--container-dynamic-brand-bold-foreground-default,#ffffff)] disabled:opacity-50 disabled:bg-[var(--container-dynamic-neutral-subtle-background-disabled,#c6c6cc)]">
             ➜ Activate
           </Button>
         </div>
-        <p className="text-[11px] text-center text-[var(--surface-foreground-static-neutral-lvl3,#717180)] font-medium">Activation not connected.</p>
+        <p className="text-[11px] text-center text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)] font-medium">Activation not connected.</p>
       </div>
     </div>
   );

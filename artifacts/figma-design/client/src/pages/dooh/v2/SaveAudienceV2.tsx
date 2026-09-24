@@ -162,7 +162,7 @@ export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters,
       footer={footer}
     >
       <div className="flex flex-1 items-start relative mb-4">
-        <p className="[word-break:break-word] flex-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] min-w-px text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
+        <p className="[word-break:break-word] flex-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] min-w-px text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)]">
           {editId ? "Update this saved audience with your submitted filters, intelligence selections, and geographic results." : "Save your submitted filters, intelligence selections, and geographic results as a reusable audience."}{" "}
           You can then select it from Saved Audience in DOOH planning.
         </p>
@@ -170,7 +170,7 @@ export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters,
 
       <div className="w-full space-y-4">
         <div className="w-full">
-          <label htmlFor="audience-name" className="text-[length:var(--body-sm-medium-size,12px)] font-medium leading-[var(--body-sm-medium-line-height,18px)] mb-[var(--spacing-50,4px)] block" style={{ fontFamily: '"DM Sans", Helvetica', color: "var(--surface-foreground-static-neutral-lvl3, #717180)" }}>
+          <label htmlFor="audience-name" className="text-[length:var(--body-sm-medium-size,12px)] font-medium leading-[var(--body-sm-medium-line-height,18px)] mb-[var(--spacing-50,4px)] block" style={{ fontFamily: '"DM Sans", Helvetica', color: "var(--surface-foreground-dynamic-neutral-disabled, #717180)" }}>
             Audience Name *
           </label>
           <FiberInput 
@@ -184,17 +184,17 @@ export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters,
             disabled={isPending}
           />
           <div className="flex justify-between gap-3 mt-1 text-[11px] leading-snug">
-            <span className={validationError ? "text-[var(--surface-foreground-static-error,#da294b)]" : "text-[var(--surface-foreground-static-neutral-lvl3,#717180)]"}>
+            <span className={validationError ? "text-[var(--surface-foreground-dynamic-error-default,#da294b)]" : "text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)]"}>
               {validationError || "5–50 characters; letters, numbers, and hyphens only."}
             </span>
-            <span className={name.length > 50 ? "text-[var(--surface-foreground-static-error,#da294b)]" : "text-[var(--surface-foreground-static-neutral-lvl3,#717180)]"}>
+            <span className={name.length > 50 ? "text-[var(--surface-foreground-dynamic-error-default,#da294b)]" : "text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)]"}>
               {name.length}/50
             </span>
           </div>
         </div>
         
         <div className="w-full">
-          <label htmlFor="audience-desc" className="text-[length:var(--body-sm-medium-size,12px)] font-medium leading-[var(--body-sm-medium-line-height,18px)] mb-[var(--spacing-50,4px)] block" style={{ fontFamily: '"DM Sans", Helvetica', color: "var(--surface-foreground-static-neutral-lvl3, #717180)" }}>
+          <label htmlFor="audience-desc" className="text-[length:var(--body-sm-medium-size,12px)] font-medium leading-[var(--body-sm-medium-line-height,18px)] mb-[var(--spacing-50,4px)] block" style={{ fontFamily: '"DM Sans", Helvetica', color: "var(--surface-foreground-dynamic-neutral-disabled, #717180)" }}>
             Description (Optional)
           </label>
           <FiberTextarea 
@@ -206,7 +206,7 @@ export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters,
             rows={3}
             disabled={isPending}
           />
-          <div className="flex justify-end mt-1 text-[11px] leading-snug text-[var(--surface-foreground-static-neutral-lvl3,#717180)]">
+          <div className="flex justify-end mt-1 text-[11px] leading-snug text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)]">
             {description.length}/200
           </div>
         </div>
@@ -215,10 +215,10 @@ export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters,
           <div className="relative flex flex-1 items-start gap-2 min-w-px rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-warning-default,#ffc000)] bg-[var(--surface-background-lvl1,#ffffff)] p-4 shadow-sm w-full mt-2">
             <div className="flex w-full items-start gap-2 shrink-0">
               <div className="flex flex-1 flex-col items-start min-w-px">
-                <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] w-full">
+                <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)] w-full">
                   Warning
                 </p>
-                <p className="[word-break:break-word] mt-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
+                <p className="[word-break:break-word] mt-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)]">
                   An audience with this name already exists. Confirming will create a new version (e.g. {name}-v2).
                 </p>
               </div>
@@ -229,10 +229,10 @@ export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters,
           <div className="relative flex flex-1 items-start gap-2 min-w-px rounded-[var(--radiuses-small,2px)] border border-solid border-[#4facfe] bg-[var(--surface-background-lvl1,#ffffff)] p-4 shadow-sm w-full mt-2">
             <div className="flex w-full items-start gap-2 shrink-0">
               <div className="flex flex-1 flex-col items-start min-w-px">
-                <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] w-full">
+                <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)] w-full">
                   Advisory
                 </p>
-                <p className="[word-break:break-word] mt-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
+                <p className="[word-break:break-word] mt-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)]">
                   A similarly named audience already exists. Consider using a distinct name.
                 </p>
               </div>
@@ -243,10 +243,10 @@ export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters,
           <div className="relative flex flex-1 items-start gap-2 min-w-px rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-warning-default,#ffc000)] bg-[var(--surface-background-lvl1,#ffffff)] p-4 shadow-sm w-full mt-2">
             <div className="flex w-full items-start gap-2 shrink-0">
               <div className="flex flex-1 flex-col items-start min-w-px">
-                <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] w-full">
+                <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)] w-full">
                   Warning
                 </p>
-                <p className="[word-break:break-word] mt-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
+                <p className="[word-break:break-word] mt-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)]">
                   Another audience already uses this name. This may fail unless the name is changed.
                 </p>
               </div>
@@ -258,13 +258,13 @@ export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters,
           <div className="relative flex flex-1 items-start gap-2 min-w-px rounded-[var(--radiuses-small,2px)] border border-solid border-[var(--border-dynamic-error-default,#da294b)] bg-[var(--surface-background-lvl1,#ffffff)] p-4 shadow-sm w-full mt-2">
             <div className="flex w-full items-center gap-2 shrink-0">
               <div className="flex flex-1 flex-col items-start min-w-px">
-                <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] w-full">
+                <p className="[word-break:break-word] font-['DM_Sans',Helvetica] font-medium leading-[var(--body-md-medium-line-height,20px)] text-[length:var(--body-md-medium-size,14px)] text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)] w-full">
                   Error
                 </p>
-                <p className="[word-break:break-word] mt-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)]">
+                <p className="[word-break:break-word] mt-1 font-['DM_Sans',Helvetica] font-normal leading-[var(--body-md-regular-line-height,20px)] text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)]">
                   {saveError}
                 </p>
-                <button type="button" onClick={handleSave} className="mt-2 text-[var(--surface-foreground-static-error,#da294b)] underline font-medium text-sm">
+                <button type="button" onClick={handleSave} className="mt-2 text-[var(--surface-foreground-dynamic-error-default,#da294b)] underline font-medium text-sm">
                   Retry
                 </button>
               </div>

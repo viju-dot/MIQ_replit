@@ -53,7 +53,7 @@ export type MetricsValueProps = {
 export function MetricsValue({
   metricValue = "8.3% M",
   size = "Small",
-  color = "var(--surface-foreground-static-neutral-lvl1, #13131a)",
+  color = "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)",
 }: MetricsValueProps) {
   if (size === "Regular") {
     return (
@@ -114,7 +114,7 @@ export function MetricsCardContent({
         <UsersIcon />
         <div className="flex gap-0 items-center p-0 relative shrink-0 w-full">
           <div className="flex gap-[var(--spacing-100,8px)] items-center p-0 relative shrink-0">
-            <p className="[word-break:break-word] font-[var(--body-sm-regular-family,'DM_Sans')] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-static-neutral-lvl3,#717180)] text-center whitespace-nowrap">
+            <p className="[word-break:break-word] font-[var(--body-sm-regular-family,'DM_Sans')] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#717180)] text-center whitespace-nowrap">
               {descriptionText}
             </p>
           </div>
@@ -123,7 +123,7 @@ export function MetricsCardContent({
         <div className="flex gap-[var(--spacing-75,6px)] items-end p-0 relative shrink-0">
           <MetricsValue metricValue={metricValue} />
           <div className="flex gap-[var(--spacing-100,8px)] items-center pb-[var(--spacing-25,2px)] pt-0 px-0 relative shrink-0">
-            <p className="[word-break:break-word] font-[var(--body-sm-regular-family,'DM_Sans')] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-static-neutral-lvl2,#282833)] text-center whitespace-nowrap">
+            <p className="[word-break:break-word] font-[var(--body-sm-regular-family,'DM_Sans')] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)] text-center whitespace-nowrap">
               {metricsName}
             </p>
           </div>
@@ -137,7 +137,7 @@ export function MetricsCardContent({
                 </p>
               </div>
             </div>
-            <p className="[word-break:break-word] font-[var(--body-sm-regular-family,'DM_Sans')] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-static-neutral-lvl2,#282833)] text-center whitespace-nowrap">
+            <p className="[word-break:break-word] font-[var(--body-sm-regular-family,'DM_Sans')] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)] text-center whitespace-nowrap">
               {bottomText}
             </p>
           </div>
@@ -373,14 +373,14 @@ export function MetricsTileCompact({
       <div className="flex flex-col gap-[var(--spacing-75,6px)] items-start p-0 relative shrink-0">
         <div className="flex gap-[var(--spacing-75,6px)] items-end p-0 relative shrink-0">
           <div className="flex items-center justify-center relative shrink-0">
-            <p className="[word-break:break-word] font-[var(--headline-sm-semibold-family,'DM_Sans')] font-semibold leading-[var(--headline-sm-semibold-line-height,28px)] not-italic relative shrink-0 text-[length:var(--headline-sm-semibold-size,20px)] text-[var(--surface-foreground-static-neutral-lvl1,#13131a)] text-center tracking-[-0.2px] w-[68px]">
+            <p className="[word-break:break-word] font-[var(--headline-sm-semibold-family,'DM_Sans')] font-semibold leading-[var(--headline-sm-semibold-line-height,28px)] not-italic relative shrink-0 text-[length:var(--headline-sm-semibold-size,20px)] text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)] text-center tracking-[-0.2px] w-[68px]">
               {metricValue}
             </p>
           </div>
         </div>
         <div className="flex gap-0 items-center p-0 relative shrink-0 w-full">
           <div className="flex gap-[var(--spacing-100,8px)] items-center p-0 relative shrink-0">
-            <p className="[word-break:break-word] font-[var(--body-sm-regular-family,'DM_Sans')] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-static-neutral-lvl2,#282833)] text-center whitespace-nowrap">
+            <p className="[word-break:break-word] font-[var(--body-sm-regular-family,'DM_Sans')] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic relative shrink-0 text-[length:var(--body-sm-regular-size,12px)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)] text-center whitespace-nowrap">
               {descriptionText}
             </p>
           </div>

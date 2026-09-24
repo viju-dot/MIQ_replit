@@ -75,7 +75,7 @@ function MapView({ points, market }: { points: any[], market: string }) {
         >
           <Popup>
             <div className="font-semibold">{point.postcode}</div>
-            <div className="text-gray-600">{point.city}</div>
+            <div className="text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]">{point.city}</div>
           </Popup>
         </CircleMarker>
       ))}
@@ -200,15 +200,15 @@ export default function GeoPlannerV2() {
 
   // Loading/Error states
   if (editId && audiencesQuery.isLoading) {
-    return <div className="flex-1 flex items-center justify-center text-gray-600">Loading audience...</div>;
+    return <div className="flex-1 flex items-center justify-center text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]">Loading audience...</div>;
   }
   
   if (editId && (audiencesQuery.isError || notFound)) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-8">
         <div className="text-center">
-          <p className="font-semibold text-gray-900">{audiencesQuery.isError ? "Failed to load audience" : "Audience not found"}</p>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="font-semibold text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)]">{audiencesQuery.isError ? "Failed to load audience" : "Audience not found"}</p>
+          <p className="text-sm text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)] mt-2">
             {audiencesQuery.isError ? "Cannot fetch the audience details from the server." : "The requested audience does not exist or has been deleted."}
           </p>
           <Button className="mt-4" onClick={() => {
@@ -371,10 +371,10 @@ export default function GeoPlannerV2() {
                 <MapPin className="w-5 h-5 mr-2 text-[var(--dooh-accent)]" />
                 Audience Definition
               </h3>
-              <ul className="space-y-2 text-sm text-gray-700">
+              <ul className="space-y-2 text-sm text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)]">
                 {results.details.map((detail, idx) => (
                   <li key={idx} className="flex items-start">
-                    <ChevronRight className="w-4 h-4 mr-2 mt-0.5 text-gray-400 shrink-0" />
+                    <ChevronRight className="w-4 h-4 mr-2 mt-0.5 text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)] shrink-0" />
                     <span className={detail.startsWith('Note:') ? 'text-amber-600 font-medium' : ''}>
                       {detail}
                     </span>
@@ -385,28 +385,28 @@ export default function GeoPlannerV2() {
 
             <div className="grid grid-cols-2 gap-6">
               <div className="v2-card">
-                <h3 className="text-md font-bold text-gray-600 mb-2">Coverage</h3>
+                <h3 className="text-md font-bold text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)] mb-2">Coverage</h3>
                 <div className="text-3xl font-bold text-[var(--dooh-purple)]">
                   {results.coverage}
                 </div>
               </div>
 
               <div className="v2-card">
-                <h3 className="text-md font-bold text-gray-600 mb-2 flex items-center">
+                <h3 className="text-md font-bold text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)] mb-2 flex items-center">
                   Intelligence Summary
-                  <Info className="w-3 h-3 ml-2 text-gray-400" />
+                  <Info className="w-3 h-3 ml-2 text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)]" />
                 </h3>
-                <div className="text-sm text-gray-700 space-y-1">
-                  <div><span className="text-gray-500">Average Spend:</span> <strong className="text-gray-900">{results.summary.avgSpend}</strong></div>
-                  <div><span className="text-gray-500">Index:</span> <strong className="text-gray-900">{results.summary.index}</strong> <span className="text-xs text-gray-400">(Avg: 100)</span></div>
+                <div className="text-sm text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)] space-y-1">
+                  <div><span className="text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)]">Average Spend:</span> <strong className="text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)]">{results.summary.avgSpend}</strong></div>
+                  <div><span className="text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)]">Index:</span> <strong className="text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)]">{results.summary.index}</strong> <span className="text-xs text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)]">(Avg: 100)</span></div>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="v2-card p-0 overflow-hidden flex flex-col">
-            <div className="p-4 border-b border-gray-100 bg-gray-50">
-              <h3 className="font-bold text-gray-700">Geographic Distribution</h3>
+            <div className="p-4 border-b border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)] bg-[var(--surface-background-lvl2,#f7f7fa)]">
+              <h3 className="font-bold text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)]">Geographic Distribution</h3>
             </div>
             <div className="flex-1 min-h-[400px]">
               <MapView points={results.points} market={submittedFilters.market} />

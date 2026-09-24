@@ -38,12 +38,12 @@ const noop = () => undefined;
 // Fiber Colors mapping:
 const getColorBySource = (source?: string | null) => {
   switch (source) {
-    case "postcode": return "var(--surface-foreground-static-success, #059669)";
-    case "poi": return "var(--surface-foreground-static-info, #2563eb)";
+    case "postcode": return "var(--surface-foreground-dynamic-success-default, #059669)";
+    case "poi": return "var(--surface-foreground-dynamic-info-default, #2563eb)";
     case "audience": return "var(--container-dynamic-brand-bold-background-default, #7c33b5)";
-    case "latlng": return "var(--surface-foreground-static-info, #2563eb)";
-    case "screenlist": return "var(--surface-foreground-static-warning, #b45309)";
-    default: return "var(--surface-foreground-static-error, #dc2626)";
+    case "latlng": return "var(--surface-foreground-dynamic-info-default, #2563eb)";
+    case "screenlist": return "var(--surface-foreground-dynamic-warning-default, #b45309)";
+    default: return "var(--surface-foreground-dynamic-error-default, #dc2626)";
   }
 };
 
@@ -54,7 +54,7 @@ const pinIcon = (active: boolean, color: string, isSelected: boolean = false, is
     className: "",
     iconSize: active ? [24, 24] : [18, 18],
     iconAnchor: active ? [12, 12] : [9, 9],
-    html: `<span style="display:block;width:100%;height:100%;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${active ? "var(--surface-foreground-static-neutral-lvl1, #13131a)" : color};border:2px solid ${borderColor};box-shadow:0 2px 6px var(--shadow-lvl8, rgba(113,113,128,0.15))${glow};transition:all 0.2s ease;"></span>`,
+    html: `<span style="display:block;width:100%;height:100%;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${active ? "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" : color};border:2px solid ${borderColor};box-shadow:0 2px 6px var(--shadow-lvl8, rgba(113,113,128,0.15))${glow};transition:all 0.2s ease;"></span>`,
   });
 };
 
@@ -297,7 +297,7 @@ function ClusteredScreens({
                 ]);
                 return (
                   <Fragment key={screen.id}>
-                    <Polyline positions={[center, endpoint]} pathOptions={{ color: "var(--border-static-subtle-neutral, #e1e1e8)", weight: 2 }} />
+                    <Polyline positions={[center, endpoint]} pathOptions={{ color: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", weight: 2 }} />
                     {screenMarker(screen, endpoint)}
                   </Fragment>
                 );

@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect, CSSProperties, ReactNode } from "react";
 
 export const FONT = '"DM Sans", Helvetica';
-export const MUTED = "var(--surface-foreground-static-neutral-lvl3, #717180)";
-export const TITLE = "var(--surface-foreground-static-neutral-lvl1, #13131a)";
+export const MUTED = "var(--surface-foreground-dynamic-neutral-default-regular, #717180)";
+export const TITLE = "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)";
 export const CARD_BG = "var(--surface-background-lvl1, #ffffff)";
 export const CARD_SHADOW = "0px 1px 4px 0px var(--shadow-lvl8, rgba(113,113,128,0.08)), 0px 8px 16px 0px var(--shadow-lvl4, rgba(113,113,128,0.04))";
-export const GRID = "var(--border-static-subtle-neutral, #e1e1e8)";
+export const GRID = "var(--border-dynamic-neutral-subtle-default, #e1e1e8)";
 
 export type Option = { value: string; label: string };
 
@@ -155,10 +155,10 @@ export function FiberButton({
       : hover
         ? "var(--container-dynamic-neutral-subtle-background-hover, rgba(113,113,128,0.08))"
         : "var(--surface-background-lvl2, #f7f7fa)";
-    style.border = "1px solid var(--border-static-subtle-neutral, #e1e1e8)";
+    style.border = "1px solid var(--border-dynamic-neutral-subtle-default, #e1e1e8)";
     style.color = inactive
       ? "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)"
-      : "var(--surface-foreground-static-neutral-lvl1, #13131a)";
+      : "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)";
   } else {
     style.border = `1px solid ${
       inactive
@@ -229,7 +229,7 @@ export function IconButton({
       className="flex size-8 items-center justify-center rounded-[var(--radius-25,2px)] transition-colors focus:outline-none focus-visible:ring-2"
       style={{
         backgroundColor: hover && !inactive ? "var(--container-dynamic-error-subtle-background-selected, #ffedef)" : "transparent",
-        color: hover && !inactive ? "var(--surface-foreground-static-error, #da294b)" : "var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59)",
+        color: hover && !inactive ? "var(--surface-foreground-dynamic-error-default, #da294b)" : "var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59)",
       }}
     >
       <IconComponent size={20} />
@@ -376,14 +376,14 @@ export function SearchableDropdown({
           }}
         >
           {options.length > 5 && (
-            <div className="p-2 border-b border-gray-100">
+            <div className="p-2 border-b border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)]">
               <input
                 type="text"
                 autoFocus
                 placeholder="Search..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full text-sm outline-none px-2 py-1 border border-gray-200 rounded"
+                className="w-full text-sm outline-none px-2 py-1 border border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)] rounded bg-transparent text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)]"
               />
             </div>
           )}
@@ -409,7 +409,7 @@ export function SearchableDropdown({
                       setOpen(false);
                     }}
                     onMouseEnter={() => setFocusedIndex(idx)}
-                    className={`flex w-full items-center justify-between px-3 py-2 text-left focus:outline-none ${isFocused ? 'bg-gray-50' : ''}`}
+                    className={`flex w-full items-center justify-between px-3 py-2 text-left focus:outline-none ${isFocused ? 'bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))]' : ''}`}
                   >
                     <span
                       className="truncate text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)]"
