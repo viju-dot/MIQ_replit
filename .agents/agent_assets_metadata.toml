@@ -28,3 +28,17 @@ mtime_ms = 1788162969675
 storage_uri = "gcs://replit-rams-assets-spock/rams/assets/repl:85adb4f5-ad43-439c-b429-d15bb0ed940c/3c179040-4788-4fa7-ace5-92d7b845bd5e/e8e49272-9aff-4269-8732-2b3e92e68bb0"
 storage_version_token = "1788162984677171"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "iggUdZF1x1GmWNKMox9kV"
+uri = "file://artifacts/figma-design/dooh-v3-upload-preview.mp4"
+type = "video"
+title = "DOOH V3 upload preview walkthrough"
+description = "21-second live V3 walkthrough showing the postcode, lat/long, and screen-list upload areas, their Overall preview summaries, and the searchable Full preview Fiber modal."
+logical_id = "e40ee9f0-6dcc-45a0-acb4-bf964c386454"
+content_hash = "sha256:ea45144e858e804f43b09d7cea0a6926bbcdd1d850cf053f5a30a68e852e3fc2"
+size = 114775
+mtime_ms = 1790248473965
+storage_uri = "gcs://replit-rams-assets-spock/rams/assets/repl:85adb4f5-ad43-439c-b429-d15bb0ed940c/e40ee9f0-6dcc-45a0-acb4-bf964c386454/e640c7b6-79db-4ba7-9dfa-7d6a92f1e8ee"
+storage_version_token = "1790248477321507"
+content_type = "video/mp4"
