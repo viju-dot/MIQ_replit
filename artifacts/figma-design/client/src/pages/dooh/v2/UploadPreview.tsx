@@ -16,6 +16,7 @@ interface UploadPreviewProps {
   report: UploadReport;
   selectedKeys: Set<string>;
   noun: string;
+  selectionOnly?: boolean;
   onToggle: (key: string) => void;
   onRemoveFile: () => void;
 }
@@ -78,6 +79,7 @@ export function UploadPreview({
   report,
   selectedKeys,
   noun,
+  selectionOnly = false,
   onToggle,
   onRemoveFile,
 }: UploadPreviewProps) {
@@ -124,12 +126,19 @@ export function UploadPreview({
           </FiberButton>
         </div>
         <p className="break-all" style={{ color: mutedColor }}>{fileName}</p>
-        <div className="grid grid-cols-2 gap-x-3 gap-y-1 sm:grid-cols-4">
-          <span>Uploaded: <strong>{totalUploaded}</strong></span>
-          <span>Usable: <strong>{report.valid}</strong></span>
-          <span>Selected: <strong>{selectedCount}</strong></span>
-          <span>Not selected: <strong>{records.length - selectedCount}</strong></span>
-        </div>
+        {selectionOnly ? (
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+            <span>Selected: <strong>{selectedCount}</strong></span>
+            <span>Not selected: <strong>{records.length - selectedCount}</strong></span>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1 sm:grid-cols-4">
+            <span>Uploaded: <strong>{totalUploaded}</strong></span>
+            <span>Usable: <strong>{report.valid}</strong></span>
+            <span>Selected: <strong>{selectedCount}</strong></span>
+            <span>Not selected: <strong>{records.length - selectedCount}</strong></span>
+          </div>
+        )}
         {invalidCount > 0 && (
           <p style={{ color: "var(--surface-foreground-static-warning, #b45309)" }}>
             Validation issues: {invalidCount}

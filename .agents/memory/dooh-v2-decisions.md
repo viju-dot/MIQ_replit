@@ -80,3 +80,9 @@ The V3 demo preset should populate every non-audience Match Source input.
 **Why:** The demo is used to explain the Match Source legend and must visibly demonstrate each supported source rather than leaving Lat/Long or POI empty.
 
 **How to apply:** Seed valid Postcode and Lat/Long upload records, select a real POI, and keep Planning Zone enabled; leave Geo Planner unpopulated unless the demo explicitly includes a saved audience.
+
+Location upload cards should prioritize the uploaded-file summary before the replacement drop zone.
+
+**Why:** Reviewers need to see the current filename and selection state first, while sample-format details add noise to the Postcode and Lat/Long workflow.
+
+**How to apply:** For both methods, show Overall preview with filename, Selected, Not selected, Full preview, and Remove file; omit the sample-format accordion and place Download sample CSV after the drop zone.

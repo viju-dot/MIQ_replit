@@ -3,7 +3,7 @@ import { FiberDropZone } from "@/components/FiberDropZone";
 import { MOCK_POSTCODES } from "../data";
 import type { UploadReport } from "../uploadHelpers";
 import { FiberButton } from "./primitives";
-import { UploadPreview, UploadPreviewOptions, type UploadPreviewRecord } from "./UploadPreview";
+import { UploadPreview, type UploadPreviewRecord } from "./UploadPreview";
 
 type Method = "postcode" | "latlng";
 
@@ -40,17 +40,18 @@ export function LocationUpload({ method, file, fileState, report, records, selec
     <p className="text-xs" style={{ color: "var(--surface-foreground-static-neutral-lvl3, #717180)" }}>
       {method === "postcode" ? "CSV with a postcode column, one postcode per row. This prototype recognises demo postcodes only; the sample contains supported examples." : "CSV with lat and lng columns, one coordinate pair per row. Latitude: −90 to 90; longitude: −180 to 180."}
     </p>
-    <FiberButton variant="outline" size="compact" className="w-full" ariaLabel={`Download ${method === "postcode" ? "postcode" : "latitude and longitude"} sample CSV`} onClick={() => downloadSample(method)}>
-      <Download size={14} aria-hidden />Download sample CSV
-    </FiberButton>
-    <details className="rounded border p-2 text-xs" style={{ borderColor: "var(--border-static-subtle-neutral, #e1e1e8)", background: "var(--surface-background-lvl2, #f7f7fa)" }}>
-      <summary className="cursor-pointer font-medium">Preview sample format</summary>
-      <pre className="mt-2 overflow-auto text-xs">{locationSample(method)}</pre>
-    </details>
-    <UploadPreviewOptions
-      hasFile={Boolean(file)}
-      ready={Boolean(file && report && fileState === "Uploaded")}
-    />
+    {file && report && fileState === "Uploaded" && (
+      <UploadPreview
+        fileName={file.name}
+        records={records}
+        selectedKeys={selectedKeys}
+        report={report}
+        noun={label}
+        selectionOnly
+        onToggle={onToggleRecord}
+        onRemoveFile={onRemove}
+      />
+    )}
     <FiberDropZone
       accept=".csv,text/csv"
       acceptLabel="Only .csv files supported"
@@ -60,16 +61,8 @@ export function LocationUpload({ method, file, fileState, report, records, selec
       onFileRemove={onRemove}
       onFileError={onError}
     />
-    {file && report && fileState === "Uploaded" && (
-      <UploadPreview
-        fileName={file.name}
-        records={records}
-        selectedKeys={selectedKeys}
-        report={report}
-        noun={label}
-        onToggle={onToggleRecord}
-        onRemoveFile={onRemove}
-      />
-    )}
+    <FiberButton variant="outline" size="compact" className="w-full" ariaLabel={`Download ${method === "postcode" ? "postcode" : "latitude and longitude"} sample CSV`} onClick={() => downloadSample(method)}>
+      <Download size={14} aria-hidden />Download sample CSV
+    </FiberButton>
   </div>;
 }
