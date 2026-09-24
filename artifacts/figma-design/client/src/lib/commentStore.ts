@@ -552,10 +552,15 @@ export async function hydrateComments(prototypeId: string): Promise<void> {
     // them instead of silently discarding browser-local collaboration data.
     cacheComments(prototypeId, [...remote, ...migrated, ...migrationFailed]);
   } catch (error) {
-    apiComments = apiComments.filter(
-      (comment) => comment.prototypeId !== prototypeId,
-    );
-    console.warn("[prototype-comments] API unavailable; showing empty state", error);
+    // Keep the last browser-local copy visible if the shared API is temporarily
+    // unavailable. A transient network/deployment restart must not make review
+    // history appear to vanish on refresh; the next interval or navigation
+    // retries the database hydration.
+    apiComments = [
+      ...apiComments.filter((comment) => comment.prototypeId !== prototypeId),
+      ...readAll().filter((comment) => comment.prototypeId === prototypeId),
+    ];
+    console.warn("[prototype-comments] API unavailable; showing cached state", error);
   }
 }
 

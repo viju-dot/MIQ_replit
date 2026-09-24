@@ -4,11 +4,11 @@ import { Clock, Download, LayoutDashboard, List, Map, MapPin, MonitorPlay, Targe
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger as BaseSelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/pages/ds/CheckPage";
 import { useAudiences, useIncrementAudienceUse } from "../api";
 import { CREATIVE_FORMATS, DAYPART_PRESETS, MOCK_POIS, MOCK_POSTCODES, PUBLISHERS, RESOLUTIONS, SCREENS, VENUES, getDistance } from "../data";
 import { downloadScreenTemplate, parseCoordinateCsv, parsePostcodeCsv, parseScreenList, type UploadedLocationRecord, type UploadedScreenRecord, type UploadReport } from "../uploadHelpers";
-import { FiberSlider, FiberRadio, FiberButton, SmartCard } from "./primitives";
+import { FiberSlider, FiberButton, SmartCard } from "./primitives";
 import { FiberRoundedTabsBar, FiberTabButton } from "@/components/FiberTabItem";
 import { PoiSearch } from "./PoiSearch";
 import { FiberDropZone } from "@/components/FiberDropZone";
@@ -465,6 +465,16 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
     });
   };
 
+  const planningZoneFreehand = filters.planningZone.drawCircleRadius === "";
+  const planningZoneRadiusMin = filters.planningZone.drawCircleUnit === "km" ? 0.05 : 50;
+  const planningZoneRadiusMax = filters.planningZone.drawCircleUnit === "km" ? 10 : 10000;
+  const planningZoneRadius = planningZoneFreehand
+    ? planningZoneRadiusMin
+    : Math.min(
+        planningZoneRadiusMax,
+        Math.max(planningZoneRadiusMin, Number(filters.planningZone.drawCircleRadius) || planningZoneRadiusMin),
+      );
+
   return (
     <div data-annotate="DOOH filter panel" className="w-[300px] xl:w-[340px] shrink-0 bg-[var(--surface-background-lvl2,#f7f7fa)] flex flex-col z-20 overflow-y-auto">
       <SmartCard title="DOOH Filters" ariaLabel="DOOH Filters">
@@ -612,43 +622,40 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
           }
         }}>
           <div className="space-y-4">
-             <div className="flex items-center gap-4">
-               <FiberRadio 
-                 name="drawShape"
-                 value="circle"
-                 selected={filters.planningZone.drawShape === "circle"} 
-                 labelText="Circle" 
-                 onSelect={() => {
-                   updateSection("planningZone", { drawShape: "circle", drawMode: null });
-                 }} 
-               />
-               <FiberRadio 
-                 name="drawShape"
-                 value="polygon"
-                 selected={filters.planningZone.drawShape === "polygon"} 
-                 labelText="Polygon" 
-                 onSelect={() => {
-                   updateSection("planningZone", { drawShape: "polygon", drawMode: null });
-                 }} 
-               />
+              <div role="group" aria-label="Planning zone shape">
+                <FiberRoundedTabsBar wrap={false}>
+                  <FiberTabButton
+                    label="Circle"
+                    selected={filters.planningZone.drawShape === "circle"}
+                    onClick={() => updateSection("planningZone", { drawShape: "circle", drawMode: null })}
+                  />
+                  <FiberTabButton
+                    label="Polygon"
+                    selected={filters.planningZone.drawShape === "polygon"}
+                    onClick={() => updateSection("planningZone", { drawShape: "polygon", drawMode: null })}
+                  />
+                </FiberRoundedTabsBar>
              </div>
 
              {filters.planningZone.drawShape === "circle" && (
                <div className="space-y-3">
                  <div className="flex items-center justify-between">
                    <label className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Radius (optional)</label>
-                   <Select value={filters.planningZone.drawCircleUnit} onValueChange={(val: "m"|"km") => {
-                     if (filters.planningZone.drawCircleRadius === "") {
-                       updateSection("planningZone", { drawCircleUnit: val, drawMode: null });
-                     } else {
-                       let current = Number(filters.planningZone.drawCircleRadius);
-                       if (val === "km" && filters.planningZone.drawCircleUnit === "m") {
-                         current = current / 1000;
-                       } else if (val === "m" && filters.planningZone.drawCircleUnit === "km") {
-                         current = current * 1000;
-                       }
-                       updateSection("planningZone", { drawCircleUnit: val, drawCircleRadius: String(current), drawMode: null });
-                     }
+                    <Select disabled={planningZoneFreehand} value={filters.planningZone.drawCircleUnit} onValueChange={(val: "m"|"km") => {
+                      if (planningZoneFreehand) return;
+                      let current = Number(filters.planningZone.drawCircleRadius) || planningZoneRadiusMin;
+                      if (val === "km" && filters.planningZone.drawCircleUnit === "m") {
+                        current /= 1000;
+                      } else if (val === "m" && filters.planningZone.drawCircleUnit === "km") {
+                        current *= 1000;
+                      }
+                      const nextMin = val === "km" ? 0.05 : 50;
+                      const nextMax = val === "km" ? 10 : 10000;
+                      updateSection("planningZone", {
+                        drawCircleUnit: val,
+                        drawCircleRadius: String(Math.min(nextMax, Math.max(nextMin, current))),
+                        drawMode: null,
+                      });
                      setDrawError("");
                    }}>
                      <SelectTrigger className="h-6 w-[85px] text-[11px]" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectValue /></SelectTrigger>
@@ -658,22 +665,52 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
                      </SelectContent>
                    </Select>
                  </div>
-                 <Input 
-                   style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }} 
-                   type="number" 
-                   aria-label="Circle radius"
-                   placeholder="Freehand if empty"
-                   min={filters.planningZone.drawCircleUnit === "km" ? 0.05 : 50}
-                   max={filters.planningZone.drawCircleUnit === "km" ? 10 : 10000}
-                   step="any"
-                   value={filters.planningZone.drawCircleRadius} 
-                   onChange={e => {
-                     updateSection("planningZone", { drawCircleRadius: e.target.value, drawMode: null });
-                     setDrawError("");
-                   }} 
-                   className="h-8 text-sm" 
-                 />
-                 <div className="text-[11px] text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)] leading-tight">Leave empty to draw freely</div>
+                  <div className="flex items-center gap-3">
+                    <div className="min-w-0 flex-1">
+                      <FiberSlider
+                        value={planningZoneRadius}
+                        min={planningZoneRadiusMin}
+                        max={planningZoneRadiusMax}
+                        step={filters.planningZone.drawCircleUnit === "km" ? 0.05 : 50}
+                        disabled={planningZoneFreehand}
+                        ariaLabel="Planning zone radius"
+                        onChange={value => {
+                          updateSection("planningZone", { drawCircleRadius: String(value), drawMode: null });
+                          setDrawError("");
+                        }}
+                      />
+                    </div>
+                    <Input
+                      style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-variation, #13131a)" }}
+                      type="number"
+                      aria-label="Exact planning zone radius"
+                      min={planningZoneRadiusMin}
+                      max={planningZoneRadiusMax}
+                      step="any"
+                      disabled={planningZoneFreehand}
+                      value={planningZoneFreehand ? "" : filters.planningZone.drawCircleRadius}
+                      placeholder={planningZoneFreehand ? "Freehand" : undefined}
+                      onChange={e => {
+                        const value = e.target.value;
+                        updateSection("planningZone", {
+                          drawCircleRadius: value === "" ? "" : String(Math.min(planningZoneRadiusMax, Math.max(planningZoneRadiusMin, Number(value)))),
+                          drawMode: null,
+                        });
+                        setDrawError("");
+                      }}
+                      className="h-7 w-[60px] px-2 text-xs"
+                    />
+                  </div>
+                  <div className="flex items-center">
+                    <Checkbox
+                      labelValue="Freehand draw"
+                      variant={planningZoneFreehand ? "Checked" : "Unchecked"}
+                      onToggle={() => updateSection("planningZone", {
+                        drawCircleRadius: planningZoneFreehand ? String(planningZoneRadiusMin) : "",
+                        drawMode: null,
+                      })}
+                    />
+                  </div>
                  <FiberButton 
                    variant="secondary" 
                    className="w-full" 
@@ -733,7 +770,10 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
         {/* 5. Day Part */}
         <FilterCard title="Day Part" icon={<Clock className="w-4 h-4" />} enabled={filters.daypart.enabled} onToggle={enabled => updateSection("daypart", { enabled })}>
           <div className="space-y-3">
-            <div className="flex rounded bg-[var(--surface-background-lvl3,#ebebf0)] p-1">{(["presets", "custom"] as const).map(mode => <button key={mode} onClick={() => updateSection("daypart", { mode })} className={`flex-1 rounded py-1 text-xs font-medium ${filters.daypart.mode === mode ? "bg-[var(--surface-background-lvl1,#ffffff)] shadow text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)]" : "text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)]"}`}>{mode === "presets" ? "Presets" : "Custom"}</button>)}</div>
+             <FiberRoundedTabsBar wrap={false}>
+               <FiberTabButton label="Presets" selected={filters.daypart.mode === "presets"} onClick={() => updateSection("daypart", { mode: "presets" })} />
+               <FiberTabButton label="Custom" selected={filters.daypart.mode === "custom"} onClick={() => updateSection("daypart", { mode: "custom" })} />
+             </FiberRoundedTabsBar>
             {filters.daypart.mode === "presets" ? <div className="grid grid-cols-2 gap-2">{DAYPART_PRESETS.map(preset => <button key={preset} onClick={() => updateSection("daypart", { presets: filters.daypart.presets.includes(preset) ? filters.daypart.presets.filter(p => p !== preset) : [...filters.daypart.presets, preset] })} className={`rounded border py-1.5 text-[11px] transition-colors ${filters.daypart.presets.includes(preset) ? "border-[var(--border-dynamic-brand-default,#7c33b5)] bg-[var(--container-dynamic-brand-subtle-background-default,#f0e6f7)] text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)] font-medium" : "border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)] text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)] hover:border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]"}`}>{preset}</button>)}</div>
               : (
                 <div className="space-y-1">
@@ -825,9 +865,9 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
                 />
               )}
              {screenListError && <p className="text-[11px] text-[var(--surface-foreground-dynamic-error-default,#da294b)]" role="alert">{screenListError}</p>}
-             <Button type="button" variant="outline" size="sm" className="w-full" onClick={downloadScreenTemplate}>
-               <Download className="h-3 w-3 mr-2" />Download sample CSV
-             </Button>
+             <FiberButton variant="outline" size="compact" className="w-full" ariaLabel="Download screen list sample CSV" onClick={downloadScreenTemplate}>
+               <Download size={14} aria-hidden />Download sample CSV
+             </FiberButton>
            </div>
          </FilterCard>
 

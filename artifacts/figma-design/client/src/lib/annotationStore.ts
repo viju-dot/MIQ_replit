@@ -743,11 +743,16 @@ export async function hydrateAnnotations(prototypeId: string): Promise<void> {
       ...migrationFailed,
     ]);
   } catch (error) {
-    apiAnnotations = apiAnnotations.filter(
-      (annotation) => annotation.prototypeId !== prototypeId,
-    );
+    // Keep the last browser-local copy visible if the shared API is temporarily
+    // unavailable. A transient network/deployment restart must not make design
+    // feedback appear to vanish on refresh; the next interval retries the
+    // database hydration.
+    apiAnnotations = [
+      ...apiAnnotations.filter((annotation) => annotation.prototypeId !== prototypeId),
+      ...readAll().filter((annotation) => annotation.prototypeId === prototypeId),
+    ];
     console.warn(
-      "[prototype-annotations] API unavailable; showing empty state",
+      "[prototype-annotations] API unavailable; showing cached state",
       error,
     );
   }

@@ -1786,20 +1786,32 @@ export function PrototypeCollabOverlay({
       );
   }, []);
 
-  // Hydrate the shared Postgres-backed stores whenever the prototype changes.
-  // Both loaders handle API failures internally and expose an empty, safe state.
+  // Hydrate the shared Postgres-backed stores whenever the prototype changes,
+  // then poll while the prototype is open so another collaborator's comments
+  // and annotations appear without requiring a manual refresh.
   const collaborationPrototypeId = proto?.id;
   useEffect(() => {
     if (!collaborationPrototypeId) return;
     let cancelled = false;
-    void Promise.all([
-      hydrateComments(collaborationPrototypeId),
-      hydrateAnnotations(collaborationPrototypeId),
-    ]).then(() => {
-      if (!cancelled) setTick((current) => current + 1);
-    });
+    let refreshInFlight = false;
+    const refresh = async () => {
+      if (refreshInFlight) return;
+      refreshInFlight = true;
+      try {
+        await Promise.all([
+          hydrateComments(collaborationPrototypeId),
+          hydrateAnnotations(collaborationPrototypeId),
+        ]);
+        if (!cancelled) setTick((current) => current + 1);
+      } finally {
+        refreshInFlight = false;
+      }
+    };
+    void refresh();
+    const interval = window.setInterval(() => void refresh(), 5000);
     return () => {
       cancelled = true;
+      window.clearInterval(interval);
     };
   }, [collaborationPrototypeId]);
 
