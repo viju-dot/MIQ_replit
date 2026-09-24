@@ -39,6 +39,39 @@ function IssueGroup({ label, values, tone }: { label: string; values: string[]; 
   );
 }
 
+export function UploadPreviewOptions({ hasFile, ready }: { hasFile: boolean; ready: boolean }) {
+  if (ready) return null;
+
+  return (
+    <div
+      aria-label="Upload preview options"
+      className="space-y-2 rounded border p-3"
+      style={{
+        borderColor,
+        background: cardColor,
+        color: textColor,
+      }}
+    >
+      <div>
+        <p className="text-xs font-medium">Preview options</p>
+        <p className="mt-0.5 text-[11px]" style={{ color: mutedColor }}>
+          {hasFile
+            ? "Processing the upload. Both preview options will be available when it finishes."
+            : "Upload a file to enable both preview options."}
+        </p>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <FiberButton variant="secondary" size="compact" disabled>
+          Overall preview
+        </FiberButton>
+        <FiberButton variant="secondary" size="compact" disabled>
+          Full preview
+        </FiberButton>
+      </div>
+    </div>
+  );
+}
+
 export function UploadPreview({
   fileName,
   records,

@@ -3,7 +3,7 @@ import { FiberDropZone } from "@/components/FiberDropZone";
 import { MOCK_POSTCODES } from "../data";
 import type { UploadReport } from "../uploadHelpers";
 import { FiberButton } from "./primitives";
-import { UploadPreview, type UploadPreviewRecord } from "./UploadPreview";
+import { UploadPreview, UploadPreviewOptions, type UploadPreviewRecord } from "./UploadPreview";
 
 type Method = "postcode" | "latlng";
 
@@ -47,6 +47,10 @@ export function LocationUpload({ method, file, fileState, report, records, selec
       <summary className="cursor-pointer font-medium">Preview sample format</summary>
       <pre className="mt-2 overflow-auto text-xs">{locationSample(method)}</pre>
     </details>
+    <UploadPreviewOptions
+      hasFile={Boolean(file)}
+      ready={Boolean(file && report && fileState === "Uploaded")}
+    />
     <FiberDropZone
       accept=".csv,text/csv"
       acceptLabel="Only .csv files supported"

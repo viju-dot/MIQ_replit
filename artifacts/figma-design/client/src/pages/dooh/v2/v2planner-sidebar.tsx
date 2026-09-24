@@ -14,7 +14,7 @@ import { PoiSearch } from "./PoiSearch";
 import { FiberDropZone } from "@/components/FiberDropZone";
 import { LocationUpload } from "./LocationUpload";
 import { FacetDropdown } from "./FacetDropdown";
-import { UploadPreview } from "./UploadPreview";
+import { UploadPreview, UploadPreviewOptions } from "./UploadPreview";
 
 // Theme the control itself, not SelectValue's inner span. Fiber uses
 // data-theme, whereas the underlying headless control's defaults use .dark.
@@ -573,6 +573,10 @@ export function SidebarV2({ filters, setFilters }: Props) {
          {/* 8. Screen List */}
          <FilterCard title="Screen List" icon={<List className="w-4 h-4" />} enabled={filters.screenList.enabled} onToggle={enabled => updateSection("screenList", { enabled })}>
            <div className="space-y-2">
+             <UploadPreviewOptions
+               hasFile={Boolean(screenListFile)}
+               ready={Boolean(screenListFile && screenListReport && screenListFileState === "Uploaded")}
+             />
              <FiberDropZone
                 accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 acceptLabel="CSV or XLSX with a Screen ID column"
