@@ -27,6 +27,7 @@ interface Props {
   zones?: PlanningZone[];
   onZonesChange?: (zones: PlanningZone[]) => void;
   drawMode?: "circle" | "polygon" | null;
+  drawCircleRadius?: number;
   onDrawComplete?: () => void;
   locationSource?: string | null; // "audience", "postcode", "poi", "latlng", "screenlist", etc.
   selectedScreenIds?: Set<string>;
@@ -387,11 +388,13 @@ function ZoneLayers({
 
 function DrawingLayer({
   mode,
+  circleRadius,
   zones,
   onZonesChange,
   onDrawComplete,
 }: {
   mode: "circle" | "polygon";
+  circleRadius?: number;
   zones: PlanningZone[];
   onZonesChange: (zones: PlanningZone[]) => void;
   onDrawComplete: () => void;
@@ -409,20 +412,39 @@ function DrawingLayer({
 
   useMapEvents({
     click(event) {
-      if (mode === "circle" && points.length === 1) {
-        const radius = map.distance(points[0], event.latlng);
-        onZonesChange([
-          ...zones,
-          {
-            id: `zone-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-            type: "circle",
-            center: { lat: points[0].lat, lng: points[0].lng },
-            radius,
-          },
-        ]);
-        setPoints([]);
-        onDrawComplete();
-        return;
+      // Leaflet receives native clicks before React's bubbling handlers.
+      // Drawing toolbar actions must never add a point underneath the button.
+      if ((event.originalEvent.target as Element | null)?.closest("button, input, select, [role='button']")) return;
+      if (mode === "circle") {
+        if (circleRadius && circleRadius > 0) {
+          onZonesChange([
+            ...zones,
+            {
+              id: `zone-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+              type: "circle",
+              center: { lat: event.latlng.lat, lng: event.latlng.lng },
+              radius: circleRadius,
+            },
+          ]);
+          onDrawComplete();
+          return;
+        }
+
+        if (points.length === 1) {
+          const radius = map.distance(points[0], event.latlng);
+          onZonesChange([
+            ...zones,
+            {
+              id: `zone-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+              type: "circle",
+              center: { lat: points[0].lat, lng: points[0].lng },
+              radius,
+            },
+          ]);
+          setPoints([]);
+          onDrawComplete();
+          return;
+        }
       }
       setPoints((current) => [...current, event.latlng]);
     },
@@ -468,7 +490,9 @@ function DrawingLayer({
       >
         <span className="text-[length:var(--body-sm-medium-size,12px)] font-medium mr-[var(--spacing-100,8px)]" style={{ fontFamily: FONT, color: TITLE }}>
           {mode === "circle"
-            ? points.length ? "Click the circle edge" : "Click the circle centre"
+            ? (circleRadius && circleRadius > 0)
+              ? "Click map to place circle"
+              : points.length ? "Click the circle edge" : "Click the circle centre"
             : `Click polygon vertices (${points.length})`}
         </span>
         {mode === "polygon" && (
@@ -530,6 +554,7 @@ export function MapPanelV2({
   zones = [],
   onZonesChange = noop,
   drawMode = null,
+  drawCircleRadius,
   onDrawComplete = noop,
   locationSource = null,
   selectedScreenIds = new Set(),
@@ -628,6 +653,7 @@ export function MapPanelV2({
           <DrawingLayer
             key={drawMode}
             mode={drawMode}
+            circleRadius={drawCircleRadius}
             zones={zones}
             onZonesChange={onZonesChange}
             onDrawComplete={onDrawComplete}

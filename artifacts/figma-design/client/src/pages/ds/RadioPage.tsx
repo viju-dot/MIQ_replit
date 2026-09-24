@@ -26,7 +26,7 @@ function radioSrc(selected: boolean, disabled: boolean, label: boolean): string 
   return imgUnselected;
 }
 
-function Radio({
+export function Radio({
   selected,
   label,
   labelText,

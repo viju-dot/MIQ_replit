@@ -7,6 +7,52 @@ export const CARD_BG = "var(--surface-background-lvl1, #ffffff)";
 export const CARD_SHADOW = "0px 1px 4px 0px var(--shadow-lvl8, rgba(113,113,128,0.08)), 0px 8px 16px 0px var(--shadow-lvl4, rgba(113,113,128,0.04))";
 export const GRID = "var(--border-dynamic-neutral-subtle-default, #e1e1e8)";
 
+import { Radio } from "../../ds/RadioPage";
+
+export function FiberRadio({
+  selected,
+  labelText,
+  disabled = false,
+  onSelect,
+  name,
+  value,
+}: {
+  selected: boolean;
+  labelText?: string;
+  disabled?: boolean;
+  onSelect?: () => void;
+  name?: string;
+  value?: string;
+}) {
+  return (
+    <label className={`flex gap-2 items-center cursor-pointer ${disabled ? "cursor-not-allowed opacity-50" : ""}`}>
+      <input 
+        type="radio" 
+        className="sr-only peer" 
+        checked={selected} 
+        disabled={disabled} 
+        onChange={() => !disabled && onSelect?.()}
+        name={name}
+        value={value}
+      />
+      <div className="peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--border-dynamic-brand-selected,#7c33b5)] rounded-full">
+        <Radio 
+          selected={selected} 
+          label={false} 
+          labelText="" 
+          disabled={disabled} 
+          dark={false} 
+        />
+      </div>
+      {labelText && (
+        <span className="text-[length:var(--body-md-regular-size,14px)] font-[var(--body-md-regular-weight,400)]" style={{ color: disabled ? "var(--surface-foreground-dynamic-neutral-disabled)" : TITLE, fontFamily: 'var(--body-md-regular-family, "DM Sans", Helvetica)' }}>
+          {labelText}
+        </span>
+      )}
+    </label>
+  );
+}
+
 export type Option = { value: string; label: string };
 
 export function SmartCard({

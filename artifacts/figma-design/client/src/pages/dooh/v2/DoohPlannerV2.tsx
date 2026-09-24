@@ -216,6 +216,7 @@ export default function DoohPlannerV2() {
                 zones={filters.planningZone.zones}
                 onZonesChange={zones => setFilters(prev => ({ ...prev, planningZone: { ...prev.planningZone, zones } }))}
                 drawMode={filters.planningZone.drawMode}
+                drawCircleRadius={filters.planningZone.drawCircleRadius !== "" ? Number(filters.planningZone.drawCircleRadius) * (filters.planningZone.drawCircleUnit === "km" ? 1000 : 1) : undefined}
                 onDrawComplete={() => setFilters(prev => ({ ...prev, planningZone: { ...prev.planningZone, drawMode: null } }))}
                 locationSource={locationMethod}
                 selectedScreenIds={selectedScreenIds}

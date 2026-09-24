@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useAudiences, useIncrementAudienceUse } from "../api";
 import { CREATIVE_FORMATS, DAYPART_PRESETS, PUBLISHERS, RESOLUTIONS, SCREENS, VENUES } from "../data";
 import { downloadScreenTemplate, parseCoordinateCsv, parsePostcodeCsv, parseScreenList, type UploadReport } from "../uploadHelpers";
-import { FiberSlider } from "./primitives";
+import { FiberSlider, FiberRadio, FiberButton } from "./primitives";
 import { FiberRoundedTabsBar, FiberTabButton } from "@/components/FiberTabItem";
 import { PoiSearch } from "./PoiSearch";
 import { FiberDropZone } from "@/components/FiberDropZone";
@@ -49,7 +49,7 @@ export interface FilterStateV2 {
     radiusUnit: "m" | "km";
     uploadedPoints: Array<{ lat: number; lng: number }>;
   };
-  planningZone: { enabled: boolean; zones: PlanningZone[]; drawMode: "circle" | "polygon" | null };
+  planningZone: { enabled: boolean; zones: PlanningZone[]; drawMode: "circle" | "polygon" | null; drawShape: "circle" | "polygon"; drawCircleRadius: string; drawCircleUnit: "m" | "km" };
   venueType: { enabled: boolean; venues: string[] };
   publishers: { enabled: boolean; publishers: string[] };
   daypart: {
@@ -67,7 +67,7 @@ export interface FilterStateV2 {
 
 export const DEFAULT_FILTERS_V2: FilterStateV2 = {
   location: { enabled: true, method: "audience", audienceId: "", postcode: "", poiIds: [], radius: 500, radiusUnit: "m", uploadedPoints: [] },
-  planningZone: { enabled: false, zones: [], drawMode: null },
+  planningZone: { enabled: false, zones: [], drawMode: null, drawShape: "circle", drawCircleRadius: "", drawCircleUnit: "km" },
   venueType: { enabled: false, venues: [] },
   publishers: { enabled: false, publishers: [] },
   daypart: { enabled: false, applies: "Every Day", mode: "presets", presets: [], customStart: "09:00", customEnd: "17:00" },
@@ -101,6 +101,7 @@ export function SidebarV2({ filters, setFilters }: Props) {
   const { data: audiences, isError } = useAudiences();
   const incrementUse = useIncrementAudienceUse();
   const [uploadError, setUploadError] = useState("");
+  const [drawError, setDrawError] = useState("");
   const [locationReport, setLocationReport] = useState<UploadReport | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileState, setFileState] = useState<"Uploading" | "Uploaded">("Uploading");
@@ -334,15 +335,113 @@ export function SidebarV2({ filters, setFilters }: Props) {
         </FilterCard>
 
         {/* 2. Planning Zone */}
-        <FilterCard title="Planning Zone" icon={<Map className="w-4 h-4" />} enabled={filters.planningZone.enabled} onToggle={enabled => updateSection("planningZone", { enabled, drawMode: enabled ? filters.planningZone.drawMode : null })}>
-          <div className="space-y-3">
-             <Button size="sm" variant="secondary" className="w-full bg-[var(--surface-background-lvl1,#ffffff)] text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)] hover:bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))] border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)]" onClick={() => updateSection("planningZone", { drawMode: filters.planningZone.drawMode ? null : "circle" })}>
-              {filters.planningZone.drawMode ? "Cancel Drawing" : "Draw on Map"}
-            </Button>
-            <Select value={filters.planningZone.drawMode ?? "circle"} onValueChange={(value: "circle" | "polygon") => updateSection("planningZone", { drawMode: value })}>
-              <SelectTrigger className="h-8 text-sm" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectValue /></SelectTrigger>
-              <SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectItem value="circle">Circle</SelectItem><SelectItem value="polygon">Polygon</SelectItem></SelectContent>
-            </Select>
+        <FilterCard title="Planning Zone" icon={<Map className="w-4 h-4" />} enabled={filters.planningZone.enabled} onToggle={enabled => {
+          if (!enabled) {
+            updateSection("planningZone", { enabled, drawMode: null });
+          } else {
+            updateSection("planningZone", { enabled });
+          }
+        }}>
+          <div className="space-y-4">
+             <div className="flex items-center gap-4">
+               <FiberRadio 
+                 name="drawShape"
+                 value="circle"
+                 selected={filters.planningZone.drawShape === "circle"} 
+                 labelText="Circle" 
+                 onSelect={() => {
+                   updateSection("planningZone", { drawShape: "circle", drawMode: null });
+                 }} 
+               />
+               <FiberRadio 
+                 name="drawShape"
+                 value="polygon"
+                 selected={filters.planningZone.drawShape === "polygon"} 
+                 labelText="Polygon" 
+                 onSelect={() => {
+                   updateSection("planningZone", { drawShape: "polygon", drawMode: null });
+                 }} 
+               />
+             </div>
+
+             {filters.planningZone.drawShape === "circle" && (
+               <div className="space-y-3">
+                 <div className="flex items-center justify-between">
+                   <label className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Radius (optional)</label>
+                   <Select value={filters.planningZone.drawCircleUnit} onValueChange={(val: "m"|"km") => {
+                     if (filters.planningZone.drawCircleRadius === "") {
+                       updateSection("planningZone", { drawCircleUnit: val, drawMode: null });
+                     } else {
+                       let current = Number(filters.planningZone.drawCircleRadius);
+                       if (val === "km" && filters.planningZone.drawCircleUnit === "m") {
+                         current = current / 1000;
+                       } else if (val === "m" && filters.planningZone.drawCircleUnit === "km") {
+                         current = current * 1000;
+                       }
+                       updateSection("planningZone", { drawCircleUnit: val, drawCircleRadius: String(current), drawMode: null });
+                     }
+                     setDrawError("");
+                   }}>
+                     <SelectTrigger className="h-6 w-[85px] text-[11px]" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectValue /></SelectTrigger>
+                     <SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>
+                       <SelectItem value="m" className="text-[11px]">meters</SelectItem>
+                       <SelectItem value="km" className="text-[11px]">kilometers</SelectItem>
+                     </SelectContent>
+                   </Select>
+                 </div>
+                 <Input 
+                   style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }} 
+                   type="number" 
+                   aria-label="Circle radius"
+                   placeholder="Freehand if empty"
+                   min={filters.planningZone.drawCircleUnit === "km" ? 0.05 : 50}
+                   max={filters.planningZone.drawCircleUnit === "km" ? 10 : 10000}
+                   step="any"
+                   value={filters.planningZone.drawCircleRadius} 
+                   onChange={e => {
+                     updateSection("planningZone", { drawCircleRadius: e.target.value, drawMode: null });
+                     setDrawError("");
+                   }} 
+                   className="h-8 text-sm" 
+                 />
+                 <div className="text-[11px] text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)] leading-tight">Leave empty to draw freely</div>
+                 <FiberButton 
+                   variant="secondary" 
+                   className="w-full" 
+                   onClick={() => {
+                     if (filters.planningZone.drawMode === "circle") {
+                       updateSection("planningZone", { drawMode: null });
+                     } else {
+                       if (filters.planningZone.drawCircleRadius !== "") {
+                         const r = Number(filters.planningZone.drawCircleRadius);
+                         const max = filters.planningZone.drawCircleUnit === "km" ? 10 : 10000;
+                         const min = filters.planningZone.drawCircleUnit === "km" ? 0.05 : 50;
+                         if (isNaN(r) || r < min || r > max) {
+                           setDrawError(`Radius must be between ${min} and ${max} ${filters.planningZone.drawCircleUnit}.`);
+                           return;
+                         }
+                       }
+                       updateSection("planningZone", { drawMode: "circle" });
+                       setDrawError("");
+                     }
+                   }}
+                 >
+                   {filters.planningZone.drawMode === "circle" ? "Cancel Drawing" : "Draw on Map"}
+                 </FiberButton>
+                 {drawError && <p className="text-[11px] text-[var(--surface-foreground-dynamic-error-default,#da294b)]" role="alert">{drawError}</p>}
+               </div>
+             )}
+
+             {filters.planningZone.drawShape === "polygon" && (
+               <FiberButton 
+                 variant="secondary" 
+                 className="w-full" 
+                 onClick={() => updateSection("planningZone", { drawMode: filters.planningZone.drawMode === "polygon" ? null : "polygon" })}
+               >
+                 {filters.planningZone.drawMode === "polygon" ? "Cancel Drawing" : "Draw on Map"}
+               </FiberButton>
+             )}
+
             <div className="space-y-1">
               {filters.planningZone.zones.map((zone, index) => <div key={zone.id} className="flex items-center justify-between rounded bg-[var(--surface-background-lvl2,#f7f7fa)] p-2 text-xs border border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)]">
                 <span className="text-[var(--surface-foreground-dynamic-neutral-disabled,#717180)] truncate mr-2" title={zone.label || `Zone ${index + 1}`}>
