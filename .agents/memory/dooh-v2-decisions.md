@@ -9,6 +9,12 @@ Smart selection should infer geography only, not independent commercial or audie
 
 **How to apply:** Represent captured circles as visible, removable geographic constraints. Preserve manually chosen facets; do not infer budget, publishers, or venue selections from whichever billboards happen to fall inside a circle.
 
+Keep facet search, the global All action, and selected values visible immediately when a filter is enabled.
+
+**Why:** The user rejected hiding these controls and selections inside Venue Type and Publisher dropdowns; visibility matters more than compactness here.
+
+**How to apply:** Future facet refinements may scroll option lists, but must not require opening a dropdown to search, select All, or inspect existing selections.
+
 Treat the DOOH V2 brief as a minimal mock-data planning prototype, not authorization to connect a DSP or make live campaign bookings.
 
 **Why:** The brief explicitly requested mock screens/intelligence and a minimal Phase 1 implementation. Saved audiences already had real persistence, which should not be replaced with browser-only state just because the example brief used React state.
