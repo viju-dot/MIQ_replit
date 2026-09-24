@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger as BaseSelectTrigger, 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAudiences, useIncrementAudienceUse } from "../api";
-import { CREATIVE_FORMATS, DAYPART_PRESETS, MOCK_POSTCODES, PUBLISHERS, RESOLUTIONS, SCREENS, VENUES, getDistance } from "../data";
+import { CREATIVE_FORMATS, DAYPART_PRESETS, MOCK_POIS, MOCK_POSTCODES, PUBLISHERS, RESOLUTIONS, SCREENS, VENUES, getDistance } from "../data";
 import { downloadScreenTemplate, parseCoordinateCsv, parsePostcodeCsv, parseScreenList, type UploadedLocationRecord, type UploadedScreenRecord, type UploadReport } from "../uploadHelpers";
 import { FiberSlider, FiberRadio, FiberButton, SmartCard } from "./primitives";
 import { FiberRoundedTabsBar, FiberTabButton } from "@/components/FiberTabItem";
@@ -135,14 +135,25 @@ const DEMO_SCREEN_IDS = SCREENS
 
 export const DEMO_UPLOADS = {
   location: {
-    fileName: "demo-postcodes.csv",
-    content: ["postcode", ...DEMO_POSTCODE_KEYS].join("\n"),
-    records: DEMO_POSTCODE_KEYS.map(postcode => ({
-      key: postcode,
-      label: postcode,
-      point: { lat: MOCK_POSTCODES[postcode].lat, lng: MOCK_POSTCODES[postcode].lng },
-    })),
-    report: { valid: DEMO_POSTCODE_KEYS.length, unknown: [], malformed: [], duplicates: [] } as UploadReport,
+    postcode: {
+      fileName: "demo-postcodes.csv",
+      content: ["postcode", ...DEMO_POSTCODE_KEYS].join("\n"),
+      records: DEMO_POSTCODE_KEYS.map(postcode => ({
+        key: postcode,
+        label: postcode,
+        point: { lat: MOCK_POSTCODES[postcode].lat, lng: MOCK_POSTCODES[postcode].lng },
+      })),
+      report: { valid: DEMO_POSTCODE_KEYS.length, unknown: [], malformed: [], duplicates: [] } as UploadReport,
+    },
+    latlng: {
+      fileName: "demo-coordinates.csv",
+      content: ["lat,lng", ...DEMO_LOCATION_POINTS.map(point => `${point.lat},${point.lng}`)].join("\n"),
+      records: DEMO_LOCATION_POINTS.map(point => {
+        const key = `${point.lat},${point.lng}`;
+        return { key, label: key, point };
+      }),
+      report: { valid: DEMO_LOCATION_POINTS.length, unknown: [], malformed: [], duplicates: [] } as UploadReport,
+    },
   },
   screenList: {
     fileName: "demo-screen-list.csv",
@@ -152,6 +163,8 @@ export const DEMO_UPLOADS = {
   },
 };
 
+const DEMO_POI = MOCK_POIS.find(poi => poi.city === "London") ?? MOCK_POIS[0];
+
 export function createDemoFilters(): FilterStateV2 {
   return {
     location: {
@@ -159,13 +172,13 @@ export function createDemoFilters(): FilterStateV2 {
       method: "postcode",
       audienceId: "",
       postcode: DEMO_POSTCODE_KEYS[0],
-      poiIds: [],
+      poiIds: [DEMO_POI.id],
       radius: DEMO_RADIUS_METERS,
       radiusUnit: "m",
-      uploadedPoints: DEMO_UPLOADS.location.records.map(record => record.point),
+      uploadedPoints: DEMO_UPLOADS.location.postcode.records.map(record => record.point),
       uploadedPointsByMethod: {
-        postcode: DEMO_UPLOADS.location.records.map(record => record.point),
-        latlng: [],
+        postcode: DEMO_UPLOADS.location.postcode.records.map(record => record.point),
+        latlng: DEMO_UPLOADS.location.latlng.records.map(record => record.point),
       },
     },
     planningZone: {
@@ -234,13 +247,14 @@ function emptyLocationUpload(): LocationUploadState {
   };
 }
 
-function demoLocationUpload(): LocationUploadState {
+function demoLocationUpload(method: LocationUploadMethod): LocationUploadState {
+  const upload = DEMO_UPLOADS.location[method];
   return {
-    file: createDemoFile(DEMO_UPLOADS.location.fileName, DEMO_UPLOADS.location.content),
+    file: createDemoFile(upload.fileName, upload.content),
     fileState: "Uploaded",
-    report: DEMO_UPLOADS.location.report,
-    records: DEMO_UPLOADS.location.records,
-    selectedKeys: new Set(DEMO_UPLOADS.location.records.map(record => record.key)),
+    report: upload.report,
+    records: upload.records,
+    selectedKeys: new Set(upload.records.map(record => record.key)),
   };
 }
 
@@ -250,8 +264,8 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
   const [uploadError, setUploadError] = useState("");
   const [drawError, setDrawError] = useState("");
   const [locationUploads, setLocationUploads] = useState<Record<LocationUploadMethod, LocationUploadState>>(() => ({
-    postcode: demoView ? demoLocationUpload() : emptyLocationUpload(),
-    latlng: emptyLocationUpload(),
+    postcode: demoView ? demoLocationUpload("postcode") : emptyLocationUpload(),
+    latlng: demoView ? demoLocationUpload("latlng") : emptyLocationUpload(),
   }));
   const [screenListError, setScreenListError] = useState("");
   const [screenListReport, setScreenListReport] = useState<UploadReport | null>(() => demoView ? DEMO_UPLOADS.screenList.report : null);
