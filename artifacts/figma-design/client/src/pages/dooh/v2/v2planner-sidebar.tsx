@@ -47,7 +47,7 @@ export interface FilterStateV2 {
     customEnd: string;
   };
   budget: { enabled: boolean; currency: "GBP" | "EUR" | "USD"; total: number | ""; cpm: number | "" | null };
-  creativeType: { enabled: boolean; format: string; resolution: string; customWidth: string; customHeight: string };
+  creativeType: { enabled: boolean; format: string; resolution: string };
   screenList: { enabled: boolean; ids: string[]; configured: boolean };
 }
 
@@ -58,7 +58,7 @@ export const DEFAULT_FILTERS_V2: FilterStateV2 = {
   publishers: { enabled: false, publishers: [] },
   daypart: { enabled: false, applies: "Every Day", mode: "presets", presets: [], customStart: "09:00", customEnd: "17:00" },
   budget: { enabled: false, currency: "GBP", total: 50000, cpm: null },
-  creativeType: { enabled: false, format: "", resolution: "", customWidth: "", customHeight: "" },
+  creativeType: { enabled: false, format: "", resolution: "" },
   screenList: { enabled: false, ids: [], configured: false },
 };
 
@@ -103,12 +103,6 @@ export function SidebarV2({ filters, setFilters }: Props) {
   };
   const selectedAudience = audiences?.find(a => a.id === filters.location.audienceId);
   
-  const resolutionError = filters.creativeType.resolution === "custom" && (
-    !/^\d+$/.test(filters.creativeType.customWidth) || !/^\d+$/.test(filters.creativeType.customHeight) ||
-    Number(filters.creativeType.customWidth) < 1 || Number(filters.creativeType.customWidth) > 16384 ||
-    Number(filters.creativeType.customHeight) < 1 || Number(filters.creativeType.customHeight) > 16384
-  );
-
   const cancelUpload = () => {
     uploadIdRef.current++;
     setSelectedFile(null);
@@ -381,31 +375,9 @@ export function SidebarV2({ filters, setFilters }: Props) {
         <FilterCard title="Budget" icon={<Wallet className="w-4 h-4" />} enabled={filters.budget.enabled} onToggle={enabled => updateSection("budget", { enabled })}>
           <div className="space-y-3">
              <div>
-               <label className="text-xs font-medium text-gray-700">Currency</label>
-               <Select 
-                 value={filters.budget.currency} 
-                 onValueChange={(val: "GBP"|"EUR"|"USD") => {
-                   const oldRate = EXCHANGE_RATES[filters.budget.currency];
-                   const newRate = EXCHANGE_RATES[val];
-                   const convert = (v: number | "") => v === "" ? "" : Math.round((Number(v) / oldRate) * newRate);
-                   updateSection("budget", { 
-                     currency: val, 
-                     total: convert(filters.budget.total), 
-                     cpm: filters.budget.cpm === null ? null : convert(filters.budget.cpm) 
-                   });
-                 }}
-               >
-                 <SelectTrigger className="h-8 mt-1"><SelectValue /></SelectTrigger>
-                 <SelectContent>
-                   <SelectItem value="GBP">GBP (£)</SelectItem>
-                   <SelectItem value="EUR">EUR (€)</SelectItem>
-                   <SelectItem value="USD">USD ($)</SelectItem>
-                 </SelectContent>
-               </Select>
-             </div>
-             <div>
-               <label className="text-xs font-medium text-gray-700">Total Budget</label>
+               <label htmlFor="dooh-budget" className="text-xs font-medium text-gray-700">Total Budget (£)</label>
                <Input 
+                 id="dooh-budget"
                  type="number" min={0} step="100" 
                  value={filters.budget.total} 
                  onChange={e => updateSection("budget", { total: e.target.value === "" ? "" : Math.max(0, Number(e.target.value)) })} 
@@ -413,8 +385,9 @@ export function SidebarV2({ filters, setFilters }: Props) {
                />
              </div>
              <div>
-               <label className="text-xs font-medium text-gray-700">CPM Ceiling (Optional)</label>
+               <label htmlFor="dooh-cpm" className="text-xs font-medium text-gray-700">CPM Ceiling (£, Optional)</label>
                <Input 
+                 id="dooh-cpm"
                  type="number" min={0} step=".01" 
                  value={filters.budget.cpm ?? ""} 
                  onChange={e => updateSection("budget", { cpm: e.target.value === "" ? null : Math.max(0, Number(e.target.value)) })} 
@@ -436,13 +409,9 @@ export function SidebarV2({ filters, setFilters }: Props) {
             <div>
               <label className="text-xs font-medium text-gray-700">Resolution</label>
               <Select value={filters.creativeType.resolution || "any"} onValueChange={resolution => updateSection("creativeType", { resolution: resolution === "any" ? "" : resolution })}>
-                <SelectTrigger className="h-8 mt-1"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="any">Any</SelectItem>{RESOLUTIONS.map(r => <SelectItem value={r} key={r}>{r}</SelectItem>)}<SelectItem value="custom">Custom</SelectItem></SelectContent>
+                <SelectTrigger className="h-8 mt-1"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="any">Any</SelectItem>{RESOLUTIONS.map(r => <SelectItem value={r} key={r}>{r}</SelectItem>)}</SelectContent>
               </Select>
             </div>
-            {filters.creativeType.resolution === "custom" && <div>
-              <div className="flex items-center gap-2"><Input aria-label="Custom width" placeholder="Width" inputMode="numeric" value={filters.creativeType.customWidth} onChange={e => updateSection("creativeType", { customWidth: e.target.value })} className="h-8 text-sm" /><span>×</span><Input aria-label="Custom height" placeholder="Height" inputMode="numeric" value={filters.creativeType.customHeight} onChange={e => updateSection("creativeType", { customHeight: e.target.value })} className="h-8 text-sm" /></div>
-              {resolutionError && <p className="text-[10px] text-red-600 mt-1">Enter whole-pixel dimensions from 1 to 16,384.</p>}
-            </div>}
           </div>
         </FilterCard>
 

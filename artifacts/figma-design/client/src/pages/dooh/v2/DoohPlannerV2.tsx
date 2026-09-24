@@ -111,14 +111,7 @@ export default function DoohPlannerV2() {
       if (filters.creativeType.format) {
         baseResults = baseResults.filter(s => s.creativeFormat === filters.creativeType.format);
       }
-      if (filters.creativeType.resolution === "custom") {
-        const width = Number(filters.creativeType.customWidth);
-        const height = Number(filters.creativeType.customHeight);
-        const valid = /^\d+$/.test(filters.creativeType.customWidth) &&
-          /^\d+$/.test(filters.creativeType.customHeight) &&
-          width >= 1 && width <= 16384 && height >= 1 && height <= 16384;
-        baseResults = valid ? baseResults.filter(s => s.creativeRes === `${width}x${height}`) : [];
-      } else if (filters.creativeType.resolution) {
+      if (filters.creativeType.resolution) {
         baseResults = baseResults.filter(s => s.creativeRes === filters.creativeType.resolution);
       }
     }
