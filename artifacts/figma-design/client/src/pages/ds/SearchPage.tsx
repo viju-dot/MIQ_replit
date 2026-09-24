@@ -40,13 +40,17 @@ type SearchStandardProps = {
   showIcon?: boolean;
   state?: StandardState;
   label?: string;
+  value?: string;
+  onValueChange?: (value: string) => void;
 };
 
-function SearchStandard({
+export function SearchStandard({
   background = false,
   showIcon = false,
   state: baseState = "Default",
   label,
+  value,
+  onValueChange,
 }: SearchStandardProps): JSX.Element {
   const [hover, setHover] = useState(false);
   const [focus, setFocus] = useState(false);
@@ -117,8 +121,8 @@ function SearchStandard({
   return (
     <div
       className="flex w-[300px] min-w-[180px] flex-col items-start gap-[var(--odd-numbers-10,10px)] rounded-[var(--radiuses-small,2px)] border border-solid transition-colors duration-150"
-      style={{ ...containerStyle, cursor: baseDisabled ? "not-allowed" : "text" }}
-      tabIndex={baseDisabled ? -1 : 0}
+      style={{ ...containerStyle, width: onValueChange ? "100%" : undefined, minWidth: onValueChange ? 0 : undefined, cursor: baseDisabled ? "not-allowed" : "text" }}
+      tabIndex={baseDisabled || onValueChange ? -1 : 0}
       aria-disabled={baseDisabled || undefined}
       {...interactionHandlers}
     >
@@ -138,12 +142,21 @@ function SearchStandard({
               : "gap-[var(--numbers-8,8px)]"
           }`}
         >
-          <p
+          {onValueChange ? <input
+            type="search"
+            aria-label={label || "Search"}
+            placeholder={label || "Search…"}
+            value={value ?? ""}
+            onChange={event => onValueChange(event.target.value)}
+            disabled={baseDisabled}
+            className="w-full min-w-0 flex-1 border-0 bg-transparent text-sm outline-none"
+            style={{ fontFamily: '"DM Sans", Helvetica', color: textColorValue }}
+          /> : <p
             className="relative min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)] transition-colors duration-150 [word-break:break-word]"
             style={{ fontFamily: '"DM Sans", Helvetica', color: textColorValue }}
           >
             {resolvedLabel}
-          </p>
+          </p>}
           {["Default", "Hover", "Active / Focus", "Filled"].includes(state) && showIcon && (
             <div className="flex size-[20px] shrink-0 items-center justify-center">
               <div className="relative size-[20px] shrink-0">

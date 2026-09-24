@@ -38,7 +38,7 @@ type CheckboxProps = {
  * Tailwind v4 CSS-variable arbitrary values have been converted to plain
  * fallback values for Tailwind v3.
  */
-function Checkbox({
+export function Checkbox({
   variant = "Unchecked",
   state = "Default",
   disabled = false,

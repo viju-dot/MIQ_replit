@@ -13,6 +13,7 @@ import { FiberRoundedTabsBar, FiberTabButton } from "@/components/FiberTabItem";
 import { PoiSearch } from "./PoiSearch";
 import { FiberDropZone } from "@/components/FiberDropZone";
 import { LocationUpload } from "./LocationUpload";
+import { FacetDropdown } from "./FacetDropdown";
 
 export interface PlanningZone {
   id: string;
@@ -476,14 +477,9 @@ function ScalarFacet({ title, icon, enabled, values, selected, onToggle, onSelec
   title: string; icon: ReactNode; enabled: boolean; values: string[]; selected: string[];
   onToggle: (value: boolean) => void; onSelected: (value: string[]) => void;
 }) {
-  return <FilterCard title={title} icon={icon} enabled={enabled} onToggle={onToggle}><div className="space-y-2">
-    <div className="space-y-1 mt-2">
-      {values.map(value => <label key={value} className="flex items-center gap-2 p-1.5 text-sm hover:bg-gray-50 rounded cursor-pointer">
-        <input type="checkbox" className="rounded border-gray-300 text-purple-600 focus:ring-purple-500" checked={selected.includes(value)} onChange={e => onSelected(e.target.checked ? [...selected, value] : selected.filter(item => item !== value))} />
-        <span className="text-gray-700">{value}</span>
-      </label>)}
-    </div>
-  </div></FilterCard>;
+  return <FilterCard title={title} icon={icon} enabled={enabled} onToggle={onToggle}>
+    <FacetDropdown title={title} values={values} selected={selected} onSelected={onSelected} />
+  </FilterCard>;
 }
 
 function FilterCard({ title, icon, enabled, onToggle, children }: { title: string; icon: ReactNode; enabled: boolean; onToggle: (enabled: boolean) => void; children: ReactNode }) {
