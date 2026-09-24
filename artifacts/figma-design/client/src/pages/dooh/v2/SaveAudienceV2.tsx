@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Loader2 } from "lucide-react";
 import { useCreateAudience, useUpdateAudience, useAudiences, AudienceInput, AudienceUpdate, type Audience } from "../api";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { GeoPlannerFilters } from "../api";
 import { FiberModal, FiberInput, FiberTextarea, FiberGhostButton } from "./FiberModal";
@@ -17,15 +17,19 @@ interface SaveAudienceV2Props {
     coverage: string;
   };
   filters: GeoPlannerFilters;
+  version?: string;
   onSuccess?: (audience: Audience) => void;
 }
 
-export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters, onSuccess }: SaveAudienceV2Props) {
+export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters, version: versionProp, onSuccess }: SaveAudienceV2Props) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [saveError, setSaveError] = useState("");
   const { toast } = useToast();
-  const [locationStr, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
+  const search = useSearch();
+  const version = versionProp || new URLSearchParams(search).get("version") || "v2";
+  const encodedVersion = encodeURIComponent(version);
 
   const audiencesQuery = useAudiences();
   const { mutateAsync: createAudience, isPending: isCreating } = useCreateAudience();
@@ -115,7 +119,7 @@ export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters,
           description: (
             <div className="flex flex-col gap-2 mt-1">
               <div>{result.name || data.name} contains {geography.points.length} saved locations.</div>
-              <Link href={`/dooh-planner?version=v2&audience=${result.id}`} className="text-[var(--dooh-purple)] underline font-medium hover:text-[#400047]">
+              <Link href={`/dooh-planner?version=${encodedVersion}&audience=${encodeURIComponent(result.id)}`} className="text-[var(--dooh-purple)] underline font-medium hover:text-[#400047]">
                 Plan DOOH with this audience
               </Link>
             </div>
@@ -124,7 +128,7 @@ export function SaveAudienceV2({ open, onOpenChange, editId, geography, filters,
         if (onSuccess) {
           onSuccess(result);
         } else {
-          setLocation(`${locationStr}?version=v2&edit=${result.id}`);
+          setLocation(`/geo-planner?version=${encodedVersion}&edit=${encodeURIComponent(result.id)}`);
         }
       }
       onOpenChange(false);

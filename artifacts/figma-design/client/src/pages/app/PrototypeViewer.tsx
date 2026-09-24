@@ -906,7 +906,9 @@ export function PrototypeViewer({
             <DetailRow label="Notes">{displayData.notes}</DetailRow>
           )}
           <DetailRow label="Route">
-            <OpenRouteLink route={prototype.route} />
+            <OpenRouteLink route={prototype.id === "dooh" && selected
+              ? `${prototype.route}?version=${encodeURIComponent(selected.id)}`
+              : prototype.route} />
           </DetailRow>
         </div>
       </Section>

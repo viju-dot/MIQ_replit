@@ -59,7 +59,7 @@ function AudiencePreview({ audience, onUse, isUsing }: { audience: Audience; onU
   );
 }
 
-export default function SavedAudiences({ version = "v2" }: { version?: "v1" | "v2" }) {
+export default function SavedAudiences({ version = "v2" }: { version?: string }) {
   const audiencesQuery = useAudiences();
   const [search, setSearch] = useState("");
   const [previewAudience, setPreviewAudience] = useState<Audience | null>(null);
@@ -69,12 +69,13 @@ export default function SavedAudiences({ version = "v2" }: { version?: "v1" | "v
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const audiences = audiencesQuery.data || [];
+  const encodedVersion = encodeURIComponent(version);
   const filtered = audiences.filter(audience => audience.isActive && audience.name.toLowerCase().includes(search.toLowerCase()));
 
   const handleUse = async (id: string) => {
     try {
       await useAudience(id);
-      setLocation(`/dooh-planner?version=${version}&audience=${encodeURIComponent(id)}`);
+      setLocation(`/dooh-planner?version=${encodedVersion}&audience=${encodeURIComponent(id)}`);
     } catch (error: any) {
       toast({ title: "Audience could not be used", description: error?.message || "Please try again.", variant: "destructive" });
     }
@@ -96,7 +97,7 @@ export default function SavedAudiences({ version = "v2" }: { version?: "v1" | "v
       <div className="p-8 pb-4 shrink-0">
         <div className="flex flex-wrap gap-4 justify-between items-end mb-6">
           <div><h1 className="text-2xl font-bold text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]">Saved Audiences</h1><p className="text-gray-500 mt-1">Total saved: {audiences.filter(audience => audience.isActive).length} audiences</p></div>
-          <Link href={`/geo-planner?version=${version}`} className="bg-[var(--colours-blue-300,#d194ff)] text-[#2b0030] hover:bg-[#c178f7] h-10 px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center">+ Create New</Link>
+          <Link href={`/geo-planner?version=${encodedVersion}`} className="bg-[var(--colours-blue-300,#d194ff)] text-[#2b0030] hover:bg-[#c178f7] h-10 px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center">+ Create New</Link>
         </div>
         <div className="relative max-w-md mb-6"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" /><Input value={search} onChange={event => setSearch(event.target.value)} placeholder="Type to filter by name..." className="pl-10" />{search && <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-blue-500">Clear</button>}</div>
       </div>

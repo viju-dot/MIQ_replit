@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useLocation, useSearch } from "wouter";
 import { PrototypeCollabOverlay, PrototypeCommentLayer } from "@/components/PrototypeCollabOverlay";
 import { DesignAnnotationLayer } from "@/components/DesignAnnotationLayer";
-import { DOOH_VERSION_IDS } from "@/lib/prototypeStore";
+import { doohRendererVersion, doohVersionToken, resolveDoohVersion } from "@/lib/doohVersions";
 import { usePrototypeVersion } from "@/lib/prototypeVersionContext";
 import { PrimaryNavigation, SecondaryNavigation } from "./TvAudienceApp";
 import { FiberTabLink, FiberRoundedTabsBar } from "@/components/FiberTabItem";
@@ -27,10 +27,15 @@ export default function DoohApp() {
 function DoohVersionedContent() {
   const [location, navigate] = useLocation();
   const search = useSearch();
-  const version = new URLSearchParams(search).get("version") === "v1" ? "v1" : "v2";
+  const requestedVersion = new URLSearchParams(search).get("version");
   const versionContext = usePrototypeVersion();
   const viewedVersionId = versionContext?.viewedVersion.id;
-  const previous = useRef<{ version: "v1" | "v2"; viewedVersionId?: string }>();
+  const previous = useRef<{ requestedVersion: string | null; viewedVersionId?: string }>();
+  const versions = versionContext?.prototype.versions ?? [];
+  const resolved = resolveDoohVersion(versions, requestedVersion);
+  const version = doohRendererVersion(versionContext?.viewedVersion ?? resolved, versions);
+  const versionToken = versionContext ? doohVersionToken(versionContext.viewedVersion) : requestedVersion ?? "v2";
+  const versionName = versionContext?.viewedVersion.name ?? version.toUpperCase();
   const isGeo = location.startsWith("/geo-planner");
   const isSaved = location.startsWith("/saved-audiences");
   const moduleTitle = isGeo ? "Geo Planner" : isSaved ? "Saved Audiences" : "DOOH Planner";
@@ -39,45 +44,39 @@ function DoohVersionedContent() {
   // collaboration version-history changes are reflected back into the URL.
   useEffect(() => {
     if (!versionContext) return;
-    const desiredId = DOOH_VERSION_IDS[version];
     const prior = previous.current;
 
-    if (!prior || prior.version !== version) {
-      previous.current = { version, viewedVersionId };
-      if (viewedVersionId !== desiredId) {
+    if (!prior || prior.requestedVersion !== requestedVersion) {
+      const desiredId = resolved?.id ?? viewedVersionId;
+      // Record the expected selection so the context update isn't mistaken
+      // for a new user selection and reflected back into the URL.
+      previous.current = { requestedVersion, viewedVersionId: desiredId };
+      if (desiredId && viewedVersionId !== desiredId) {
         versionContext.setViewedVersionId(desiredId);
       }
       return;
     }
 
     if (prior.viewedVersionId !== viewedVersionId) {
-      previous.current = { version, viewedVersionId };
-      if (
-        viewedVersionId !== DOOH_VERSION_IDS.v1 &&
-        viewedVersionId !== DOOH_VERSION_IDS.v2
-      ) {
-        versionContext.setViewedVersionId(desiredId);
-        return;
-      }
-      const viewedVersion =
-        viewedVersionId === DOOH_VERSION_IDS.v1 ? "v1" : "v2";
-      if (viewedVersion !== version) {
+      previous.current = { requestedVersion, viewedVersionId };
+      const viewedToken = doohVersionToken(versionContext.viewedVersion);
+      if (viewedToken !== requestedVersion) {
         const params = new URLSearchParams(search);
-        params.set("version", viewedVersion);
+        params.set("version", viewedToken);
         params.delete("edit");
         navigate(`${location}?${params}`);
       }
     }
-  }, [location, navigate, search, version, versionContext, viewedVersionId]);
+  }, [location, navigate, search, requestedVersion, resolved?.id, versionContext, viewedVersionId]);
 
   useEffect(() => {
     const previousTitle = document.title;
-    document.title = `${moduleTitle} ${version.toUpperCase()} · MiQ`;
+    document.title = `${moduleTitle} ${versionName} · MiQ`;
     return () => { document.title = previousTitle; };
-  }, [moduleTitle, version]);
+  }, [moduleTitle, versionName]);
 
-  const moduleLink = (path: string) => `${path}?version=${version}`;
-  const content = isSaved ? <SavedAudiences version={version} />
+  const moduleLink = (path: string) => `${path}?version=${encodeURIComponent(versionToken)}`;
+  const content = isSaved ? <SavedAudiences version={versionToken} />
     : isGeo ? version === "v2" ? <GeoPlannerV2 /> : <GeoPlanner />
     : version === "v2" ? <DoohPlannerV2 /> : <DoohPlanner />;
 
@@ -110,6 +109,11 @@ function DoohVersionedContent() {
         </nav>
       </section>
 
+      {versionContext && requestedVersion && !resolved && (
+        <p role="alert" className="px-4 py-2 text-sm">
+          That version is unavailable in this browser. Showing {versionName}.
+        </p>
+      )}
       <main className="flex-1 min-h-0 relative flex flex-col overflow-hidden">
         {/* Keep planner stacking (sidebar/map) below both feedback layers. */}
         <div key={`${location}?${search}`} className="relative isolate flex-1 flex flex-col min-w-0 min-h-0">{content}</div>

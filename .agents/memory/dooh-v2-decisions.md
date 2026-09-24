@@ -9,6 +9,12 @@ Smart selection should infer geography only, not independent commercial or audie
 
 **How to apply:** Represent captured circles as visible, removable geographic constraints. Preserve manually chosen facets; do not infer budget, publishers, or venue selections from whichever billboards happen to fall inside a circle.
 
+Keep prototype version identity separate from the V1/V2 rendering implementation.
+
+**Why:** Users duplicate versions for review. Restricting navigation to renderer names silently resets those duplicates to V2 and loses their review context.
+
+**How to apply:** Carry the selected version identity through opening, module navigation, and save/use links; choose the layout from the duplicate's ancestry. Do not treat a new version label as a new independent code snapshot.
+
 Keep facet search, the global All action, and selected values visible immediately when a filter is enabled.
 
 **Why:** The user rejected hiding these controls and selections inside Venue Type and Publisher dropdowns; visibility matters more than compactness here.

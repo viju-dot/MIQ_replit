@@ -84,9 +84,16 @@ function MapView({ points, market }: { points: any[], market: string }) {
 }
 
 export default function GeoPlannerV2() {
-  const [locationStr, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
   const search = useSearch();
-  const editId = useMemo(() => new URLSearchParams(search).get("edit"), [search]);
+  const { editId, version } = useMemo(() => {
+    const params = new URLSearchParams(search);
+    return {
+      editId: params.get("edit"),
+      version: params.get("version") || "v2",
+    };
+  }, [search]);
+  const encodedVersion = encodeURIComponent(version);
   
   const [filters, setFilters] = useState<DraftFilters>(() =>
     new URLSearchParams(search).get("reset") === "1" ? EMPTY_FILTERS : DEFAULT_FILTERS
@@ -170,7 +177,7 @@ export default function GeoPlannerV2() {
     setIsV1Audience(false);
     initializedEditId.current = null;
     // Start a new draft rather than accidentally updating a saved audience.
-    if (editId) setLocation("/geo-planner?version=v2&reset=1");
+    if (editId) setLocation(`/geo-planner?version=${encodedVersion}&reset=1`);
   };
 
   const handleSubmit = () => {
@@ -206,7 +213,7 @@ export default function GeoPlannerV2() {
           </p>
           <Button className="mt-4" onClick={() => {
             if (audiencesQuery.isError) audiencesQuery.refetch();
-            else setLocation('/saved-audiences?version=v2');
+            else setLocation(`/saved-audiences?version=${encodedVersion}`);
           }}>
             {audiencesQuery.isError ? "Retry" : "Back to Saved Audiences"}
           </Button>
@@ -412,7 +419,7 @@ export default function GeoPlannerV2() {
       {savedAudience && (
         <div role="status" className="p-4 text-sm" style={{ background: "var(--surface-background-lvl1, #ffffff)", color: "var(--surface-foreground-static-neutral-lvl1, #13131a)" }}>
           <strong>{savedAudience.name}</strong> has been saved. It is now available in DOOH’s Saved Audience dropdown.{" "}
-          <Link href={`/dooh-planner?version=v2&audience=${encodeURIComponent(savedAudience.id)}`} className="underline font-medium">Use in DOOH</Link>
+          <Link href={`/dooh-planner?version=${encodedVersion}&audience=${encodeURIComponent(savedAudience.id)}`} className="underline font-medium">Use in DOOH</Link>
         </div>
       )}
       <div className="geo-save-bar">
@@ -435,6 +442,7 @@ export default function GeoPlannerV2() {
           editId={editId}
           geography={{ points: results.points, coverage: results.coverage }}
           filters={submittedFilters}
+          version={version}
           onSuccess={setSavedAudience}
         />
       )}
