@@ -692,11 +692,22 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
                       placeholder={planningZoneFreehand ? "Freehand" : undefined}
                       onChange={e => {
                         const value = e.target.value;
+                        if (value === "") return;
+                        const parsed = Number(value);
+                        if (!Number.isFinite(parsed)) return;
                         updateSection("planningZone", {
-                          drawCircleRadius: value === "" ? "" : String(Math.min(planningZoneRadiusMax, Math.max(planningZoneRadiusMin, Number(value)))),
+                          drawCircleRadius: String(Math.min(planningZoneRadiusMax, Math.max(planningZoneRadiusMin, parsed))),
                           drawMode: null,
                         });
                         setDrawError("");
+                      }}
+                      onBlur={e => {
+                        if (e.target.value === "") {
+                          updateSection("planningZone", {
+                            drawCircleRadius: String(planningZoneRadiusMin),
+                            drawMode: null,
+                          });
+                        }
                       }}
                       className="h-7 w-[60px] px-2 text-xs"
                     />
@@ -705,10 +716,22 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
                     <Checkbox
                       labelValue="Freehand draw"
                       variant={planningZoneFreehand ? "Checked" : "Unchecked"}
-                      onToggle={() => updateSection("planningZone", {
-                        drawCircleRadius: planningZoneFreehand ? String(planningZoneRadiusMin) : "",
-                        drawMode: null,
-                      })}
+                      onToggle={() => {
+                        setFilters(prev => {
+                          const planningZone = prev.planningZone;
+                          const currentlyFreehand = planningZone.drawCircleRadius === "";
+                          const radiusMin = planningZone.drawCircleUnit === "km" ? 0.05 : 50;
+                          return {
+                            ...prev,
+                            planningZone: {
+                              ...planningZone,
+                              drawCircleRadius: currentlyFreehand ? String(radiusMin) : "",
+                              drawMode: null,
+                            },
+                          };
+                        });
+                        setDrawError("");
+                      }}
                     />
                   </div>
                   <FiberButton

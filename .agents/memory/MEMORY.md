@@ -9,3 +9,4 @@
 - [Mixed upload accept rules](mixed-upload-accept.md) — FiberDropZone must validate each declared extension; CSV plus XLSX accept strings must not become CSV-only.
 - [DOOH version routing](dooh-version-routing.md) — DOOH version identity is separate from renderer folders; new V3 work needs a canonical seed ID, token mapping, and local-storage reconciliation.
 - [Collaboration persistence](collaboration-persistence.md) — comments and annotations must use shared Postgres state, cached outage fallback, and live rehydration instead of browser-only or process memory.
+- [Optional numeric input modes](optional-numeric-inputs.md) — do not treat an intermediate empty edit as a mode toggle; reserve sentinel-mode changes for explicit controls.
