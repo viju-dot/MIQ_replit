@@ -87,6 +87,7 @@ const STORAGE_KEY = "fiber:ai-prototype:prototypes:v2";
 export const DOOH_VERSION_IDS = {
   v1: "dooh_v1",
   v2: "dooh_v2",
+  v3: "dooh_v3",
 } as const;
 
 /* ---------------------------------------------------------------------- */
@@ -174,6 +175,20 @@ const SEED: Prototype[] = [
           description: "Digital out-of-home planning: build and reuse audiences, find screens, and export campaign shortlists.",
           status: "Live",
           notes: "Current DOOH experience. Original V1 remains available from version history.",
+        },
+      },
+      {
+        id: DOOH_VERSION_IDS.v3,
+        name: "V3",
+        createdAt: "2026-09-24T00:00:00.000Z",
+        updatedAt: "2026-09-24T00:00:00.000Z",
+        description: "Updated DOOH upload workflow with compact previews and searchable selection.",
+        rendererKey: "dooh",
+        status: "active",
+        snapshot: {
+          description: "Digital out-of-home planning with searchable upload previews for locations and screen lists.",
+          status: "Live",
+          notes: "CSV/XLSX upload previews, selectable valid records, and validation summaries.",
         },
       },
     ],
@@ -435,7 +450,7 @@ function readLocal(): Prototype[] {
     const migrated = clean.map((prototype) =>
       prototype.id === "dooh" &&
       doohSeed &&
-      !prototype.versions.some((version) => version.id === DOOH_VERSION_IDS.v2)
+      !prototype.versions.some((version) => version.id === DOOH_VERSION_IDS.v3)
         ? reconcileSeededVersions(prototype, doohSeed)
         : prototype,
     );

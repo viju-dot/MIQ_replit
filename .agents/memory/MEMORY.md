@@ -7,3 +7,4 @@
 - [DOOH MVP boundaries](dooh-v2-decisions.md) — keep mock planning distinct from live activation; duplicate saves create confirmed new versions without overwriting existing audiences.
 - [Map tile services](map-tile-services.md) — visually verify tile responses; CARTO's legacy Positron endpoint can return API-key-required watermarks.
 - [Mixed upload accept rules](mixed-upload-accept.md) — FiberDropZone must validate each declared extension; CSV plus XLSX accept strings must not become CSV-only.
+- [DOOH version routing](dooh-version-routing.md) — DOOH version identity is separate from renderer folders; new V3 work needs a canonical seed ID, token mapping, and local-storage reconciliation.
