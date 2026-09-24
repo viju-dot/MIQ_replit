@@ -12,6 +12,7 @@ import { FiberSlider } from "./primitives";
 import { FiberRoundedTabsBar, FiberTabButton } from "@/components/FiberTabItem";
 import { PoiSearch } from "./PoiSearch";
 import { FiberDropZone } from "@/components/FiberDropZone";
+import { LocationUpload } from "./LocationUpload";
 
 export interface PlanningZone {
   id: string;
@@ -129,6 +130,8 @@ export function SidebarV2({ filters, setFilters }: Props) {
     setSelectedFile(file);
     setFileState("Uploading");
     setUploadError("");
+    setLocationReport(null);
+    updateSection("location", { uploadedPoints: [] });
     try {
       const result = await parser(file);
       if (uploadIdRef.current !== currentUploadId) return;
@@ -236,16 +239,15 @@ export function SidebarV2({ filters, setFilters }: Props) {
            </div>}
           
           {filters.location.method === "postcode" && <div className="space-y-2">
-            <FiberDropZone
-              accept=".csv,text/csv"
-              acceptLabel="(Only .csv files supported)"
+            <LocationUpload
+              method="postcode"
+              report={locationReport}
               file={selectedFile}
               fileState={fileState}
-              onFileSelect={(file) => void readUpload(file, parsePostcodeCsv)}
-              onFileRemove={cancelUpload}
-              onFileError={handleLocationFileError}
+              onSelect={(file) => void readUpload(file, parsePostcodeCsv)}
+              onRemove={cancelUpload}
+              onError={handleLocationFileError}
             />
-            <Report report={locationReport} />
           </div>}
           
           {filters.location.method === "poi" && <div className="space-y-2">
@@ -253,16 +255,15 @@ export function SidebarV2({ filters, setFilters }: Props) {
           </div>}
           
           {filters.location.method === "latlng" && <div className="space-y-2">
-            <FiberDropZone
-              accept=".csv,text/csv"
-              acceptLabel="(Only .csv files supported)"
+            <LocationUpload
+              method="latlng"
+              report={locationReport}
               file={selectedFile}
               fileState={fileState}
-              onFileSelect={(file) => void readUpload(file, parseCoordinateCsv)}
-              onFileRemove={cancelUpload}
-              onFileError={handleLocationFileError}
+              onSelect={(file) => void readUpload(file, parseCoordinateCsv)}
+              onRemove={cancelUpload}
+              onError={handleLocationFileError}
             />
-            <Report report={locationReport} />
           </div>}
 
           {uploadError && <p className="text-[11px] text-red-600 mt-2" role="alert">{uploadError}</p>}

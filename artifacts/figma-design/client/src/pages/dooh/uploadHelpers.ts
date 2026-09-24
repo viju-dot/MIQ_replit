@@ -67,7 +67,7 @@ export async function parseCoordinateCsv(file: File) {
   rows.slice(1).forEach((row, index) => {
     const lat = Number(row[latColumn]);
     const lng = Number(row[lngColumn]);
-    if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    if (!row[latColumn]?.trim() || !row[lngColumn]?.trim() || !Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
       malformed.push(`Row ${index + 2}`);
       return;
     }
