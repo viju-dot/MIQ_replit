@@ -13,3 +13,9 @@ Fiber theme integration must follow the root `data-theme`, not assume generic `.
 **Why:** Mixed UI components can remain white while surrounding Fiber surfaces are dark. Missing token names can also fall back to pale selected backgrounds with correctly switched white text.
 
 **How to apply:** Verify token names against both theme definitions, use matching surface/foreground pairs, and style the actual input/trigger rather than its inner value span. Check selected states and portal content, not only default cards.
+
+Leaflet marker icons are raw HTML strings and should receive explicit source color values rather than relying on Fiber CSS variables.
+
+**Why:** CSS-variable colors rendered correctly in the React Match Source legend but could resolve to black or a default value inside Leaflet icon markup.
+
+**How to apply:** Share a stable explicit source palette between the legend and Leaflet pin/cluster icon HTML; preserve the source color when a pin is hovered, selected, or clustered.

@@ -38,17 +38,17 @@ interface Props {
 
 const noop = () => undefined;
 
-// Fiber Colors mapping:
+const SOURCE_COLORS = {
+  geoPlanner: "#7c33b5",
+  planningZone: "#b45309",
+  postcode: "#059669",
+  latlng: "#0f766e",
+  poi: "#2563eb",
+  default: "#13131a",
+} as const;
+
 const getSourceColor = (sourceKey: string) => {
-  switch (sourceKey) {
-    case "geoPlanner": return "var(--container-dynamic-brand-bold-background-default, #7c33b5)";
-    case "planningZone": return "var(--surface-foreground-dynamic-warning-default, #b45309)";
-    case "postcode": return "var(--surface-foreground-dynamic-success-default, #059669)";
-    case "latlng": return "var(--surface-foreground-dynamic-info-variation, #0f766e)";
-    case "poi": return "var(--surface-foreground-dynamic-info-default, #2563eb)";
-    case "default": return "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)";
-    default: return "var(--surface-foreground-dynamic-error-default, #dc2626)";
-  }
+  return SOURCE_COLORS[sourceKey as keyof typeof SOURCE_COLORS] ?? SOURCE_COLORS.default;
 };
 
 const pinIcon = (active: boolean, color: string, isSelected: boolean = false, isCandidate: boolean = false) => {
@@ -58,7 +58,7 @@ const pinIcon = (active: boolean, color: string, isSelected: boolean = false, is
     className: "",
     iconSize: active ? [24, 24] : [18, 18],
     iconAnchor: active ? [12, 12] : [9, 9],
-    html: `<span style="display:block;width:100%;height:100%;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${active ? "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" : color};border:2px solid ${borderColor};box-shadow:0 2px 6px var(--shadow-lvl8, rgba(113,113,128,0.15))${glow};transition:all 0.2s ease;"></span>`,
+    html: `<span style="display:block;width:100%;height:100%;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${color};border:2px solid ${borderColor};box-shadow:0 2px 6px var(--shadow-lvl8, rgba(113,113,128,0.15))${glow};transition:all 0.2s ease;"></span>`,
   });
 };
 
@@ -181,11 +181,11 @@ function DynamicScale() {
 
 function MapLegend({ activeSources, sourceCounts }: { activeSources?: Props["activeSources"], sourceCounts: Record<string, number> }) {
   const sources = [
-    { id: "geoPlanner", label: "Geo Planner", color: "var(--container-dynamic-brand-bold-background-default, #7c33b5)" },
-    { id: "planningZone", label: "Planning Zone", color: "var(--surface-foreground-dynamic-warning-default, #b45309)" },
-    { id: "postcode", label: "Postcode", color: "var(--surface-foreground-dynamic-success-default, #059669)" },
-    { id: "latlng", label: "Lat/Long", color: "var(--surface-foreground-dynamic-info-variation, #0f766e)" },
-    { id: "poi", label: "POI", color: "var(--surface-foreground-dynamic-info-default, #2563eb)" }
+    { id: "geoPlanner", label: "Geo Planner", color: SOURCE_COLORS.geoPlanner },
+    { id: "planningZone", label: "Planning Zone", color: SOURCE_COLORS.planningZone },
+    { id: "postcode", label: "Postcode", color: SOURCE_COLORS.postcode },
+    { id: "latlng", label: "Lat/Long", color: SOURCE_COLORS.latlng },
+    { id: "poi", label: "POI", color: SOURCE_COLORS.poi }
   ] as const;
 
   return (
