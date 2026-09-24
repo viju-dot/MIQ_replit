@@ -171,6 +171,7 @@ export function FiberButton({
   disabled = false,
   loading = false,
   ariaLabel,
+  ariaPressed,
   className = "",
 }: {
   variant?: "solid" | "outline" | "secondary";
@@ -180,6 +181,7 @@ export function FiberButton({
   disabled?: boolean;
   loading?: boolean;
   ariaLabel?: string;
+  ariaPressed?: boolean;
   className?: string;
 }) {
   const [hover, setHover] = useState(false);
@@ -224,6 +226,7 @@ export function FiberButton({
       aria-disabled={inactive}
       aria-busy={loading || undefined}
       aria-label={ariaLabel}
+      aria-pressed={ariaPressed}
       onClick={onClick}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}

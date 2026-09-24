@@ -36,8 +36,10 @@ function DoohVersionedContent() {
   const version = doohRendererVersion(versionContext?.viewedVersion ?? resolved, versions);
   const versionToken = versionContext ? doohVersionToken(versionContext.viewedVersion) : requestedVersion ?? "v2";
   const versionName = versionContext?.viewedVersion.name ?? version.toUpperCase();
+  const demoView = versionToken === "v3" && new URLSearchParams(search).get("demo") === "1";
   const isGeo = location.startsWith("/geo-planner");
   const isSaved = location.startsWith("/saved-audiences");
+  const isDoohV3Planner = versionToken === "v3" && !isGeo && !isSaved;
   const moduleTitle = isGeo ? "Geo Planner" : isSaved ? "Saved Audiences" : "DOOH Planner";
 
   // The URL is authoritative on first render/direct navigation. After that,
@@ -75,10 +77,21 @@ function DoohVersionedContent() {
     return () => { document.title = previousTitle; };
   }, [moduleTitle, versionName]);
 
-  const moduleLink = (path: string) => `${path}?version=${encodeURIComponent(versionToken)}`;
+  const moduleLink = (path: string) => {
+    const params = new URLSearchParams({ version: versionToken });
+    if (demoView) params.set("demo", "1");
+    return `${path}?${params.toString()}`;
+  };
+  const toggleDemoView = () => {
+    const params = new URLSearchParams(search);
+    if (demoView) params.delete("demo");
+    else params.set("demo", "1");
+    const query = params.toString();
+    navigate(`${location}${query ? `?${query}` : ""}`);
+  };
   const content = isSaved ? <SavedAudiences version={versionToken} />
     : isGeo ? version === "v2" ? <GeoPlannerV2 /> : <GeoPlanner />
-    : version === "v2" ? <DoohPlannerV2 /> : <DoohPlanner />;
+    : version === "v2" ? <DoohPlannerV2 demoView={demoView} /> : <DoohPlanner />;
 
   return (
     <div className={`min-h-screen flex flex-col dooh-theme bg-[var(--surface-background-lvl2,#f7f7fa)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)] ${!isGeo && !isSaved && version === "v2" ? "dooh-fixed-planner" : ""}`}>
@@ -88,8 +101,22 @@ function DoohVersionedContent() {
       </header>
       <div className="dooh-page-content">
       <section className="dooh-page-intro" aria-labelledby="dooh-page-title">
-        <h1 id="dooh-page-title">{isSaved ? "Saved Audiences" : "Audience & DOOH Planner"}</h1>
-        {!isSaved && <p>Build target audiences and plan digital out-of-home screens.</p>}
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 id="dooh-page-title">{isSaved ? "Saved Audiences" : "Audience & DOOH Planner"}</h1>
+            {!isSaved && <p>Build target audiences and plan digital out-of-home screens.</p>}
+          </div>
+          {isDoohV3Planner && (
+            <FiberButton
+              variant={demoView ? "solid" : "outline"}
+              ariaLabel={demoView ? "Exit DOOH demo view" : "Open DOOH demo view"}
+              ariaPressed={demoView}
+              onClick={toggleDemoView}
+            >
+              {demoView ? "Exit demo view" : "Demo view"}
+            </FiberButton>
+          )}
+        </div>
         <nav aria-label="DOOH navigation" className="dooh-fiber-tabs flex justify-between items-center w-full">
           <FiberRoundedTabsBar>
             <FiberTabLink rounded href={moduleLink("/geo-planner")} selected={isGeo} label="Geo Planner" />

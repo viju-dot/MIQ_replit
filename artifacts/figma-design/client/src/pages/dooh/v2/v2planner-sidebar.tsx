@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger as BaseSelectTrigger, 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAudiences, useIncrementAudienceUse } from "../api";
-import { CREATIVE_FORMATS, DAYPART_PRESETS, PUBLISHERS, RESOLUTIONS, SCREENS, VENUES } from "../data";
+import { CREATIVE_FORMATS, DAYPART_PRESETS, MOCK_POSTCODES, PUBLISHERS, RESOLUTIONS, SCREENS, VENUES, getDistance } from "../data";
 import { downloadScreenTemplate, parseCoordinateCsv, parsePostcodeCsv, parseScreenList, type UploadedLocationRecord, type UploadedScreenRecord, type UploadReport } from "../uploadHelpers";
 import { FiberSlider, FiberRadio, FiberButton, SmartCard } from "./primitives";
 import { FiberRoundedTabsBar, FiberTabButton } from "@/components/FiberTabItem";
@@ -77,29 +77,141 @@ export const DEFAULT_FILTERS_V2: FilterStateV2 = {
   screenList: { enabled: false, ids: [], configured: false },
 };
 
+function formatDemoTime(minutes: number) {
+  const safeMinutes = Math.min(23 * 60 + 59, Math.max(0, minutes));
+  const hours = Math.floor(safeMinutes / 60).toString().padStart(2, "0");
+  const mins = (safeMinutes % 60).toString().padStart(2, "0");
+  return `${hours}:${mins}`;
+}
+
+const DEMO_POSTCODE_KEYS = ["SE1 7AA", "W1D 3QF", "SW1A 2AA"] as const;
+const DEMO_LOCATION_POINTS = DEMO_POSTCODE_KEYS.map(postcode => ({
+  lat: MOCK_POSTCODES[postcode].lat,
+  lng: MOCK_POSTCODES[postcode].lng,
+}));
+const DEMO_RADIUS_METERS = 2000;
+const DEMO_ANCHOR_SCREEN = SCREENS.find(screen =>
+  DEMO_LOCATION_POINTS.some(point => getDistance(screen.lat, screen.lng, point.lat, point.lng) <= DEMO_RADIUS_METERS),
+) ?? SCREENS[0];
+const DEMO_DAYPART_START = DEMO_ANCHOR_SCREEN.availability.start;
+const DEMO_DAYPART_END = Math.min(23 * 60 + 59, DEMO_ANCHOR_SCREEN.availability.end);
+const DEMO_DAYPART_APPLIES = DEMO_ANCHOR_SCREEN.availability.days;
+
+function matchesDemoDaypart(screen: (typeof SCREENS)[number]) {
+  const dayMatches = DEMO_DAYPART_APPLIES === "Every Day"
+    ? screen.availability.days === "Every Day"
+    : screen.availability.days === "Every Day" || screen.availability.days === DEMO_DAYPART_APPLIES;
+  return dayMatches
+    && screen.availability.start <= DEMO_DAYPART_START
+    && screen.availability.end >= DEMO_DAYPART_END;
+}
+
+const DEMO_SCREEN_IDS = SCREENS
+  .filter(screen =>
+    DEMO_LOCATION_POINTS.some(point => getDistance(screen.lat, screen.lng, point.lat, point.lng) <= DEMO_RADIUS_METERS)
+    && screen.venue === DEMO_ANCHOR_SCREEN.venue
+    && screen.publisher === DEMO_ANCHOR_SCREEN.publisher
+    && screen.creativeFormat === DEMO_ANCHOR_SCREEN.creativeFormat
+    && screen.creativeRes === DEMO_ANCHOR_SCREEN.creativeRes
+    && matchesDemoDaypart(screen)
+    && screen.cpm <= DEMO_ANCHOR_SCREEN.cpm + 5,
+  )
+  .slice(0, 8)
+  .map(screen => screen.id);
+
+export const DEMO_UPLOADS = {
+  location: {
+    fileName: "demo-postcodes.csv",
+    content: ["postcode", ...DEMO_POSTCODE_KEYS].join("\n"),
+    records: DEMO_POSTCODE_KEYS.map(postcode => ({
+      key: postcode,
+      label: postcode,
+      point: { lat: MOCK_POSTCODES[postcode].lat, lng: MOCK_POSTCODES[postcode].lng },
+    })),
+    report: { valid: DEMO_POSTCODE_KEYS.length, unknown: [], malformed: [], duplicates: [] } as UploadReport,
+  },
+  screenList: {
+    fileName: "demo-screen-list.csv",
+    content: ["screen_id", ...DEMO_SCREEN_IDS].join("\n"),
+    records: DEMO_SCREEN_IDS.map(id => ({ key: id, label: id, id })),
+    report: { valid: DEMO_SCREEN_IDS.length, unknown: [], malformed: [], duplicates: [] } as UploadReport,
+  },
+};
+
+export function createDemoFilters(): FilterStateV2 {
+  return {
+    location: {
+      enabled: true,
+      method: "postcode",
+      audienceId: "",
+      postcode: DEMO_POSTCODE_KEYS[0],
+      poiIds: [],
+      radius: DEMO_RADIUS_METERS,
+      radiusUnit: "m",
+      uploadedPoints: DEMO_UPLOADS.location.records.map(record => record.point),
+    },
+    planningZone: {
+      enabled: true,
+      zones: [{
+        id: "demo-planning-zone",
+        type: "circle",
+        center: DEMO_LOCATION_POINTS[0],
+        radius: DEMO_RADIUS_METERS,
+        label: "Central London demo zone",
+      }],
+      drawMode: null,
+      drawShape: "circle",
+      drawCircleRadius: String(DEMO_RADIUS_METERS / 1000),
+      drawCircleUnit: "km",
+    },
+    venueType: { enabled: true, venues: [DEMO_ANCHOR_SCREEN.venue] },
+    publishers: { enabled: true, publishers: [DEMO_ANCHOR_SCREEN.publisher] },
+    daypart: {
+      enabled: true,
+      applies: DEMO_DAYPART_APPLIES,
+      mode: "custom",
+      presets: [],
+      customStart: formatDemoTime(DEMO_DAYPART_START),
+      customEnd: formatDemoTime(DEMO_DAYPART_END),
+    },
+    budget: { enabled: true, currency: "GBP", total: 1000000, cpm: DEMO_ANCHOR_SCREEN.cpm + 5 },
+    creativeType: {
+      enabled: true,
+      format: DEMO_ANCHOR_SCREEN.creativeFormat,
+      resolution: DEMO_ANCHOR_SCREEN.creativeRes,
+    },
+    screenList: { enabled: true, ids: DEMO_SCREEN_IDS, configured: true },
+  };
+}
+
+function createDemoFile(name: string, content: string) {
+  return typeof File === "undefined" ? null : new File([content], name, { type: "text/csv" });
+}
+
 export const EXCHANGE_RATES = { GBP: 1, EUR: 1.17, USD: 1.25 };
 
 interface Props {
   filters: FilterStateV2;
   setFilters: React.Dispatch<React.SetStateAction<FilterStateV2>>;
+  demoView?: boolean;
 }
 
-export function SidebarV2({ filters, setFilters }: Props) {
+export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
   const { data: audiences, isError } = useAudiences();
   const incrementUse = useIncrementAudienceUse();
   const [uploadError, setUploadError] = useState("");
   const [drawError, setDrawError] = useState("");
-  const [locationReport, setLocationReport] = useState<UploadReport | null>(null);
-  const [locationRecords, setLocationRecords] = useState<UploadedLocationRecord[]>([]);
-  const [selectedLocationKeys, setSelectedLocationKeys] = useState<Set<string>>(new Set());
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [fileState, setFileState] = useState<"Uploading" | "Uploaded">("Uploading");
+  const [locationReport, setLocationReport] = useState<UploadReport | null>(() => demoView ? DEMO_UPLOADS.location.report : null);
+  const [locationRecords, setLocationRecords] = useState<UploadedLocationRecord[]>(() => demoView ? DEMO_UPLOADS.location.records : []);
+  const [selectedLocationKeys, setSelectedLocationKeys] = useState<Set<string>>(() => demoView ? new Set(DEMO_UPLOADS.location.records.map(record => record.key)) : new Set());
+  const [selectedFile, setSelectedFile] = useState<File | null>(() => demoView ? createDemoFile(DEMO_UPLOADS.location.fileName, DEMO_UPLOADS.location.content) : null);
+  const [fileState, setFileState] = useState<"Uploading" | "Uploaded">(demoView ? "Uploaded" : "Uploading");
   const [screenListError, setScreenListError] = useState("");
-  const [screenListReport, setScreenListReport] = useState<UploadReport | null>(null);
-  const [screenListRecords, setScreenListRecords] = useState<UploadedScreenRecord[]>([]);
-  const [selectedScreenListKeys, setSelectedScreenListKeys] = useState<Set<string>>(new Set());
-  const [screenListFile, setScreenListFile] = useState<File | null>(null);
-  const [screenListFileState, setScreenListFileState] = useState<"Uploading" | "Uploaded">("Uploading");
+  const [screenListReport, setScreenListReport] = useState<UploadReport | null>(() => demoView ? DEMO_UPLOADS.screenList.report : null);
+  const [screenListRecords, setScreenListRecords] = useState<UploadedScreenRecord[]>(() => demoView ? DEMO_UPLOADS.screenList.records : []);
+  const [selectedScreenListKeys, setSelectedScreenListKeys] = useState<Set<string>>(() => demoView ? new Set(DEMO_UPLOADS.screenList.records.map(record => record.key)) : new Set());
+  const [screenListFile, setScreenListFile] = useState<File | null>(() => demoView ? createDemoFile(DEMO_UPLOADS.screenList.fileName, DEMO_UPLOADS.screenList.content) : null);
+  const [screenListFileState, setScreenListFileState] = useState<"Uploading" | "Uploaded">(demoView ? "Uploaded" : "Uploading");
 
   const uploadIdRef = useRef(0);
   const screenListUploadIdRef = useRef(0);

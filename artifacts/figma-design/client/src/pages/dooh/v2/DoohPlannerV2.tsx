@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { SCREENS, MOCK_POIS, DAYPART_RANGES, getDistance, isPointInPolygon, ScreenData } from "../data";
 import { useAudiences } from "../api";
-import { SidebarV2, FilterStateV2, DEFAULT_FILTERS_V2, EXCHANGE_RATES, PlanningZone } from "./v2planner-sidebar";
+import { SidebarV2, FilterStateV2, DEFAULT_FILTERS_V2, EXCHANGE_RATES, PlanningZone, createDemoFilters, DEMO_UPLOADS } from "./v2planner-sidebar";
 import { MapPanelV2 } from "./v2planner-map-panel";
 import { RightPanelV2, PlanOverviewCards } from "./v2planner-right-panel";
 import { FiberButton, SmartCard, TabsBarUnderline } from "./primitives";
@@ -9,9 +9,11 @@ import { Download } from "lucide-react";
 import { useScreenExport } from "./useScreenExport";
 import "./DoohPlannerV2.css";
 
-export default function DoohPlannerV2() {
-  const [filters, setFilters] = useState<FilterStateV2>(DEFAULT_FILTERS_V2);
-  const [selectedScreenIds, setSelectedScreenIds] = useState<Set<string>>(new Set());
+export default function DoohPlannerV2({ demoView = false }: { demoView?: boolean }) {
+  const [filters, setFilters] = useState<FilterStateV2>(() => demoView ? createDemoFilters() : DEFAULT_FILTERS_V2);
+  const [selectedScreenIds, setSelectedScreenIds] = useState<Set<string>>(
+    () => demoView ? new Set(DEMO_UPLOADS.screenList.records.map(record => record.id)) : new Set(),
+  );
   const [hoveredScreenId, setHoveredScreenId] = useState<string | null>(null);
   const [view, setView] = useState<"map" | "list">("map");
   const [showMapOverview, setShowMapOverview] = useState(false);
@@ -250,7 +252,7 @@ export default function DoohPlannerV2() {
   return (
     <div className="dooh-v2-planner flex flex-col flex-1 min-h-0 font-fiber">
       <div className="flex flex-1 min-h-0 items-start gap-6">
-        <SidebarV2 filters={filters} setFilters={setFilters} />
+        <SidebarV2 filters={filters} setFilters={setFilters} demoView={demoView} />
         
         <div className="flex-1 min-w-0 min-h-0 flex flex-col sticky top-4 self-start bg-transparent">
           <SmartCard

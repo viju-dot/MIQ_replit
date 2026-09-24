@@ -56,3 +56,9 @@ Keep the planner navigation limited to Geo Planner and DOOH, using Fiber rounded
 **Why:** The user explicitly wants only these two modules in navigation and considers the bottom-right collaboration controls sufficient for version and exit actions.
 
 **How to apply:** Do not reintroduce a Saved Audiences navigation tab or duplicate toolbar controls when extending the planner. Preserve saved-audience data and reuse functionality. “Tabs Bar — rounded” means the complete catalogue bar, including its shared neutral rounded track—not isolated pill items; the user explicitly rejected the latter.
+
+For deterministic stakeholder demo presets, derive uploaded screen IDs from the real inventory after applying the same geographic and filter constraints as the visible planner.
+
+**Why:** Hardcoded or independently generated IDs can produce an apparently populated upload card that parses to zero usable screens. Native time inputs also reject `24:00`, even when inventory availability uses minute 1440 for an all-day endpoint.
+
+**How to apply:** Anchor the preset to an in-radius real screen, select IDs from the shared `SCREENS` data, and clamp displayed all-day end times to `23:59` while preserving a non-empty interval.
