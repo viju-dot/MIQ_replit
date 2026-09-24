@@ -3,7 +3,7 @@ import { SCREENS, MOCK_POIS, DAYPART_RANGES, getDistance, isPointInPolygon, Scre
 import { useAudiences } from "../api";
 import { SidebarV2, FilterStateV2, DEFAULT_FILTERS_V2, EXCHANGE_RATES, PlanningZone } from "./v2planner-sidebar";
 import { MapPanelV2 } from "./v2planner-map-panel";
-import { RightPanelV2 } from "./v2planner-right-panel";
+import { RightPanelV2, PlanOverviewCards } from "./v2planner-right-panel";
 import { FiberButton, SmartCard, TabsBarUnderline } from "./primitives";
 import { Download } from "lucide-react";
 import { useScreenExport } from "./useScreenExport";
@@ -14,6 +14,7 @@ export default function DoohPlannerV2() {
   const [selectedScreenIds, setSelectedScreenIds] = useState<Set<string>>(new Set());
   const [hoveredScreenId, setHoveredScreenId] = useState<string | null>(null);
   const [view, setView] = useState<"map" | "list">("map");
+  const [showMapOverview, setShowMapOverview] = useState(false);
 
   const { data: audiences } = useAudiences();
 
@@ -201,57 +202,72 @@ export default function DoohPlannerV2() {
               />
             }
           >
-          {csvDownload && <div role="status" className="shrink-0 px-4 py-2 text-xs bg-purple-50 text-purple-900">
+          {csvDownload && <div role="status" className="shrink-0 px-4 py-2 text-xs bg-[var(--container-dynamic-brand-subtle-background-default-regular,#f0e6f7)] text-[var(--surface-foreground-dynamic-brand-default,#7c33b5)]">
             CSV ready: {csvDownload.count.toLocaleString()} screen{csvDownload.count === 1 ? "" : "s"}.{" "}
             <a href={csvDownload.url} download="DOOH-Shortlist.csv" className="underline font-semibold">Download CSV again</a>
           </div>}
-          {view === "map" && <MapPanelV2 
-            screens={matchedScreens}
-            smartCandidates={smartCandidates}
-            hoveredScreenId={hoveredScreenId}
-            onScreenClick={setHoveredScreenId}
-            zones={filters.planningZone.zones}
-            onZonesChange={zones => setFilters(prev => ({ ...prev, planningZone: { ...prev.planningZone, zones } }))}
-            drawMode={filters.planningZone.drawMode}
-            onDrawComplete={() => setFilters(prev => ({ ...prev, planningZone: { ...prev.planningZone, drawMode: null } }))}
-            locationSource={locationMethod}
-            selectedScreenIds={selectedScreenIds}
-            onSmartSelectionCapture={(zone: PlanningZone, screenIds: string[]) => {
-              setFilters(prev => ({
-                ...prev,
-                planningZone: {
-                  ...prev.planningZone,
-                  enabled: true,
-                  zones: [...prev.planningZone.zones, zone]
-                }
-              }));
-              setSelectedScreenIds(prev => {
-                const next = new Set(prev);
-                screenIds.forEach((id: string) => next.add(id));
-                return next;
-              });
-            }}
-          />}
+          {view === "map" && (
+            <div className="relative flex-1 min-h-0 flex flex-col">
+              <MapPanelV2 
+                screens={matchedScreens}
+                smartCandidates={smartCandidates}
+                hoveredScreenId={hoveredScreenId}
+                onScreenClick={setHoveredScreenId}
+                zones={filters.planningZone.zones}
+                onZonesChange={zones => setFilters(prev => ({ ...prev, planningZone: { ...prev.planningZone, zones } }))}
+                drawMode={filters.planningZone.drawMode}
+                onDrawComplete={() => setFilters(prev => ({ ...prev, planningZone: { ...prev.planningZone, drawMode: null } }))}
+                locationSource={locationMethod}
+                selectedScreenIds={selectedScreenIds}
+                onSmartSelectionCapture={(zone: PlanningZone, screenIds: string[]) => {
+                  setFilters(prev => ({
+                    ...prev,
+                    planningZone: {
+                      ...prev.planningZone,
+                      enabled: true,
+                      zones: [...prev.planningZone.zones, zone]
+                    }
+                  }));
+                  setSelectedScreenIds(prev => {
+                    const next = new Set(prev);
+                    screenIds.forEach((id: string) => next.add(id));
+                    return next;
+                  });
+                }}
+              />
+              <div className="absolute top-[16px] right-[16px] bottom-[260px] z-[1000] flex flex-col items-end gap-2 pointer-events-none">
+                <div className="pointer-events-auto shrink-0">
+                  <FiberButton 
+                    variant={showMapOverview ? "solid" : "secondary"}
+                    onClick={() => setShowMapOverview(s => !s)}
+                    aria-expanded={showMapOverview}
+                    aria-controls="map-plan-overview"
+                  >
+                    {showMapOverview ? "Hide Plan Overview" : "Show Plan Overview"}
+                  </FiberButton>
+                </div>
+                {showMapOverview && (
+                  <div id="map-plan-overview" className="pointer-events-auto w-[280px] min-h-0 overflow-y-auto mt-2 dooh-scrollbar pb-2">
+                    <SmartCard title="Plan Overview" ariaLabel="Map Plan Overview">
+                      <PlanOverviewCards 
+                        matchedScreens={matchedScreens}
+                        selectedScreens={selectedScreens}
+                        budget={filters.budget.enabled ? Number(filters.budget.total) : null}
+                        currency={filters.budget.currency}
+                        layout="vertical"
+                      />
+                    </SmartCard>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
         {view === "list" && <div className="flex-1 min-h-0 overflow-y-auto"><RightPanelV2 
           matchedScreens={matchedScreens}
           selectedScreens={selectedScreens}
-          selectedScreenIds={selectedScreenIds}
           budget={filters.budget.enabled ? Number(filters.budget.total) : null}
           currency={filters.budget.currency}
-          onSelect={(id, checked) => {
-            setSelectedScreenIds(prev => {
-              const next = new Set(prev);
-              if (checked) next.add(id); else next.delete(id);
-              return next;
-            });
-          }}
-          onSelectAll={(checked) => {
-            if (checked) setSelectedScreenIds(new Set(matchedScreens.map(s => s.id)));
-            else setSelectedScreenIds(new Set());
-          }}
-          onHover={setHoveredScreenId}
-          highlightedScreenId={hoveredScreenId}
         /></div>}
           </SmartCard>
         </div>

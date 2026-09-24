@@ -15,6 +15,12 @@ Keep prototype version identity separate from the V1/V2 rendering implementation
 
 **How to apply:** Carry the selected version identity through opening, module navigation, and save/use links; choose the layout from the duplicate's ancestry. Do not treat a new version label as a new independent code snapshot.
 
+Keep the Screen List view focused on Plan Overview, with an optional vertical overview on the map.
+
+**Why:** The user explicitly prioritizes comparing planning metrics with geography over a screen inventory table.
+
+**How to apply:** Do not reintroduce a table under Screen List without a new request. Reuse Fiber Smart Card and Metrics components for summaries; keep the map overview dismissible and clear of map controls.
+
 Keep facet search, the global All action, and selected values visible immediately when a filter is enabled.
 
 **Why:** The user rejected hiding these controls and selections inside Venue Type and Publisher dropdowns; visibility matters more than compactness here.

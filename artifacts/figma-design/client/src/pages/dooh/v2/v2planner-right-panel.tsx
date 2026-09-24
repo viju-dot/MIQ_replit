@@ -1,18 +1,14 @@
 import { ScreenData } from "../data";
 import { Button } from "@/components/ui/button";
-import { ScreenTableV2 } from "./v2planner-screen-table";
 import { EXCHANGE_RATES } from "./v2planner-sidebar";
+import { MetricsTile } from "@/components/ds/MetricsTile";
+import { SmartCard } from "./primitives";
 
 interface Props {
   matchedScreens: ScreenData[];
   selectedScreens: ScreenData[];
-  selectedScreenIds: Set<string>;
   budget: number | null;
   currency: "GBP" | "EUR" | "USD";
-  onSelect: (id: string, checked: boolean) => void;
-  onSelectAll: (checked: boolean) => void;
-  onHover: (id: string | null) => void;
-  highlightedScreenId?: string | null;
 }
 
 const formatCurrency = (amount: number, currency: "GBP" | "EUR" | "USD") => {
@@ -29,17 +25,19 @@ const formatCurrencyZero = (amount: number, currency: "GBP" | "EUR" | "USD") => 
   return `£${amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 };
 
-export function RightPanelV2({
+export function PlanOverviewCards({
   matchedScreens,
   selectedScreens,
-  selectedScreenIds,
   budget,
   currency,
-  onSelect,
-  onSelectAll,
-  onHover,
-  highlightedScreenId
-}: Props) {
+  layout = "horizontal"
+}: {
+  matchedScreens: ScreenData[];
+  selectedScreens: ScreenData[];
+  budget: number | null;
+  currency: "GBP" | "EUR" | "USD";
+  layout?: "horizontal" | "vertical";
+}) {
   const rate = EXCHANGE_RATES[currency] || 1;
 
   const screensToCalculate = selectedScreens.length > 0 ? selectedScreens : matchedScreens;
@@ -52,76 +50,72 @@ export function RightPanelV2({
   const budgetUtilization = budget ? (totalSpend / budget) * 100 : 0;
 
   return (
-    <div className="w-full min-w-0 flex-1 bg-white flex flex-col">
-      
-      <div className="flex-1 flex flex-col min-h-0">
-          <section className="shrink-0 p-5 border-b border-gray-200" aria-label="Plan Overview">
-            <h2 id="dooh-plan-overview" tabIndex={-1} className="font-semibold text-lg text-gray-900 mb-5">Plan Overview</h2>
-            
-            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 items-start">
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
-                <p className="text-xs text-gray-500 mb-1 font-medium">Matched Screens</p>
-                <p className="text-2xl font-bold text-gray-900">{matchedScreens.length}</p>
-              </div>
-              <div className="bg-purple-50 rounded-lg p-4 border border-purple-100">
-                <p className="text-xs text-purple-600 mb-1 font-medium">Selected Screens</p>
-                <p className="text-2xl font-bold text-purple-700">{selectedScreens.length}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1 font-medium">Est. Average CPM</p>
-                <p className="text-xl font-semibold text-gray-900">{formatCurrency(totalCpm, currency)}</p>
-              </div>
-              
-              <div>
-                <p className="text-xs text-gray-500 mb-1 font-medium">Est. Impressions</p>
-                <p className="text-xl font-semibold text-gray-900">{(totalImpressions / 1000000).toFixed(1)}M</p>
-              </div>
-              
-              <div>
-                <p className="text-xs text-gray-500 mb-1 font-medium">Est. Total Spend</p>
-                <p className="text-2xl font-bold text-gray-900">{formatCurrencyZero(totalSpend, currency)}</p>
-                
-                {budget !== null && (
-                  <div className="mt-3">
-                    <div className="flex justify-between text-xs mb-1.5">
-                      <span className="font-medium text-gray-500">Budget Used</span>
-                      <span className="font-semibold text-gray-700">{formatCurrencyZero(totalSpend, currency)} / {formatCurrencyZero(budget, currency)} ({budgetUtilization.toFixed(0)}%)</span>
-                    </div>
-                    <div className="h-2.5 w-full bg-gray-100 rounded-full overflow-hidden border border-gray-200">
-                      <div 
-                        className={`h-full rounded-full transition-all duration-500 ${budgetUtilization > 100 ? 'bg-red-500' : 'bg-purple-500'}`} 
-                        style={{ width: `${Math.min(budgetUtilization, 100)}%` }} 
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
+    <div className={`grid gap-4 items-start ${layout === "horizontal" ? "grid-cols-2 lg:grid-cols-5" : "grid-cols-1"}`}>
+      <MetricsTile 
+        descriptionText="Matched Screens"
+        metricValue={String(matchedScreens.length)}
+        showIcon={false}
+        fullWidth
+      />
+      <MetricsTile 
+        descriptionText="Selected Screens"
+        metricValue={String(selectedScreens.length)}
+        showIcon={false}
+        fullWidth
+        state={selectedScreens.length > 0 ? "Selected" : "Default"}
+      />
+      <MetricsTile 
+        descriptionText="Est. Average CPM"
+        metricValue={formatCurrency(totalCpm, currency)}
+        showIcon={false}
+        fullWidth
+      />
+      <MetricsTile 
+        descriptionText="Est. Impressions"
+        metricValue={(totalImpressions / 1000000).toFixed(1) + "M"}
+        showIcon={false}
+        fullWidth
+      />
+      <MetricsTile 
+        descriptionText="Est. Total Spend"
+        metricValue={formatCurrencyZero(totalSpend, currency)}
+        badgeText={budget !== null ? `${budgetUtilization.toFixed(0)}% budget used` : undefined}
+        showIcon={false}
+        fullWidth
+      />
+    </div>
+  );
+}
 
-          <div className="flex-1 overflow-hidden flex flex-col" style={{ height: 400, minHeight: 320, maxHeight: 600 }}>
-            <ScreenTableV2 
-              screens={matchedScreens}
-              selectedScreenIds={selectedScreenIds}
-              currency={currency}
-              onSelect={onSelect}
-              onSelectAll={onSelectAll}
-              onHover={onHover}
-              highlightedScreenId={highlightedScreenId}
-            />
-          </div>
+export function RightPanelV2({
+  matchedScreens,
+  selectedScreens,
+  budget,
+  currency
+}: Props) {
+  return (
+    <div className="w-full min-w-0 flex-1 bg-[var(--surface-background-lvl1,#ffffff)] flex flex-col">
+      <div className="flex-1 flex flex-col min-h-0 overflow-y-auto dooh-scrollbar p-6">
+        <SmartCard title="Plan Overview" ariaLabel="Plan Overview">
+          <PlanOverviewCards 
+            matchedScreens={matchedScreens} 
+            selectedScreens={selectedScreens} 
+            budget={budget} 
+            currency={currency} 
+            layout="horizontal" 
+          />
+        </SmartCard>
       </div>
       
       {/* Global Actions - Always visible at bottom */}
-      <div className="p-4 border-t border-gray-200 bg-gray-50 shrink-0 space-y-3">
+      <div className="p-4 border-t border-[var(--border-static-subtle-neutral,#e1e1e8)] bg-[var(--surface-background-lvl2,#f7f7fa)] shrink-0 space-y-3">
         <div className="flex gap-3">
-          <Button disabled title="Activation not connected" className="flex-1 flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:bg-gray-400">
+          <Button disabled title="Activation not connected" className="flex-1 flex items-center justify-center gap-2 bg-[var(--container-dynamic-brand-bold-background-default,#7c33b5)] hover:bg-[var(--container-dynamic-brand-bold-background-hover,#702ea3)] text-[var(--container-dynamic-brand-bold-foreground-default,#ffffff)] disabled:opacity-50 disabled:bg-[var(--container-dynamic-neutral-subtle-background-disabled,#c6c6cc)]">
             ➜ Activate
           </Button>
         </div>
-        <p className="text-[11px] text-center text-gray-500 font-medium">Activation not connected.</p>
+        <p className="text-[11px] text-center text-[var(--surface-foreground-static-neutral-lvl3,#717180)] font-medium">Activation not connected.</p>
       </div>
-
     </div>
   );
 }

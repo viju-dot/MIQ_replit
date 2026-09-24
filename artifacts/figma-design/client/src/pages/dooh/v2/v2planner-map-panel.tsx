@@ -128,7 +128,7 @@ function MapControls({ screens }: { screens: ScreenData[] }) {
 
   return (
     <div
-      className="absolute right-[var(--spacing-200,16px)] top-[var(--spacing-200,16px)] z-[1000] flex flex-col overflow-hidden rounded-[var(--radius-50,4px)]"
+      className="absolute right-[var(--spacing-200,16px)] bottom-[140px] z-[1000] flex flex-col overflow-hidden rounded-[var(--radius-50,4px)]"
       style={{ backgroundColor: CARD_BG, boxShadow: CARD_SHADOW, border: `1px solid ${GRID}` }}
       onDoubleClick={(event) => event.stopPropagation()}
       onMouseDown={(event) => event.stopPropagation()}
