@@ -656,7 +656,7 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
                         drawCircleRadius: String(Math.min(nextMax, Math.max(nextMin, current))),
                         drawMode: null,
                       });
-                     setDrawError("");
+                       setDrawError("");
                    }}>
                      <SelectTrigger className="h-6 w-[85px] text-[11px]" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectValue /></SelectTrigger>
                      <SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>
@@ -711,42 +711,42 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
                       })}
                     />
                   </div>
-                 <FiberButton 
-                   variant="secondary" 
-                   className="w-full" 
-                   onClick={() => {
-                     if (filters.planningZone.drawMode === "circle") {
-                       updateSection("planningZone", { drawMode: null });
-                     } else {
-                       if (filters.planningZone.drawCircleRadius !== "") {
-                         const r = Number(filters.planningZone.drawCircleRadius);
-                         const max = filters.planningZone.drawCircleUnit === "km" ? 10 : 10000;
-                         const min = filters.planningZone.drawCircleUnit === "km" ? 0.05 : 50;
-                         if (isNaN(r) || r < min || r > max) {
-                           setDrawError(`Radius must be between ${min} and ${max} ${filters.planningZone.drawCircleUnit}.`);
-                           return;
-                         }
-                       }
-                       updateSection("planningZone", { drawMode: "circle" });
-                       setDrawError("");
-                     }
-                   }}
-                 >
-                   {filters.planningZone.drawMode === "circle" ? "Cancel Drawing" : "Draw on Map"}
-                 </FiberButton>
-                 {drawError && <p className="text-[11px] text-[var(--surface-foreground-dynamic-error-default,#da294b)]" role="alert">{drawError}</p>}
+                  <FiberButton
+                    variant="secondary"
+                    className="w-full"
+                    onClick={() => {
+                      if (filters.planningZone.drawMode === "circle") {
+                        updateSection("planningZone", { drawMode: null });
+                      } else {
+                        if (filters.planningZone.drawCircleRadius !== "") {
+                          const r = Number(filters.planningZone.drawCircleRadius);
+                          const max = filters.planningZone.drawCircleUnit === "km" ? 10 : 10000;
+                          const min = filters.planningZone.drawCircleUnit === "km" ? 0.05 : 50;
+                          if (isNaN(r) || r < min || r > max) {
+                            setDrawError(`Radius must be between ${min} and ${max} ${filters.planningZone.drawCircleUnit}.`);
+                            return;
+                          }
+                        }
+                        updateSection("planningZone", { drawMode: "circle" });
+                        setDrawError("");
+                      }
+                    }}
+                  >
+                    {filters.planningZone.drawMode === "circle" ? "Cancel Drawing" : "Draw on Map"}
+                  </FiberButton>
+                  {drawError && <p className="text-[11px] text-[var(--surface-foreground-dynamic-error-default,#da294b)]" role="alert">{drawError}</p>}
                </div>
              )}
 
-             {filters.planningZone.drawShape === "polygon" && (
-               <FiberButton 
-                 variant="secondary" 
-                 className="w-full" 
-                 onClick={() => updateSection("planningZone", { drawMode: filters.planningZone.drawMode === "polygon" ? null : "polygon" })}
-               >
-                 {filters.planningZone.drawMode === "polygon" ? "Cancel Drawing" : "Draw on Map"}
-               </FiberButton>
-             )}
+              {filters.planningZone.drawShape === "polygon" && (
+                <FiberButton
+                  variant="secondary"
+                  className="w-full"
+                  onClick={() => updateSection("planningZone", { drawMode: filters.planningZone.drawMode === "polygon" ? null : "polygon" })}
+                >
+                  {filters.planningZone.drawMode === "polygon" ? "Cancel Drawing" : "Draw on Map"}
+                </FiberButton>
+              )}
 
             <div className="space-y-1">
               {filters.planningZone.zones.map((zone, index) => <div key={zone.id} className="flex items-center justify-between rounded bg-[var(--surface-background-lvl2,#f7f7fa)] p-2 text-xs border border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)]">
