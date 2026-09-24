@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useAudiences, useIncrementAudienceUse } from "../api";
 import { CREATIVE_FORMATS, DAYPART_PRESETS, PUBLISHERS, RESOLUTIONS, SCREENS, VENUES } from "../data";
 import { downloadScreenTemplate, parseCoordinateCsv, parsePostcodeCsv, parseScreenList, type UploadReport } from "../uploadHelpers";
-import { FiberSlider, FiberRadio, FiberButton } from "./primitives";
+import { FiberSlider, FiberRadio, FiberButton, SmartCard } from "./primitives";
 import { FiberRoundedTabsBar, FiberTabButton } from "@/components/FiberTabItem";
 import { PoiSearch } from "./PoiSearch";
 import { FiberDropZone } from "@/components/FiberDropZone";
@@ -200,11 +200,11 @@ export function SidebarV2({ filters, setFilters }: Props) {
   };
 
   return (
-    <div data-annotate="DOOH filter panel" className="w-[300px] xl:w-[340px] shrink-0 bg-[var(--surface-background-lvl1,#ffffff)] flex flex-col z-20 border-r border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)]">
-      <div className="flex-1">
-        
-        {/* 1. Location Filter */}
-        <FilterCard title="Location" icon={<MapPin className="w-4 h-4" />} enabled={filters.location.enabled} onToggle={enabled => updateSection("location", { enabled })}>
+    <div data-annotate="DOOH filter panel" className="w-[300px] xl:w-[340px] shrink-0 bg-[var(--surface-background-lvl2,#f7f7fa)] p-3 xl:p-4 flex flex-col z-20 border-r border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)] overflow-y-auto">
+      <SmartCard title="DOOH Filters" ariaLabel="DOOH Filters">
+        <div className="-mx-4 -mb-4 flex flex-col overflow-hidden rounded-b-[4px]">
+          {/* 1. Location Filter */}
+          <FilterCard title="Location" icon={<MapPin className="w-4 h-4" />} enabled={filters.location.enabled} onToggle={enabled => updateSection("location", { enabled })}>
           <div className="mb-4 pt-1 pb-1 max-w-full overflow-x-auto" role="group" aria-label="Location filter method">
             <FiberRoundedTabsBar wrap={false}>
               {(["audience", "postcode", "poi", "latlng"] as const).map(method => (
@@ -548,9 +548,9 @@ export function SidebarV2({ filters, setFilters }: Props) {
            </div>
          </FilterCard>
 
-        <div className="h-8" />
-      </div>
-
+        <div className="h-8 border-t-0" />
+        </div>
+      </SmartCard>
     </div>
   );
 }

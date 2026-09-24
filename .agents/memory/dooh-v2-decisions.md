@@ -41,6 +41,12 @@ Interpret duplicate-name “override” as an explicitly confirmed new version, 
 
 Use the TV Audience Planner's Fiber navigation as the reference for DOOH's product header.
 
+Keep source provenance visible on the map when multiple targeting inputs are active.
+
+**Why:** A map of matched screens without explaining whether results came from a geo audience, planning zone, postcode, or POI makes the inventory look arbitrary.
+
+**How to apply:** Use stable source colors and a bottom-left Match Source legend with independent counts and explicit inactive states. Keep the legend above fixed collaboration controls and separate from map controls.
+
 **Why:** The user rejected a custom MiQ wordmark/breadcrumb/demo-controls header in favor of the existing Fiber primary and Reports secondary navigation.
 
 **How to apply:** Keep Reports / Advanced active for DOOH, and place planner-specific tabs below the product navigation rather than rebuilding the top bar. The user also rejected custom styling for the module tabs: reuse the actual Fiber catalogue component and its states, not a visually similar custom tab bar.

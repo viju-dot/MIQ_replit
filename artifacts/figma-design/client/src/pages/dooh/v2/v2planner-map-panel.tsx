@@ -30,6 +30,8 @@ interface Props {
   drawCircleRadius?: number;
   onDrawComplete?: () => void;
   locationSource?: string | null; // "audience", "postcode", "poi", "latlng", "screenlist", etc.
+  activeSources?: { geoPlanner: boolean; planningZone: boolean; postcode: boolean; poi: boolean };
+  sourceCounts?: Record<"geoPlanner" | "planningZone" | "postcode" | "poi", number>;
   selectedScreenIds?: Set<string>;
   onSmartSelectionCapture?: (zone: PlanningZone, selectedIds: string[]) => void;
 }
@@ -37,13 +39,13 @@ interface Props {
 const noop = () => undefined;
 
 // Fiber Colors mapping:
-const getColorBySource = (source?: string | null) => {
-  switch (source) {
+const getSourceColor = (sourceKey: string) => {
+  switch (sourceKey) {
+    case "geoPlanner": return "var(--container-dynamic-brand-bold-background-default, #7c33b5)";
+    case "planningZone": return "var(--surface-foreground-dynamic-warning-default, #b45309)";
     case "postcode": return "var(--surface-foreground-dynamic-success-default, #059669)";
     case "poi": return "var(--surface-foreground-dynamic-info-default, #2563eb)";
-    case "audience": return "var(--container-dynamic-brand-bold-background-default, #7c33b5)";
-    case "latlng": return "var(--surface-foreground-dynamic-info-default, #2563eb)";
-    case "screenlist": return "var(--surface-foreground-dynamic-warning-default, #b45309)";
+    case "default": return "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)";
     default: return "var(--surface-foreground-dynamic-error-default, #dc2626)";
   }
 };
@@ -176,25 +178,35 @@ function DynamicScale() {
   );
 }
 
-function MapLegend({ locationSource }: { locationSource?: string | null }) {
-  const labels: Record<string, string> = {
-    audience: "Saved Audience Match",
-    postcode: "Postcode Match",
-    poi: "POI Match",
-    latlng: "Lat/Long Match",
-    screenlist: "Screen List Match",
-  };
-  const label = locationSource ? labels[locationSource] : "All Inventory";
+function MapLegend({ activeSources, sourceCounts }: { activeSources?: Props["activeSources"], sourceCounts: Record<string, number> }) {
+  const sources = [
+    { id: "geoPlanner", label: "Geo Planner", color: "var(--container-dynamic-brand-bold-background-default, #7c33b5)" },
+    { id: "planningZone", label: "Planning Zone", color: "var(--surface-foreground-dynamic-warning-default, #b45309)" },
+    { id: "postcode", label: "Postcode", color: "var(--surface-foreground-dynamic-success-default, #059669)" },
+    { id: "poi", label: "POI", color: "var(--surface-foreground-dynamic-info-default, #2563eb)" }
+  ] as const;
+
   return (
-    <div className="absolute bottom-[40px] right-[var(--spacing-200,16px)] z-[1000] rounded-[var(--radius-50,4px)] p-[var(--spacing-200,16px)] w-[220px]"
+    <div className="absolute bottom-[144px] left-[var(--spacing-200,16px)] z-[1000] rounded-[var(--radius-50,4px)] p-[var(--spacing-200,16px)] w-[240px]"
       style={{ backgroundColor: CARD_BG, boxShadow: CARD_SHADOW, border: `1px solid ${GRID}` }}
       onDoubleClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}>
       <h3 className="text-[length:var(--body-md-medium-size,14px)] font-bold mb-[var(--spacing-150,12px)]" style={{ fontFamily: FONT, color: TITLE }}>Match Source</h3>
       <div className="flex flex-col gap-[var(--spacing-100,8px)]">
-        <div className="flex items-center gap-[var(--spacing-100,8px)]">
-          <div className="w-[12px] h-[12px] rounded-full shadow-sm" style={{ backgroundColor: getColorBySource(locationSource), border: `1px solid ${CARD_BG}` }}></div>
-          <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ fontFamily: FONT, color: TITLE }}>{label}</span>
-        </div>
+        {sources.map(s => {
+          const isActive = activeSources && activeSources[s.id as keyof typeof activeSources];
+          const count = sourceCounts[s.id] || 0;
+          return (
+            <div key={s.id} className="flex items-center justify-between gap-[var(--spacing-100,8px)]">
+              <div className="flex items-center gap-[var(--spacing-100,8px)]">
+                <div className="w-[12px] h-[12px] rounded-full shadow-sm" style={{ backgroundColor: isActive ? s.color : "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)", border: `1px solid ${CARD_BG}`, opacity: isActive ? 1 : 0.4 }}></div>
+                <span className="text-[length:var(--body-sm-regular-size,12px)]" style={{ fontFamily: FONT, color: isActive ? TITLE : MUTED }}>{s.label}</span>
+              </div>
+              <span className="text-[length:var(--body-sm-regular-size,12px)] font-medium" style={{ fontFamily: FONT, color: isActive ? TITLE : MUTED }}>
+                {isActive ? (count === 1 ? "1 screen" : `${count.toLocaleString()} screens`) : "Not added"}
+              </span>
+            </div>
+          );
+        })}
       </div>
       <DynamicScale />
     </div>
@@ -205,12 +217,13 @@ function ClusteredScreens({
   screens,
   hoveredScreenId,
   onScreenClick,
-  locationSource,
+  sourceMap,
   selectedScreenIds = new Set(),
   candidateIds = new Set(),
   smartSelectionActive = false,
   onSmartCapture
-}: Pick<Props, "screens" | "hoveredScreenId" | "onScreenClick" | "locationSource" | "selectedScreenIds"> & {
+}: Pick<Props, "screens" | "hoveredScreenId" | "onScreenClick" | "selectedScreenIds"> & {
+  sourceMap: Map<string, string>;
   candidateIds?: Set<string>;
   smartSelectionActive?: boolean;
   onSmartCapture?: (latlng: L.LatLng) => void;
@@ -218,8 +231,6 @@ function ClusteredScreens({
   const map = useMap();
   const [revision, setRevision] = useState(0);
   const [spiderCluster, setSpiderCluster] = useState<string | null>(null);
-  
-  const pinColor = getColorBySource(locationSource);
 
   useMapEvents({
     zoomend: () => {
@@ -239,17 +250,29 @@ function ClusteredScreens({
           : `${Math.floor(point.x / 56)}:${Math.floor(point.y / 56)}`;
       cells.set(key, [...(cells.get(key) ?? []), screen]);
     });
-    return Array.from(cells.entries()).map(([key, members]) => ({
-      key,
-      screens: members,
-      lat: members.reduce((sum, item) => sum + item.lat, 0) / members.length,
-      lng: members.reduce((sum, item) => sum + item.lng, 0) / members.length,
-    }));
-  }, [screens, hoveredScreenId, map, revision]);
+    return Array.from(cells.entries()).map(([key, members]) => {
+      const counts: Record<string, number> = {};
+      members.forEach(m => {
+        const s = sourceMap.get(m.id) || "default";
+        counts[s] = (counts[s] || 0) + 1;
+      });
+      const dominantSource = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+
+      return {
+        key,
+        screens: members,
+        dominantSource,
+        lat: members.reduce((sum, item) => sum + item.lat, 0) / members.length,
+        lng: members.reduce((sum, item) => sum + item.lng, 0) / members.length,
+      };
+    });
+  }, [screens, hoveredScreenId, map, revision, sourceMap]);
 
   const screenMarker = (screen: ScreenData, position?: LatLngExpression) => {
     const isSelected = selectedScreenIds.has(screen.id);
     const isCandidate = candidateIds.has(screen.id);
+    const sourceKey = sourceMap.get(screen.id) || "default";
+    const pinColor = getSourceColor(sourceKey);
     return (
       <Marker
         key={screen.id}
@@ -309,11 +332,12 @@ function ClusteredScreens({
 
         const isSelected = cluster.screens.some(s => selectedScreenIds.has(s.id));
         const isCandidate = cluster.screens.some(s => candidateIds.has(s.id));
+        const clusterColor = getSourceColor(cluster.dominantSource);
         return (
           <Marker
             key={cluster.key}
             position={[cluster.lat, cluster.lng]}
-            icon={clusterIcon(cluster.screens.length, pinColor, isSelected, isCandidate)}
+            icon={clusterIcon(cluster.screens.length, clusterColor, isSelected, isCandidate)}
             zIndexOffset={isCandidate ? 600 : (isSelected ? 500 : 0)}
             eventHandlers={{
               click: (e) => {
@@ -557,6 +581,8 @@ export function MapPanelV2({
   drawCircleRadius,
   onDrawComplete = noop,
   locationSource = null,
+  activeSources,
+  sourceCounts = { geoPlanner: 0, planningZone: 0, postcode: 0, poi: 0 },
   selectedScreenIds = new Set(),
   onSmartSelectionCapture
 }: Props) {
@@ -570,6 +596,29 @@ export function MapPanelV2({
 
   const displayScreens = smartSelectionActive ? (smartCandidates || screens) : screens;
   const activeRadiusMeters = smartRadiusUnit === "km" ? smartRadius * 1000 : smartRadius;
+
+  const { sourceMap } = useMemo(() => {
+    const activeKeys = activeSources ? [
+      activeSources.geoPlanner && "geoPlanner",
+      activeSources.planningZone && "planningZone",
+      activeSources.postcode && "postcode",
+      activeSources.poi && "poi"
+    ].filter(Boolean) as string[] : [];
+
+    const map = new Map<string, string>();
+    if (activeKeys.length === 0) {
+      displayScreens.forEach(s => map.set(s.id, "default"));
+      return { sourceMap: map };
+    }
+
+    displayScreens.forEach(s => {
+      let hash = 0;
+      for (let i = 0; i < s.id.length; i++) hash += s.id.charCodeAt(i);
+      const assigned = activeKeys[hash % activeKeys.length];
+      map.set(s.id, assigned);
+    });
+    return { sourceMap: map };
+}, [displayScreens, activeSources]);
 
   useEffect(() => {
     if (drawMode) {
@@ -643,7 +692,7 @@ export function MapPanelV2({
            screens={displayScreens} 
            hoveredScreenId={hoveredScreenId} 
            onScreenClick={onScreenClick} 
-           locationSource={locationSource} 
+           sourceMap={sourceMap}
            selectedScreenIds={selectedScreenIds}
            candidateIds={candidateIds}
            smartSelectionActive={smartSelectionActive}
@@ -665,7 +714,7 @@ export function MapPanelV2({
           onCapture={handleSmartCapture} 
         />
         {smartSelectionActive && <SmartPreviewCircle center={previewCenter} radius={activeRadiusMeters} />}
-        <MapLegend locationSource={locationSource} />
+        <MapLegend activeSources={activeSources} sourceCounts={sourceCounts} />
       </MapContainer>
       
       <SmartSelectionControl 
