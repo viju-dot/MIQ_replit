@@ -466,7 +466,7 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
   };
 
   return (
-    <div data-annotate="DOOH filter panel" className="w-[300px] xl:w-[340px] shrink-0 bg-[var(--surface-background-lvl2,#f7f7fa)] p-3 xl:p-4 flex flex-col z-20 overflow-y-auto pl-[0px] pr-[0px] pt-[0px] pb-[0px]">
+    <div data-annotate="DOOH filter panel" className="w-[300px] xl:w-[340px] shrink-0 bg-[var(--surface-background-lvl2,#f7f7fa)] flex flex-col z-20 overflow-y-auto">
       <SmartCard title="DOOH Filters" ariaLabel="DOOH Filters">
         <div className="-mx-4 -mb-4 flex flex-col overflow-hidden rounded-b-[4px]">
           {/* 1. Location Filter */}
