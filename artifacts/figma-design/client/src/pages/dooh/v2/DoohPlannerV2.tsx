@@ -182,10 +182,11 @@ export default function DoohPlannerV2({ demoView = false }: { demoView?: boolean
       : null;
       
   const activeSources = {
-    geoPlanner: filters.location.enabled && filters.location.method === "audience" && !!filters.location.audienceId,
+    geoPlanner: filters.location.enabled && !!filters.location.audienceId,
     planningZone: filters.planningZone.enabled && filters.planningZone.zones.length > 0,
-    postcode: filters.location.enabled && filters.location.method === "postcode" && filters.location.uploadedPoints.length > 0,
-    poi: filters.location.enabled && filters.location.method === "poi" && filters.location.poiIds.length > 0,
+    postcode: filters.location.enabled && filters.location.uploadedPointsByMethod.postcode.length > 0,
+    latlng: filters.location.enabled && filters.location.uploadedPointsByMethod.latlng.length > 0,
+    poi: filters.location.enabled && filters.location.poiIds.length > 0,
   };
 
   // Match Source reports each active input independently. This keeps a
@@ -233,7 +234,12 @@ export default function DoohPlannerV2({ demoView = false }: { demoView?: boolean
           : countAround(audiencePoints)
         : 0,
       planningZone: planningZoneCount,
-      postcode: activeSources.postcode ? countAround(filters.location.uploadedPoints) : 0,
+      postcode: activeSources.postcode
+        ? countAround(filters.location.uploadedPointsByMethod.postcode)
+        : 0,
+      latlng: activeSources.latlng
+        ? countAround(filters.location.uploadedPointsByMethod.latlng)
+        : 0,
       poi: activeSources.poi
         ? countAround(MOCK_POIS
             .filter(poi => filters.location.poiIds.includes(poi.id))
@@ -241,7 +247,7 @@ export default function DoohPlannerV2({ demoView = false }: { demoView?: boolean
         : 0,
     };
   }, [activeSources.geoPlanner, activeSources.planningZone, activeSources.postcode,
-    activeSources.poi, audiences, filters]);
+    activeSources.latlng, activeSources.poi, audiences, filters]);
       
   const selectedScreens = matchedScreens.filter(screen => selectedScreenIds.has(screen.id));
   const { csvDownload, handleExport } = useScreenExport(

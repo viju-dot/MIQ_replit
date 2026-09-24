@@ -68,3 +68,9 @@ Keep Postcode and Lat/Long uploads as separate location-method states.
 **Why:** Switching location methods should not destroy a previously uploaded file, but it must not show a Postcode preview under Lat/Long or apply the wrong points to the active method.
 
 **How to apply:** Render only the selected method's upload state, restore that state's records when switching back, and let explicit file removal clear only the active method.
+
+Match Source should summarize every populated targeting input, not only the currently selected Location method.
+
+**Why:** The legend replaces duplicated geography controls by explaining the provenance of all map inputs. Hiding Postcode, POI, Lat/Long, or Saved Audience as soon as another method is selected makes existing data appear to disappear.
+
+**How to apply:** Keep source presence and counts independent for Planning Zone, Saved Audience, Postcode, Lat/Long, and POI; switching tabs should only change the active editor and matching geography, not erase other legend rows.

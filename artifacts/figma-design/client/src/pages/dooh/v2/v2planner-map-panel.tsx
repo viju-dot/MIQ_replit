@@ -30,8 +30,8 @@ interface Props {
   drawCircleRadius?: number;
   onDrawComplete?: () => void;
   locationSource?: string | null; // "audience", "postcode", "poi", "latlng", "screenlist", etc.
-  activeSources?: { geoPlanner: boolean; planningZone: boolean; postcode: boolean; poi: boolean };
-  sourceCounts?: Record<"geoPlanner" | "planningZone" | "postcode" | "poi", number>;
+  activeSources?: { geoPlanner: boolean; planningZone: boolean; postcode: boolean; latlng: boolean; poi: boolean };
+  sourceCounts?: Record<"geoPlanner" | "planningZone" | "postcode" | "latlng" | "poi", number>;
   selectedScreenIds?: Set<string>;
   onSmartSelectionCapture?: (zone: PlanningZone, selectedIds: string[]) => void;
 }
@@ -44,6 +44,7 @@ const getSourceColor = (sourceKey: string) => {
     case "geoPlanner": return "var(--container-dynamic-brand-bold-background-default, #7c33b5)";
     case "planningZone": return "var(--surface-foreground-dynamic-warning-default, #b45309)";
     case "postcode": return "var(--surface-foreground-dynamic-success-default, #059669)";
+    case "latlng": return "var(--surface-foreground-dynamic-info-variation, #0f766e)";
     case "poi": return "var(--surface-foreground-dynamic-info-default, #2563eb)";
     case "default": return "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)";
     default: return "var(--surface-foreground-dynamic-error-default, #dc2626)";
@@ -183,6 +184,7 @@ function MapLegend({ activeSources, sourceCounts }: { activeSources?: Props["act
     { id: "geoPlanner", label: "Geo Planner", color: "var(--container-dynamic-brand-bold-background-default, #7c33b5)" },
     { id: "planningZone", label: "Planning Zone", color: "var(--surface-foreground-dynamic-warning-default, #b45309)" },
     { id: "postcode", label: "Postcode", color: "var(--surface-foreground-dynamic-success-default, #059669)" },
+    { id: "latlng", label: "Lat/Long", color: "var(--surface-foreground-dynamic-info-variation, #0f766e)" },
     { id: "poi", label: "POI", color: "var(--surface-foreground-dynamic-info-default, #2563eb)" }
   ] as const;
 
@@ -582,7 +584,7 @@ export function MapPanelV2({
   onDrawComplete = noop,
   locationSource = null,
   activeSources,
-  sourceCounts = { geoPlanner: 0, planningZone: 0, postcode: 0, poi: 0 },
+  sourceCounts = { geoPlanner: 0, planningZone: 0, postcode: 0, latlng: 0, poi: 0 },
   selectedScreenIds = new Set(),
   onSmartSelectionCapture
 }: Props) {
@@ -602,6 +604,7 @@ export function MapPanelV2({
       activeSources.geoPlanner && "geoPlanner",
       activeSources.planningZone && "planningZone",
       activeSources.postcode && "postcode",
+      activeSources.latlng && "latlng",
       activeSources.poi && "poi"
     ].filter(Boolean) as string[] : [];
 

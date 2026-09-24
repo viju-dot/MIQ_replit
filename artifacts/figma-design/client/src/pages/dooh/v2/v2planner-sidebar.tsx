@@ -49,6 +49,10 @@ export interface FilterStateV2 {
     radius: number | "";
     radiusUnit: "m" | "km";
     uploadedPoints: Array<{ lat: number; lng: number }>;
+    uploadedPointsByMethod: {
+      postcode: Array<{ lat: number; lng: number }>;
+      latlng: Array<{ lat: number; lng: number }>;
+    };
   };
   planningZone: { enabled: boolean; zones: PlanningZone[]; drawMode: "circle" | "polygon" | null; drawShape: "circle" | "polygon"; drawCircleRadius: string; drawCircleUnit: "m" | "km" };
   venueType: { enabled: boolean; venues: string[] };
@@ -67,7 +71,17 @@ export interface FilterStateV2 {
 }
 
 export const DEFAULT_FILTERS_V2: FilterStateV2 = {
-  location: { enabled: true, method: "audience", audienceId: "", postcode: "", poiIds: [], radius: 500, radiusUnit: "m", uploadedPoints: [] },
+  location: {
+    enabled: true,
+    method: "audience",
+    audienceId: "",
+    postcode: "",
+    poiIds: [],
+    radius: 500,
+    radiusUnit: "m",
+    uploadedPoints: [],
+    uploadedPointsByMethod: { postcode: [], latlng: [] },
+  },
   planningZone: { enabled: false, zones: [], drawMode: null, drawShape: "circle", drawCircleRadius: "", drawCircleUnit: "km" },
   venueType: { enabled: false, venues: [] },
   publishers: { enabled: false, publishers: [] },
@@ -149,6 +163,10 @@ export function createDemoFilters(): FilterStateV2 {
       radius: DEMO_RADIUS_METERS,
       radiusUnit: "m",
       uploadedPoints: DEMO_UPLOADS.location.records.map(record => record.point),
+      uploadedPointsByMethod: {
+        postcode: DEMO_UPLOADS.location.records.map(record => record.point),
+        latlng: [],
+      },
     },
     planningZone: {
       enabled: true,
@@ -252,22 +270,47 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
 
   const activeLocationMethod: LocationUploadMethod = filters.location.method === "latlng" ? "latlng" : "postcode";
   const activeLocationUpload = locationUploads[activeLocationMethod];
+  const updateLocationPoints = (method: LocationUploadMethod, points: Array<{ lat: number; lng: number }>) => {
+    setFilters(prev => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        uploadedPointsByMethod: {
+          ...prev.location.uploadedPointsByMethod,
+          [method]: points,
+        },
+        uploadedPoints: prev.location.method === method ? points : prev.location.uploadedPoints,
+      },
+    }));
+  };
   const updateLocationUpload = (method: LocationUploadMethod, data: Partial<LocationUploadState>) => {
     setLocationUploads(prev => ({ ...prev, [method]: { ...prev[method], ...data } }));
   };
 
   const selectLocationMethod = (method: "audience" | "postcode" | "poi" | "latlng") => {
-    updateSection("location", { method });
     setUploadError("");
     if (method === "postcode" || method === "latlng") {
       const upload = locationUploads[method];
-      updateSection("location", {
-        uploadedPoints: upload.records
-          .filter(record => upload.selectedKeys.has(record.key))
-          .map(record => record.point),
-      });
+      const points = upload.records
+        .filter(record => upload.selectedKeys.has(record.key))
+        .map(record => record.point);
+      setFilters(prev => ({
+        ...prev,
+        location: {
+          ...prev.location,
+          method,
+          uploadedPoints: points,
+        },
+      }));
     } else {
-      updateSection("location", { uploadedPoints: [] });
+      setFilters(prev => ({
+        ...prev,
+        location: {
+          ...prev.location,
+          method,
+          uploadedPoints: [],
+        },
+      }));
     }
   };
 
@@ -276,7 +319,7 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
     updateLocationUpload(method, emptyLocationUpload());
     setUploadError("");
     if (filters.location.method === method) {
-      updateSection("location", { uploadedPoints: [] });
+      updateLocationPoints(method, []);
     }
   };
 
@@ -286,7 +329,7 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
     uploadIdRef.current[method]++;
     updateLocationUpload(method, emptyLocationUpload());
     if (filters.location.method === method) {
-      updateSection("location", { uploadedPoints: [] });
+      updateLocationPoints(method, []);
     }
   };
 
@@ -305,7 +348,7 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
     });
     setUploadError("");
     if (filters.location.method === method) {
-      updateSection("location", { uploadedPoints: [] });
+      updateLocationPoints(method, []);
     }
     try {
       const result = await parser(file);
@@ -318,14 +361,14 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
         selectedKeys: new Set(result.records.map(record => record.key)),
       });
       if (filters.location.method === method) {
-        updateSection("location", { uploadedPoints: result.points });
+        updateLocationPoints(method, result.points);
       }
     } catch (error) {
       if (uploadIdRef.current[method] !== currentUploadId) return;
       setUploadError(error instanceof Error ? error.message : "Could not read this file.");
       updateLocationUpload(method, emptyLocationUpload());
       if (filters.location.method === method) {
-        updateSection("location", { uploadedPoints: [] });
+        updateLocationPoints(method, []);
       }
     }
   };
@@ -387,11 +430,12 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
     if (next.has(key)) next.delete(key);
     else next.add(key);
     updateLocationUpload(activeLocationMethod, { selectedKeys: next });
-    updateSection("location", {
-      uploadedPoints: activeLocationUpload.records
+    updateLocationPoints(
+      activeLocationMethod,
+      activeLocationUpload.records
         .filter(record => next.has(record.key))
         .map(record => record.point),
-    });
+    );
   };
 
   const toggleScreenListRecord = (key: string) => {
