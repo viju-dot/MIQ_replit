@@ -4,6 +4,8 @@ import { ArrowUpDown } from "lucide-react";
 import { EXCHANGE_RATES } from "./v2planner-sidebar";
 import { Checkbox as FiberCheckbox } from "../../ds/CheckPage";
 import { SearchStandard } from "../../ds/SearchPage";
+import { PaginationButton, PaginationLabel } from "../../ds/PaginationPage";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { CARD_BG, TITLE } from "./primitives";
 
 interface Props {
@@ -21,6 +23,8 @@ type SortConfig = { key: keyof ScreenData; dir: 'asc' | 'desc' } | null;
 export function ScreenTableV2({ screens, selectedScreenIds, currency, onSelect, onSelectMany, onHover, highlightedScreenId }: Props) {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortConfig>(null);
+  const [pageSize, setPageSize] = useState<number>(15);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const highlightedRow = useRef<HTMLTableRowElement>(null);
   const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
   
@@ -35,6 +39,11 @@ export function ScreenTableV2({ screens, selectedScreenIds, currency, onSelect, 
       highlightedRow.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
   }, [highlightedScreenId]);
+
+  // Reset page on search or sort change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, sort, pageSize]);
 
   const filteredAndSorted = useMemo(() => {
     let result = screens;
@@ -62,8 +71,23 @@ export function ScreenTableV2({ screens, selectedScreenIds, currency, onSelect, 
     return result;
   }, [screens, search, sort, rate, currencySymbol]);
 
-  const allSelected = filteredAndSorted.length > 0 && filteredAndSorted.every(s => selectedScreenIds.has(s.id));
-  const someSelected = filteredAndSorted.length > 0 && filteredAndSorted.some(s => selectedScreenIds.has(s.id));
+  const totalPages = Math.max(1, Math.ceil(filteredAndSorted.length / pageSize));
+
+  // Clamp if data changes
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
+  const paginatedScreens = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredAndSorted.slice(start, start + pageSize);
+  }, [filteredAndSorted, currentPage, pageSize]);
+
+  const currentPageIds = paginatedScreens.map(s => s.id);
+  const allSelected = currentPageIds.length > 0 && currentPageIds.every(id => selectedScreenIds.has(id));
+  const someSelected = currentPageIds.length > 0 && currentPageIds.some(id => selectedScreenIds.has(id));
 
   const handleSort = (key: keyof ScreenData) => {
     setSort(prev => {
@@ -81,8 +105,7 @@ export function ScreenTableV2({ screens, selectedScreenIds, currency, onSelect, 
   };
 
   const handleSelectAll = (checked: boolean) => {
-    const ids = filteredAndSorted.map(s => s.id);
-    onSelectMany(ids, checked);
+    onSelectMany(currentPageIds, checked);
   };
 
   const onRowMouseEnter = (id: string) => {
@@ -118,7 +141,7 @@ export function ScreenTableV2({ screens, selectedScreenIds, currency, onSelect, 
           <thead className="sticky top-0 shadow-sm z-10 uppercase tracking-wider" style={{ backgroundColor: "var(--surface-background-lvl2, #f7f7fa)", color: "var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59)" }}>
             <tr>
               <th className="px-3 py-2.5 w-[44px] border-b border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]">
-                <div aria-label="Select all visible screens">
+                <div aria-label="Select all screens on this page">
                   <FiberCheckbox 
                     variant={allSelected ? "Checked" : someSelected ? "Partial" : "Unchecked"}
                     onToggle={() => handleSelectAll(!allSelected)}
@@ -165,14 +188,14 @@ export function ScreenTableV2({ screens, selectedScreenIds, currency, onSelect, 
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]">
-            {filteredAndSorted.length === 0 ? (
+            {paginatedScreens.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-4 py-8 text-center" style={{ color: "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)", backgroundColor: "var(--surface-background-lvl2, #f7f7fa)" }}>
                   No screens match the search query.
                 </td>
               </tr>
             ) : (
-              filteredAndSorted.map(s => {
+              paginatedScreens.map(s => {
                 const isSelected = selectedScreenIds.has(s.id);
                 const isHighlighted = s.id === highlightedScreenId;
                 
@@ -213,8 +236,50 @@ export function ScreenTableV2({ screens, selectedScreenIds, currency, onSelect, 
           </tbody>
         </table>
       </div>
-      <div className="p-2 border-t text-[11px] text-center" style={{ borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59)", backgroundColor: "var(--surface-background-lvl2, #f7f7fa)" }}>
-        Showing {filteredAndSorted.length} screens
+      <div aria-label="Screen table pagination" className="flex flex-wrap gap-3 items-center justify-between p-2 border-t border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)] bg-[var(--surface-background-lvl1,#ffffff)] shrink-0">
+        <div className="flex items-center gap-2">
+          <p className="text-[length:var(--body-md-regular-size,14px)] text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)] font-normal">
+            Rows per page
+          </p>
+          <Select value={pageSize.toString()} onValueChange={(v) => setPageSize(Number(v))}>
+            <SelectTrigger aria-label="Rows per page" style={{ backgroundColor: CARD_BG, color: TITLE, borderColor: "var(--border-dynamic-neutral-subtle-default)" }} className="h-[34px] w-[70px] rounded-[var(--radius-25,2px)] text-[14px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent style={{ backgroundColor: CARD_BG, color: TITLE, borderColor: "var(--border-dynamic-neutral-subtle-default)" }}>
+              {[15, 30, 60].map((size) => (
+                <SelectItem 
+                  key={size} 
+                  value={size.toString()}
+                  className="focus:bg-[var(--container-dynamic-neutral-subtle-background-hover,rgba(113,113,128,0.08))] focus:text-[var(--surface-foreground-dynamic-neutral-default-variation,#13131a)] cursor-pointer"
+                >
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div 
+          className="flex items-center gap-2"
+          style={{ "--surface-foreground-static-neutral-lvl1": "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" } as React.CSSProperties}
+        >
+          <PaginationLabel 
+            labelValue={
+              filteredAndSorted.length === 0 
+                ? "0 screens" 
+                : `${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, filteredAndSorted.length)} of ${filteredAndSorted.length} screens`
+            } 
+          />
+          <PaginationButton
+            direction="left"
+            disabled={currentPage <= 1}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+          />
+          <PaginationButton
+            direction="right"
+            disabled={currentPage >= totalPages || totalPages === 0}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+          />
+        </div>
       </div>
     </div>
   );

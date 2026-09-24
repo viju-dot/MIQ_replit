@@ -4,13 +4,13 @@ import type { PlaygroundConfig } from "@/components/playground/types";
 
 const TOTAL_PAGES = 20;
 
-type PaginationLabelProps = {
+export type PaginationLabelProps = {
   isDisabled?: boolean;
   isInverted?: boolean;
   labelValue?: string;
 };
 
-function PaginationLabel({
+export function PaginationLabel({
   isDisabled = false,
   isInverted = false,
   labelValue = "x of y",
@@ -40,13 +40,13 @@ function PaginationLabel({
   );
 }
 
-type PaginationButtonProps = {
+export type PaginationButtonProps = {
   direction: "left" | "right";
   disabled?: boolean;
   onClick?: () => void;
 };
 
-function PaginationButton({ direction, disabled, onClick }: PaginationButtonProps) {
+export function PaginationButton({ direction, disabled, onClick }: PaginationButtonProps) {
   return (
     <button
       type="button"
