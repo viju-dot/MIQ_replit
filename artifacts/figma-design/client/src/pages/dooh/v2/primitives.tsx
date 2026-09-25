@@ -258,27 +258,51 @@ export function IconButton({
   onClick,
   disabled = false,
   ariaLabel,
+  title,
+  variant = "ghost",
+  ariaPressed,
 }: {
   icon: any;
   onClick?: () => void;
   disabled?: boolean;
   ariaLabel?: string;
+  title?: string;
+  variant?: "ghost" | "secondary";
+  ariaPressed?: boolean;
 }) {
   const [hover, setHover] = useState(false);
   const inactive = disabled;
+  const isSecondary = variant === "secondary";
   return (
     <button
       type="button"
       disabled={inactive}
       aria-disabled={inactive}
       aria-label={ariaLabel}
+      aria-pressed={ariaPressed}
+      title={title}
       onClick={onClick}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       className="flex size-8 items-center justify-center rounded-[var(--radius-25,2px)] transition-colors focus:outline-none focus-visible:ring-2"
       style={{
-        backgroundColor: hover && !inactive ? "var(--container-dynamic-error-subtle-background-selected, #ffedef)" : "transparent",
-        color: hover && !inactive ? "var(--surface-foreground-dynamic-error-default, #da294b)" : "var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59)",
+        backgroundColor: inactive
+          ? "var(--container-dynamic-neutral-subtle-background-disabled, #7171801a)"
+          : hover
+            ? isSecondary
+              ? "var(--container-dynamic-neutral-subtle-background-hover, rgba(113,113,128,0.08))"
+              : "var(--container-dynamic-error-subtle-background-selected, #ffedef)"
+            : isSecondary
+              ? "var(--surface-background-lvl2, #f7f7fa)"
+              : "transparent",
+        border: isSecondary
+          ? "1px solid var(--border-dynamic-neutral-subtle-default, #e1e1e8)"
+          : undefined,
+        color: inactive
+          ? "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)"
+          : hover && !isSecondary
+            ? "var(--surface-foreground-dynamic-error-default, #da294b)"
+            : "var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59)",
       }}
     >
       <IconComponent size={20} />

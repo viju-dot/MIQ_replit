@@ -4,8 +4,9 @@ import { useAudiences } from "../api";
 import { SidebarV2, FilterStateV2, DEFAULT_FILTERS_V2, EXCHANGE_RATES, PlanningZone, createDemoFilters, DEMO_UPLOADS } from "./v2planner-sidebar";
 import { MapPanelV2 } from "./v2planner-map-panel";
 import { RightPanelV2, PlanOverviewCards } from "./v2planner-right-panel";
-import { FiberButton, SmartCard, TabsBarUnderline } from "./primitives";
-import { Download } from "lucide-react";
+import { FiberButton, IconButton, SmartCard, TabsBarUnderline } from "./primitives";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Download, Maximize2 } from "lucide-react";
 import { useScreenExport } from "./useScreenExport";
 import "./DoohPlannerV2.css";
 
@@ -17,6 +18,7 @@ export default function DoohPlannerV2({ demoView = false }: { demoView?: boolean
   const [hoveredScreenId, setHoveredScreenId] = useState<string | null>(null);
   const [view, setView] = useState<"map" | "list">("map");
   const [showMapOverview, setShowMapOverview] = useState(false);
+  const [showMapExpanded, setShowMapExpanded] = useState(false);
 
   const { data: audiences } = useAudiences();
 
@@ -255,6 +257,40 @@ export default function DoohPlannerV2({ demoView = false }: { demoView?: boolean
     filters.budget.currency,
   );
 
+  const renderMapPanel = (expanded = false) => (
+    <MapPanelV2
+      screens={matchedScreens}
+      smartCandidates={smartCandidates}
+      hoveredScreenId={hoveredScreenId}
+      onScreenClick={setHoveredScreenId}
+      zones={filters.planningZone.zones}
+      onZonesChange={zones => setFilters(prev => ({ ...prev, planningZone: { ...prev.planningZone, zones } }))}
+      drawMode={filters.planningZone.drawMode}
+      drawCircleRadius={filters.planningZone.drawCircleRadius !== "" ? Number(filters.planningZone.drawCircleRadius) * (filters.planningZone.drawCircleUnit === "km" ? 1000 : 1) : undefined}
+      onDrawComplete={() => setFilters(prev => ({ ...prev, planningZone: { ...prev.planningZone, drawMode: null } }))}
+      expanded={expanded}
+      locationSource={locationMethod}
+      activeSources={activeSources}
+      sourceCounts={sourceCounts}
+      selectedScreenIds={selectedScreenIds}
+      onSmartSelectionCapture={(zone: PlanningZone, screenIds: string[]) => {
+        setFilters(prev => ({
+          ...prev,
+          planningZone: {
+            ...prev.planningZone,
+            enabled: true,
+            zones: [...prev.planningZone.zones, zone],
+          },
+        }));
+        setSelectedScreenIds(prev => {
+          const next = new Set(prev);
+          screenIds.forEach((id: string) => next.add(id));
+          return next;
+        });
+      }}
+    />
+  );
+
   return (
     <div className="dooh-v2-planner flex flex-col flex-1 min-h-0 font-fiber">
       <div className="flex flex-1 min-h-0 items-start gap-6">
@@ -279,39 +315,10 @@ export default function DoohPlannerV2({ demoView = false }: { demoView?: boolean
           </div>}
           {view === "map" && (
             <div className="relative flex-1 min-h-0 flex flex-col">
-              <MapPanelV2 
-                screens={matchedScreens}
-                smartCandidates={smartCandidates}
-                hoveredScreenId={hoveredScreenId}
-                onScreenClick={setHoveredScreenId}
-                zones={filters.planningZone.zones}
-                onZonesChange={zones => setFilters(prev => ({ ...prev, planningZone: { ...prev.planningZone, zones } }))}
-                drawMode={filters.planningZone.drawMode}
-                drawCircleRadius={filters.planningZone.drawCircleRadius !== "" ? Number(filters.planningZone.drawCircleRadius) * (filters.planningZone.drawCircleUnit === "km" ? 1000 : 1) : undefined}
-                onDrawComplete={() => setFilters(prev => ({ ...prev, planningZone: { ...prev.planningZone, drawMode: null } }))}
-                locationSource={locationMethod}
-                activeSources={activeSources}
-                sourceCounts={sourceCounts}
-                selectedScreenIds={selectedScreenIds}
-                onSmartSelectionCapture={(zone: PlanningZone, screenIds: string[]) => {
-                  setFilters(prev => ({
-                    ...prev,
-                    planningZone: {
-                      ...prev.planningZone,
-                      enabled: true,
-                      zones: [...prev.planningZone.zones, zone]
-                    }
-                  }));
-                  setSelectedScreenIds(prev => {
-                    const next = new Set(prev);
-                    screenIds.forEach((id: string) => next.add(id));
-                    return next;
-                  });
-                }}
-              />
+              {!showMapExpanded && renderMapPanel()}
               <div className="absolute top-[16px] right-[16px] bottom-[260px] z-[1000] flex flex-col items-end gap-2 pointer-events-none">
-                <div className="pointer-events-auto shrink-0">
-                  <FiberButton 
+                <div className="pointer-events-auto flex items-center gap-2 shrink-0">
+                  <FiberButton
                     variant={showMapOverview ? "solid" : "secondary"}
                     onClick={() => setShowMapOverview(s => !s)}
                     aria-expanded={showMapOverview}
@@ -319,6 +326,13 @@ export default function DoohPlannerV2({ demoView = false }: { demoView?: boolean
                   >
                     {showMapOverview ? "Hide Plan Overview" : "Show Plan Overview"}
                   </FiberButton>
+                  <IconButton
+                    icon={Maximize2}
+                    variant="secondary"
+                    onClick={() => setShowMapExpanded(true)}
+                    ariaLabel="Expand view"
+                    title="Expand view"
+                  />
                 </div>
                 {showMapOverview && (
                   <div id="map-plan-overview" className="pointer-events-auto w-[280px] min-h-0 overflow-y-auto mt-2 dooh-scrollbar pb-2">
@@ -334,6 +348,24 @@ export default function DoohPlannerV2({ demoView = false }: { demoView?: boolean
                   </div>
                 )}
               </div>
+              <Dialog open={showMapExpanded} onOpenChange={setShowMapExpanded}>
+                <DialogContent className="z-[2000] flex h-[calc(100vh-32px)] w-[calc(100vw-32px)] max-w-none flex-col gap-0 overflow-hidden border-0 bg-[var(--surface-background-lvl1,#ffffff)] p-0 sm:max-w-none">
+                  <div className="flex h-full min-h-0 flex-col">
+                    <DialogTitle
+                      className="flex h-[48px] shrink-0 items-center border-b border-solid px-4 pr-14 text-left text-[length:var(--body-md-medium-size,14px)] font-medium"
+                      style={{
+                        borderColor: "var(--border-static-subtle-neutral,#e1e1e8)",
+                        color: "var(--surface-foreground-static-neutral-lvl1,#13131a)",
+                      }}
+                    >
+                      Expanded map view
+                    </DialogTitle>
+                    <div className="min-h-0 flex-1">
+                      {showMapExpanded && renderMapPanel(true)}
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           )}
 
