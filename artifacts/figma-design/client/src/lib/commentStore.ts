@@ -155,8 +155,8 @@ export interface CommentRepository {
   listAuthors(): string[];
   /** The persisted color currently associated with an author. */
   colorForAuthor(author: string): CommentColor;
-  /** Persist a new comment. Throws on empty author/text. */
-  add(input: NewCommentInput): PrototypeComment;
+  /** Persist a new comment. The shared repository resolves only after the API confirms it. */
+  add(input: NewCommentInput): PrototypeComment | Promise<PrototypeComment>;
   resolve(id: string, actor: string): void;
   reopen(id: string, actor: string): void;
 }
@@ -512,9 +512,9 @@ function cacheComments(prototypeId: string, comments: PrototypeComment[]): void 
  * An unreachable API deliberately yields an empty live store: the database is
  * the source of truth and the prototype must remain usable without crashing.
  */
-export async function hydrateComments(prototypeId: string): Promise<void> {
+export async function hydrateComments(prototypeId: string): Promise<boolean> {
   try {
-    const response = await fetch(commentsUrl(prototypeId));
+    const response = await fetch(commentsUrl(prototypeId), { cache: "no-store" });
     if (!response.ok) throw new Error(`Comment load failed (${response.status})`);
     const raw: unknown = await response.json();
     if (!Array.isArray(raw)) throw new Error("Comment API returned a non-array");
@@ -551,6 +551,7 @@ export async function hydrateComments(prototypeId: string): Promise<void> {
     // Failed records stay both visible and cached so the next hydration retries
     // them instead of silently discarding browser-local collaboration data.
     cacheComments(prototypeId, [...remote, ...migrated, ...migrationFailed]);
+    return true;
   } catch (error) {
     // Keep the last browser-local copy visible if the shared API is temporarily
     // unavailable. A transient network/deployment restart must not make review
@@ -561,6 +562,7 @@ export async function hydrateComments(prototypeId: string): Promise<void> {
       ...readAll().filter((comment) => comment.prototypeId === prototypeId),
     ];
     console.warn("[prototype-comments] API unavailable; showing cached state", error);
+    return false;
   }
 }
 
@@ -616,7 +618,7 @@ export const apiCommentRepository: CommentRepository = {
       DEFAULT_COMMENT_COLOR
     );
   },
-  add(input) {
+  async add(input) {
     const author = input.author.trim();
     const text = input.text.trim();
     if (!input.prototypeId) throw new Error("commentStore: prototypeId is required.");
@@ -644,6 +646,10 @@ export const apiCommentRepository: CommentRepository = {
     };
 
     const authorKey = author.toLowerCase();
+    // Do not tell the composer a comment was saved until Postgres confirms it.
+    // In particular, clearing browser storage after a failed PUT must not
+    // silently erase a comment the UI had already accepted.
+    await putComment(comment);
     apiComments = apiComments.map((existing) => {
       if (
         existing.author.toLowerCase() !== authorKey ||
@@ -660,7 +666,6 @@ export const apiCommentRepository: CommentRepository = {
       input.prototypeId,
       apiComments.filter((item) => item.prototypeId === input.prototypeId),
     );
-    persistCommentQuiet(comment);
     return comment;
   },
   resolve(id, actor) {

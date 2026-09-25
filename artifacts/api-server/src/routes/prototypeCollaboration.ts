@@ -25,8 +25,10 @@ function canonicalComment(row: { id: string; prototype_id: string; version_id: s
 }
 
 router.get("/prototypes/:prototypeId/comments", async (req, res, next) => {
-  const client = await pool.connect();
+  res.set("Cache-Control", "no-store");
+  let client;
   try {
+    client = await pool.connect();
     await client.query("BEGIN");
     // Durable, idempotent recovery for records created by the retired
     // soft-delete flow. Explicit open/resolved status always wins (notably,
@@ -71,10 +73,10 @@ router.get("/prototypes/:prototypeId/comments", async (req, res, next) => {
       result.rows.map(canonicalComment),
     );
   } catch (error) {
-    await client.query("ROLLBACK");
+    if (client) await client.query("ROLLBACK");
     next(error);
   } finally {
-    client.release();
+    client?.release();
   }
 });
 
@@ -97,12 +99,11 @@ router.put("/prototypes/:prototypeId/comments/:id", async (req, res, next) => {
         ? { resolvedAt: legacyDeletedAt }
         : {}),
     };
-    await pool.query(
+    const saved = await pool.query(
       `INSERT INTO prototype_comments
          (id, prototype_id, version_id, data, created_at, updated_at)
        VALUES ($1, $2, $3, $4::jsonb, COALESCE($5::timestamptz, NOW()), NOW())
        ON CONFLICT (id) DO UPDATE SET
-         prototype_id = EXCLUDED.prototype_id,
          version_id = EXCLUDED.version_id,
          -- Full PUT remains useful for create/migration/recolor, but lifecycle
          -- fields are server-owned and cannot be clobbered by delayed writes.
@@ -126,7 +127,9 @@ router.put("/prototypes/:prototypeId/comments/:id", async (req, res, next) => {
              'statusHistory', prototype_comments.data->'statusHistory',
              'deletedAt', COALESCE(prototype_comments.data->'deletedAt', EXCLUDED.data->'deletedAt')
            )),
-         updated_at = NOW()`,
+          updated_at = NOW()
+        WHERE prototype_comments.prototype_id = EXCLUDED.prototype_id
+        RETURNING id`,
       [
         id,
         prototypeId,
@@ -135,6 +138,10 @@ router.put("/prototypes/:prototypeId/comments/:id", async (req, res, next) => {
         typeof req.body.createdAt === "string" ? req.body.createdAt : null,
       ],
     );
+    if (saved.rowCount === 0) {
+      res.status(409).json({ error: "Comment ID belongs to another prototype" });
+      return;
+    }
     res.json({ ok: true });
   } catch (error) {
     next(error);

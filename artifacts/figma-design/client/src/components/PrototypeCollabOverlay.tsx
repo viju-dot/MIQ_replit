@@ -588,7 +588,7 @@ function CommentsPanelBody({
     color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
-  ) => boolean;
+  ) => Promise<boolean>;
   onStatus: (id: string, action: "resolve" | "reopen") => void;
 }) {
   const [versionFilter, setVersionFilter] = useState<string>("All");
@@ -716,7 +716,7 @@ function CommentThreadCard({
     color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
-  ) => boolean;
+  ) => Promise<boolean>;
   onStatus: (id: string, action: "resolve" | "reopen") => void;
 }) {
   const [replying, setReplying] = useState(false);
@@ -784,8 +784,8 @@ function CommentThreadCard({
           <div className="mt-1">
             <ReplyComposer
               authors={authors}
-              onPost={(author, color, text, attachment) => {
-                const ok = onReply(parent.id, author, color, text, attachment);
+              onPost={async (author, color, text, attachment) => {
+                const ok = await onReply(parent.id, author, color, text, attachment);
                 if (ok) setReplying(false);
                 return ok;
               }}
@@ -959,13 +959,13 @@ function InlineComposer({
 }: {
   draft: DraftPin;
   authors: string[];
-  /** Returns true if the comment was saved; false on failure (quota). */
+  /** Returns true only after the server confirms the comment. */
   onPost: (
     author: string,
     color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
-  ) => boolean;
+  ) => Promise<boolean>;
   onCancel: () => void;
   onColorChange: (color: CommentColor) => void;
 }) {
@@ -981,6 +981,7 @@ function InlineComposer({
   const [text, setText] = useState("");
   const [attachment, setAttachment] = useState<CommentAttachment | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const textRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -997,7 +998,8 @@ function InlineComposer({
 
   const resolvedName = choice === NEW_NAME ? newName.trim() : choice.trim();
 
-  function post() {
+  async function post() {
+    if (saving) return;
     if (resolvedName.length === 0) {
       setError("Please enter a name.");
       return;
@@ -1006,11 +1008,12 @@ function InlineComposer({
       setError("Please enter a comment.");
       return;
     }
-    // onPost returns false on quota failure — keep text + attachment so the
-    // user can remove the image and retry.
-    const ok = onPost(resolvedName, color, text.trim(), attachment);
-    if (!ok) {
-      setError("Image too large to attach. Remove it and try again.");
+    setSaving(true);
+    try {
+      const ok = await onPost(resolvedName, color, text.trim(), attachment);
+      if (!ok) setError("Comment was not saved. Check your connection or attachment and try again.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -1091,10 +1094,11 @@ function InlineComposer({
           <button
             type="button"
             onClick={post}
+            disabled={saving}
             className="rounded-[var(--radius-100,8px)] px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)] text-[length:var(--body-sm-medium-size,12px)] font-medium"
             style={{ backgroundColor: C.brandBg, color: C.brandFgOn }}
           >
-            Post
+            {saving ? "Saving…" : "Post"}
           </button>
         </div>
       </div>
@@ -1112,13 +1116,13 @@ function ReplyComposer({
   onCancel,
 }: {
   authors: string[];
-  /** Returns true if the reply was saved; false on failure (quota). */
+  /** Returns true only after the server confirms the reply. */
   onPost: (
     author: string,
     color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
-  ) => boolean;
+  ) => Promise<boolean>;
   onCancel: () => void;
 }) {
   const [choice, setChoice] = useState<string>(
@@ -1133,10 +1137,12 @@ function ReplyComposer({
   const [text, setText] = useState("");
   const [attachment, setAttachment] = useState<CommentAttachment | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const resolvedName = choice === NEW_NAME ? newName.trim() : choice.trim();
 
-  function post() {
+  async function post() {
+    if (saving) return;
     if (resolvedName.length === 0) {
       setError("Please enter a name.");
       return;
@@ -1145,9 +1151,12 @@ function ReplyComposer({
       setError("Please enter a reply.");
       return;
     }
-    const ok = onPost(resolvedName, color, text.trim(), attachment);
-    if (!ok) {
-      setError("Image too large to attach. Remove it and try again.");
+    setSaving(true);
+    try {
+      const ok = await onPost(resolvedName, color, text.trim(), attachment);
+      if (!ok) setError("Reply was not saved. Check your connection or attachment and try again.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -1207,10 +1216,11 @@ function ReplyComposer({
         <button
           type="button"
           onClick={post}
+          disabled={saving}
           className="rounded-[var(--radius-100,8px)] px-[var(--spacing-150,12px)] py-[var(--spacing-100,8px)] text-[length:var(--body-sm-medium-size,12px)] font-medium"
           style={{ backgroundColor: C.brandBg, color: C.brandFgOn }}
         >
-          Reply
+          {saving ? "Saving…" : "Reply"}
         </button>
       </div>
     </div>
@@ -1294,7 +1304,7 @@ function MarkerBubble({
     color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
-  ) => boolean;
+  ) => Promise<boolean>;
   onStatus: (id: string, action: "resolve" | "reopen") => void;
   onClose: () => void;
 }) {
@@ -1364,8 +1374,8 @@ function MarkerBubble({
         <div className="mt-1">
           <ReplyComposer
             authors={authors}
-            onPost={(author, color, text, attachment) => {
-              const ok = onReply(comment.id, author, color, text, attachment);
+            onPost={async (author, color, text, attachment) => {
+              const ok = await onReply(comment.id, author, color, text, attachment);
               if (ok) setReplying(false);
               return ok;
             }}
@@ -1423,7 +1433,7 @@ function Marker({
     color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
-  ) => boolean;
+  ) => Promise<boolean>;
   onStatus: (id: string, action: "resolve" | "reopen") => void;
 }) {
   const anchor = comment.anchor;
@@ -1584,14 +1594,14 @@ export function PrototypeCommentLayer(): JSX.Element | null {
     });
   }
 
-  function postDraft(
+  async function postDraft(
     author: string,
     color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
-  ): boolean {
+  ): Promise<boolean> {
     if (!draft) return false;
-    const ok = addComment(
+    const ok = await addComment(
       author,
       color,
       text,
@@ -1790,6 +1800,7 @@ export function PrototypeCollabOverlay({
   // then poll while the prototype is open so another collaborator's comments
   // and annotations appear without requiring a manual refresh.
   const collaborationPrototypeId = proto?.id;
+  const [commentsUnavailable, setCommentsUnavailable] = useState(false);
   useEffect(() => {
     if (!collaborationPrototypeId) return;
     let cancelled = false;
@@ -1798,11 +1809,14 @@ export function PrototypeCollabOverlay({
       if (refreshInFlight) return;
       refreshInFlight = true;
       try {
-        await Promise.all([
+        const [commentsLoaded] = await Promise.all([
           hydrateComments(collaborationPrototypeId),
           hydrateAnnotations(collaborationPrototypeId),
         ]);
-        if (!cancelled) setTick((current) => current + 1);
+        if (!cancelled) {
+          setCommentsUnavailable(!commentsLoaded);
+          setTick((current) => current + 1);
+        }
       } finally {
         refreshInFlight = false;
       }
@@ -1973,16 +1987,16 @@ export function PrototypeCollabOverlay({
       .slice()
       .reverse();
 
-  function addComment(
+  async function addComment(
     author: string,
     color: CommentColor,
     text: string,
     anchor: CommentAnchor,
     attachment: CommentAttachment | null,
-  ): boolean {
+  ): Promise<boolean> {
     if (!proto) return false;
     try {
-      commentRepository.add({
+      await commentRepository.add({
         prototypeId: proto.id,
         versionId: viewedVersion.id,
         versionName: viewedVersion.name,
@@ -2001,19 +2015,19 @@ export function PrototypeCollabOverlay({
     return true;
   }
 
-  function addReply(
+  async function addReply(
     parentId: string,
     author: string,
     color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
-  ): boolean {
+  ): Promise<boolean> {
     if (!proto) return false;
     // A reply inherits the PARENT's version so the whole thread maps to one
     // version. Find the parent among all comments for this prototype.
     const parent = comments.find((c) => c.id === parentId);
     try {
-      commentRepository.add({
+      await commentRepository.add({
         prototypeId: proto.id,
         versionId: parent?.versionId ?? viewedVersion.id,
         versionName: parent?.versionName ?? viewedVersion.name,
@@ -2399,6 +2413,11 @@ export function PrototypeCollabOverlay({
           subtitle={`${proto.name} · ${comments.length} total`}
           size="400"
         >
+          {commentsUnavailable && (
+            <p role="alert" className="mx-6 mt-4 rounded border p-3 text-sm" style={{ borderColor: C.errorFg, color: C.errorFg }}>
+              Comments could not sync with the server. Showing any cached comments; new comments cannot be saved until the connection recovers.
+            </p>
+          )}
           <CommentsPanelBody
             comments={comments}
             versions={proto.versions}

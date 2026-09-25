@@ -78,7 +78,7 @@ export interface PrototypeCollabContextValue {
   repliesOf: (parentId: string) => PrototypeComment[];
   /**
    * Persist a new pinned top-level comment against the viewed version. Returns
-   * true on success, false if persistence failed (e.g. localStorage quota).
+   * true only after the shared API confirms the save; false on failure.
    */
   addComment: (
     author: string,
@@ -86,10 +86,10 @@ export interface PrototypeCollabContextValue {
     text: string,
     anchor: CommentAnchor,
     attachment: CommentAttachment | null,
-  ) => boolean;
+  ) => Promise<boolean>;
   /**
    * Persist a reply to an existing comment. Returns true on success, false if
-   * persistence failed (e.g. localStorage quota).
+   * persistence failed.
    */
   addReply: (
     parentId: string,
@@ -97,7 +97,7 @@ export interface PrototypeCollabContextValue {
     color: CommentColor,
     text: string,
     attachment: CommentAttachment | null,
-  ) => boolean;
+  ) => Promise<boolean>;
   /** Change a comment's review lifecycle while preserving its full history. */
   resolveComment: (id: string, actor: string) => void;
   reopenComment: (id: string, actor: string) => void;
