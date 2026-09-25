@@ -133,7 +133,7 @@ function MapControls({ screens }: { screens: ScreenData[] }) {
 
   return (
     <div
-      className="absolute right-[var(--spacing-200,16px)] bottom-[144px] z-[1000] flex flex-col overflow-hidden rounded-[var(--radius-50,4px)]"
+      className="absolute right-[var(--spacing-200,16px)] bottom-[var(--spacing-200,16px)] z-[1000] flex flex-col overflow-hidden rounded-[var(--radius-50,4px)]"
       style={{ backgroundColor: CARD_BG, boxShadow: CARD_SHADOW, border: `1px solid ${GRID}` }}
       onDoubleClick={(event) => event.stopPropagation()}
       onMouseDown={(event) => event.stopPropagation()}
@@ -190,7 +190,7 @@ function MapLegend({ activeSources, sourceCounts }: { activeSources?: Props["act
   ] as const;
 
   return (
-    <div className="absolute bottom-[144px] left-[var(--spacing-200,16px)] z-[1000] rounded-[var(--radius-50,4px)] p-[var(--spacing-200,16px)] w-[240px]"
+    <div className="absolute bottom-[var(--spacing-200,16px)] left-[var(--spacing-200,16px)] z-[1000] rounded-[var(--radius-50,4px)] p-[var(--spacing-200,16px)] w-[240px]"
       style={{ backgroundColor: CARD_BG, boxShadow: CARD_SHADOW, border: `1px solid ${GRID}` }}
       onDoubleClick={e => e.stopPropagation()} onMouseDown={e => e.stopPropagation()}>
       <h3 className="text-[length:var(--body-md-medium-size,14px)] font-bold mb-[var(--spacing-150,12px)]" style={{ fontFamily: FONT, color: TITLE }}>Match Source</h3>
