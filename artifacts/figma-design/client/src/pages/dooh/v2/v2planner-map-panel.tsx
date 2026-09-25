@@ -133,19 +133,19 @@ function MapControls({ screens }: { screens: ScreenData[] }) {
 
   return (
     <div
-      className="absolute right-[var(--spacing-200,16px)] bottom-[140px] z-[1000] flex flex-col overflow-hidden rounded-[var(--radius-50,4px)]"
+      className="absolute right-[var(--spacing-200,16px)] bottom-[144px] z-[1000] flex flex-col overflow-hidden rounded-[var(--radius-50,4px)]"
       style={{ backgroundColor: CARD_BG, boxShadow: CARD_SHADOW, border: `1px solid ${GRID}` }}
       onDoubleClick={(event) => event.stopPropagation()}
       onMouseDown={(event) => event.stopPropagation()}
     >
-      <button type="button" aria-label="Zoom in" className="h-[34px] w-[34px] flex items-center justify-center transition-colors hover:bg-black/5" style={{ color: TITLE }} onClick={() => map.zoomIn()}>
+      <button type="button" aria-label="Refresh map view" title="Refresh view" className="h-[34px] w-[34px] flex items-center justify-center transition-colors hover:bg-black/5" style={{ color: TITLE }} onClick={reset}>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.04858 10C2.6025 12.8362 4.88726 15 7.78857 15C11.2173 15 13.9972 12.2215 13.9972 8.79373C13.9972 5.36592 11.2173 2.58746 7.78857 2.58746C5.58079 2.58746 3.64234 3.73715 2.57141 5.48512M2.57141 5.48512H5.67713M2.57141 5.48512V2.38139" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+      </button>
+      <button type="button" aria-label="Zoom in" className="h-[34px] w-[34px] flex items-center justify-center transition-colors hover:bg-black/5" style={{ color: TITLE, borderTop: `1px solid ${GRID}` }} onClick={() => map.zoomIn()}>
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 3.33334V12.6667M3.33334 8H12.6667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
       </button>
       <button type="button" aria-label="Zoom out" className="h-[34px] w-[34px] flex items-center justify-center transition-colors hover:bg-black/5" style={{ color: TITLE, borderTop: `1px solid ${GRID}` }} onClick={() => map.zoomOut()}>
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.33334 8H12.6667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-      </button>
-      <button type="button" aria-label="Reset map view" title="Reset view" className="h-[34px] w-[34px] flex items-center justify-center transition-colors hover:bg-black/5" style={{ color: TITLE, borderTop: `1px solid ${GRID}` }} onClick={reset}>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.04858 10C2.6025 12.8362 4.88726 15 7.78857 15C11.2173 15 13.9972 12.2215 13.9972 8.79373C13.9972 5.36592 11.2173 2.58746 7.78857 2.58746C5.58079 2.58746 3.64234 3.73715 2.57141 5.48512M2.57141 5.48512H5.67713M2.57141 5.48512V2.38139" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
       </button>
     </div>
   );
