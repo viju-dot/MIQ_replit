@@ -247,14 +247,25 @@ export default function V5ContentPlanner({ instanceId }: { instanceId: string })
   // applicable downstream views (Time-Spent tab, Trends shows, Temporal tab,
   // Cultural Affinity + Migration).
   const scopeTvType = typeKeyToTvType(selectedType);
+  const previousScopeTvType = useRef<typeof scopeTvType>(null);
 
   // When the consumption scope changes, sync the platform tabs to it and reset
   // stale dependent local selections (channel dropdowns / genre filter). A
   // genre selected under "All" is cleared so the scoped pool is coherent and
   // reverting to All restores the full mix.
   useEffect(() => {
+    const hadScope = previousScopeTvType.current !== null;
+    previousScopeTvType.current = scopeTvType;
     if (!scopeTvType) {
-      // Reverted to All: leave tabs where the user left them.
+      // Removing a consumption scope must also remove its downstream tab
+      // selections. Otherwise the chip says "All" while charts remain scoped
+      // to Streaming/Fast. Do not reset user-selected tabs on initial mount.
+      if (hadScope) {
+        setChannelTab("Linear TV");
+        setTrendsTvTab("Linear TV");
+        setTemporalTab("Linear TV");
+        setTemporalChannel("All");
+      }
       return;
     }
     const label = tvTypeToTabLabel(scopeTvType);

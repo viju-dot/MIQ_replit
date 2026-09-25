@@ -10,5 +10,6 @@
 - [DOOH version routing](dooh-version-routing.md) — DOOH version identity is separate from renderer folders; new V3 work needs a canonical seed ID, token mapping, and local-storage reconciliation.
 - [Collaboration persistence](collaboration-persistence.md) — comments and annotations must use shared Postgres state, cached outage fallback, and live rehydration instead of browser-only or process memory.
 - [Comment coordinate frames](comment-coordinate-frames.md) — preserve old pin positions when expanding commentable regions; new regions need distinct coordinate frames.
+- [Cross-filter clearing](cross-filter-clearing.md) — removing a dashboard scope must reset downstream selections, not only the visible scope chip.
 - [Review environment isolation](review-environments.md) — dev and published review data are separate; publishing code does not copy existing comments or annotations between databases.
 - [Optional numeric input modes](optional-numeric-inputs.md) — do not treat an intermediate empty edit as a mode toggle; reserve sentinel-mode changes for explicit controls.
