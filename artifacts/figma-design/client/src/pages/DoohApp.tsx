@@ -100,7 +100,7 @@ function DoohVersionedContent() {
         <SecondaryNavigation activeSection="Advanced" />
       </header>
       <div className="dooh-page-content">
-      <section className="dooh-page-intro" aria-labelledby="dooh-page-title">
+      <section className="dooh-page-intro relative z-[3]" aria-labelledby="dooh-page-title">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 id="dooh-page-title">{isSaved ? "Saved Audiences" : "Audience & DOOH Planner"}</h1>
@@ -134,6 +134,7 @@ function DoohVersionedContent() {
             </div>
           )}
         </nav>
+        <PrototypeCommentLayer region="intro" />
       </section>
 
       {versionContext && requestedVersion && !resolved && (

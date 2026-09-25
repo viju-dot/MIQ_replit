@@ -1511,7 +1511,11 @@ function Marker({
  * click-capture overlay (covering the canvas box) that drops pins. Renders
  * nothing when there is no collaboration context (e.g. /share view).
  */
-export function PrototypeCommentLayer(): JSX.Element | null {
+export function PrototypeCommentLayer({
+  region = "content",
+}: {
+  region?: "content" | "intro";
+} = {}): JSX.Element | null {
   const collab = usePrototypeCollab();
   const wrapRef = useRef<HTMLDivElement>(null);
   const [draft, setDraft] = useState<DraftPin | null>(null);
@@ -1527,6 +1531,7 @@ export function PrototypeCommentLayer(): JSX.Element | null {
   // an anchored comment by firing this event with the region-center anchor.
   useEffect(() => {
     function onStartComment(ev: Event) {
+      if (region !== "content") return;
       const anchor = (ev as CustomEvent<CommentAnchor>).detail;
       if (!anchor || typeof anchor.xPct !== "number") return;
       setOpenMarkerId(null);
@@ -1542,7 +1547,7 @@ export function PrototypeCommentLayer(): JSX.Element | null {
     window.addEventListener("fiber:start-comment", onStartComment as EventListener);
     return () =>
       window.removeEventListener("fiber:start-comment", onStartComment as EventListener);
-  }, []);
+  }, [region]);
 
   if (!collab) return null;
 
@@ -1605,7 +1610,12 @@ export function PrototypeCommentLayer(): JSX.Element | null {
       author,
       color,
       text,
-      { xPct: draft.xPct, yPct: draft.yPct, targetLabel: draft.targetLabel },
+      {
+        xPct: draft.xPct,
+        yPct: draft.yPct,
+        targetLabel: draft.targetLabel,
+        ...(region === "intro" ? { region: "intro" as const } : {}),
+      },
       attachment,
     );
     if (ok) setDraft(null);
@@ -1616,7 +1626,7 @@ export function PrototypeCommentLayer(): JSX.Element | null {
     <div
       ref={wrapRef}
       className="pointer-events-none absolute inset-0 z-[2]"
-      aria-hidden={!commentMode && markers.length === 0 ? true : undefined}
+      aria-hidden={!commentMode && !markers.some((c) => (c.anchor?.region ?? "content") === region) ? true : undefined}
     >
       {/* Click-capture overlay — only in comment mode. Sits ABOVE the (possibly
           inert) prototype content so clicks always register. */}
@@ -1631,7 +1641,7 @@ export function PrototypeCommentLayer(): JSX.Element | null {
 
       {/* Markers for the viewed version include resolved muted pins. Numbering
           remains chronological across the complete review history. */}
-      {markers.map((c, i) => (
+      {markers.map((c, i) => (c.anchor?.region ?? "content") === region && (
         <Marker
           key={c.id}
           comment={c}

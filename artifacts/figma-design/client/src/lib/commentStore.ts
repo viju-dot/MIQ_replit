@@ -48,6 +48,8 @@ export interface CommentAnchor {
   xPct: number;
   yPct: number;
   targetLabel: string;
+  /** Omitted for existing pins in the prototype's main content. */
+  region?: "intro";
 }
 
 /**
@@ -280,6 +282,7 @@ function coerceAnchor(raw: unknown): CommentAnchor | undefined {
     xPct: clamp(x),
     yPct: clamp(y),
     targetLabel: label.trim() || "Screen",
+    ...(a.region === "intro" ? { region: "intro" as const } : {}),
   };
 }
 
