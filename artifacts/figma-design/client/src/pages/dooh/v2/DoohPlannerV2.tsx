@@ -291,6 +291,45 @@ export default function DoohPlannerV2({ demoView = false }: { demoView?: boolean
     />
   );
 
+  const renderMapControls = (expanded = false) => (
+    <div
+      className={`absolute top-[16px] right-[16px] ${expanded ? "bottom-[16px]" : "bottom-[260px]"} z-[1000] flex flex-col items-end gap-2 pointer-events-none`}
+    >
+      <div className="pointer-events-auto flex items-center gap-2 shrink-0">
+        <FiberButton
+          variant={showMapOverview ? "solid" : "secondary"}
+          onClick={() => setShowMapOverview(s => !s)}
+          aria-expanded={showMapOverview}
+          aria-controls="map-plan-overview"
+        >
+          {showMapOverview ? "Hide Plan Overview" : "Show Plan Overview"}
+        </FiberButton>
+        {!expanded && (
+          <IconButton
+            icon={Maximize2}
+            variant="secondary"
+            onClick={() => setShowMapExpanded(true)}
+            ariaLabel="Expand view"
+            title="Expand view"
+          />
+        )}
+      </div>
+      {showMapOverview && (
+        <div id="map-plan-overview" className="pointer-events-auto w-[280px] min-h-0 overflow-y-auto mt-2 dooh-scrollbar pb-2">
+          <SmartCard title="Plan Overview" ariaLabel="Map Plan Overview">
+            <PlanOverviewCards
+              matchedScreens={matchedScreens}
+              selectedScreens={selectedScreens}
+              budget={filters.budget.enabled ? Number(filters.budget.total) : null}
+              currency={filters.budget.currency}
+              layout="vertical"
+            />
+          </SmartCard>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className="dooh-v2-planner flex flex-col flex-1 min-h-0 font-fiber">
       <div className="flex flex-1 min-h-0 items-start gap-6">
@@ -316,38 +355,7 @@ export default function DoohPlannerV2({ demoView = false }: { demoView?: boolean
           {view === "map" && (
             <div className="relative flex-1 min-h-0 flex flex-col">
               {!showMapExpanded && renderMapPanel()}
-              <div className="absolute top-[16px] right-[16px] bottom-[260px] z-[1000] flex flex-col items-end gap-2 pointer-events-none">
-                <div className="pointer-events-auto flex items-center gap-2 shrink-0">
-                  <FiberButton
-                    variant={showMapOverview ? "solid" : "secondary"}
-                    onClick={() => setShowMapOverview(s => !s)}
-                    aria-expanded={showMapOverview}
-                    aria-controls="map-plan-overview"
-                  >
-                    {showMapOverview ? "Hide Plan Overview" : "Show Plan Overview"}
-                  </FiberButton>
-                  <IconButton
-                    icon={Maximize2}
-                    variant="secondary"
-                    onClick={() => setShowMapExpanded(true)}
-                    ariaLabel="Expand view"
-                    title="Expand view"
-                  />
-                </div>
-                {showMapOverview && (
-                  <div id="map-plan-overview" className="pointer-events-auto w-[280px] min-h-0 overflow-y-auto mt-2 dooh-scrollbar pb-2">
-                    <SmartCard title="Plan Overview" ariaLabel="Map Plan Overview">
-                      <PlanOverviewCards 
-                        matchedScreens={matchedScreens}
-                        selectedScreens={selectedScreens}
-                        budget={filters.budget.enabled ? Number(filters.budget.total) : null}
-                        currency={filters.budget.currency}
-                        layout="vertical"
-                      />
-                    </SmartCard>
-                  </div>
-                )}
-              </div>
+              {renderMapControls()}
               <Dialog open={showMapExpanded} onOpenChange={setShowMapExpanded}>
                 <DialogContent className="z-[2000] flex h-[calc(100vh-32px)] w-[calc(100vw-32px)] max-w-none flex-col gap-0 overflow-hidden border-0 bg-[var(--surface-background-lvl1,#ffffff)] p-0 sm:max-w-none">
                   <div className="flex h-full min-h-0 flex-col">
@@ -360,8 +368,9 @@ export default function DoohPlannerV2({ demoView = false }: { demoView?: boolean
                     >
                       Expanded map view
                     </DialogTitle>
-                    <div className="min-h-0 flex-1">
+                    <div className="relative min-h-0 flex-1">
                       {showMapExpanded && renderMapPanel(true)}
+                      {renderMapControls(true)}
                     </div>
                   </div>
                 </DialogContent>
