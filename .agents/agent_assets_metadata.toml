@@ -42,3 +42,17 @@ mtime_ms = 1790248473965
 storage_uri = "gcs://replit-rams-assets-spock/rams/assets/repl:85adb4f5-ad43-439c-b429-d15bb0ed940c/e40ee9f0-6dcc-45a0-acb4-bf964c386454/e640c7b6-79db-4ba7-9dfa-7d6a92f1e8ee"
 storage_version_token = "1790248477321507"
 content_type = "video/mp4"
+
+[[outputs]]
+id = "xRO6LtP2_CRhR_OhyorHv"
+uri = "file://production-dooh-v3-comments.md"
+type = "text"
+title = "Production DOOH V3 comments"
+description = "Markdown export of the 14 production comments and replies for DOOH V3, including authors, timestamps, current statuses, and pinned targets."
+logical_id = "c9ef0778-7c25-4bc8-a9cf-8c5c63b482ba"
+content_hash = "sha256:1dea9ec0b61b3ccd3fe411ad0b77132d099546534283895a9d9e5a138d2efd98"
+size = 4039
+mtime_ms = 1791272120885
+storage_uri = "gcs://replit-rams-assets-spock/rams/assets/repl:85adb4f5-ad43-439c-b429-d15bb0ed940c/c9ef0778-7c25-4bc8-a9cf-8c5c63b482ba/68961b08-8faa-4ebf-a451-af86ad1b68b7"
+storage_version_token = "1791272126067062"
+content_type = "text/markdown"
