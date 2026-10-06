@@ -13,3 +13,4 @@
 - [Cross-filter clearing](cross-filter-clearing.md) — removing a dashboard scope must reset downstream selections, not only the visible scope chip.
 - [Review environment isolation](review-environments.md) — dev and published review data are separate; publishing code does not copy existing comments or annotations between databases.
 - [Optional numeric input modes](optional-numeric-inputs.md) — do not treat an intermediate empty edit as a mode toggle; reserve sentinel-mode changes for explicit controls.
+- [Shared prototype versions](shared-prototype-versions.md) — sync version records individually and preserve free requested labels so partial/out-of-order browser migrations keep history intact.

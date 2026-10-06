@@ -73,6 +73,7 @@ import {
   type AnnotationPatch,
   type NewAnnotationInput,
 } from "@/lib/annotationStore";
+import { hydratePrototypeVersions } from "@/lib/prototypeVersionSync";
 import { AnnotationsPanelBody } from "@/components/DesignAnnotationLayer";
 // Re-exported so prototype pages import the in-content layer from the same
 // module as PrototypeCommentLayer (parallel structure).
@@ -1822,6 +1823,7 @@ export function PrototypeCollabOverlay({
         const [commentsLoaded] = await Promise.all([
           hydrateComments(collaborationPrototypeId),
           hydrateAnnotations(collaborationPrototypeId),
+          hydratePrototypeVersions(collaborationPrototypeId),
         ]);
         if (!cancelled) {
           setCommentsUnavailable(!commentsLoaded);

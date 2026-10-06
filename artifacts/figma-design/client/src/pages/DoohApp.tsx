@@ -49,6 +49,13 @@ function DoohVersionedContent() {
     const prior = previous.current;
 
     if (!prior || prior.requestedVersion !== requestedVersion) {
+      // Keep an unknown deep-link token pending while shared version metadata
+      // hydrates; otherwise the initial V3 fallback would replace a valid V4
+      // URL before its version record arrives from the API.
+      if (requestedVersion && !resolved) {
+        previous.current = { requestedVersion, viewedVersionId: "" };
+        return;
+      }
       const desiredId = resolved?.id ?? viewedVersionId;
       // Record the expected selection so the context update isn't mistaken
       // for a new user selection and reflected back into the URL.
@@ -56,6 +63,17 @@ function DoohVersionedContent() {
       if (desiredId && viewedVersionId !== desiredId) {
         versionContext.setViewedVersionId(desiredId);
       }
+      return;
+    }
+
+    if (
+      requestedVersion &&
+      resolved &&
+      prior.viewedVersionId === "" &&
+      viewedVersionId !== resolved.id
+    ) {
+      previous.current = { requestedVersion, viewedVersionId: resolved.id };
+      versionContext.setViewedVersionId(resolved.id);
       return;
     }
 

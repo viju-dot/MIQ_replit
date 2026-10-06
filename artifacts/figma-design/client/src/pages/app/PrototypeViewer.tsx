@@ -44,6 +44,10 @@ import {
 } from "@/lib/prototypeStore";
 import { putShare, deleteShare, getShareMeta } from "@/lib/shareApi";
 import {
+  hydratePrototypeVersions,
+  savePrototypeVersion,
+} from "@/lib/prototypeVersionSync";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -759,6 +763,50 @@ export function PrototypeViewer({
 
   // Surfaced (no silent fallback) when server-side share sync fails.
   const [syncError, setSyncError] = useState<string | null>(null);
+  const [versionSyncError, setVersionSyncError] = useState<string | null>(null);
+  const onChangedRef = useRef(onChanged);
+  onChangedRef.current = onChanged;
+
+  useEffect(() => {
+    if (readOnly) return;
+    let cancelled = false;
+    let inFlight = false;
+    const refresh = async () => {
+      if (inFlight) return;
+      inFlight = true;
+      try {
+        const changed = await hydratePrototypeVersions(prototype.id);
+        if (changed && !cancelled) {
+          const latest = prototypeRepository.get(prototype.id);
+          if (latest) onChangedRef.current?.(latest);
+        }
+      } finally {
+        inFlight = false;
+      }
+    };
+    void refresh();
+    const interval = window.setInterval(() => void refresh(), 5000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [prototype.id, readOnly]);
+
+  const syncVersion = (updated: Prototype, versionId: string | undefined) => {
+    const version = updated.versions.find((item) => item.id === versionId);
+    if (!version) return;
+    void savePrototypeVersion(updated.id, version)
+      .then(() => {
+        setVersionSyncError(null);
+        const latest = prototypeRepository.get(updated.id);
+        if (latest) onChanged?.(latest);
+      })
+      .catch((error: unknown) => {
+        setVersionSyncError(
+          error instanceof Error ? error.message : "Couldn't sync version history.",
+        );
+      });
+  };
 
   /**
    * Serialize share sync per prototype: every PUT/DELETE/reconcile is appended
@@ -833,6 +881,7 @@ export function PrototypeViewer({
     const latest = updated.versions[updated.versions.length - 1];
     setSelectedId(latest?.id);
     onChanged?.(updated);
+    syncVersion(updated, latest?.id);
     // If this prototype is currently shared, push the new version snapshot
     // (queued on the same chain to preserve ordering).
     if (updated.share.enabled) runSync(() => doSyncShare(updated));
@@ -846,6 +895,7 @@ export function PrototypeViewer({
     const created = updated.versions[updated.versions.length - 1];
     setSelectedId(created?.id);
     onChanged?.(updated);
+    syncVersion(updated, created?.id);
     if (updated.share.enabled) runSync(() => doSyncShare(updated));
   };
 
@@ -858,12 +908,14 @@ export function PrototypeViewer({
       setSelectedId(active[active.length - 1]?.id);
     }
     onChanged?.(updated);
+    syncVersion(updated, versionId);
     if (updated.share.enabled) runSync(() => doSyncShare(updated));
   };
 
   const restoreVersion = (versionId: string) => {
     const updated = prototypeRepository.unarchiveVersion(prototype.id, versionId);
     onChanged?.(updated);
+    syncVersion(updated, versionId);
     if (updated.share.enabled) runSync(() => doSyncShare(updated));
   };
 
@@ -924,6 +976,11 @@ export function PrototypeViewer({
         onRestore={restoreVersion}
         readOnly={readOnly}
       />
+      {versionSyncError && !readOnly && (
+        <p role="alert" className="text-[12px]" style={{ color: "var(--surface-foreground-dynamic-danger-default,#b42318)" }}>
+          {versionSyncError} This version is saved in this browser but is not yet shared.
+        </p>
+      )}
 
       {/* Share Settings (authoring only) */}
       {!readOnly && (

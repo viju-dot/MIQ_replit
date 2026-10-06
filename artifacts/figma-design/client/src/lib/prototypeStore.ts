@@ -310,6 +310,8 @@ export interface PrototypeRepository {
   duplicateVersion(id: string, sourceVersionId: string): Prototype;
   archiveVersion(id: string, versionId: string): Prototype;
   unarchiveVersion(id: string, versionId: string): Prototype;
+  /** Merge server-owned version entries without replacing prototype-local fields. */
+  mergeVersions(id: string, versions: PrototypeVersion[]): Prototype | undefined;
   /** Replace the share config for a prototype. */
   setShare(id: string, share: ShareConfig): Prototype;
 }
@@ -367,6 +369,10 @@ function coerceVersion(raw: unknown, fallbackTs: string): PrototypeVersion | nul
         : undefined,
     snapshot: coerceSnapshot(r.snapshot),
   };
+}
+
+export function coercePrototypeVersion(raw: unknown): PrototypeVersion | null {
+  return coerceVersion(raw, nowIso());
 }
 
 function coerceShare(raw: unknown): ShareConfig {
@@ -693,6 +699,29 @@ export const localStorageRepository: PrototypeRepository = {
           : version,
       ),
     });
+    persist(clean);
+    return clean;
+  },
+  mergeVersions(id, incomingVersions) {
+    const current = readAll().find((prototype) => prototype.id === id);
+    if (!current) return undefined;
+    const byId = new Map(current.versions.map((version) => [version.id, version]));
+    for (const incoming of incomingVersions) {
+      const existing = byId.get(incoming.id);
+      if (
+        !existing ||
+        Date.parse(incoming.updatedAt) >= Date.parse(existing.updatedAt)
+      ) {
+        byId.set(incoming.id, incoming);
+      }
+    }
+    const versions = current.versions.map((version) => byId.get(version.id)!);
+    const existingIds = new Set(current.versions.map((version) => version.id));
+    const appended = incomingVersions
+      .filter((version) => !existingIds.has(version.id))
+      .slice()
+      .sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
+    const clean = validateForWrite({ ...current, versions: [...versions, ...appended] });
     persist(clean);
     return clean;
   },
