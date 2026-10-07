@@ -102,6 +102,7 @@ export default function GeoPlannerV2() {
   
   const [modalOpen, setModalOpen] = useState(false);
   const [savedAudience, setSavedAudience] = useState<Audience | null>(null);
+  const [activationNotice, setActivationNotice] = useState(false);
   const audiencesQuery = useAudiences();
 
   const initializedEditId = useRef<string | null>(null);
@@ -423,7 +424,16 @@ export default function GeoPlannerV2() {
         </div>
       )}
       <div className="geo-save-bar">
-        <div>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {activationNotice && (
+            <p
+              className="max-w-[220px] text-right text-xs text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]"
+              role="status"
+              aria-live="polite"
+            >
+              Activation is not connected in this prototype.
+            </p>
+          )}
           <FiberButton 
             variant="solid"
             onClick={() => setModalOpen(true)}
@@ -431,6 +441,12 @@ export default function GeoPlannerV2() {
           >
             <Save className="w-4 h-4" aria-hidden="true" />
             Save audience
+          </FiberButton>
+          <FiberButton
+            variant="solid"
+            onClick={() => setActivationNotice(true)}
+          >
+            Activate
           </FiberButton>
         </div>
       </div>
