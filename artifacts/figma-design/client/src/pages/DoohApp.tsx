@@ -36,10 +36,11 @@ function DoohVersionedContent() {
   const version = doohRendererVersion(versionContext?.viewedVersion ?? resolved, versions);
   const versionToken = versionContext ? doohVersionToken(versionContext.viewedVersion) : requestedVersion ?? "v2";
   const versionName = versionContext?.viewedVersion.name ?? version.toUpperCase();
-  const demoView = versionToken === "v3" && new URLSearchParams(search).get("demo") === "1";
+  const supportsDemoView = versionToken === "v3" || versionName.trim().toLowerCase() === "v4";
+  const demoView = supportsDemoView && new URLSearchParams(search).get("demo") === "1";
   const isGeo = location.startsWith("/geo-planner");
   const isSaved = location.startsWith("/saved-audiences");
-  const isDoohV3Planner = versionToken === "v3" && !isGeo && !isSaved;
+  const isDoohDemoPlanner = supportsDemoView && !isGeo && !isSaved;
   const moduleTitle = isGeo ? "Geo Planner" : isSaved ? "Saved Audiences" : "DOOH Planner";
 
   // The URL is authoritative on first render/direct navigation. After that,
@@ -129,7 +130,7 @@ function DoohVersionedContent() {
             <h1 id="dooh-page-title">{isSaved ? "Saved Audiences" : "Audience & DOOH Planner"}</h1>
             {!isSaved && <p>Build target audiences and plan digital out-of-home screens.</p>}
           </div>
-          {isDoohV3Planner && (
+          {isDoohDemoPlanner && (
             <FiberButton
               variant={demoView ? "solid" : "outline"}
               ariaLabel={demoView ? "Exit DOOH demo view" : "Open DOOH demo view"}
