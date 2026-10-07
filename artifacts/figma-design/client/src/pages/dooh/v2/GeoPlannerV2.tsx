@@ -5,6 +5,7 @@ import { MapPin, Info, Save, ChevronRight, Trash2 } from "lucide-react";
 import { CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
 import { useAudiences, GeoPlannerFilters, type Audience } from "../api";
 import { SmartCard, SearchableDropdown, TabsBarUnderline, FiberButton, IconButton } from "./primitives";
+import { usePrototypeVersion } from "@/lib/prototypeVersionContext";
 import { computeMockResults } from "./geoMock";
 import { SaveAudienceV2 } from "./SaveAudienceV2";
 import "./GeoPlannerV2.css";
@@ -86,13 +87,24 @@ function MapView({ points, market }: { points: any[], market: string }) {
 export default function GeoPlannerV2() {
   const [, setLocation] = useLocation();
   const search = useSearch();
-  const { editId, version } = useMemo(() => {
+  const prototypeVersion = usePrototypeVersion();
+  const { editId, version, hasVersionParam } = useMemo(() => {
     const params = new URLSearchParams(search);
     return {
       editId: params.get("edit"),
       version: params.get("version") || "v2",
+      hasVersionParam: params.has("version"),
     };
   }, [search]);
+  const routeVersion = prototypeVersion?.prototype.versions.find(
+    candidate =>
+      candidate.id === version ||
+      candidate.name.toLowerCase() === version.toLowerCase(),
+  );
+  const selectedVersionName = hasVersionParam
+    ? routeVersion?.name
+    : prototypeVersion?.viewedVersion.name;
+  const isDoohV4 = selectedVersionName?.trim().toLowerCase() === "v4";
   const encodedVersion = encodeURIComponent(version);
   
   const [filters, setFilters] = useState<DraftFilters>(() =>
@@ -425,7 +437,7 @@ export default function GeoPlannerV2() {
       )}
       <div className="geo-save-bar">
         <div className="flex flex-wrap items-center justify-end gap-2">
-          {activationNotice && (
+          {isDoohV4 && activationNotice && (
             <p
               className="max-w-[220px] text-right text-xs text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)]"
               role="status"
@@ -442,12 +454,14 @@ export default function GeoPlannerV2() {
             <Save className="w-4 h-4" aria-hidden="true" />
             Save audience
           </FiberButton>
-          <FiberButton
-            variant="solid"
-            onClick={() => setActivationNotice(true)}
-          >
-            Activate
-          </FiberButton>
+          {isDoohV4 && (
+            <FiberButton
+              variant="solid"
+              onClick={() => setActivationNotice(true)}
+            >
+              Activate
+            </FiberButton>
+          )}
         </div>
       </div>
 
