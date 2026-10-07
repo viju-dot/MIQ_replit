@@ -109,7 +109,12 @@ function DoohVersionedContent() {
   };
   const content = isSaved ? <SavedAudiences version={versionToken} />
     : isGeo ? version === "v2" ? <GeoPlannerV2 /> : <GeoPlanner />
-    : version === "v2" ? <DoohPlannerV2 demoView={demoView} /> : <DoohPlanner />;
+    : version === "v2" ? (
+      <DoohPlannerV2
+        demoView={demoView}
+        showRadius={versionName.trim().toLowerCase() !== "v4"}
+      />
+    ) : <DoohPlanner />;
 
   return (
     <div className={`min-h-screen flex flex-col dooh-theme bg-[var(--surface-background-lvl2,#f7f7fa)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)] ${!isGeo && !isSaved && version === "v2" ? "dooh-fixed-planner" : ""}`}>

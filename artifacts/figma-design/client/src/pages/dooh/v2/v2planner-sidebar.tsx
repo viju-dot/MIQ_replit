@@ -225,6 +225,7 @@ interface Props {
   filters: FilterStateV2;
   setFilters: React.Dispatch<React.SetStateAction<FilterStateV2>>;
   demoView?: boolean;
+  showRadius?: boolean;
 }
 
 type LocationUploadMethod = "postcode" | "latlng";
@@ -258,7 +259,12 @@ function demoLocationUpload(method: LocationUploadMethod): LocationUploadState {
   };
 }
 
-export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
+export function SidebarV2({
+  filters,
+  setFilters,
+  demoView = false,
+  showRadius = true,
+}: Props) {
   const { data: audiences, isError } = useAudiences();
   const incrementUse = useIncrementAudienceUse();
   const [uploadError, setUploadError] = useState("");
@@ -557,6 +563,7 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
 
           {uploadError && <p className="text-[11px] text-[var(--surface-foreground-dynamic-error-default,#da294b)] mt-2" role="alert">{uploadError}</p>}
           
+          {showRadius && (
           <div className="mt-4 pt-4 border-t border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)]">
              <div className="flex items-center justify-between mb-3">
                <label className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Radius around points</label>
@@ -610,7 +617,8 @@ export function SidebarV2({ filters, setFilters, demoView = false }: Props) {
                  />
               </div>
            </div>
-            </div>
+             </div>
+          )}
         </FilterCard>
 
         {/* 2. Planning Zone */}

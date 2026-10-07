@@ -10,7 +10,13 @@ import { Download, Maximize2 } from "lucide-react";
 import { useScreenExport } from "./useScreenExport";
 import "./DoohPlannerV2.css";
 
-export default function DoohPlannerV2({ demoView = false }: { demoView?: boolean }) {
+export default function DoohPlannerV2({
+  demoView = false,
+  showRadius = true,
+}: {
+  demoView?: boolean;
+  showRadius?: boolean;
+}) {
   const [filters, setFilters] = useState<FilterStateV2>(() => demoView ? createDemoFilters() : DEFAULT_FILTERS_V2);
   const [selectedScreenIds, setSelectedScreenIds] = useState<Set<string>>(
     () => demoView ? new Set(DEMO_UPLOADS.screenList.records.map(record => record.id)) : new Set(),
@@ -333,7 +339,12 @@ export default function DoohPlannerV2({ demoView = false }: { demoView?: boolean
   return (
     <div className="dooh-v2-planner flex flex-col flex-1 min-h-0 font-fiber">
       <div className="flex flex-1 min-h-0 items-start gap-6">
-        <SidebarV2 filters={filters} setFilters={setFilters} demoView={demoView} />
+        <SidebarV2
+          filters={filters}
+          setFilters={setFilters}
+          demoView={demoView}
+          showRadius={showRadius}
+        />
         
         <div className="flex-1 min-w-0 min-h-0 flex flex-col sticky top-4 self-start bg-transparent">
           <SmartCard
