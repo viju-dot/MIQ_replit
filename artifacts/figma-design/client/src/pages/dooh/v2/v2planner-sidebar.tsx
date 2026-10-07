@@ -1,4 +1,4 @@
-import { useState, useRef, forwardRef, type ComponentPropsWithoutRef, type ElementRef, type ReactNode } from "react";
+import { useState, useRef, forwardRef, type ComponentPropsWithoutRef, type CSSProperties, type ElementRef, type ReactNode } from "react";
 import { Link } from "wouter";
 import { Clock, Download, LayoutDashboard, List, Map, MapPin, MonitorPlay, Target, Wallet, X } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
@@ -226,6 +226,7 @@ interface Props {
   setFilters: React.Dispatch<React.SetStateAction<FilterStateV2>>;
   demoView?: boolean;
   showRadius?: boolean;
+  v4Layout?: boolean;
 }
 
 type LocationUploadMethod = "postcode" | "latlng";
@@ -264,6 +265,7 @@ export function SidebarV2({
   setFilters,
   demoView = false,
   showRadius = true,
+  v4Layout = false,
 }: Props) {
   const { data: audiences, isError } = useAudiences();
   const incrementUse = useIncrementAudienceUse();
@@ -480,13 +482,15 @@ export function SidebarV2({
         planningZoneRadiusMax,
         Math.max(planningZoneRadiusMin, Number(filters.planningZone.drawCircleRadius) || planningZoneRadiusMin),
       );
+  const sectionStyle = (order: number): CSSProperties | undefined =>
+    v4Layout ? { order } : undefined;
 
   return (
     <div data-annotate="DOOH filter panel" className="w-[300px] xl:w-[340px] shrink-0 bg-[var(--surface-background-lvl2,#f7f7fa)] flex flex-col z-20 overflow-y-auto">
       <SmartCard title="DOOH Filters" ariaLabel="DOOH Filters">
         <div className="-mx-4 -mb-4 flex flex-col overflow-hidden rounded-b-[4px]">
           {/* 1. Location Filter */}
-          <FilterCard title="Location" icon={<MapPin className="w-4 h-4" />} enabled={filters.location.enabled} onToggle={enabled => updateSection("location", { enabled })}>
+          <FilterCard style={sectionStyle(1)} title="Location" icon={<MapPin className="w-4 h-4" />} enabled={filters.location.enabled} onToggle={enabled => updateSection("location", { enabled })}>
           <div className="mb-4 pt-1 pb-1 max-w-full overflow-x-auto" role="group" aria-label="Location filter method">
             <FiberRoundedTabsBar wrap={false}>
               {(["audience", "postcode", "poi", "latlng"] as const).map(method => (
@@ -622,7 +626,7 @@ export function SidebarV2({
         </FilterCard>
 
         {/* 2. Planning Zone */}
-        <FilterCard title="Planning Zone" icon={<Map className="w-4 h-4" />} enabled={filters.planningZone.enabled} onToggle={enabled => {
+        <FilterCard style={sectionStyle(2)} title="Planning Zone" icon={<Map className="w-4 h-4" />} enabled={filters.planningZone.enabled} onToggle={enabled => {
           if (!enabled) {
             updateSection("planningZone", { enabled, drawMode: null });
           } else {
@@ -791,15 +795,15 @@ export function SidebarV2({
         </FilterCard>
 
         {/* 3. Venue Type */}
-        <ScalarFacet title="Venue Type" icon={<LayoutDashboard className="w-4 h-4" />} enabled={filters.venueType.enabled} values={VENUES} selected={filters.venueType.venues}
+        <ScalarFacet style={sectionStyle(4)} title="Venue Type" icon={<LayoutDashboard className="w-4 h-4" />} enabled={filters.venueType.enabled} values={VENUES} selected={filters.venueType.venues}
           onToggle={enabled => updateSection("venueType", { enabled })} onSelected={venues => updateSection("venueType", { venues })} />
         
         {/* 4. Publisher */}
-        <ScalarFacet title="Publisher" icon={<Target className="w-4 h-4" />} enabled={filters.publishers.enabled} values={PUBLISHERS} selected={filters.publishers.publishers}
+        <ScalarFacet style={sectionStyle(6)} title="Publisher" icon={<Target className="w-4 h-4" />} enabled={filters.publishers.enabled} values={PUBLISHERS} selected={filters.publishers.publishers}
           onToggle={enabled => updateSection("publishers", { enabled })} onSelected={publishers => updateSection("publishers", { publishers })} />
 
         {/* 5. Day Part */}
-        <FilterCard title="Day Part" icon={<Clock className="w-4 h-4" />} enabled={filters.daypart.enabled} onToggle={enabled => updateSection("daypart", { enabled })}>
+        <FilterCard style={sectionStyle(7)} title="Day Part" icon={<Clock className="w-4 h-4" />} enabled={filters.daypart.enabled} onToggle={enabled => updateSection("daypart", { enabled })}>
           <div className="space-y-3">
              <FiberRoundedTabsBar wrap={false}>
                <FiberTabButton label="Presets" selected={filters.daypart.mode === "presets"} onClick={() => updateSection("daypart", { mode: "presets" })} />
@@ -825,7 +829,7 @@ export function SidebarV2({
         </FilterCard>
 
         {/* 6. Budget */}
-        <FilterCard title="Budget" icon={<Wallet className="w-4 h-4" />} enabled={filters.budget.enabled} onToggle={enabled => updateSection("budget", { enabled })}>
+        <FilterCard style={sectionStyle(8)} title="Budget" icon={<Wallet className="w-4 h-4" />} enabled={filters.budget.enabled} onToggle={enabled => updateSection("budget", { enabled })}>
           <div className="space-y-3">
              <div>
                <label htmlFor="dooh-budget" className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Total Budget (£)</label>
@@ -851,7 +855,7 @@ export function SidebarV2({
         </FilterCard>
 
         {/* 7. Creative Type */}
-        <FilterCard title="Creative Type" icon={<MonitorPlay className="w-4 h-4" />} enabled={filters.creativeType.enabled} onToggle={enabled => updateSection("creativeType", { enabled })}>
+        <FilterCard style={sectionStyle(5)} title={v4Layout ? "Creative" : "Creative Type"} icon={<MonitorPlay className="w-4 h-4" />} enabled={filters.creativeType.enabled} onToggle={enabled => updateSection("creativeType", { enabled })}>
           <div className="space-y-3">
             <div>
               <label className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Format</label>
@@ -869,7 +873,7 @@ export function SidebarV2({
         </FilterCard>
 
          {/* 8. Screen List */}
-         <FilterCard title="Screen List" icon={<List className="w-4 h-4" />} enabled={filters.screenList.enabled} onToggle={enabled => updateSection("screenList", { enabled })}>
+         <FilterCard style={sectionStyle(3)} title="Screen List" icon={<List className="w-4 h-4" />} enabled={filters.screenList.enabled} onToggle={enabled => updateSection("screenList", { enabled })}>
            <div className="space-y-2">
              <UploadPreviewOptions
                hasFile={Boolean(screenListFile)}
@@ -902,25 +906,25 @@ export function SidebarV2({
            </div>
          </FilterCard>
 
-        <div className="h-8 border-t-0" />
+        <div className="h-8 border-t-0" style={sectionStyle(9)} />
         </div>
       </SmartCard>
     </div>
   );
 }
 
-function ScalarFacet({ title, icon, enabled, values, selected, onToggle, onSelected }: {
+function ScalarFacet({ title, icon, enabled, values, selected, onToggle, onSelected, style }: {
   title: string; icon: ReactNode; enabled: boolean; values: string[]; selected: string[];
-  onToggle: (value: boolean) => void; onSelected: (value: string[]) => void;
+  onToggle: (value: boolean) => void; onSelected: (value: string[]) => void; style?: CSSProperties;
 }) {
-  return <FilterCard title={title} icon={icon} enabled={enabled} onToggle={onToggle}>
+  return <FilterCard style={style} title={title} icon={icon} enabled={enabled} onToggle={onToggle}>
     <FacetDropdown title={title} values={values} selected={selected} onSelected={onSelected} />
   </FilterCard>;
 }
 
-function FilterCard({ title, icon, enabled, onToggle, children }: { title: string; icon: ReactNode; enabled: boolean; onToggle: (enabled: boolean) => void; children: ReactNode }) {
+function FilterCard({ title, icon, enabled, onToggle, children, style }: { title: string; icon: ReactNode; enabled: boolean; onToggle: (enabled: boolean) => void; children: ReactNode; style?: CSSProperties }) {
   return (
-    <section data-annotate={`DOOH filters: ${title}`} className="border-b border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)]">
+    <section data-annotate={`DOOH filters: ${title}`} className="border-b border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)]" style={style}>
       <header className="px-4 py-3 flex items-center justify-between hover:bg-[var(--surface-background-lvl2,#f7f7fa)] transition-colors">
         <div className="flex items-center gap-2.5 text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">
           {icon}

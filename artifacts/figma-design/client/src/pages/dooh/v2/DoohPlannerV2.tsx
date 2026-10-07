@@ -13,9 +13,11 @@ import "./DoohPlannerV2.css";
 export default function DoohPlannerV2({
   demoView = false,
   showRadius = true,
+  v4Layout = false,
 }: {
   demoView?: boolean;
   showRadius?: boolean;
+  v4Layout?: boolean;
 }) {
   const [filters, setFilters] = useState<FilterStateV2>(() => demoView ? createDemoFilters() : DEFAULT_FILTERS_V2);
   const [selectedScreenIds, setSelectedScreenIds] = useState<Set<string>>(
@@ -344,6 +346,7 @@ export default function DoohPlannerV2({
           setFilters={setFilters}
           demoView={demoView}
           showRadius={showRadius}
+          v4Layout={v4Layout}
         />
         
         <div className="flex-1 min-w-0 min-h-0 flex flex-col sticky top-4 self-start bg-transparent">

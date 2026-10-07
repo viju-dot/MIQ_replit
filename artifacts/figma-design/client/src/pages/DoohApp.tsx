@@ -36,7 +36,8 @@ function DoohVersionedContent() {
   const version = doohRendererVersion(versionContext?.viewedVersion ?? resolved, versions);
   const versionToken = versionContext ? doohVersionToken(versionContext.viewedVersion) : requestedVersion ?? "v2";
   const versionName = versionContext?.viewedVersion.name ?? version.toUpperCase();
-  const supportsDemoView = versionToken === "v3" || versionName.trim().toLowerCase() === "v4";
+  const isV4 = versionName.trim().toLowerCase() === "v4";
+  const supportsDemoView = versionToken === "v3" || isV4;
   const demoView = supportsDemoView && new URLSearchParams(search).get("demo") === "1";
   const isGeo = location.startsWith("/geo-planner");
   const isSaved = location.startsWith("/saved-audiences");
@@ -113,7 +114,8 @@ function DoohVersionedContent() {
     : version === "v2" ? (
       <DoohPlannerV2
         demoView={demoView}
-        showRadius={versionName.trim().toLowerCase() !== "v4"}
+        showRadius={!isV4}
+        v4Layout={isV4}
       />
     ) : <DoohPlanner />;
 
