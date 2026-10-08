@@ -16,6 +16,7 @@ import { LocationUpload } from "./LocationUpload";
 import { FacetDropdown } from "./FacetDropdown";
 import { UploadPreview, UploadPreviewOptions } from "./UploadPreview";
 import { CURRENCY_SYMBOLS, convertBudgetCurrency, type BudgetCurrency } from "./budgetCurrency";
+import type { CreativeScreenCounts } from "./creativeCounts";
 export { EXCHANGE_RATES } from "./budgetCurrency";
 
 // Theme the control itself, not SelectValue's inner span. Fiber uses
@@ -239,6 +240,7 @@ interface Props {
   demoView?: boolean;
   showRadius?: boolean;
   v4Layout?: boolean;
+  creativeCounts?: CreativeScreenCounts;
 }
 
 type LocationUploadMethod = "postcode" | "latlng" | "city";
@@ -278,6 +280,7 @@ export function SidebarV2({
   demoView = false,
   showRadius = true,
   v4Layout = false,
+  creativeCounts,
 }: Props) {
   const { data: audiences, isError } = useAudiences();
   const incrementUse = useIncrementAudienceUse();
@@ -498,6 +501,8 @@ export function SidebarV2({
   const sectionStyle = (order: number): CSSProperties | undefined =>
     v4Layout ? { order } : undefined;
   const budgetSymbol = v4Layout ? CURRENCY_SYMBOLS[filters.budget.currency] : "£";
+  const formatCount = (format: string) => v4Layout && creativeCounts ? ` [${creativeCounts.formats[format].toLocaleString()}]` : "";
+  const resolutionCount = (resolution: string) => v4Layout && creativeCounts ? ` [${creativeCounts.resolutions[resolution].toLocaleString()}]` : "";
 
   return (
     <div data-annotate="DOOH filter panel" className="w-[300px] xl:w-[340px] shrink-0 bg-[var(--surface-background-lvl2,#f7f7fa)] flex flex-col z-20 overflow-y-auto">
@@ -892,15 +897,20 @@ export function SidebarV2({
             <div>
               <label className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Format</label>
               <Select value={filters.creativeType.format || "any"} onValueChange={format => updateSection("creativeType", { format: format === "any" ? "" : format })}>
-                <SelectTrigger className="h-8 mt-1"><SelectValue /></SelectTrigger><SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectItem value="any" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>Display + Video (Both)</SelectItem>{CREATIVE_FORMATS.map(f => <SelectItem value={f} key={f}>{f}</SelectItem>)}</SelectContent>
+                <SelectTrigger className="h-8 mt-1"><SelectValue /></SelectTrigger><SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectItem value="any" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>{v4Layout ? "Display + Video" : "Display + Video (Both)"}{formatCount("")}</SelectItem>{CREATIVE_FORMATS.map(f => <SelectItem value={f} key={f}>{f}{formatCount(f)}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div>
               <label className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Resolution</label>
               <Select value={filters.creativeType.resolution || "any"} onValueChange={resolution => updateSection("creativeType", { resolution: resolution === "any" ? "" : resolution })}>
-                <SelectTrigger className="h-8 mt-1"><SelectValue /></SelectTrigger><SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectItem value="any" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>Any</SelectItem>{RESOLUTIONS.map(r => <SelectItem value={r} key={r}>{r}</SelectItem>)}</SelectContent>
+                <SelectTrigger className="h-8 mt-1"><SelectValue /></SelectTrigger><SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectItem value="any" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>Any{resolutionCount("")}</SelectItem>{RESOLUTIONS.map(r => <SelectItem value={r} key={r}>{r}{resolutionCount(r)}</SelectItem>)}</SelectContent>
               </Select>
             </div>
+            {v4Layout && creativeCounts && (
+              <p className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]" role="status" aria-live="polite">
+                {creativeCounts.overall.toLocaleString()} {creativeCounts.overall === 1 ? "screen" : "screens"} matching format + resolution
+              </p>
+            )}
           </div>
         </FilterCard>
 

@@ -8,6 +8,7 @@ import { FiberButton, IconButton, SmartCard, TabsBarUnderline } from "./primitiv
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Download, Maximize2 } from "lucide-react";
 import { useScreenExport } from "./useScreenExport";
+import { countCreativeOptions } from "./creativeCounts";
 import "./DoohPlannerV2.css";
 
 export default function DoohPlannerV2({
@@ -42,7 +43,8 @@ export default function DoohPlannerV2({
     }
   }, []);
 
-  const { matchedScreens, smartCandidates } = useMemo(() => {
+  const { matchedScreens, smartCandidates, creativeCounts } = useMemo(() => {
+    const computeResults = (creativeType = filters.creativeType) => {
     const method = filters.location.method;
     const radius = Number(filters.location.radius) * (filters.location.radiusUnit === "km" ? 1000 : 1);
     const selectedAudience = method === "audience"
@@ -121,12 +123,12 @@ export default function DoohPlannerV2({
     }
 
     // 6. Creative Type
-    if (filters.creativeType.enabled) {
-      if (filters.creativeType.format) {
-        baseResults = baseResults.filter(s => s.creativeFormat === filters.creativeType.format);
+    if (creativeType.enabled) {
+      if (creativeType.format) {
+        baseResults = baseResults.filter(s => s.creativeFormat === creativeType.format);
       }
-      if (filters.creativeType.resolution) {
-        baseResults = baseResults.filter(s => s.creativeRes === filters.creativeType.resolution);
+      if (creativeType.resolution) {
+        baseResults = baseResults.filter(s => s.creativeRes === creativeType.resolution);
       }
     }
 
@@ -170,6 +172,15 @@ export default function DoohPlannerV2({
     }
 
     return { matchedScreens: finalMatched, smartCandidates: finalSmartCandidates };
+    };
+
+    return {
+      ...computeResults(),
+      creativeCounts: v4Layout ? countCreativeOptions(
+        filters.creativeType,
+        (format, resolution) => computeResults({ enabled: true, format, resolution }).matchedScreens.length,
+      ) : undefined,
+    };
   }, [filters, audiences, v4Layout]);
 
   useEffect(() => {
@@ -349,6 +360,7 @@ export default function DoohPlannerV2({
           demoView={demoView}
           showRadius={showRadius}
           v4Layout={v4Layout}
+          creativeCounts={creativeCounts}
         />
         
         <div className="flex-1 min-w-0 min-h-0 flex flex-col sticky top-4 self-start bg-transparent">

@@ -98,3 +98,9 @@ Currency selection for European planning belongs to DOOH V4 only.
 **Why:** The user wants to expand planning across Europe while keeping all other versions unchanged, and explicitly requires Plan Overview to follow the selected Budget-filter currency.
 
 **How to apply:** Keep monetary labels, estimates, screen CPM, and exports consistent with the selected currency. Convert populated Budget/CPM amounts when changing currency to preserve the plan's economic value and preserve blank optional inputs. Rates are fixed prototype rates, not live FX; the user explicitly removed the explanatory text beneath the Currency field, so do not restore it there. Euro support does not imply live European inventory or activation.
+
+Creative counts in V4 represent matching inventory, not manually checked screen rows.
+
+**Why:** The user wants counts beside each format and resolution and an overall count for their combined selection. An option's count should describe the result of choosing it, including other active planning constraints.
+
+**How to apply:** Keep the other creative dimension selected when counting an alternative. Include geography, screen lists, commercial filters, and budget; calculate budget allocation after the alternative selection rather than counting an already budget-truncated pool. Keep previous prototype versions unchanged.
