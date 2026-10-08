@@ -4,6 +4,7 @@ import { EXCHANGE_RATES } from "./v2planner-sidebar";
 import { MetricsTile } from "@/components/ds/MetricsTile";
 import { SmartCard } from "./primitives";
 import { ScreenTableV2 } from "./v2planner-screen-table";
+import { FiberToggle } from "@/pages/ds/TogglePage";
 
 interface Props {
   matchedScreens: ScreenData[];
@@ -15,6 +16,8 @@ interface Props {
   onSelectMany: (ids: string[], checked: boolean) => void;
   onHover: (id: string | null) => void;
   highlightedScreenId?: string | null;
+  showCpm?: boolean;
+  onShowCpmChange?: (visible: boolean) => void;
 }
 
 const formatCurrency = (amount: number, currency: "GBP" | "EUR" | "USD") => {
@@ -36,13 +39,21 @@ export function PlanOverviewCards({
   selectedScreens,
   budget,
   currency,
-  layout = "horizontal"
+  layout = "horizontal",
+  showAverageCpm = true,
+  showTotalSpend = true,
+  onShowAverageCpmChange,
+  onShowTotalSpendChange,
 }: {
   matchedScreens: ScreenData[];
   selectedScreens: ScreenData[];
   budget: number | null;
   currency: "GBP" | "EUR" | "USD";
   layout?: "horizontal" | "vertical";
+  showAverageCpm?: boolean;
+  showTotalSpend?: boolean;
+  onShowAverageCpmChange?: (visible: boolean) => void;
+  onShowTotalSpendChange?: (visible: boolean) => void;
 }) {
   const rate = EXCHANGE_RATES[currency] || 1;
 
@@ -72,7 +83,8 @@ export function PlanOverviewCards({
       />
       <MetricsTile 
         descriptionText="Est. Average CPM"
-        metricValue={formatCurrency(totalCpm, currency)}
+        metricValue={showAverageCpm ? formatCurrency(totalCpm, currency) : "Hidden"}
+        headerAction={onShowAverageCpmChange && <FiberToggle compact on={showAverageCpm} disabled={false} ariaLabel="Show estimated average CPM" onCheckedChange={onShowAverageCpmChange} />}
         showIcon={false}
         fullWidth
       />
@@ -84,8 +96,9 @@ export function PlanOverviewCards({
       />
       <MetricsTile 
         descriptionText="Est. Total Spend"
-        metricValue={formatCurrencyZero(totalSpend, currency)}
-        badgeText={budget !== null ? `${budgetUtilization.toFixed(0)}% budget used` : undefined}
+        metricValue={showTotalSpend ? formatCurrencyZero(totalSpend, currency) : "Hidden"}
+        badgeText={showTotalSpend && budget !== null ? `${budgetUtilization.toFixed(0)}% budget used` : undefined}
+        headerAction={onShowTotalSpendChange && <FiberToggle compact on={showTotalSpend} disabled={false} ariaLabel="Show estimated total spend" onCheckedChange={onShowTotalSpendChange} />}
         showIcon={false}
         fullWidth
       />
@@ -102,7 +115,9 @@ export function RightPanelV2({
   onSelect,
   onSelectMany,
   onHover,
-  highlightedScreenId
+  highlightedScreenId,
+  showCpm,
+  onShowCpmChange,
 }: Props) {
   return (
     <div className="w-full min-w-0 flex-1 bg-[var(--surface-background-lvl1,#ffffff)] flex flex-col">
@@ -115,6 +130,8 @@ export function RightPanelV2({
           onSelectMany={onSelectMany}
           onHover={onHover}
           highlightedScreenId={highlightedScreenId}
+          showCpm={showCpm}
+          onShowCpmChange={onShowCpmChange}
         />
       </div>
       

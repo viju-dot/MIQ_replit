@@ -26,6 +26,7 @@
  * ========================================================================= */
 
 import { ArrowUp, ArrowDown, Minus } from "@phosphor-icons/react";
+import type { ReactNode } from "react";
 
 const imgUsersThree = "/figmaAssets/metrics/users-three.svg";
 const imgUsersThreeDisabled = "/figmaAssets/metrics/users-three-disabled.svg";
@@ -172,6 +173,8 @@ export type MetricsTileProps = {
   loading?: boolean;
   /** Fill available width (grid cells). Default true when used as a card. */
   fullWidth?: boolean;
+  /** Optional accessible control beside the description. */
+  headerAction?: ReactNode;
 };
 
 function indexColor(index: number): { fg: string; Arrow: typeof ArrowUp } {
@@ -195,6 +198,7 @@ export function MetricsTile({
   trendLabel = "vs national",
   loading = false,
   fullWidth = false,
+  headerAction,
 }: MetricsTileProps) {
   const isDisabled = state === "Disabled";
   const isSelected = state === "Selected";
@@ -260,7 +264,7 @@ export function MetricsTile({
 
         {/* Context Label Top */}
         {descriptionText != null && (
-          <div className="flex gap-0 items-center p-0 relative shrink-0 w-full">
+          <div className={`flex items-center p-0 relative shrink-0 w-full ${headerAction ? "justify-between gap-2" : "gap-0"}`}>
             <div className="flex gap-[var(--spacing-100,8px)] items-center relative shrink-0 min-w-0">
               <p
                 className="[word-break:break-word] font-[var(--body-sm-regular-family,'DM_Sans')] font-normal leading-[var(--body-sm-regular-line-height,18px)] not-italic relative shrink min-w-0 truncate text-[length:var(--body-sm-regular-size,12px)]"
@@ -271,6 +275,7 @@ export function MetricsTile({
               </p>
             </div>
             {showIcon && <UsersIcon src={iconSrc} />}
+            {headerAction && <div className="shrink-0">{headerAction}</div>}
           </div>
         )}
 

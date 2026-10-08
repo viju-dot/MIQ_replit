@@ -9,14 +9,18 @@ const ASSET = "/figmaAssets/toggle";
 const FOCUS_RING =
   "0 0 0 2px var(--surface-background-lvl1,#ffffff), 0 0 0 4px var(--border-dynamic-brand-selected,#7c33b5)";
 
-function FiberToggle({
+export function FiberToggle({
   compact,
   on,
   disabled,
+  onCheckedChange,
+  ariaLabel,
 }: {
   compact: boolean;
   on: boolean;
   disabled: boolean;
+  onCheckedChange?: (checked: boolean) => void;
+  ariaLabel?: string;
 }): JSX.Element {
   // Natural interactivity: clicking flips the switch. The panel "On" control
   // seeds the state and re-syncs when changed, keeping it authoritative.
@@ -25,7 +29,7 @@ function FiberToggle({
   useEffect(() => {
     setChecked(on);
   }, [on]);
-  const isOn = !disabled && checked;
+  const isOn = !disabled && (onCheckedChange ? on : checked);
   // Track background (Figma control tokens)
   let bgClass = "bg-[var(--controls-background-inactive,#ebebf0)]";
   if (disabled) bgClass = "bg-[var(--controls-background-disabled,rgba(113,113,128,0.1))]";
@@ -49,14 +53,22 @@ function FiberToggle({
     <button
       type="button"
       disabled={disabled}
-      onClick={() => !disabled && setChecked((c) => !c)}
+      onClick={() => {
+        if (disabled) return;
+        if (onCheckedChange) onCheckedChange(!on);
+        else setChecked((c) => !c);
+      }}
       onFocus={(e) => setFocused(e.currentTarget.matches(":focus-visible"))}
       onBlur={() => setFocused(false)}
       className={`relative flex items-center rounded-[20px] transition-colors duration-150 outline-none ${trackClass} ${bgClass} ${
         isOn ? "justify-end" : ""
       } ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
-      style={focused && !disabled ? { boxShadow: FOCUS_RING } : undefined}
+      style={{
+        backgroundColor: disabled ? "var(--controls-background-disabled,rgba(113,113,128,0.1))" : isOn ? "var(--controls-background-active,#7c33b5)" : "var(--controls-background-inactive,#ebebf0)",
+        ...(focused && !disabled ? { boxShadow: FOCUS_RING } : {}),
+      }}
       role="switch"
+      aria-label={ariaLabel}
       aria-checked={isOn}
       aria-disabled={disabled}
     >

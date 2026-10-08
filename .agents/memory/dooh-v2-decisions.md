@@ -33,6 +33,12 @@ Publisher screen-count labels belong only to the V4 Publisher filter, not Venue 
 
 **How to apply:** Use actual prototype inventory counts rather than illustrative example numbers. Total the inventory belonging to the selected publishers; All includes every publisher. Keep publisher inventory totals distinct from the plan's matched-screen count after other constraints.
 
+V4 sellers need independent visibility controls for Screen List CPM, Plan Overview estimated average CPM, and estimated total spend.
+
+**Why:** Stakeholders want exact financial figures available internally but optionally hidden while demonstrating the planner to clients. These are presentation controls, not role-based authorization.
+
+**How to apply:** Reuse Fiber switches and metric tiles. Hide derived budget-use information with total spend and stop CPM sorting when its column is hidden. Keep visibility state across tab switches and normal/expanded map overview mounts, without changing calculations or older versions.
+
 Treat the DOOH V2 brief as a minimal mock-data planning prototype, not authorization to connect a DSP or make live campaign bookings.
 
 **Why:** The brief explicitly requested mock screens/intelligence and a minimal Phase 1 implementation. Saved audiences already had real persistence, which should not be replaced with browser-only state just because the example brief used React state.

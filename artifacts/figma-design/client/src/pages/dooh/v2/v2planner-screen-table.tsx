@@ -7,6 +7,7 @@ import { SearchStandard } from "../../ds/SearchPage";
 import { PaginationButton, PaginationLabel } from "../../ds/PaginationPage";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { CARD_BG, TITLE } from "./primitives";
+import { FiberToggle } from "@/pages/ds/TogglePage";
 
 interface Props {
   screens: ScreenData[];
@@ -16,11 +17,13 @@ interface Props {
   onSelectMany: (ids: string[], checked: boolean) => void;
   onHover: (id: string | null) => void;
   highlightedScreenId?: string | null;
+  showCpm?: boolean;
+  onShowCpmChange?: (visible: boolean) => void;
 }
 
 type SortConfig = { key: keyof ScreenData; dir: 'asc' | 'desc' } | null;
 
-export function ScreenTableV2({ screens, selectedScreenIds, currency, onSelect, onSelectMany, onHover, highlightedScreenId }: Props) {
+export function ScreenTableV2({ screens, selectedScreenIds, currency, onSelect, onSelectMany, onHover, highlightedScreenId, showCpm = true, onShowCpmChange }: Props) {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortConfig>(null);
   const [pageSize, setPageSize] = useState<number>(15);
@@ -32,6 +35,11 @@ export function ScreenTableV2({ screens, selectedScreenIds, currency, onSelect, 
   const currencySymbol = currency === "EUR" ? "€" : currency === "USD" ? "$" : "£";
 
   const isTableHovered = useRef(false);
+
+  // Hidden prices must not continue to determine the visible row order.
+  useEffect(() => {
+    if (!showCpm) setSort(previous => previous?.key === "cpm" ? null : previous);
+  }, [showCpm]);
 
   // Prevent silent full-row scroll on hover if unnecessary
   useEffect(() => {
@@ -134,6 +142,10 @@ export function ScreenTableV2({ screens, selectedScreenIds, currency, onSelect, 
             label="Search ID, publisher, city..."
           />
         </div>
+        {onShowCpmChange && <label className="flex items-center justify-end gap-2 text-xs" style={{ color: TITLE }}>
+          Show CPM
+          <FiberToggle compact on={showCpm} disabled={false} ariaLabel="Show screen list CPM" onCheckedChange={onShowCpmChange} />
+        </label>}
       </div>
       
       <div className="flex-1 overflow-auto dooh-scrollbar">
@@ -176,7 +188,7 @@ export function ScreenTableV2({ screens, selectedScreenIds, currency, onSelect, 
                   City <SortIcon colKey="city" />
                 </button>
               </th>
-              <th className="px-3 py-2.5 group border-b border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]">
+              {showCpm && <th className="px-3 py-2.5 group border-b border-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]">
                 <button 
                   onClick={() => handleSort('cpm')}
                   aria-label="Sort by CPM"
@@ -184,13 +196,13 @@ export function ScreenTableV2({ screens, selectedScreenIds, currency, onSelect, 
                 >
                   CPM <SortIcon colKey="cpm" />
                 </button>
-              </th>
+              </th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--border-dynamic-neutral-subtle-default,#c6c6cc)]">
             {paginatedScreens.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center" style={{ color: "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)", backgroundColor: "var(--surface-background-lvl2, #f7f7fa)" }}>
+                <td colSpan={showCpm ? 5 : 4} className="px-4 py-8 text-center" style={{ color: "var(--surface-foreground-dynamic-neutral-disabled, #a8a8b2)", backgroundColor: "var(--surface-background-lvl2, #f7f7fa)" }}>
                   No screens match the search query.
                 </td>
               </tr>
@@ -228,7 +240,7 @@ export function ScreenTableV2({ screens, selectedScreenIds, currency, onSelect, 
                     <td className="px-3 py-2 font-medium whitespace-nowrap" style={{ color: TITLE }}>{s.id}</td>
                     <td className="px-3 py-2 whitespace-nowrap truncate max-w-[100px]" style={{ color: "var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59)" }}>{s.publisher}</td>
                     <td className="px-3 py-2 whitespace-nowrap" style={{ color: "var(--surface-foreground-dynamic-neutral-default-regular, #4b4b59)" }}>{s.city}</td>
-                    <td className="px-3 py-2 font-medium whitespace-nowrap" style={{ color: TITLE }}>{currencySymbol}{(s.cpm * rate).toFixed(2)}</td>
+                    {showCpm && <td className="px-3 py-2 font-medium whitespace-nowrap" style={{ color: TITLE }}>{currencySymbol}{(s.cpm * rate).toFixed(2)}</td>}
                   </tr>
                 );
               })
