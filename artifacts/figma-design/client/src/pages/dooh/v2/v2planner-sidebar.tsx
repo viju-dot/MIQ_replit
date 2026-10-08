@@ -6,8 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger as BaseSelectTrigger, 
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/pages/ds/CheckPage";
 import { useAudiences, useIncrementAudienceUse } from "../api";
-import { CREATIVE_FORMATS, DAYPART_PRESETS, MOCK_POIS, MOCK_POSTCODES, PUBLISHERS, RESOLUTIONS, SCREENS, VENUES, getDistance } from "../data";
-import { downloadScreenTemplate, parseCoordinateCsv, parsePostcodeCsv, parseScreenList, type UploadedLocationRecord, type UploadedScreenRecord, type UploadReport } from "../uploadHelpers";
+import { CITIES, CREATIVE_FORMATS, DAYPART_PRESETS, MOCK_POIS, MOCK_POSTCODES, PUBLISHERS, RESOLUTIONS, SCREENS, VENUES, getDistance } from "../data";
+import { downloadScreenTemplate, parseCityCsv, parseCoordinateCsv, parsePostcodeCsv, parseScreenList, type UploadedLocationRecord, type UploadedScreenRecord, type UploadReport } from "../uploadHelpers";
 import { FiberSlider, FiberButton, SmartCard } from "./primitives";
 import { FiberRoundedTabsBar, FiberTabButton } from "@/components/FiberTabItem";
 import { PoiSearch } from "./PoiSearch";
@@ -42,7 +42,7 @@ export interface PlanningZone {
 export interface FilterStateV2 {
   location: {
     enabled: boolean;
-    method: "audience" | "postcode" | "poi" | "latlng";
+    method: "audience" | "postcode" | "poi" | "latlng" | "city";
     audienceId: string;
     postcode: string;
     poiIds: string[];
@@ -52,6 +52,7 @@ export interface FilterStateV2 {
     uploadedPointsByMethod: {
       postcode: Array<{ lat: number; lng: number }>;
       latlng: Array<{ lat: number; lng: number }>;
+      city: Array<{ lat: number; lng: number }>;
     };
   };
   planningZone: { enabled: boolean; zones: PlanningZone[]; drawMode: "circle" | "polygon" | null; drawShape: "circle" | "polygon"; drawCircleRadius: string; drawCircleUnit: "m" | "km" };
@@ -80,7 +81,7 @@ export const DEFAULT_FILTERS_V2: FilterStateV2 = {
     radius: 500,
     radiusUnit: "m",
     uploadedPoints: [],
-    uploadedPointsByMethod: { postcode: [], latlng: [] },
+    uploadedPointsByMethod: { postcode: [], latlng: [], city: [] },
   },
   planningZone: { enabled: false, zones: [], drawMode: null, drawShape: "circle", drawCircleRadius: "", drawCircleUnit: "km" },
   venueType: { enabled: false, venues: [] },
@@ -135,6 +136,16 @@ const DEMO_SCREEN_IDS = SCREENS
 
 export const DEMO_UPLOADS = {
   location: {
+    city: {
+      fileName: "demo-cities.csv",
+      content: "city\nLondon",
+      records: CITIES.filter(city => city.name === "London").map(city => ({
+        key: city.name,
+        label: city.name,
+        point: { lat: city.lat, lng: city.lng },
+      })),
+      report: { valid: 1, unknown: [], malformed: [], duplicates: [] } as UploadReport,
+    },
     postcode: {
       fileName: "demo-postcodes.csv",
       content: ["postcode", ...DEMO_POSTCODE_KEYS].join("\n"),
@@ -165,7 +176,7 @@ export const DEMO_UPLOADS = {
 
 const DEMO_POI = MOCK_POIS.find(poi => poi.city === "London") ?? MOCK_POIS[0];
 
-export function createDemoFilters(): FilterStateV2 {
+export function createDemoFilters(v4Layout = false): FilterStateV2 {
   return {
     location: {
       enabled: true,
@@ -179,6 +190,7 @@ export function createDemoFilters(): FilterStateV2 {
       uploadedPointsByMethod: {
         postcode: DEMO_UPLOADS.location.postcode.records.map(record => record.point),
         latlng: DEMO_UPLOADS.location.latlng.records.map(record => record.point),
+        city: v4Layout ? DEMO_UPLOADS.location.city.records.map(record => record.point) : [],
       },
     },
     planningZone: {
@@ -229,7 +241,7 @@ interface Props {
   v4Layout?: boolean;
 }
 
-type LocationUploadMethod = "postcode" | "latlng";
+type LocationUploadMethod = "postcode" | "latlng" | "city";
 
 interface LocationUploadState {
   file: File | null;
@@ -274,6 +286,7 @@ export function SidebarV2({
   const [locationUploads, setLocationUploads] = useState<Record<LocationUploadMethod, LocationUploadState>>(() => ({
     postcode: demoView ? demoLocationUpload("postcode") : emptyLocationUpload(),
     latlng: demoView ? demoLocationUpload("latlng") : emptyLocationUpload(),
+    city: demoView && v4Layout ? demoLocationUpload("city") : emptyLocationUpload(),
   }));
   const [screenListError, setScreenListError] = useState("");
   const [screenListReport, setScreenListReport] = useState<UploadReport | null>(() => demoView ? DEMO_UPLOADS.screenList.report : null);
@@ -282,7 +295,7 @@ export function SidebarV2({
   const [screenListFile, setScreenListFile] = useState<File | null>(() => demoView ? createDemoFile(DEMO_UPLOADS.screenList.fileName, DEMO_UPLOADS.screenList.content) : null);
   const [screenListFileState, setScreenListFileState] = useState<"Uploading" | "Uploaded">(demoView ? "Uploaded" : "Uploading");
 
-  const uploadIdRef = useRef<Record<LocationUploadMethod, number>>({ postcode: 0, latlng: 0 });
+  const uploadIdRef = useRef<Record<LocationUploadMethod, number>>({ postcode: 0, latlng: 0, city: 0 });
   const screenListUploadIdRef = useRef(0);
 
   const updateSection = <K extends keyof FilterStateV2>(section: K, data: Partial<FilterStateV2[K]>) => {
@@ -290,7 +303,7 @@ export function SidebarV2({
   };
   const selectedAudience = audiences?.find(a => a.id === filters.location.audienceId);
 
-  const activeLocationMethod: LocationUploadMethod = filters.location.method === "latlng" ? "latlng" : "postcode";
+  const activeLocationMethod: LocationUploadMethod = filters.location.method === "city" ? "city" : filters.location.method === "latlng" ? "latlng" : "postcode";
   const activeLocationUpload = locationUploads[activeLocationMethod];
   const updateLocationPoints = (method: LocationUploadMethod, points: Array<{ lat: number; lng: number }>) => {
     setFilters(prev => ({
@@ -309,9 +322,9 @@ export function SidebarV2({
     setLocationUploads(prev => ({ ...prev, [method]: { ...prev[method], ...data } }));
   };
 
-  const selectLocationMethod = (method: "audience" | "postcode" | "poi" | "latlng") => {
+  const selectLocationMethod = (method: FilterStateV2["location"]["method"]) => {
     setUploadError("");
-    if (method === "postcode" || method === "latlng") {
+    if (method === "postcode" || method === "latlng" || method === "city") {
       const upload = locationUploads[method];
       const points = upload.records
         .filter(record => upload.selectedKeys.has(record.key))
@@ -493,10 +506,10 @@ export function SidebarV2({
           <FilterCard style={sectionStyle(1)} title="Location" icon={<MapPin className="w-4 h-4" />} enabled={filters.location.enabled} onToggle={enabled => updateSection("location", { enabled })}>
           <div className="mb-4 pt-1 pb-1 max-w-full overflow-x-auto" role="group" aria-label="Location filter method">
             <FiberRoundedTabsBar wrap={false}>
-              {(["audience", "postcode", "poi", "latlng"] as const).map(method => (
+              {(["audience", "postcode", ...(v4Layout ? ["city" as const] : []), "poi", "latlng"] as const).map(method => (
                 <FiberTabButton
                   key={method}
-                  label={method === "audience" ? "Saved Audience" : method === "postcode" ? "Postcode" : method === "poi" ? "POI" : "Lat/Long"}
+                  label={method === "audience" ? "Saved Audience" : method === "postcode" ? "Postcode" : method === "city" ? "City" : method === "poi" ? "POI" : "Lat/Long"}
                   selected={filters.location.method === method}
                   onClick={() => selectLocationMethod(method)}
                 />
@@ -531,17 +544,17 @@ export function SidebarV2({
              )}
            </div>}
           
-          {filters.location.method === "postcode" && <div className="space-y-2">
+          {(filters.location.method === "postcode" || (v4Layout && filters.location.method === "city")) && <div className="space-y-2">
             <LocationUpload
-              method="postcode"
+              method={activeLocationMethod}
               report={activeLocationUpload.report}
                records={activeLocationUpload.records.map(record => ({ key: record.key, label: record.label, detail: `${record.point.lat}, ${record.point.lng}` }))}
                selectedKeys={activeLocationUpload.selectedKeys}
               file={activeLocationUpload.file}
               fileState={activeLocationUpload.fileState}
-              onSelect={(file) => void readUpload(file, "postcode", parsePostcodeCsv)}
-              onRemove={() => cancelUpload("postcode")}
-              onError={(error) => handleLocationFileError("postcode", error)}
+              onSelect={(file) => void readUpload(file, activeLocationMethod, activeLocationMethod === "city" ? parseCityCsv : parsePostcodeCsv)}
+              onRemove={() => cancelUpload(activeLocationMethod)}
+              onError={(error) => handleLocationFileError(activeLocationMethod, error)}
                onToggleRecord={toggleLocationRecord}
             />
           </div>}

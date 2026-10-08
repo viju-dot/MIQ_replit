@@ -1,13 +1,14 @@
 import { Download } from "lucide-react";
 import { FiberDropZone } from "@/components/FiberDropZone";
-import { MOCK_POSTCODES } from "../data";
+import { CITIES, MOCK_POSTCODES } from "../data";
 import type { UploadReport } from "../uploadHelpers";
 import { FiberButton } from "./primitives";
 import { UploadPreview, type UploadPreviewRecord } from "./UploadPreview";
 
-type Method = "postcode" | "latlng";
+type Method = "postcode" | "latlng" | "city";
 
 export function locationSample(method: Method) {
+  if (method === "city") return ["city", ...CITIES.slice(0, 3).map(city => city.name)].join("\n");
   const examples = Object.entries(MOCK_POSTCODES).slice(0, 3);
   return method === "postcode"
     ? ["postcode", ...examples.map(([postcode]) => postcode)].join("\n")
@@ -18,7 +19,7 @@ function downloadSample(method: Method) {
   const url = URL.createObjectURL(new Blob([locationSample(method)], { type: "text/csv;charset=utf-8" }));
   const link = document.createElement("a");
   link.href = url;
-  link.download = `dooh-${method === "postcode" ? "postcodes" : "coordinates"}-sample.csv`;
+  link.download = `dooh-${method === "city" ? "cities" : method === "postcode" ? "postcodes" : "coordinates"}-sample.csv`;
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
@@ -35,7 +36,7 @@ export function LocationUpload({ method, file, fileState, report, records, selec
   onError: (message: string) => void;
   onToggleRecord: (key: string) => void;
 }) {
-  const label = method === "postcode" ? "postcodes" : "coordinate pairs";
+  const label = method === "city" ? "cities" : method === "postcode" ? "postcodes" : "coordinate pairs";
   return <div className="space-y-2" style={{ fontFamily: "var(--font-family-body, 'DM Sans', sans-serif)", color: "var(--surface-foreground-static-neutral-lvl1, #13131a)" }}>
     {file && report && fileState === "Uploaded" && (
       <UploadPreview
@@ -58,7 +59,7 @@ export function LocationUpload({ method, file, fileState, report, records, selec
       onFileRemove={onRemove}
       onFileError={onError}
     />
-    <FiberButton variant="outline" size="compact" className="w-full" ariaLabel={`Download ${method === "postcode" ? "postcode" : "latitude and longitude"} sample CSV`} onClick={() => downloadSample(method)}>
+    <FiberButton variant="outline" size="compact" className="w-full" ariaLabel={`Download ${method === "city" ? "city" : method === "postcode" ? "postcode" : "latitude and longitude"} sample CSV`} onClick={() => downloadSample(method)}>
       <Download size={14} aria-hidden />Download sample CSV
     </FiberButton>
   </div>;

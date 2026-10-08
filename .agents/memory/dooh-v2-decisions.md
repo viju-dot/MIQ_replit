@@ -86,3 +86,9 @@ Location upload cards should prioritize the uploaded-file summary before the rep
 **Why:** Reviewers need to see the current filename and selection state first, while sample-format details add noise to the Postcode and Lat/Long workflow.
 
 **How to apply:** For both methods, show Overall preview with filename, Selected, Not selected, Full preview, and Remove file; omit the sample-format accordion and place Download sample CSV after the drop zone.
+
+Keep the City Location subfilter and its seeded upload demo exclusive to DOOH V4.
+
+**Why:** The user explicitly requested City with the same upload/sample/filter functionality as Postcode, without changing other prototype versions.
+
+**How to apply:** Reuse the existing CSV validation, selection, preview, removal, and point-based matching workflow; preserve City uploads independently from other methods. Seed City only in V4 demo mode and do not remove the existing V3 demo.

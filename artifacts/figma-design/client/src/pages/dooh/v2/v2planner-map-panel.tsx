@@ -31,8 +31,8 @@ interface Props {
   onDrawComplete?: () => void;
   expanded?: boolean;
   locationSource?: string | null; // "audience", "postcode", "poi", "latlng", "screenlist", etc.
-  activeSources?: { geoPlanner: boolean; planningZone: boolean; postcode: boolean; latlng: boolean; poi: boolean };
-  sourceCounts?: Record<"geoPlanner" | "planningZone" | "postcode" | "latlng" | "poi", number>;
+  activeSources?: { geoPlanner: boolean; planningZone: boolean; postcode: boolean; latlng: boolean; poi: boolean; city?: boolean };
+  sourceCounts?: Record<"geoPlanner" | "planningZone" | "postcode" | "latlng" | "poi", number> & { city?: number };
   selectedScreenIds?: Set<string>;
   onSmartSelectionCapture?: (zone: PlanningZone, selectedIds: string[]) => void;
 }
@@ -43,6 +43,7 @@ const SOURCE_COLORS = {
   geoPlanner: "#7c33b5",
   planningZone: "#b45309",
   postcode: "#059669",
+  city: "#0891b2",
   latlng: "#0f766e",
   poi: "#2563eb",
   default: "#13131a",
@@ -185,6 +186,7 @@ function MapLegend({ activeSources, sourceCounts }: { activeSources?: Props["act
     { id: "geoPlanner", label: "Geo Planner", color: SOURCE_COLORS.geoPlanner },
     { id: "planningZone", label: "Planning Zone", color: SOURCE_COLORS.planningZone },
     { id: "postcode", label: "Postcode", color: SOURCE_COLORS.postcode },
+    ...(activeSources?.city !== undefined ? [{ id: "city", label: "City", color: SOURCE_COLORS.city }] : []),
     { id: "latlng", label: "Lat/Long", color: SOURCE_COLORS.latlng },
     { id: "poi", label: "POI", color: SOURCE_COLORS.poi }
   ] as const;
@@ -606,6 +608,7 @@ export function MapPanelV2({
       activeSources.geoPlanner && "geoPlanner",
       activeSources.planningZone && "planningZone",
       activeSources.postcode && "postcode",
+      activeSources.city && "city",
       activeSources.latlng && "latlng",
       activeSources.poi && "poi"
     ].filter(Boolean) as string[] : [];

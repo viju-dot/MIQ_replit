@@ -113,6 +113,7 @@ function DoohVersionedContent() {
     : isGeo ? version === "v2" ? <GeoPlannerV2 /> : <GeoPlanner />
     : version === "v2" ? (
       <DoohPlannerV2
+        key={isV4 ? "v4" : "v2"}
         demoView={demoView}
         showRadius={!isV4}
         v4Layout={isV4}

@@ -1,5 +1,5 @@
 import * as XLSX from "xlsx";
-import { MOCK_POSTCODES, SCREENS, type ScreenData } from "./data";
+import { CITIES, MOCK_POSTCODES, SCREENS, type ScreenData } from "./data";
 
 export interface UploadReport {
   valid: number;
@@ -65,6 +65,30 @@ export async function parsePostcodeCsv(file: File) {
     report.valid++;
   });
   return { points, records, report };
+}
+
+export async function parseCityCsv(file: File) {
+  if (!file.name.toLowerCase().endsWith(".csv")) throw new Error("Unsupported file type. Upload a .csv file.");
+  const rows = rowsFromCsv(await file.text());
+  if (!rows.length) throw new Error("The CSV is empty.");
+  const header = rows[0].map(value => value.toLowerCase().replace(/[\s_-]/g, ""));
+  const column = header.findIndex(value => value === "city" || value === "cityname");
+  if (column < 0) throw new Error('Missing required "city" header.');
+  const records: UploadedLocationRecord[] = [];
+  const report: UploadReport = { valid: 0, unknown: [], malformed: [], duplicates: [] };
+  const seen = new Set<string>();
+  rows.slice(1).forEach((row, index) => {
+    const supplied = (row[column] || "").replace(/\s+/g, " ").trim();
+    if (!supplied) return report.malformed.push(`Row ${index + 2}`);
+    const key = supplied.toLowerCase();
+    if (seen.has(key)) return report.duplicates.push(supplied);
+    seen.add(key);
+    const city = CITIES.find(city => city.name.toLowerCase() === key);
+    if (!city) return report.unknown.push(supplied);
+    records.push({ key: city.name, label: city.name, point: { lat: city.lat, lng: city.lng } });
+    report.valid++;
+  });
+  return { points: records.map(record => record.point), records, report };
 }
 
 export async function parseCoordinateCsv(file: File) {

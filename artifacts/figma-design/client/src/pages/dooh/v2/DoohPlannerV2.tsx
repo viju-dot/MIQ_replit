@@ -19,7 +19,7 @@ export default function DoohPlannerV2({
   showRadius?: boolean;
   v4Layout?: boolean;
 }) {
-  const [filters, setFilters] = useState<FilterStateV2>(() => demoView ? createDemoFilters() : DEFAULT_FILTERS_V2);
+  const [filters, setFilters] = useState<FilterStateV2>(() => demoView ? createDemoFilters(v4Layout) : DEFAULT_FILTERS_V2);
   const [selectedScreenIds, setSelectedScreenIds] = useState<Set<string>>(
     () => demoView ? new Set(DEMO_UPLOADS.screenList.records.map(record => record.id)) : new Set(),
   );
@@ -59,7 +59,7 @@ export default function DoohPlannerV2({
       if (aud && aud.geoDefinition.points) {
         targetPoints = aud.geoDefinition.points.map(p => ({ lat: p.lat, lng: p.lng }));
       }
-    } else if (method === "postcode") {
+    } else if (method === "postcode" || (v4Layout && method === "city")) {
       targetPoints = filters.location.uploadedPoints;
     } else if (method === "poi") {
       targetPoints = MOCK_POIS
@@ -170,7 +170,7 @@ export default function DoohPlannerV2({
     }
 
     return { matchedScreens: finalMatched, smartCandidates: finalSmartCandidates };
-  }, [filters, audiences]);
+  }, [filters, audiences, v4Layout]);
 
   useEffect(() => {
     const ids = new Set(matchedScreens.map(screen => screen.id));
@@ -183,7 +183,7 @@ export default function DoohPlannerV2({
   const locationConfigured = filters.location.enabled && (
     (filters.location.method === "audience" && !!filters.location.audienceId) ||
     (filters.location.method === "poi" && filters.location.poiIds.length > 0) ||
-    ((filters.location.method === "postcode" || filters.location.method === "latlng") && filters.location.uploadedPoints.length > 0)
+    ((filters.location.method === "postcode" || filters.location.method === "latlng" || (v4Layout && filters.location.method === "city")) && filters.location.uploadedPoints.length > 0)
   );
   const locationMethod = locationConfigured
     ? filters.location.method
@@ -197,6 +197,7 @@ export default function DoohPlannerV2({
     postcode: filters.location.enabled && filters.location.uploadedPointsByMethod.postcode.length > 0,
     latlng: filters.location.enabled && filters.location.uploadedPointsByMethod.latlng.length > 0,
     poi: filters.location.enabled && filters.location.poiIds.length > 0,
+    ...(v4Layout ? { city: filters.location.enabled && filters.location.uploadedPointsByMethod.city.length > 0 } : {}),
   };
 
   // Match Source reports each active input independently. This keeps a
@@ -244,6 +245,7 @@ export default function DoohPlannerV2({
           : countAround(audiencePoints)
         : 0,
       planningZone: planningZoneCount,
+      ...(v4Layout ? { city: activeSources.city ? countAround(filters.location.uploadedPointsByMethod.city) : 0 } : {}),
       postcode: activeSources.postcode
         ? countAround(filters.location.uploadedPointsByMethod.postcode)
         : 0,
@@ -257,7 +259,7 @@ export default function DoohPlannerV2({
         : 0,
     };
   }, [activeSources.geoPlanner, activeSources.planningZone, activeSources.postcode,
-    activeSources.latlng, activeSources.poi, audiences, filters]);
+    activeSources.latlng, activeSources.poi, activeSources.city, audiences, filters, v4Layout]);
       
   const selectedScreens = matchedScreens.filter(screen => selectedScreenIds.has(screen.id));
   const { csvDownload, handleExport } = useScreenExport(
