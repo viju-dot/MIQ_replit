@@ -92,3 +92,9 @@ Keep the City Location subfilter and its seeded upload demo exclusive to DOOH V4
 **Why:** The user explicitly requested City with the same upload/sample/filter functionality as Postcode, without changing other prototype versions.
 
 **How to apply:** Reuse the existing CSV validation, selection, preview, removal, and point-based matching workflow; preserve City uploads independently from other methods. Seed City only in V4 demo mode and do not remove the existing V3 demo.
+
+Currency selection for European planning belongs to DOOH V4 only.
+
+**Why:** The user wants to expand planning across Europe while keeping all other versions unchanged, and explicitly requires Plan Overview to follow the selected Budget-filter currency.
+
+**How to apply:** Keep monetary labels, estimates, screen CPM, and exports consistent with the selected currency. Convert populated Budget/CPM amounts when changing currency to preserve the plan's economic value, preserve blank optional inputs, and clearly identify prototype rates as fixed demo rates rather than live FX. Euro support does not imply live European inventory or activation.

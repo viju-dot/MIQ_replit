@@ -15,6 +15,8 @@ import { FiberDropZone } from "@/components/FiberDropZone";
 import { LocationUpload } from "./LocationUpload";
 import { FacetDropdown } from "./FacetDropdown";
 import { UploadPreview, UploadPreviewOptions } from "./UploadPreview";
+import { CURRENCY_SYMBOLS, convertBudgetCurrency, type BudgetCurrency } from "./budgetCurrency";
+export { EXCHANGE_RATES } from "./budgetCurrency";
 
 // Theme the control itself, not SelectValue's inner span. Fiber uses
 // data-theme, whereas the underlying headless control's defaults use .dark.
@@ -230,8 +232,6 @@ export function createDemoFilters(v4Layout = false): FilterStateV2 {
 function createDemoFile(name: string, content: string) {
   return typeof File === "undefined" ? null : new File([content], name, { type: "text/csv" });
 }
-
-export const EXCHANGE_RATES = { GBP: 1, EUR: 1.17, USD: 1.25 };
 
 interface Props {
   filters: FilterStateV2;
@@ -497,6 +497,7 @@ export function SidebarV2({
       );
   const sectionStyle = (order: number): CSSProperties | undefined =>
     v4Layout ? { order } : undefined;
+  const budgetSymbol = v4Layout ? CURRENCY_SYMBOLS[filters.budget.currency] : "£";
 
   return (
     <div data-annotate="DOOH filter panel" className="w-[300px] xl:w-[340px] shrink-0 bg-[var(--surface-background-lvl2,#f7f7fa)] flex flex-col z-20 overflow-y-auto">
@@ -844,8 +845,27 @@ export function SidebarV2({
         {/* 6. Budget */}
         <FilterCard style={sectionStyle(8)} title="Budget" icon={<Wallet className="w-4 h-4" />} enabled={filters.budget.enabled} onToggle={enabled => updateSection("budget", { enabled })}>
           <div className="space-y-3">
+             {v4Layout && (
+               <div>
+                 <label htmlFor="dooh-currency" className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Currency</label>
+                 <Select value={filters.budget.currency} onValueChange={(currency: BudgetCurrency) => {
+                   setFilters(previous => ({
+                     ...previous,
+                     budget: convertBudgetCurrency(previous.budget, currency),
+                   }));
+                 }}>
+                   <SelectTrigger id="dooh-currency" className="h-8 mt-1" aria-label="Plan currency"><SelectValue /></SelectTrigger>
+                   <SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>
+                     <SelectItem value="GBP">GBP — British Pound (£)</SelectItem>
+                     <SelectItem value="EUR">EUR — Euro (€)</SelectItem>
+                     <SelectItem value="USD">USD — US Dollar ($)</SelectItem>
+                   </SelectContent>
+                 </Select>
+                 <p className="mt-1 text-[11px] text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Amounts convert using fixed demo rates, not live exchange rates.</p>
+               </div>
+             )}
              <div>
-               <label htmlFor="dooh-budget" className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Total Budget (£)</label>
+               <label htmlFor="dooh-budget" className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Total Budget ({budgetSymbol})</label>
                <Input style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }} 
                  id="dooh-budget"
                  type="number" min={0} step="100" 
@@ -855,7 +875,7 @@ export function SidebarV2({
                />
              </div>
              <div>
-               <label htmlFor="dooh-cpm" className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">CPM Ceiling (£, Optional)</label>
+               <label htmlFor="dooh-cpm" className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">CPM Ceiling ({budgetSymbol}, Optional)</label>
                <Input style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }} 
                  id="dooh-cpm"
                  type="number" min={0} step=".01" 
