@@ -33,11 +33,11 @@ Publisher screen-count labels belong only to the V4 Publisher filter, not Venue 
 
 **How to apply:** Use actual prototype inventory counts rather than illustrative example numbers. Total the inventory belonging to the selected publishers; All includes every publisher. Keep publisher inventory totals distinct from the plan's matched-screen count after other constraints.
 
-V4 sellers need independent visibility controls for Screen List CPM, Plan Overview estimated average CPM, and estimated total spend.
+V4 Plan Overview prioritizes Matched Screens, Selected Screens, then Estimated Impressions; a plain “Budget view” title with one Fiber toggle reveals both financial metric tiles below.
 
-**Why:** Stakeholders want exact financial figures available internally but optionally hidden while demonstrating the planner to clients. These are presentation controls, not role-based authorization.
+**Why:** Stakeholders want financial figures optionally hidden during client demos. The user rejected per-tile CPM/spend switches and requested a single Budget view control without changing the metric components. These are presentation controls, not authorization.
 
-**How to apply:** Reuse Fiber switches and metric tiles. Hide derived budget-use information with total spend and stop CPM sorting when its column is hidden. Keep visibility state across tab switches and normal/expanded map overview mounts, without changing calculations or older versions.
+**How to apply:** Default Budget view off and omit both financial tiles until enabled. Keep their standard Fiber appearance and budget-use badge when shown, without individual switches or “Hidden” placeholders. Preserve the separate Screen List CPM toggle, clear CPM sorting when hidden, and retain state across tab switches and overview mounts. Do not change calculations or older versions.
 
 Treat the DOOH V2 brief as a minimal mock-data planning prototype, not authorization to connect a DSP or make live campaign bookings.
 

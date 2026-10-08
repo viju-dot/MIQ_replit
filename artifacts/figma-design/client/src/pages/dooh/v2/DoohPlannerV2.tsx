@@ -29,8 +29,7 @@ export default function DoohPlannerV2({
   const [showMapOverview, setShowMapOverview] = useState(false);
   const [showMapExpanded, setShowMapExpanded] = useState(false);
   const [showScreenCpm, setShowScreenCpm] = useState(true);
-  const [showAverageCpm, setShowAverageCpm] = useState(true);
-  const [showTotalSpend, setShowTotalSpend] = useState(true);
+  const [budgetView, setBudgetView] = useState(false);
 
   const { data: audiences } = useAudiences();
 
@@ -347,10 +346,8 @@ export default function DoohPlannerV2({
               budget={filters.budget.enabled ? Number(filters.budget.total) : null}
               currency={filters.budget.currency}
               layout="vertical"
-              showAverageCpm={showAverageCpm}
-              showTotalSpend={showTotalSpend}
-              onShowAverageCpmChange={v4Layout ? setShowAverageCpm : undefined}
-              onShowTotalSpendChange={v4Layout ? setShowTotalSpend : undefined}
+              budgetView={budgetView}
+              onBudgetViewChange={v4Layout ? setBudgetView : undefined}
             />
           </SmartCard>
         </div>

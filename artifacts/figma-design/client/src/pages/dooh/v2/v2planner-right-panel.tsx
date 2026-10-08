@@ -40,20 +40,16 @@ export function PlanOverviewCards({
   budget,
   currency,
   layout = "horizontal",
-  showAverageCpm = true,
-  showTotalSpend = true,
-  onShowAverageCpmChange,
-  onShowTotalSpendChange,
+  budgetView = false,
+  onBudgetViewChange,
 }: {
   matchedScreens: ScreenData[];
   selectedScreens: ScreenData[];
   budget: number | null;
   currency: "GBP" | "EUR" | "USD";
   layout?: "horizontal" | "vertical";
-  showAverageCpm?: boolean;
-  showTotalSpend?: boolean;
-  onShowAverageCpmChange?: (visible: boolean) => void;
-  onShowTotalSpendChange?: (visible: boolean) => void;
+  budgetView?: boolean;
+  onBudgetViewChange?: (visible: boolean) => void;
 }) {
   const rate = EXCHANGE_RATES[currency] || 1;
 
@@ -66,42 +62,66 @@ export function PlanOverviewCards({
   
   const budgetUtilization = budget ? (totalSpend / budget) * 100 : 0;
 
-  return (
-    <div className={`grid gap-4 items-start ${layout === "horizontal" ? "grid-cols-2 lg:grid-cols-5" : "grid-cols-1"}`}>
-      <MetricsTile 
+  const matchedMetric = <MetricsTile
         descriptionText="Matched Screens"
         metricValue={String(matchedScreens.length)}
         showIcon={false}
         fullWidth
-      />
-      <MetricsTile 
+      />;
+  const selectedMetric = <MetricsTile
         descriptionText="Selected Screens"
         metricValue={String(selectedScreens.length)}
         showIcon={false}
         fullWidth
         state={selectedScreens.length > 0 ? "Selected" : "Default"}
-      />
-      <MetricsTile 
+      />;
+  const cpmMetric = <MetricsTile
         descriptionText="Est. Average CPM"
-        metricValue={showAverageCpm ? formatCurrency(totalCpm, currency) : "Hidden"}
-        headerAction={onShowAverageCpmChange && <FiberToggle compact on={showAverageCpm} disabled={false} ariaLabel="Show estimated average CPM" onCheckedChange={onShowAverageCpmChange} />}
+        metricValue={formatCurrency(totalCpm, currency)}
         showIcon={false}
         fullWidth
-      />
-      <MetricsTile 
+      />;
+  const impressionsMetric = <MetricsTile
         descriptionText="Est. Impressions"
         metricValue={(totalImpressions / 1000000).toFixed(1) + "M"}
         showIcon={false}
         fullWidth
-      />
-      <MetricsTile 
+      />;
+  const spendMetric = <MetricsTile
         descriptionText="Est. Total Spend"
-        metricValue={showTotalSpend ? formatCurrencyZero(totalSpend, currency) : "Hidden"}
-        badgeText={showTotalSpend && budget !== null ? `${budgetUtilization.toFixed(0)}% budget used` : undefined}
-        headerAction={onShowTotalSpendChange && <FiberToggle compact on={showTotalSpend} disabled={false} ariaLabel="Show estimated total spend" onCheckedChange={onShowTotalSpendChange} />}
+        metricValue={formatCurrencyZero(totalSpend, currency)}
+        badgeText={budget !== null ? `${budgetUtilization.toFixed(0)}% budget used` : undefined}
         showIcon={false}
         fullWidth
-      />
+      />;
+
+  if (onBudgetViewChange) {
+    return <div className="space-y-4">
+      <div className={`grid gap-4 items-start ${layout === "horizontal" ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-1"}`}>
+        {matchedMetric}
+        {selectedMetric}
+        {impressionsMetric}
+      </div>
+      <section className="space-y-4 border-t pt-4" aria-label="Budget view" style={{ borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)" }}>
+        <label className="flex items-center justify-between gap-2 text-sm font-medium" style={{ color: "var(--surface-foreground-static-neutral-lvl2, #282833)" }}>
+          Budget view
+          <FiberToggle compact on={budgetView} disabled={false} ariaLabel="Budget view" onCheckedChange={onBudgetViewChange} />
+        </label>
+        {budgetView && <div className={`grid gap-4 items-start ${layout === "horizontal" ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}>
+          {cpmMetric}
+          {spendMetric}
+        </div>}
+      </section>
+    </div>
+  }
+
+  return (
+    <div className={`grid gap-4 items-start ${layout === "horizontal" ? "grid-cols-2 lg:grid-cols-5" : "grid-cols-1"}`}>
+      {matchedMetric}
+      {selectedMetric}
+      {cpmMetric}
+      {impressionsMetric}
+      {spendMetric}
     </div>
   );
 }
