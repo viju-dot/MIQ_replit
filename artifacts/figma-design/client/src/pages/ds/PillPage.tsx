@@ -26,6 +26,8 @@ function Pill({
   interactive,
   onHoverChange,
   onRemove,
+  onClick,
+  expanded,
 }: {
   label: string;
   size: Size;
@@ -34,12 +36,18 @@ function Pill({
   interactive?: boolean;
   onHoverChange?: (hovered: boolean) => void;
   onRemove?: () => void;
+  onClick?: () => void;
+  expanded?: boolean;
 }) {
   const isStandard = size === "Standard";
   const CloseTag = onRemove ? "button" : "span";
+  const RootTag = onClick ? "button" : "div";
   return (
-    <div
+    <RootTag
       className={`flex items-center justify-center shrink-0 transition-colors duration-150${onRemove ? " max-w-full" : ""}`}
+      type={onClick ? "button" : undefined}
+      onClick={onClick}
+      aria-expanded={expanded}
       onMouseEnter={interactive ? () => onHoverChange?.(true) : undefined}
       onMouseLeave={interactive ? () => onHoverChange?.(false) : undefined}
       style={{
@@ -72,7 +80,7 @@ function Pill({
       >
         {label}
       </span>
-      <CloseTag
+      {!onClick && <CloseTag
         className="relative shrink-0 inline-flex items-center justify-center overflow-hidden"
         style={{ width: 16, height: 16 }}
         type={onRemove ? "button" : undefined}
@@ -85,8 +93,8 @@ function Pill({
           style={{ width: "10.001px", height: "10.001px" }}
           src={`${ASSET}/${colors.icon}`}
         />
-      </CloseTag>
-    </div>
+      </CloseTag>}
+    </RootTag>
   );
 }
 
@@ -254,6 +262,24 @@ function RemovablePill({
 }
 
 export { RemovablePill as FiberRemovablePill };
+
+/** Action pill using the same Fiber sizing and color states as selected pills. */
+export function FiberActionPill({ label, onClick, expanded }: {
+  label: string;
+  onClick: () => void;
+  expanded?: boolean;
+}) {
+  const [hovered, setHovered] = useState(false);
+  return <Pill
+    label={label}
+    size="Compact"
+    colors={resolveRemovable("Brand (Subtle)", "Filled", hovered ? "Hover" : "Active")}
+    interactive
+    onHoverChange={setHovered}
+    onClick={onClick}
+    expanded={expanded}
+  />;
+}
 
 function DraggablePill({
   fill,

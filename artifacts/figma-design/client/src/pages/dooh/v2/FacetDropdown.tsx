@@ -3,8 +3,7 @@ import { ChevronDown, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/pages/ds/CheckPage";
 import { SearchStandard } from "@/pages/ds/SearchPage";
-import { FiberAccordion } from "@/pages/ds/AccordionPage";
-import { FiberRemovablePill } from "@/pages/ds/PillPage";
+import { FiberActionPill, FiberRemovablePill } from "@/pages/ds/PillPage";
 import { FiberButton } from "./primitives";
 
 /** An empty selection means All, matching the planner's unfiltered facets. */
@@ -17,6 +16,9 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
 }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [showAllSelected, setShowAllSelected] = useState(false);
+  const visibleSelected = showAllSelected ? selected : selected.slice(0, 5);
+  const hiddenCount = selected.length - 5;
   const all = selected.length === 0;
   const noun = title === "Venue Type" ? "venue types" : "publishers";
   const filtered = values.filter(value => value.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
@@ -25,6 +27,7 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
     : filtered;
   const toggleValue = (value: string) => {
     const next = selected.includes(value) ? selected.filter(item => item !== value) : [...selected, value];
+    if (next.length <= 5 || next.length === values.length) setShowAllSelected(false);
     onSelected(next.length === values.length ? [] : next);
   };
   const optionList = <div role="group" aria-label={title === "Venue Type" ? "Venue types" : "Publishers"} className="max-h-52 overflow-y-auto space-y-1">
@@ -65,17 +68,13 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
         </Popover>
       ) : <SearchStandard background label={`Search ${noun}`} value={query} onValueChange={setQuery} />}
       <div className="pb-2 border-b" style={{ borderColor: "var(--border-static-subtle-neutral, #e1e1e8)" }}>
-        <Checkbox labelValue="All" variant={all ? "Checked" : "Unchecked"} onToggle={() => onSelected([])} />
+        <Checkbox labelValue="All" variant={all ? "Checked" : "Unchecked"} onToggle={() => { setShowAllSelected(false); onSelected([]); }} />
       </div>
       <div className="space-y-2" aria-label={`Selected ${title === "Venue Type" ? "venue types" : "publishers"}`}>
-        {dropdown ? <FiberAccordion
-          type="Collapse"
-          leftSlot="None"
-          showActions={false}
-          title={`${selected.length} selected`}
-        >
-          <div className="flex w-full max-h-52 overflow-y-auto flex-wrap gap-1">
-            {selected.map(value => <FiberRemovablePill
+        {dropdown ? <>
+          <p role="status" className="text-xs font-medium">{selected.length} selected</p>
+          <div className="flex w-full flex-wrap gap-1">
+            {visibleSelected.map(value => <FiberRemovablePill
               key={value}
               style="Brand (Subtle)"
               fill="Filled"
@@ -84,9 +83,13 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
               label={value}
               onRemove={() => toggleValue(value)}
             />)}
-            {all && <p className="text-xs">No individual options selected.</p>}
+            {hiddenCount > 0 && <FiberActionPill
+              label={showAllSelected ? "Show less" : `${hiddenCount} more`}
+              expanded={showAllSelected}
+              onClick={() => setShowAllSelected(previous => !previous)}
+            />}
           </div>
-        </FiberAccordion> : <>
+        </> : <>
         <p role="status" className="text-xs">{all ? "All included" : `${selected.length} selected`}</p>
         {!all && <div className="flex flex-wrap gap-1">
           {selected.map(value => <FiberButton key={value} variant="outline" size="compact" className="max-w-full" ariaLabel={`Remove ${value}`} onClick={() => toggleValue(value)}>
