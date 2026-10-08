@@ -17,6 +17,11 @@ import { FacetDropdown } from "./FacetDropdown";
 import { UploadPreview, UploadPreviewOptions } from "./UploadPreview";
 import { CURRENCY_SYMBOLS, convertBudgetCurrency, type BudgetCurrency } from "./budgetCurrency";
 import type { CreativeScreenCounts } from "./creativeCounts";
+
+const PUBLISHER_SCREEN_COUNTS = SCREENS.reduce<Record<string, number>>((counts, screen) => {
+  counts[screen.publisher] = (counts[screen.publisher] ?? 0) + 1;
+  return counts;
+}, {});
 export { EXCHANGE_RATES } from "./budgetCurrency";
 
 // Theme the control itself, not SelectValue's inner span. Fiber uses
@@ -818,7 +823,7 @@ export function SidebarV2({
           onToggle={enabled => updateSection("venueType", { enabled })} onSelected={venues => updateSection("venueType", { venues })} />
         
         {/* 4. Publisher */}
-        <ScalarFacet dropdown={v4Layout} style={sectionStyle(6)} title="Publisher" icon={<Target className="w-4 h-4" />} enabled={filters.publishers.enabled} values={PUBLISHERS} selected={filters.publishers.publishers}
+        <ScalarFacet dropdown={v4Layout} screenCounts={v4Layout ? PUBLISHER_SCREEN_COUNTS : undefined} style={sectionStyle(6)} title="Publisher" icon={<Target className="w-4 h-4" />} enabled={filters.publishers.enabled} values={PUBLISHERS} selected={filters.publishers.publishers}
           onToggle={enabled => updateSection("publishers", { enabled })} onSelected={publishers => updateSection("publishers", { publishers })} />
 
         {/* 5. Day Part */}
@@ -955,12 +960,13 @@ export function SidebarV2({
   );
 }
 
-function ScalarFacet({ title, icon, enabled, values, selected, onToggle, onSelected, style, dropdown = false }: {
+function ScalarFacet({ title, icon, enabled, values, selected, onToggle, onSelected, style, dropdown = false, screenCounts }: {
   title: string; icon: ReactNode; enabled: boolean; values: string[]; selected: string[];
   onToggle: (value: boolean) => void; onSelected: (value: string[]) => void; style?: CSSProperties; dropdown?: boolean;
+  screenCounts?: Record<string, number>;
 }) {
   return <FilterCard style={style} title={title} icon={icon} enabled={enabled} onToggle={onToggle}>
-    <FacetDropdown title={title} values={values} selected={selected} onSelected={onSelected} dropdown={dropdown} />
+    <FacetDropdown title={title} values={values} selected={selected} onSelected={onSelected} dropdown={dropdown} screenCounts={screenCounts} />
   </FilterCard>;
 }
 

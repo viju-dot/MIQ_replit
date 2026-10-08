@@ -27,6 +27,12 @@ For previous DOOH versions, keep facet search, the global All action, and select
 
 **How to apply:** Preserve older versions' inline facets. In V4 keep search and all options inside the multi-select dropdown, selected options before remaining options. Outside show All, the selected count, and the first five removable Fiber pills; a “N more” pill reveals the rest. Do not restore Recent or an accordion, or cap the number of selections.
 
+Publisher screen-count labels belong only to the V4 Publisher filter, not Venue Type or older versions.
+
+**Why:** The user explicitly requested publisher-only inventory counts in search/dropdown options and selected pills, plus a right-aligned screen total beside the selected heading.
+
+**How to apply:** Use actual prototype inventory counts rather than illustrative example numbers. Total the inventory belonging to the selected publishers; All includes every publisher. Keep publisher inventory totals distinct from the plan's matched-screen count after other constraints.
+
 Treat the DOOH V2 brief as a minimal mock-data planning prototype, not authorization to connect a DSP or make live campaign bookings.
 
 **Why:** The brief explicitly requested mock screens/intelligence and a minimal Phase 1 implementation. Saved audiences already had real persistence, which should not be replaced with browser-only state just because the example brief used React state.

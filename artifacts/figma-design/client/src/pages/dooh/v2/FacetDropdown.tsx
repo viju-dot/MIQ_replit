@@ -7,12 +7,13 @@ import { FiberActionPill, FiberRemovablePill } from "@/pages/ds/PillPage";
 import { FiberButton } from "./primitives";
 
 /** An empty selection means All, matching the planner's unfiltered facets. */
-export function FacetDropdown({ title, values, selected, onSelected, dropdown = false }: {
+export function FacetDropdown({ title, values, selected, onSelected, dropdown = false, screenCounts }: {
   title: string;
   values: string[];
   selected: string[];
   onSelected: (values: string[]) => void;
   dropdown?: boolean;
+  screenCounts?: Record<string, number>;
 }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -20,6 +21,11 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
   const visibleSelected = showAllSelected ? selected : selected.slice(0, 5);
   const hiddenCount = selected.length - 5;
   const all = selected.length === 0;
+  const showScreenCounts = dropdown && screenCounts !== undefined;
+  const optionLabel = (value: string) => showScreenCounts ? `${value} [${(screenCounts[value] ?? 0).toLocaleString()}]` : value;
+  const selectedScreens = showScreenCounts
+    ? (all ? values : selected).reduce((total, value) => total + (screenCounts[value] ?? 0), 0)
+    : 0;
   const noun = title === "Venue Type" ? "venue types" : "publishers";
   const filtered = values.filter(value => value.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
   const ordered = dropdown
@@ -34,7 +40,7 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
     {ordered.map((value, index) => <div key={value}>
       {dropdown && index === 0 && selected.includes(value) && <p className="text-xs font-medium pb-2">Selected options</p>}
       {dropdown && !selected.includes(value) && (index === 0 || selected.includes(ordered[index - 1])) && <p className="text-xs font-medium py-2">Other options</p>}
-      <Checkbox labelValue={value} variant={selected.includes(value) ? "Checked" : "Unchecked"} onToggle={() => toggleValue(value)} />
+      <Checkbox labelValue={optionLabel(value)} variant={selected.includes(value) ? "Checked" : "Unchecked"} onToggle={() => toggleValue(value)} />
     </div>)}
     {filtered.length === 0 && <p role="status" className="text-xs py-2">No matches. Try another search.</p>}
   </div>;
@@ -72,7 +78,12 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
       </div>
       <div className="space-y-2" aria-label={`Selected ${title === "Venue Type" ? "venue types" : "publishers"}`}>
         {dropdown ? <>
-          <p role="status" className="text-xs font-medium">{selected.length} selected</p>
+          <div role="status" className="flex items-center justify-between gap-2 text-xs font-medium">
+            <span>{selected.length} selected</span>
+            {showScreenCounts && <span className="ml-auto text-right" title="Total inventory screens belonging to the selected publishers">
+              {selectedScreens.toLocaleString()} {selectedScreens === 1 ? "screen" : "screens"} selected
+            </span>}
+          </div>
           <div className="flex w-full flex-wrap gap-1">
             {visibleSelected.map(value => <FiberRemovablePill
               key={value}
@@ -80,7 +91,7 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
               fill="Filled"
               state="Active"
               size="Compact"
-              label={value}
+              label={optionLabel(value)}
               onRemove={() => toggleValue(value)}
             />)}
             {hiddenCount > 0 && <FiberActionPill
