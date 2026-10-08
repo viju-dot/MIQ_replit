@@ -22,7 +22,7 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
   const hiddenCount = selected.length - 5;
   const all = selected.length === 0;
   const showScreenCounts = dropdown && screenCounts !== undefined;
-  const optionLabel = (value: string) => showScreenCounts ? `${value} [${(screenCounts[value] ?? 0).toLocaleString()}]` : value;
+  const optionLabel = (value: string) => showScreenCounts ? `${value} (${(screenCounts[value] ?? 0).toLocaleString()})` : value;
   const selectedScreens = showScreenCounts
     ? (all ? values : selected).reduce((total, value) => total + (screenCounts[value] ?? 0), 0)
     : 0;
@@ -81,7 +81,7 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
           <div role="status" className="flex items-center justify-between gap-2 text-xs font-medium">
             <span>{selected.length} selected</span>
             {showScreenCounts && <span className="ml-auto text-right" title="Total inventory screens belonging to the selected publishers">
-              {selectedScreens.toLocaleString()} {selectedScreens === 1 ? "screen" : "screens"} selected
+              total scr {selectedScreens.toLocaleString()}
             </span>}
           </div>
           <div className="flex w-full flex-wrap gap-1">
