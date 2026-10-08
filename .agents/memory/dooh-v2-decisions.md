@@ -33,11 +33,11 @@ Publisher screen-count labels belong only to the V4 Publisher filter, not Venue 
 
 **How to apply:** Use actual prototype inventory counts rather than illustrative example numbers. Total the inventory belonging to the selected publishers; All includes every publisher. Keep publisher inventory totals distinct from the plan's matched-screen count after other constraints.
 
-V4 Plan Overview prioritizes Matched Screens, Selected Screens, then Estimated Impressions; a plain “Budget view” title with one Fiber toggle reveals both financial metric tiles below.
+V4 Plan Overview prioritizes Matched Screens, Selected Screens, then Estimated Impressions; a plain “Other est” title with one Fiber toggle reveals both financial metric tiles below.
 
-**Why:** Stakeholders want financial figures optionally hidden during client demos. The user rejected per-tile CPM/spend switches and requested a single Budget view control without changing the metric components. These are presentation controls, not authorization.
+**Why:** Stakeholders want financial figures optionally hidden during client demos. The user rejected per-tile CPM/spend switches, requested one grouped control without changing the metric components, and renamed it “Other est.” These are presentation controls, not authorization.
 
-**How to apply:** Default Budget view off and omit both financial tiles until enabled. Keep their standard Fiber appearance and budget-use badge when shown, without individual switches or “Hidden” placeholders. Preserve the separate Screen List CPM toggle, clear CPM sorting when hidden, and retain state across tab switches and overview mounts. Do not change calculations or older versions.
+**How to apply:** Default Other est off and omit both financial tiles until enabled. Keep their standard Fiber appearance and budget-use badge when shown, without individual switches or “Hidden” placeholders. Preserve the separate Screen List CPM toggle, clear CPM sorting when hidden, and retain state across tab switches and overview mounts. Do not change calculations or older versions.
 
 Treat the DOOH V2 brief as a minimal mock-data planning prototype, not authorization to connect a DSP or make live campaign bookings.
 

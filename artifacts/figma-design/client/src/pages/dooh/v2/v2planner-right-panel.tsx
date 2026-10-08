@@ -102,10 +102,10 @@ export function PlanOverviewCards({
         {selectedMetric}
         {impressionsMetric}
       </div>
-      <section className="space-y-4 border-t pt-4" aria-label="Budget view" style={{ borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)" }}>
+      <section className="space-y-4 border-t pt-4" aria-label="Other est" style={{ borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)" }}>
         <label className="flex items-center justify-between gap-2 text-sm font-medium" style={{ color: "var(--surface-foreground-static-neutral-lvl2, #282833)" }}>
-          Budget view
-          <FiberToggle compact on={budgetView} disabled={false} ariaLabel="Budget view" onCheckedChange={onBudgetViewChange} />
+          Other est
+          <FiberToggle compact on={budgetView} disabled={false} ariaLabel="Other est" onCheckedChange={onBudgetViewChange} />
         </label>
         {budgetView && <div className={`grid gap-4 items-start ${layout === "horizontal" ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}>
           {cpmMetric}
