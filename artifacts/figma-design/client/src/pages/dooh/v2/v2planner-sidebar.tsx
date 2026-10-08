@@ -861,7 +861,6 @@ export function SidebarV2({
                      <SelectItem value="USD">USD — US Dollar ($)</SelectItem>
                    </SelectContent>
                  </Select>
-                 <p className="mt-1 text-[11px] text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Amounts convert using fixed demo rates, not live exchange rates.</p>
                </div>
              )}
              <div>

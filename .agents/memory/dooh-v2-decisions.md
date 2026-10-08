@@ -97,4 +97,4 @@ Currency selection for European planning belongs to DOOH V4 only.
 
 **Why:** The user wants to expand planning across Europe while keeping all other versions unchanged, and explicitly requires Plan Overview to follow the selected Budget-filter currency.
 
-**How to apply:** Keep monetary labels, estimates, screen CPM, and exports consistent with the selected currency. Convert populated Budget/CPM amounts when changing currency to preserve the plan's economic value, preserve blank optional inputs, and clearly identify prototype rates as fixed demo rates rather than live FX. Euro support does not imply live European inventory or activation.
+**How to apply:** Keep monetary labels, estimates, screen CPM, and exports consistent with the selected currency. Convert populated Budget/CPM amounts when changing currency to preserve the plan's economic value and preserve blank optional inputs. Rates are fixed prototype rates, not live FX; the user explicitly removed the explanatory text beneath the Currency field, so do not restore it there. Euro support does not imply live European inventory or activation.
