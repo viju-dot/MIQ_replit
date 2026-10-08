@@ -21,11 +21,11 @@ Keep the searchable screen-information table in Screen List and the optional ver
 
 **How to apply:** Preserve search, screen details, and selection in Screen List. Reuse Fiber Smart Card and Metrics components for the map summary; keep it dismissible and clear of map controls. Do not replace the table with summary metrics.
 
-Keep facet search, the global All action, and selected values visible immediately when a filter is enabled.
+For previous DOOH versions, keep facet search, the global All action, and selected values visible immediately when a filter is enabled. V4 instead uses searchable, scrollable Venue Type and Publisher dropdowns, with All and up to five Recent options outside.
 
-**Why:** The user rejected hiding these controls and selections inside Venue Type and Publisher dropdowns; visibility matters more than compactness here.
+**Why:** The original brief prioritized immediate visibility; the later V4 request explicitly replaces search-only controls with dropdowns that support many options, while retaining All, selection behavior, and a Recent list limited to five.
 
-**How to apply:** Future facet refinements may scroll option lists, but must not require opening a dropdown to search, select All, or inspect existing selections.
+**How to apply:** Preserve older versions' inline facets. In V4 put search and the full option list inside a multi-select dropdown; keep All, selected-value removal, and at most five recently used options visible outside. Do not cap the full dropdown's option list at five.
 
 Treat the DOOH V2 brief as a minimal mock-data planning prototype, not authorization to connect a DSP or make live campaign bookings.
 

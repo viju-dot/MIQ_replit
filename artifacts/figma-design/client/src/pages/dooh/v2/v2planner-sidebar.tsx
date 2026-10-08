@@ -814,11 +814,11 @@ export function SidebarV2({
         </FilterCard>
 
         {/* 3. Venue Type */}
-        <ScalarFacet style={sectionStyle(4)} title="Venue Type" icon={<LayoutDashboard className="w-4 h-4" />} enabled={filters.venueType.enabled} values={VENUES} selected={filters.venueType.venues}
+        <ScalarFacet dropdown={v4Layout} style={sectionStyle(4)} title="Venue Type" icon={<LayoutDashboard className="w-4 h-4" />} enabled={filters.venueType.enabled} values={VENUES} selected={filters.venueType.venues}
           onToggle={enabled => updateSection("venueType", { enabled })} onSelected={venues => updateSection("venueType", { venues })} />
         
         {/* 4. Publisher */}
-        <ScalarFacet style={sectionStyle(6)} title="Publisher" icon={<Target className="w-4 h-4" />} enabled={filters.publishers.enabled} values={PUBLISHERS} selected={filters.publishers.publishers}
+        <ScalarFacet dropdown={v4Layout} style={sectionStyle(6)} title="Publisher" icon={<Target className="w-4 h-4" />} enabled={filters.publishers.enabled} values={PUBLISHERS} selected={filters.publishers.publishers}
           onToggle={enabled => updateSection("publishers", { enabled })} onSelected={publishers => updateSection("publishers", { publishers })} />
 
         {/* 5. Day Part */}
@@ -955,12 +955,12 @@ export function SidebarV2({
   );
 }
 
-function ScalarFacet({ title, icon, enabled, values, selected, onToggle, onSelected, style }: {
+function ScalarFacet({ title, icon, enabled, values, selected, onToggle, onSelected, style, dropdown = false }: {
   title: string; icon: ReactNode; enabled: boolean; values: string[]; selected: string[];
-  onToggle: (value: boolean) => void; onSelected: (value: string[]) => void; style?: CSSProperties;
+  onToggle: (value: boolean) => void; onSelected: (value: string[]) => void; style?: CSSProperties; dropdown?: boolean;
 }) {
   return <FilterCard style={style} title={title} icon={icon} enabled={enabled} onToggle={onToggle}>
-    <FacetDropdown title={title} values={values} selected={selected} onSelected={onSelected} />
+    <FacetDropdown title={title} values={values} selected={selected} onSelected={onSelected} dropdown={dropdown} />
   </FilterCard>;
 }
 
