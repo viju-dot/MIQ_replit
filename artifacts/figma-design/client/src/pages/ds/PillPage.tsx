@@ -25,6 +25,7 @@ function Pill({
   colors,
   interactive,
   onHoverChange,
+  onRemove,
 }: {
   label: string;
   size: Size;
@@ -32,11 +33,13 @@ function Pill({
   /** When set, the pill responds to real hover with cursor + handlers. */
   interactive?: boolean;
   onHoverChange?: (hovered: boolean) => void;
+  onRemove?: () => void;
 }) {
   const isStandard = size === "Standard";
+  const CloseTag = onRemove ? "button" : "span";
   return (
     <div
-      className="flex items-center justify-center shrink-0 transition-colors duration-150"
+      className={`flex items-center justify-center shrink-0 transition-colors duration-150${onRemove ? " max-w-full" : ""}`}
       onMouseEnter={interactive ? () => onHoverChange?.(true) : undefined}
       onMouseLeave={interactive ? () => onHoverChange?.(false) : undefined}
       style={{
@@ -55,7 +58,7 @@ function Pill({
       }}
     >
       <span
-        className="whitespace-nowrap"
+        className={onRemove ? "truncate" : "whitespace-nowrap"}
         style={{
           ...fontMedium,
           fontSize: isStandard
@@ -69,9 +72,12 @@ function Pill({
       >
         {label}
       </span>
-      <span
+      <CloseTag
         className="relative shrink-0 inline-flex items-center justify-center overflow-hidden"
         style={{ width: 16, height: 16 }}
+        type={onRemove ? "button" : undefined}
+        aria-label={onRemove ? `Remove ${label}` : undefined}
+        onClick={onRemove}
       >
         <img
           alt=""
@@ -79,7 +85,7 @@ function Pill({
           style={{ width: "10.001px", height: "10.001px" }}
           src={`${ASSET}/${colors.icon}`}
         />
-      </span>
+      </CloseTag>
     </div>
   );
 }
@@ -216,12 +222,14 @@ function RemovablePill({
   state,
   size,
   label,
+  onRemove,
 }: {
   style: string;
   fill: string;
   state: string;
   size: Size;
   label: string;
+  onRemove?: () => void;
 }) {
   const [hovered, setHovered] = useState(false);
   useEffect(() => setHovered(false), [state, style, fill, size]);
@@ -240,9 +248,12 @@ function RemovablePill({
       colors={resolveRemovable(style, effectiveFill, effectiveState)}
       interactive
       onHoverChange={setHovered}
+      onRemove={onRemove}
     />
   );
 }
+
+export { RemovablePill as FiberRemovablePill };
 
 function DraggablePill({
   fill,

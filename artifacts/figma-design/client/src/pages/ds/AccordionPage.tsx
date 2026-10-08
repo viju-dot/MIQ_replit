@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Playground } from "@/components/playground/Playground";
 import type { PlaygroundConfig } from "@/components/playground/types";
 
 const ASSET = "/figmaAssets/accordion";
 
 type Border = "top&bottom" | "full";
-type LeftSlot = "Drag" | "Icon" | "Check-box";
+type LeftSlot = "Drag" | "Icon" | "Check-box" | "None";
 
 type AccordionProps = {
   type: "Collapse" | "Expanded";
@@ -15,6 +15,8 @@ type AccordionProps = {
   disabled?: boolean;
   title?: string;
   body?: string;
+  children?: ReactNode;
+  showActions?: boolean;
 };
 
 /**
@@ -29,6 +31,8 @@ function Accordion({
   disabled = false,
   title = "Accordion Title",
   body = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor labore incididunt et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+  children,
+  showActions = true,
 }: AccordionProps) {
   const [expanded, setExpanded] = useState(type === "Expanded");
   const [hovered, setHovered] = useState(false);
@@ -134,7 +138,7 @@ function Accordion({
                         </div>
                       </div>
                     </button>
-                  ) : leftSlot === "Icon" ? null : (
+                  ) : leftSlot === "Icon" || leftSlot === "None" ? null : (
                     <div className="flex shrink-0 items-center justify-center rounded-[var(--radius-25,2px)] p-0.5">
                       <div className="flex size-5 shrink-0 items-center justify-center p-0.5">
                         <img
@@ -155,7 +159,7 @@ function Accordion({
                 </div>
                 {/* Right actions */}
                 <div className="flex shrink-0 items-center gap-2">
-                  <div className="flex shrink-0 items-center justify-center rounded-[var(--radius-25,2px)] p-0.5">
+                  {showActions && <div className="flex shrink-0 items-center justify-center rounded-[var(--radius-25,2px)] p-0.5">
                     <div className="flex size-5 shrink-0 items-center justify-center p-0.5">
                       <div className="relative h-[16.25px] w-[15px] shrink-0">
                         <img
@@ -165,7 +169,7 @@ function Accordion({
                         />
                       </div>
                     </div>
-                  </div>
+                  </div>}
                   <div className="flex w-6 shrink-0 items-center justify-center rounded-[var(--radius-25,2px)] p-0.5">
                     <div className="flex size-5 shrink-0 items-center justify-center p-0.5">
                       <img
@@ -184,7 +188,7 @@ function Accordion({
             <div
               className={`flex w-full items-center overflow-clip border-b border-solid border-[var(--border-static-subtle-neutral,#e1e1e8)] px-4 pb-3 pt-4 ${bodyFullBorder}`}
             >
-              <div className="flex min-w-px flex-1 flex-wrap content-start items-start">
+              {children ?? <div className="flex min-w-px flex-1 flex-wrap content-start items-start">
                 <div className="flex min-w-px flex-1 items-center">
                   <p
                     className={`min-w-px flex-1 text-[length:var(--body-md-regular-size,14px)] leading-[var(--body-md-regular-line-height,20px)] [font-family:'DM_Sans',Helvetica] [word-break:break-word] ${textColor}`}
@@ -192,7 +196,7 @@ function Accordion({
                     {body}
                   </p>
                 </div>
-              </div>
+              </div>}
             </div>
           )}
         </div>
@@ -200,6 +204,8 @@ function Accordion({
     </div>
   );
 }
+
+export { Accordion as FiberAccordion };
 
 const config: PlaygroundConfig = {
   name: "Accordion",

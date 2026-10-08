@@ -3,6 +3,8 @@ import { ChevronDown, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/pages/ds/CheckPage";
 import { SearchStandard } from "@/pages/ds/SearchPage";
+import { FiberAccordion } from "@/pages/ds/AccordionPage";
+import { FiberRemovablePill } from "@/pages/ds/PillPage";
 import { FiberButton } from "./primitives";
 
 /** An empty selection means All, matching the planner's unfiltered facets. */
@@ -15,17 +17,20 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
 }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
-  const [recent, setRecent] = useState<string[]>(() => selected.slice(-5).reverse());
   const all = selected.length === 0;
   const noun = title === "Venue Type" ? "venue types" : "publishers";
   const filtered = values.filter(value => value.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
+  const ordered = dropdown
+    ? [...filtered.filter(value => selected.includes(value)), ...filtered.filter(value => !selected.includes(value))]
+    : filtered;
   const toggleValue = (value: string) => {
-    if (dropdown) setRecent(previous => [value, ...previous.filter(item => item !== value)].slice(0, 5));
     const next = selected.includes(value) ? selected.filter(item => item !== value) : [...selected, value];
     onSelected(next.length === values.length ? [] : next);
   };
   const optionList = <div role="group" aria-label={title === "Venue Type" ? "Venue types" : "Publishers"} className="max-h-52 overflow-y-auto space-y-1">
-    {filtered.map(value => <div key={value}>
+    {ordered.map((value, index) => <div key={value}>
+      {dropdown && index === 0 && selected.includes(value) && <p className="text-xs font-medium pb-2">Selected options</p>}
+      {dropdown && !selected.includes(value) && (index === 0 || selected.includes(ordered[index - 1])) && <p className="text-xs font-medium py-2">Other options</p>}
       <Checkbox labelValue={value} variant={selected.includes(value) ? "Checked" : "Unchecked"} onToggle={() => toggleValue(value)} />
     </div>)}
     {filtered.length === 0 && <p role="status" className="text-xs py-2">No matches. Try another search.</p>}
@@ -63,19 +68,33 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
         <Checkbox labelValue="All" variant={all ? "Checked" : "Unchecked"} onToggle={() => onSelected([])} />
       </div>
       <div className="space-y-2" aria-label={`Selected ${title === "Venue Type" ? "venue types" : "publishers"}`}>
-        {(!dropdown || !all) && <p role="status" className="text-xs">{all ? "All included" : `${selected.length} selected`}</p>}
+        {dropdown ? <FiberAccordion
+          type="Collapse"
+          leftSlot="None"
+          showActions={false}
+          title={`${selected.length} selected`}
+        >
+          <div className="flex w-full max-h-52 overflow-y-auto flex-wrap gap-1">
+            {selected.map(value => <FiberRemovablePill
+              key={value}
+              style="Brand (Subtle)"
+              fill="Filled"
+              state="Active"
+              size="Compact"
+              label={value}
+              onRemove={() => toggleValue(value)}
+            />)}
+            {all && <p className="text-xs">No individual options selected.</p>}
+          </div>
+        </FiberAccordion> : <>
+        <p role="status" className="text-xs">{all ? "All included" : `${selected.length} selected`}</p>
         {!all && <div className="flex flex-wrap gap-1">
           {selected.map(value => <FiberButton key={value} variant="outline" size="compact" className="max-w-full" ariaLabel={`Remove ${value}`} onClick={() => toggleValue(value)}>
             <span className="truncate">{value}</span><X size={12} aria-hidden />
           </FiberButton>)}
         </div>}
+        </>}
       </div>
-      {dropdown ? <div role="group" aria-label={`Recent ${noun}`} className="space-y-1">
-        <p className="mb-2 text-xs font-medium">Recent</p>
-        {recent.filter(value => values.includes(value)).map(value => <div key={value}>
-          <Checkbox labelValue={value} variant={selected.includes(value) ? "Checked" : "Unchecked"} onToggle={() => toggleValue(value)} />
-        </div>)}
-        {recent.filter(value => values.includes(value)).length === 0 && <p className="text-xs py-1">No recent selections yet.</p>}
-      </div> : optionList}
+      {!dropdown && optionList}
   </div>;
 }

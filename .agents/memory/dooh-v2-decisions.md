@@ -21,11 +21,11 @@ Keep the searchable screen-information table in Screen List and the optional ver
 
 **How to apply:** Preserve search, screen details, and selection in Screen List. Reuse Fiber Smart Card and Metrics components for the map summary; keep it dismissible and clear of map controls. Do not replace the table with summary metrics.
 
-For previous DOOH versions, keep facet search, the global All action, and selected values visible immediately when a filter is enabled. V4 instead uses searchable, scrollable Venue Type and Publisher dropdowns, with All and up to five Recent options outside.
+For previous DOOH versions, keep facet search, the global All action, and selected values visible immediately when a filter is enabled. V4 instead uses searchable, scrollable Venue Type and Publisher dropdowns with selected options first, plus All and a collapsed selected-count accordion outside.
 
-**Why:** The original brief prioritized immediate visibility; the later V4 request explicitly replaces search-only controls with dropdowns that support many options, while retaining All, selection behavior, and a Recent list limited to five.
+**Why:** The original brief prioritized immediate visibility; the later V4 request replaces search-only controls with dropdowns supporting many options. The user subsequently removed Recent and requested compact selected counts, optional expanded selections, and actual Fiber pills and accordion components.
 
-**How to apply:** Preserve older versions' inline facets. In V4 put search and the full option list inside a multi-select dropdown; keep All, selected-value removal, and at most five recently used options visible outside. Do not cap the full dropdown's option list at five.
+**How to apply:** Preserve older versions' inline facets. In V4 put search and the full option list inside a multi-select dropdown, selected options before remaining options. Keep All outside, put removable Fiber pills in a collapsed-by-default Fiber accordion labeled with the selected count, and do not restore Recent. Do not limit the full option list or the number of selections.
 
 Treat the DOOH V2 brief as a minimal mock-data planning prototype, not authorization to connect a DSP or make live campaign bookings.
 
