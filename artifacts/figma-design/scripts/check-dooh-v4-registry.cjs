@@ -1,0 +1,125 @@
+const assert = require("node:assert/strict");
+const path = require("node:path");
+const vm = require("node:vm");
+const { buildSync } = require("esbuild");
+
+const bundle = buildSync({
+  stdin: {
+    contents: [
+      'export { prototypeRepository, DOOH_VERSION_IDS } from "./prototypeStore";',
+      'export { resolveDoohVersion, doohVersionToken, doohRendererVersion } from "./doohVersions";',
+      'export { hydratePrototypeVersions } from "./prototypeVersionSync";',
+    ].join("\n"),
+    resolveDir: path.resolve(__dirname, "../client/src/lib"),
+    loader: "ts",
+  },
+  bundle: true,
+  platform: "node",
+  format: "cjs",
+  write: false,
+}).outputFiles[0].text;
+
+const storageKey = "fiber:ai-prototype:prototypes:v2";
+const clone = value => JSON.parse(JSON.stringify(value));
+
+function browser(localPrototype, remoteVersions = []) {
+  const storage = new Map();
+  if (localPrototype) storage.set(storageKey, JSON.stringify([localPrototype]));
+  const remote = new Map(remoteVersions.map(version => [version.id, clone(version)]));
+  const writes = [];
+  const warnings = [];
+  const module = { exports: {} };
+  vm.runInNewContext(bundle, {
+    module, exports: module.exports, require,
+    console: { ...console, warn: (...args) => warnings.push(args) },
+    window: {
+      localStorage: {
+        getItem: key => storage.get(key) ?? null,
+        setItem: (key, value) => storage.set(key, value),
+      },
+    },
+    fetch: async (url, options = {}) => {
+      if (options.method === "PUT") {
+        const { version } = JSON.parse(options.body);
+        // Model the real API's allocation so accidental duplicate V4 writes
+        // fail these tests instead of being silently accepted by the mock.
+        if (!remote.has(version.id) && [...remote.values()].some(item => item.name === version.name)) {
+          version.name = "V5";
+        }
+        remote.set(version.id, version);
+        writes.push(version.id);
+        return { ok: true, json: async () => clone(version) };
+      }
+      return { ok: true, json: async () => clone([...remote.values()]) };
+    },
+  });
+  return { ...module.exports, storage, remote, writes, warnings };
+}
+
+async function main() {
+  const fresh = browser();
+  const seed = clone(fresh.prototypeRepository.get("dooh"));
+  const v4 = seed.versions.find(version => version.name === "V4");
+  assert.equal(v4.id, "dooh_v4");
+  assert.equal(fresh.resolveDoohVersion(seed.versions, "v4").id, v4.id);
+  assert.equal(fresh.doohVersionToken(v4), "v4");
+  assert.equal(fresh.doohRendererVersion(v4, seed.versions), "v2");
+  assert.equal(fresh.doohRendererVersion(seed.versions[0], seed.versions), "v1");
+
+  const old = clone(seed);
+  old.name = "Existing DOOH review";
+  old.versions = old.versions.filter(version => version.name !== "V4");
+  const legacyBrowser = browser(old, old.versions);
+  const migrated = clone(legacyBrowser.prototypeRepository.get("dooh"));
+  assert.equal(migrated.name, old.name);
+  assert.deepEqual(migrated.versions.slice(0, 3), old.versions);
+  assert.equal(migrated.versions[3].name, "V4");
+  await legacyBrowser.hydratePrototypeVersions("dooh");
+  assert(legacyBrowser.remote.has("dooh_v4"));
+  assert.deepEqual(legacyBrowser.writes, ["dooh_v4"]);
+
+  const savedV4 = { ...v4, id: "existing_review_v4", metadata: { createdFrom: "dooh_v3" } };
+  const existing = clone(old);
+  existing.versions.push(savedV4);
+  const returning = browser(existing, existing.versions);
+  const kept = clone(returning.prototypeRepository.get("dooh"));
+  assert.deepEqual(kept.versions, existing.versions);
+  assert.equal(returning.resolveDoohVersion(kept.versions, "v4").id, savedV4.id);
+  assert.equal(returning.doohVersionToken(savedV4), "v4");
+  await returning.hydratePrototypeVersions("dooh");
+  assert.deepEqual(returning.writes, []);
+
+  const remoteOnly = browser(undefined, existing.versions);
+  await remoteOnly.hydratePrototypeVersions("dooh");
+  const adopted = clone(remoteOnly.prototypeRepository.get("dooh"));
+  assert.equal(adopted.versions.filter(version => version.name === "V4").length, 1);
+  assert.equal(adopted.versions.find(version => version.name === "V4").id, savedV4.id);
+  assert(!remoteOnly.remote.has("dooh_v4"));
+  assert.deepEqual(remoteOnly.writes, []);
+
+  // A server can already contain an earlier accidentally renamed seed.
+  // The existing review V4 must still win over that placeholder in the UI,
+  // and polling must not repeatedly try to write/rename the seed.
+  const collision = browser(undefined, [...existing.versions, { ...v4, name: "V6" }]);
+  await collision.hydratePrototypeVersions("dooh");
+  await collision.hydratePrototypeVersions("dooh");
+  const reconciled = clone(collision.prototypeRepository.get("dooh"));
+  assert.equal(collision.resolveDoohVersion(reconciled.versions, "v4").id, savedV4.id);
+  assert.equal(reconciled.versions.filter(version => version.name === "V4").length, 1);
+  assert(!reconciled.versions.some(version => version.id === "dooh_v4"));
+  assert.deepEqual(collision.writes, []);
+  assert(collision.remote.has("dooh_v4")); // No shared history was deleted.
+
+  const archived = clone(existing);
+  archived.versions[3].status = "archived";
+  const archivedBrowser = browser(archived);
+  assert.equal(archivedBrowser.prototypeRepository.get("dooh").versions[3].status, "archived");
+  assert.equal(archivedBrowser.resolveDoohVersion(archivedBrowser.prototypeRepository.get("dooh").versions, "v4"), undefined);
+
+  for (const scenario of [fresh, legacyBrowser, returning, remoteOnly, collision, archivedBrowser]) {
+    assert.deepEqual(scenario.warnings, []);
+  }
+  console.log("PASS: fresh V4 availability, V1–V3 preservation, legacy migration, shared V4 adoption without duplication, deep links, archived history.");
+}
+
+main().catch(error => { console.error(error); process.exitCode = 1; });

@@ -3,6 +3,7 @@ import { useLocation, useSearch } from "wouter";
 import { PrototypeCollabOverlay, PrototypeCommentLayer } from "@/components/PrototypeCollabOverlay";
 import { DesignAnnotationLayer } from "@/components/DesignAnnotationLayer";
 import { doohRendererVersion, doohVersionToken, resolveDoohVersion } from "@/lib/doohVersions";
+import { DOOH_VERSION_IDS } from "@/lib/prototypeStore";
 import { usePrototypeVersion } from "@/lib/prototypeVersionContext";
 import { PrimaryNavigation, SecondaryNavigation } from "./TvAudienceApp";
 import { FiberTabLink, FiberRoundedTabsBar } from "@/components/FiberTabItem";
@@ -36,7 +37,7 @@ function DoohVersionedContent() {
   const version = doohRendererVersion(versionContext?.viewedVersion ?? resolved, versions);
   const versionToken = versionContext ? doohVersionToken(versionContext.viewedVersion) : requestedVersion ?? "v2";
   const versionName = versionContext?.viewedVersion.name ?? version.toUpperCase();
-  const isV4 = versionName.trim().toLowerCase() === "v4";
+  const isV4 = versionContext?.viewedVersion.id === DOOH_VERSION_IDS.v4 || versionName.trim().toLowerCase() === "v4";
   const supportsDemoView = versionToken === "v3" || isV4;
   const demoView = supportsDemoView && new URLSearchParams(search).get("demo") === "1";
   const isGeo = location.startsWith("/geo-planner");

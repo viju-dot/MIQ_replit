@@ -1,6 +1,7 @@
 import {
   coercePrototypeVersion,
   prototypeRepository,
+  DOOH_VERSION_IDS,
   type PrototypeVersion,
 } from "./prototypeStore";
 
@@ -51,11 +52,19 @@ async function putSharedVersion(
  */
 export async function hydratePrototypeVersions(prototypeId: string): Promise<boolean> {
   try {
-    const local = prototypeRepository.get(prototypeId);
+    let local = prototypeRepository.get(prototypeId);
     if (!local) return true;
 
     const previousVersions = JSON.stringify(local.versions);
     const remote = await getSharedVersions(prototypeId);
+    // Adopt an already-shared V4 before migrating a new built-in placeholder,
+    // otherwise the server would allocate a second V4 as V5.
+    if (
+      prototypeId === "dooh" &&
+      remote.some(version => version.id !== DOOH_VERSION_IDS.v4 && version.name.trim().toUpperCase() === "V4")
+    ) {
+      local = prototypeRepository.mergeVersions(prototypeId, remote) ?? local;
+    }
     const remoteById = new Map(remote.map((version) => [version.id, version]));
     let changedRemote = false;
     for (const localVersion of local.versions) {

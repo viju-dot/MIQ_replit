@@ -88,6 +88,7 @@ export const DOOH_VERSION_IDS = {
   v1: "dooh_v1",
   v2: "dooh_v2",
   v3: "dooh_v3",
+  v4: "dooh_v4",
 } as const;
 
 /* ---------------------------------------------------------------------- */
@@ -189,6 +190,21 @@ const SEED: Prototype[] = [
           description: "Digital out-of-home planning with searchable upload previews for locations and screen lists.",
           status: "Live",
           notes: "CSV/XLSX upload previews, selectable valid records, and validation summaries.",
+        },
+      },
+      {
+        id: DOOH_VERSION_IDS.v4,
+        name: "V4",
+        createdAt: "2026-10-12T00:00:00.000Z",
+        updatedAt: "2026-10-12T00:00:00.000Z",
+        description: "DOOH V4 with searchable facets, creative formats, financial visibility controls, and Fiber map source tooltips.",
+        rendererKey: "dooh",
+        status: "active",
+        metadata: { createdFrom: DOOH_VERSION_IDS.v3 },
+        snapshot: {
+          description: "Digital out-of-home planning with City and Postcode targeting, creative compatibility, and source-aware map details.",
+          status: "Live",
+          notes: "Fiber map colors and Match Source tooltips, searchable publisher and venue facets, grouped Other est metrics, and independent Screen List CPM visibility.",
         },
       },
     ],
@@ -456,7 +472,12 @@ function readLocal(): Prototype[] {
     const migrated = clean.map((prototype) =>
       prototype.id === "dooh" &&
       doohSeed &&
-      !prototype.versions.some((version) => version.id === DOOH_VERSION_IDS.v3)
+      doohSeed.versions.some(seedVersion =>
+        !prototype.versions.some(version =>
+          version.id === seedVersion.id ||
+          (seedVersion.id === DOOH_VERSION_IDS.v4 && version.name.trim().toUpperCase() === "V4"),
+        ),
+      )
         ? reconcileSeededVersions(prototype, doohSeed)
         : prototype,
     );
@@ -521,7 +542,13 @@ function reconcileSeededVersions(
   const matchedLocalIds = new Set<string>();
   const reconciledSeed = seed.versions.map((seedVersion) => {
     const existing =
+      (seed.id === "dooh" && seedVersion.id === DOOH_VERSION_IDS.v4
+        ? local.versions.find(version => version.id !== DOOH_VERSION_IDS.v4 && version.name.trim().toUpperCase() === "V4")
+        : undefined) ??
       local.versions.find((version) => version.id === seedVersion.id) ??
+      (seed.id === "dooh" && seedVersion.id === DOOH_VERSION_IDS.v4
+        ? local.versions.find(version => version.name.trim().toUpperCase() === "V4")
+        : undefined) ??
       (seedVersion.name === "V5"
         ? local.versions.find((version) => version.name === "V5")
         : undefined);
@@ -529,7 +556,8 @@ function reconcileSeededVersions(
     matchedLocalIds.add(existing.id);
     // V5's seeded identity is canonical: collaboration records are stored
     // against this version id, including for legacy same-name duplicates.
-    return existing.id === seedVersion.id
+    // Previously saved DOOH V4 records keep their original collaboration IDs.
+    return seed.id === "dooh" || existing.id === seedVersion.id
       ? existing
       : { ...existing, id: seedVersion.id, rendererKey: "v5" as const };
   });
@@ -703,8 +731,19 @@ export const localStorageRepository: PrototypeRepository = {
     return clean;
   },
   mergeVersions(id, incomingVersions) {
-    const current = readAll().find((prototype) => prototype.id === id);
+    let current = readAll().find((prototype) => prototype.id === id);
     if (!current) return undefined;
+    // A newly shipped V4 seed is only a placeholder until shared history loads.
+    // Prefer an existing shared V4 identity, but never discard an edited seed or
+    // a seed already present remotely. Comments and annotations keep their IDs.
+    if (id === "dooh" && !incomingVersions.some(version => version.id === DOOH_VERSION_IDS.v4)) {
+      const sharedV4 = incomingVersions.find(version => version.name.trim().toUpperCase() === "V4");
+      const localSeed = current.versions.find(version => version.id === DOOH_VERSION_IDS.v4);
+      const seed = SEED.find(prototype => prototype.id === "dooh")?.versions.find(version => version.id === DOOH_VERSION_IDS.v4);
+      if (sharedV4 && localSeed && JSON.stringify(localSeed) === JSON.stringify(seed)) {
+        current = { ...current, versions: current.versions.filter(version => version.id !== DOOH_VERSION_IDS.v4) };
+      }
+    }
     const byId = new Map(current.versions.map((version) => [version.id, version]));
     for (const incoming of incomingVersions) {
       const existing = byId.get(incoming.id);
@@ -721,7 +760,9 @@ export const localStorageRepository: PrototypeRepository = {
       .filter((version) => !existingIds.has(version.id))
       .slice()
       .sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
-    const clean = validateForWrite({ ...current, versions: [...versions, ...appended] });
+    const merged = { ...current, versions: [...versions, ...appended] };
+    const doohSeed = id === "dooh" ? SEED.find(prototype => prototype.id === "dooh") : undefined;
+    const clean = validateForWrite(doohSeed ? reconcileSeededVersions(merged, doohSeed) : merged);
     persist(clean);
     return clean;
   },
