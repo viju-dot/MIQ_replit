@@ -83,3 +83,13 @@
 .leaflet-tooltip.fiber-map-zone-label::before {
   display: none;
 }
+
+/* V4 map tooltips */
+.leaflet-tooltip.fiber-v4-tooltip {
+  padding: var(--spacing-150, 12px);
+  white-space: normal;
+  pointer-events: none;
+}
+.fiber-v4-map .leaflet-marker-icon:focus-visible { outline: 2px solid var(--container-dynamic-brand-bold-background-default, #7c33b5); outline-offset: 2px; border-radius: 999px; }
+.fiber-v4-cluster { transition: transform 0.2s ease; }
+.leaflet-marker-icon:hover .fiber-v4-cluster { transform: scale(1.05); }

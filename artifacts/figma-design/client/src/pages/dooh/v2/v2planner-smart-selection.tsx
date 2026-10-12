@@ -45,14 +45,16 @@ export function SmartSelectionMapEvents({
 
 export function SmartPreviewCircle({
   center,
-  radius
+  radius,
+  color = "#7c33b5",
 }: {
   center: L.LatLng | null;
   radius: number;
+  color?: string;
 }) {
   if (!center) return null;
   return (
-    <Circle center={center} radius={radius} pathOptions={{ color: "#7c33b5", fillOpacity: 0.1, weight: 1, dashArray: "4 4" }} interactive={false} />
+    <Circle center={center} radius={radius} pathOptions={{ color, fillColor: color, fillOpacity: 0.1, weight: 1, dashArray: "4 4" }} interactive={false} />
   );
 }
 

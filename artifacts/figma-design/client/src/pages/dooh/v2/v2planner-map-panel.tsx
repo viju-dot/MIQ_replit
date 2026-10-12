@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { ScreenData, getDistance } from "../data";
 import { PlanningZone } from "./v2planner-sidebar";
 import { CARD_BG, CARD_SHADOW, GRID, MUTED, TITLE, FONT, FiberButton, FiberSlider } from "./primitives";
+import { V4ClusterTooltip, V4Currency, V4ScreenTooltip, buildV4SourceMembership, v4ClusterIcon, v4CssColor, v4FocusTooltipHandler, v4PinIcon, v4ResolvedColor } from "./v4-map-helpers";
 import { SmartSelectionMapEvents, SmartPreviewCircle, SmartSelectionControl } from "./v2planner-smart-selection";
 
 interface Props {
@@ -31,8 +32,12 @@ interface Props {
   onDrawComplete?: () => void;
   expanded?: boolean;
   locationSource?: string | null; // "audience", "postcode", "poi", "latlng", "screenlist", etc.
-  activeSources?: { geoPlanner: boolean; planningZone: boolean; postcode: boolean; latlng: boolean; poi: boolean; city?: boolean };
-  sourceCounts?: Record<"geoPlanner" | "planningZone" | "postcode" | "latlng" | "poi", number> & { city?: number };
+  activeSources?: { geoPlanner: boolean; planningZone: boolean; postcode: boolean; latlng: boolean; poi: boolean; city?: boolean; screenList?: boolean };
+  sourceCounts?: Record<"geoPlanner" | "planningZone" | "postcode" | "latlng" | "poi", number> & { city?: number; screenList?: number };
+  v4Layout?: boolean;
+  currency?: V4Currency;
+  showCpm?: boolean;
+  sourceScreenIds?: Record<string, string[]>;
   selectedScreenIds?: Set<string>;
   onSmartSelectionCapture?: (zone: PlanningZone, selectedIds: string[]) => void;
 }
@@ -181,15 +186,16 @@ function DynamicScale() {
   );
 }
 
-function MapLegend({ activeSources, sourceCounts }: { activeSources?: Props["activeSources"], sourceCounts: Record<string, number> }) {
+function MapLegend({ activeSources, sourceCounts, v4Layout }: { activeSources?: Props["activeSources"], sourceCounts: Record<string, number>, v4Layout?: boolean }) {
   const sources = [
     { id: "geoPlanner", label: "Geo Planner", color: SOURCE_COLORS.geoPlanner },
     { id: "planningZone", label: "Planning Zone", color: SOURCE_COLORS.planningZone },
     { id: "postcode", label: "Postcode", color: SOURCE_COLORS.postcode },
     ...(activeSources?.city !== undefined ? [{ id: "city", label: "City", color: SOURCE_COLORS.city }] : []),
     { id: "latlng", label: "Lat/Long", color: SOURCE_COLORS.latlng },
-    { id: "poi", label: "POI", color: SOURCE_COLORS.poi }
-  ] as const;
+    { id: "poi", label: "POI", color: SOURCE_COLORS.poi },
+    ...(v4Layout && activeSources?.screenList !== undefined ? [{ id: "screenList", label: "Screen List", color: SOURCE_COLORS.poi }] : []),
+  ].map((s) => v4Layout ? { ...s, color: v4CssColor(s.id) } : s);
 
   return (
     <div className="absolute bottom-[var(--spacing-200,16px)] left-[var(--spacing-200,16px)] z-[1000] rounded-[var(--radius-50,4px)] p-[var(--spacing-200,16px)] w-[240px]"
@@ -226,9 +232,17 @@ function ClusteredScreens({
   selectedScreenIds = new Set(),
   candidateIds = new Set(),
   smartSelectionActive = false,
-  onSmartCapture
+  onSmartCapture,
+  sourceMembership,
+  v4Layout = false,
+  currency = "GBP",
+  showCpm = true,
 }: Pick<Props, "screens" | "hoveredScreenId" | "onScreenClick" | "selectedScreenIds"> & {
   sourceMap: Map<string, string>;
+  sourceMembership?: Map<string, string[]>;
+  v4Layout?: boolean;
+  currency?: V4Currency;
+  showCpm?: boolean;
   candidateIds?: Set<string>;
   smartSelectionActive?: boolean;
   onSmartCapture?: (latlng: L.LatLng) => void;
@@ -281,10 +295,12 @@ function ClusteredScreens({
     return (
       <Marker
         key={screen.id}
+        title={v4Layout ? `Screen ${screen.id}` : undefined}
         position={position ?? [screen.lat, screen.lng]}
-        icon={pinIcon(screen.id === hoveredScreenId, pinColor, isSelected, isCandidate)}
+        icon={v4Layout ? v4PinIcon(screen.id === hoveredScreenId, sourceKey, isSelected, isCandidate) : pinIcon(screen.id === hoveredScreenId, pinColor, isSelected, isCandidate)}
         zIndexOffset={screen.id === hoveredScreenId ? 1000 : (isCandidate ? 600 : (isSelected ? 500 : 0))}
         eventHandlers={{
+          ...(v4Layout ? { add: v4FocusTooltipHandler } : {}),
           click: (e) => {
             if (smartSelectionActive && onSmartCapture) {
               L.DomEvent.stopPropagation(e);
@@ -296,6 +312,11 @@ function ClusteredScreens({
           },
         }}
       >
+        {v4Layout ? (
+          <Tooltip direction="top" offset={[0, -12]} opacity={1} className="fiber-tooltip fiber-v4-tooltip">
+            <V4ScreenTooltip screen={screen} sources={sourceMembership?.get(screen.id) ?? []} currency={currency} showCpm={showCpm} />
+          </Tooltip>
+        ) : (
         <Tooltip direction="top" offset={[0, -10]} opacity={1} className="fiber-tooltip">
           <div className="flex flex-col gap-1 text-[length:var(--body-sm-regular-size,12px)] p-1" style={{ fontFamily: FONT, color: TITLE }}>
             <strong className="text-[length:var(--body-sm-medium-size,12px)]">{screen.id}</strong>
@@ -303,6 +324,7 @@ function ClusteredScreens({
             <div className="font-medium mt-1 pt-1" style={{ borderTop: `1px solid ${GRID}` }}>CPM: £{screen.cpm.toFixed(2)}</div>
           </div>
         </Tooltip>
+        )}
       </Marker>
     );
   };
@@ -341,10 +363,12 @@ function ClusteredScreens({
         return (
           <Marker
             key={cluster.key}
+            title={v4Layout ? `${cluster.screens.length} matched screens. Click to expand.` : undefined}
             position={[cluster.lat, cluster.lng]}
-            icon={clusterIcon(cluster.screens.length, clusterColor, isSelected, isCandidate)}
+            icon={v4Layout ? v4ClusterIcon(cluster.screens.length, cluster.dominantSource, isSelected, isCandidate) : clusterIcon(cluster.screens.length, clusterColor, isSelected, isCandidate)}
             zIndexOffset={isCandidate ? 600 : (isSelected ? 500 : 0)}
             eventHandlers={{
+              ...(v4Layout ? { add: v4FocusTooltipHandler } : {}),
               click: (e) => {
                 if (smartSelectionActive && onSmartCapture) {
                    L.DomEvent.stopPropagation(e);
@@ -359,9 +383,15 @@ function ClusteredScreens({
               },
             }}
           >
+            {v4Layout ? (
+              <Tooltip direction="top" offset={[0, -18]} opacity={1} className="fiber-tooltip fiber-v4-tooltip">
+                <V4ClusterTooltip screens={cluster.screens} currency={currency} showCpm={showCpm} action={smartSelectionActive ? "Click to capture this area" : "Click to expand and see individual screens"} />
+              </Tooltip>
+            ) : (
             <Tooltip direction="top" offset={[0, -18]} className="fiber-tooltip">
               <span style={{ fontFamily: FONT }}>{cluster.screens.length} matched screens — {smartSelectionActive ? "click to capture area" : "click to expand"}</span>
             </Tooltip>
+            )}
           </Marker>
         );
       })}
@@ -372,10 +402,13 @@ function ClusteredScreens({
 function ZoneLayers({
   zones,
   onZonesChange,
+  v4Layout,
 }: {
   zones: PlanningZone[];
   onZonesChange: (zones: PlanningZone[]) => void;
+  v4Layout?: boolean;
 }) {
+  const zc = v4Layout ? v4ResolvedColor("planningZone") : "#7c33b5";
   const removeButton = (zone: PlanningZone) => (
     <Tooltip permanent direction="center" opacity={1} className="fiber-map-zone-label">
       <button
@@ -397,14 +430,14 @@ function ZoneLayers({
       {zones.map((zone) => {
         if (zone.type === "circle" && zone.center && zone.radius != null) {
           return (
-            <Circle key={zone.id} center={zone.center} radius={zone.radius} pathOptions={{ color: "#7c33b5", fillOpacity: 0.15, weight: 2 }}>
+            <Circle key={zone.id} center={zone.center} radius={zone.radius} pathOptions={{ color: zc, fillColor: zc, fillOpacity: 0.15, weight: 2 }}>
               {removeButton(zone)}
             </Circle>
           );
         }
         if (zone.type === "polygon" && zone.points && zone.points.length >= 3) {
           return (
-            <Polygon key={zone.id} positions={zone.points} pathOptions={{ color: "#7c33b5", fillOpacity: 0.15, weight: 2 }}>
+            <Polygon key={zone.id} positions={zone.points} pathOptions={{ color: zc, fillColor: zc, fillOpacity: 0.15, weight: 2, ...(v4Layout ? { dashArray: "6 5" } : {}) }}>
               {removeButton(zone)}
             </Polygon>
           );
@@ -421,7 +454,9 @@ function DrawingLayer({
   zones,
   onZonesChange,
   onDrawComplete,
+  v4Layout,
 }: {
+  v4Layout?: boolean;
   mode: "circle" | "polygon";
   circleRadius?: number;
   zones: PlanningZone[];
@@ -430,6 +465,7 @@ function DrawingLayer({
 }) {
   const map = useMap();
   const [points, setPoints] = useState<L.LatLng[]>([]);
+  const dc = v4Layout ? v4ResolvedColor("planningZone") : "#7c33b5";
 
   useEffect(() => {
     setPoints([]);
@@ -500,13 +536,13 @@ function DrawingLayer({
   return (
     <>
       {mode === "circle" && points[0] && (
-        <Circle center={points[0]} radius={5} pathOptions={{ color: "#7c33b5", fillOpacity: 0.4 }} />
+        <Circle center={points[0]} radius={5} pathOptions={{ color: dc, fillColor: dc, fillOpacity: 0.4 }} />
       )}
       {mode === "polygon" && points.length > 0 && (
         <>
-          <Polyline positions={points} pathOptions={{ color: "#7c33b5", dashArray: "6 5", weight: 2 }} />
+          <Polyline positions={points} pathOptions={{ color: dc, dashArray: "6 5", weight: 2 }} />
           {points.map((point, index) => (
-            <Circle key={index} center={point} radius={5} pathOptions={{ color: "#7c33b5", fillOpacity: 1, weight: 2 }} />
+            <Circle key={index} center={point} radius={5} pathOptions={{ color: dc, fillColor: dc, fillOpacity: 1, weight: 2 }} />
           ))}
         </>
       )}
@@ -590,7 +626,11 @@ export function MapPanelV2({
   activeSources,
   sourceCounts = { geoPlanner: 0, planningZone: 0, postcode: 0, latlng: 0, poi: 0 },
   selectedScreenIds = new Set(),
-  onSmartSelectionCapture
+  onSmartSelectionCapture,
+  v4Layout = false,
+  currency = "GBP",
+  showCpm = true,
+  sourceScreenIds,
 }: Props) {
   const hoveredScreen = screens.find((screen) => screen.id === hoveredScreenId);
 
@@ -599,11 +639,28 @@ export function MapPanelV2({
   const [smartRadiusUnit, setSmartRadiusUnit] = useState<"m" | "km">("m");
   const [previewCenter, setPreviewCenter] = useState<L.LatLng | null>(null);
   const [smartError, setSmartError] = useState<string | null>(null);
+  const [, refreshThemeColors] = useState(0);
+
+  useEffect(() => {
+    if (!v4Layout) return;
+    const observer = new MutationObserver(() => refreshThemeColors(value => value + 1));
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "data-theme", "style"],
+    });
+    return () => observer.disconnect();
+  }, [v4Layout]);
 
   const displayScreens = smartSelectionActive ? (smartCandidates || screens) : screens;
   const activeRadiusMeters = smartRadiusUnit === "km" ? smartRadius * 1000 : smartRadius;
 
+  const v4Membership = useMemo(
+    () => (v4Layout ? buildV4SourceMembership(displayScreens, sourceScreenIds, activeSources as Record<string, boolean | undefined> | undefined) : null),
+    [v4Layout, displayScreens, sourceScreenIds, activeSources],
+  );
+
   const { sourceMap } = useMemo(() => {
+    if (v4Membership) return { sourceMap: v4Membership.primary };
     const activeKeys = activeSources ? [
       activeSources.geoPlanner && "geoPlanner",
       activeSources.planningZone && "planningZone",
@@ -626,7 +683,7 @@ export function MapPanelV2({
       map.set(s.id, assigned);
     });
     return { sourceMap: map };
-}, [displayScreens, activeSources]);
+}, [displayScreens, activeSources, v4Membership]);
 
   useEffect(() => {
     if (drawMode) {
@@ -685,7 +742,7 @@ export function MapPanelV2({
   };
 
   return (
-    <div className="fiber-dooh-map relative h-full w-full min-h-0 shrink-0" style={{ height: expanded ? "100%" : "max(690px, calc(100dvh - 490px))", backgroundColor: "var(--surface-background-lvl2, #f7f7fa)" }}>
+    <div className={`fiber-dooh-map ${v4Layout ? "fiber-v4-map" : ""} relative h-full w-full min-h-0 shrink-0`} style={{ height: expanded ? "100%" : "max(690px, calc(100dvh - 490px))", backgroundColor: "var(--surface-background-lvl2, #f7f7fa)" }}>
       <MapContainer center={[54.5, -3.2]} zoom={6} minZoom={3} maxZoom={19} className="h-full w-full" zoomControl={false} style={{ fontFamily: FONT }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -695,12 +752,16 @@ export function MapPanelV2({
         <InitialBounds screens={displayScreens} />
         <FocusHovered screen={hoveredScreen} />
         <MapControls screens={displayScreens} />
-        <ZoneLayers zones={zones} onZonesChange={onZonesChange} />
+        <ZoneLayers zones={zones} onZonesChange={onZonesChange} v4Layout={v4Layout} />
         <ClusteredScreens 
            screens={displayScreens} 
            hoveredScreenId={hoveredScreenId} 
            onScreenClick={onScreenClick} 
            sourceMap={sourceMap}
+           sourceMembership={v4Membership?.all}
+           v4Layout={v4Layout}
+           currency={currency}
+           showCpm={showCpm}
            selectedScreenIds={selectedScreenIds}
            candidateIds={candidateIds}
            smartSelectionActive={smartSelectionActive}
@@ -714,6 +775,7 @@ export function MapPanelV2({
             zones={zones}
             onZonesChange={onZonesChange}
             onDrawComplete={onDrawComplete}
+            v4Layout={v4Layout}
           />
         )}
         <SmartSelectionMapEvents 
@@ -721,8 +783,8 @@ export function MapPanelV2({
           setPreviewCenter={setPreviewCenter} 
           onCapture={handleSmartCapture} 
         />
-        {smartSelectionActive && <SmartPreviewCircle center={previewCenter} radius={activeRadiusMeters} />}
-        <MapLegend activeSources={activeSources} sourceCounts={sourceCounts} />
+        {smartSelectionActive && <SmartPreviewCircle center={previewCenter} radius={activeRadiusMeters} color={v4Layout ? v4ResolvedColor("planningZone") : undefined} />}
+        <MapLegend activeSources={activeSources} sourceCounts={sourceCounts} v4Layout={v4Layout} />
       </MapContainer>
       
       <SmartSelectionControl 

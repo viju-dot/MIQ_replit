@@ -116,3 +116,9 @@ Creative counts in V4 represent matching inventory, not manually checked screen 
 **Why:** The user wants counts beside each format and resolution and an overall count for their combined selection. An option's count should describe the result of choosing it, including other active planning constraints.
 
 **How to apply:** Keep the other creative dimension selected when counting an alternative. Include geography, screen lists, commercial filters, and budget; calculate budget allocation after the alternative selection rather than counting an already budget-truncated pool. Keep previous prototype versions unchanged.
+
+V4 map colors must communicate actual Match Source provenance using Fiber's data-visualization palette, including uploaded Screen List, with brand-purple fallback markers rather than black.
+
+**Why:** The user rejected the map's black pins/clusters and requested Fiber-consistent source colors, a consistent circle/polygon pattern, and full per-screen hover details after filtering.
+
+**How to apply:** Circles and polygons share the Planning Zone source hue; dashed polygons distinguish shape without changing provenance. When sources overlap, retain one stable primary marker color but show all real source memberships in the tooltip. Show publisher, venue, city, impressions, and selected-currency CPM; omit CPM when the seller hides it. Hovering must not recenter the map. Keep older versions unchanged.
