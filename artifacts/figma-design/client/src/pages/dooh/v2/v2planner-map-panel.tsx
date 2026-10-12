@@ -237,12 +237,14 @@ function ClusteredScreens({
   v4Layout = false,
   currency = "GBP",
   showCpm = true,
+  hasSourceTargeting = false,
 }: Pick<Props, "screens" | "hoveredScreenId" | "onScreenClick" | "selectedScreenIds"> & {
   sourceMap: Map<string, string>;
   sourceMembership?: Map<string, string[]>;
   v4Layout?: boolean;
   currency?: V4Currency;
   showCpm?: boolean;
+  hasSourceTargeting?: boolean;
   candidateIds?: Set<string>;
   smartSelectionActive?: boolean;
   onSmartCapture?: (latlng: L.LatLng) => void;
@@ -314,7 +316,7 @@ function ClusteredScreens({
       >
         {v4Layout ? (
           <Tooltip direction="top" offset={[0, -12]} opacity={1} className="fiber-tooltip fiber-v4-tooltip">
-            <V4ScreenTooltip screen={screen} sources={sourceMembership?.get(screen.id) ?? []} currency={currency} showCpm={showCpm} />
+            <V4ScreenTooltip screen={screen} sources={sourceMembership?.get(screen.id) ?? []} currency={currency} showCpm={showCpm} hasSourceTargeting={hasSourceTargeting} />
           </Tooltip>
         ) : (
         <Tooltip direction="top" offset={[0, -10]} opacity={1} className="fiber-tooltip">
@@ -759,6 +761,7 @@ export function MapPanelV2({
            onScreenClick={onScreenClick} 
            sourceMap={sourceMap}
            sourceMembership={v4Membership?.all}
+           hasSourceTargeting={Object.values(activeSources ?? {}).some(Boolean)}
            v4Layout={v4Layout}
            currency={currency}
            showCpm={showCpm}

@@ -1,4 +1,5 @@
 import L from "leaflet";
+import type { ReactNode } from "react";
 import { ScreenData } from "../data";
 import { EXCHANGE_RATES } from "./budgetCurrency";
 import { FONT } from "./primitives";
@@ -7,7 +8,7 @@ export type V4Currency = "GBP" | "EUR" | "USD";
 export const V4_SOURCE_ORDER = ["geoPlanner", "planningZone", "postcode", "city", "latlng", "poi", "screenList"] as const;
 export const V4_SOURCE_LABELS: Record<string, string> = {
   geoPlanner: "Geo Planner", planningZone: "Planning Zone", postcode: "Postcode", city: "City",
-  latlng: "Lat/Long", poi: "POI", screenList: "Screen List", default: "Matched",
+  latlng: "Lat/Long", poi: "POI", screenList: "Screen List", default: "Full inventory",
 };
 // [token, fallback, dark label on this fill?]
 const TOK: Record<string, [string, string, boolean]> = {
@@ -79,16 +80,17 @@ export function buildV4SourceMembership(
   return { primary, all };
 }
 
-const row = (label: string, value: string) => (
+const row = (label: string, value: ReactNode) => (
   <div style={{ display: "grid", gridTemplateColumns: "76px 1fr", gap: "var(--spacing-100, 8px)", alignItems: "baseline" }}>
     <span style={{ color: "var(--surface-foreground-dynamic-neutral-disabled, #717180)" }}>{label}</span>
     <span style={{ fontWeight: 500, overflowWrap: "anywhere" }}>{value}</span>
   </div>
 );
 
-export function V4ScreenTooltip({ screen, sources, currency, showCpm }: {
-  screen: ScreenData; sources: string[]; currency: V4Currency; showCpm: boolean;
+export function V4ScreenTooltip({ screen, sources, currency, showCpm, hasSourceTargeting = false }: {
+  screen: ScreenData; sources: string[]; currency: V4Currency; showCpm: boolean; hasSourceTargeting?: boolean;
 }) {
+  const matchedSources = V4_SOURCE_ORDER.filter(source => sources.includes(source));
   return (
     <div style={{ fontFamily: FONT, fontSize: 12, minWidth: 220, maxWidth: 280, display: "flex", flexDirection: "column", gap: "var(--spacing-50, 4px)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>
       <strong style={{ fontSize: 14, paddingBottom: "var(--spacing-50, 4px)", borderBottom: "1px solid var(--border-dynamic-neutral-subtle-default, #e1e1e8)" }}>{screen.id}</strong>
@@ -97,7 +99,16 @@ export function V4ScreenTooltip({ screen, sources, currency, showCpm }: {
       {row("City", screen.city)}
       {showCpm && row("CPM", formatCpm(screen.cpm, currency))}
       {row("Impressions", screen.impressions.toLocaleString())}
-      {row(sources.length > 1 ? "Sources" : "Source", sources.length ? sources.map((s) => V4_SOURCE_LABELS[s]).join(", ") : "Matched")}
+      {row(matchedSources.length > 1 ? "Sources" : "Source", matchedSources.length ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-50, 4px)" }}>
+          {matchedSources.map(source => (
+            <span key={source} style={{ display: "flex", alignItems: "center", gap: "var(--spacing-50, 4px)" }}>
+              <span aria-hidden="true" style={{ width: 8, height: 8, flexShrink: 0, borderRadius: "50%", backgroundColor: v4CssColor(source) }} />
+              {V4_SOURCE_LABELS[source]}
+            </span>
+          ))}
+        </div>
+      ) : hasSourceTargeting ? "No geographic or Screen List source" : "Full inventory (no source filter)")}
     </div>
   );
 }
