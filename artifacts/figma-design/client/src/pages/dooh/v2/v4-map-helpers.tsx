@@ -8,7 +8,7 @@ export type V4Currency = "GBP" | "EUR" | "USD";
 export const V4_SOURCE_ORDER = ["geoPlanner", "planningZone", "postcode", "city", "latlng", "poi", "screenList"] as const;
 export const V4_SOURCE_LABELS: Record<string, string> = {
   geoPlanner: "Geo Planner", planningZone: "Planning Zone", postcode: "Postcode", city: "City",
-  latlng: "Lat/Long", poi: "POI", screenList: "Screen List", default: "Full inventory",
+  latlng: "Lat/Long", poi: "POI", screenList: "Screen List", default: "Not added",
 };
 // [token, fallback, dark label on this fill?]
 const TOK: Record<string, [string, string, boolean]> = {
@@ -99,7 +99,7 @@ export function V4ScreenTooltip({ screen, sources, currency, showCpm, hasSourceT
       {row("City", screen.city)}
       {showCpm && row("CPM", formatCpm(screen.cpm, currency))}
       {row("Impressions", screen.impressions.toLocaleString())}
-      {row(matchedSources.length > 1 ? "Sources" : "Source", matchedSources.length ? (
+      {row("Match Source", matchedSources.length ? (
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-50, 4px)" }}>
           {matchedSources.map(source => (
             <span key={source} style={{ display: "flex", alignItems: "center", gap: "var(--spacing-50, 4px)" }}>
@@ -108,7 +108,7 @@ export function V4ScreenTooltip({ screen, sources, currency, showCpm, hasSourceT
             </span>
           ))}
         </div>
-      ) : hasSourceTargeting ? "No geographic or Screen List source" : "Full inventory (no source filter)")}
+      ) : hasSourceTargeting ? "No match" : "Not added")}
     </div>
   );
 }
