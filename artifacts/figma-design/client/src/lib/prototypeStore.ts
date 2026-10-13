@@ -89,6 +89,7 @@ export const DOOH_VERSION_IDS = {
   v2: "dooh_v2",
   v3: "dooh_v3",
   v4: "dooh_v4",
+  v5: "dooh_v5",
 } as const;
 
 /* ---------------------------------------------------------------------- */
@@ -205,6 +206,21 @@ const SEED: Prototype[] = [
           description: "Digital out-of-home planning with City and Postcode targeting, creative compatibility, and source-aware map details.",
           status: "Live",
           notes: "Fiber map colors and Match Source tooltips, searchable publisher and venue facets, grouped Other est metrics, and independent Screen List CPM visibility.",
+        },
+      },
+      {
+        id: DOOH_VERSION_IDS.v5,
+        name: "V5",
+        createdAt: "2026-10-13T00:00:00.000Z",
+        updatedAt: "2026-10-13T00:00:00.000Z",
+        description: "Map-only exploration: bubbles, hexagonal coverage, and continuous density.",
+        rendererKey: "dooh",
+        status: "active",
+        metadata: { createdFrom: DOOH_VERSION_IDS.v4 },
+        snapshot: {
+          description: "Compare alternative DOOH map overview encodings using the same matched screen inventory.",
+          status: "Live",
+          notes: "V4 filters are unchanged. Overview options remove large cluster count labels; exact counts remain available on hover and individual screens on zoom.",
         },
       },
     ],
@@ -475,7 +491,8 @@ function readLocal(): Prototype[] {
       doohSeed.versions.some(seedVersion =>
         !prototype.versions.some(version =>
           version.id === seedVersion.id ||
-          (seedVersion.id === DOOH_VERSION_IDS.v4 && version.name.trim().toUpperCase() === "V4"),
+          (seedVersion.id === DOOH_VERSION_IDS.v4 && version.name.trim().toUpperCase() === "V4") ||
+          (seedVersion.id === DOOH_VERSION_IDS.v5 && version.name.trim().toUpperCase() === "V5" && version.status === "active"),
         ),
       )
         ? reconcileSeededVersions(prototype, doohSeed)
@@ -542,26 +559,45 @@ function reconcileSeededVersions(
   const matchedLocalIds = new Set<string>();
   const reconciledSeed = seed.versions.map((seedVersion) => {
     const existing =
-      (seed.id === "dooh" && seedVersion.id === DOOH_VERSION_IDS.v4
-        ? local.versions.find(version => version.id !== DOOH_VERSION_IDS.v4 && version.name.trim().toUpperCase() === "V4")
+      (seed.id === "dooh" && (seedVersion.id === DOOH_VERSION_IDS.v4 || seedVersion.id === DOOH_VERSION_IDS.v5)
+        ? local.versions.find(version => version.id !== seedVersion.id && version.name.trim().toUpperCase() === seedVersion.name &&
+          (seedVersion.id !== DOOH_VERSION_IDS.v5 || version.status === "active"))
         : undefined) ??
       local.versions.find((version) => version.id === seedVersion.id) ??
       (seed.id === "dooh" && seedVersion.id === DOOH_VERSION_IDS.v4
         ? local.versions.find(version => version.name.trim().toUpperCase() === "V4")
         : undefined) ??
-      (seedVersion.name === "V5"
+      (seed.id === "tv-audience-intelligence" && seedVersion.name === "V5"
         ? local.versions.find((version) => version.name === "V5")
         : undefined);
     if (!existing) return seedVersion;
     matchedLocalIds.add(existing.id);
-    // V5's seeded identity is canonical: collaboration records are stored
+    // An older server may allocate V7 to this newly shipped V5 seed because
+    // an archived V5 already exists. Correct only the untouched, code-created
+    // branch in place; retain its id and every archived/custom review record.
+    if (
+      seed.id === "dooh" &&
+      seedVersion.id === DOOH_VERSION_IDS.v5 &&
+      existing.id === DOOH_VERSION_IDS.v5 &&
+      existing.name !== "V5" &&
+      existing.createdAt === seedVersion.createdAt &&
+      existing.description === seedVersion.description &&
+      existing.metadata?.createdFrom === seedVersion.metadata?.createdFrom
+    ) {
+      return {
+        ...existing,
+        name: "V5",
+        updatedAt: new Date(Date.parse(existing.updatedAt) + 1).toISOString(),
+      };
+    }
+    // TV V5's seeded identity is canonical: collaboration records are stored
     // against this version id, including for legacy same-name duplicates.
     // Previously saved DOOH V4 records keep their original collaboration IDs.
     return seed.id === "dooh" || existing.id === seedVersion.id
       ? existing
       : { ...existing, id: seedVersion.id, rendererKey: "v5" as const };
   });
-  const hasSeededV5 = seed.versions.some((version) => version.name === "V5");
+  const hasSeededV5 = seed.id === "tv-audience-intelligence" && seed.versions.some((version) => version.name === "V5");
   const localOnly = local.versions.filter(
     (version) =>
       !seedIds.has(version.id) &&

@@ -15,6 +15,12 @@ New public DOOH versions must be available from the shipped registry, not only f
 
 **How to apply:** Backfill missing built-in versions for old browsers. Preserve an already-saved same-label V4 identity and its review links, including when it arrives from shared history, instead of creating a second placeholder that the server renames. An already-auto-renamed built-in placeholder must not take precedence over the real V4; leave shared history intact and resolve the existing V4 for the UI. Test this collision against shared metadata, not only an empty server mock. Keep an intentional older selection valid; provide the V4 picker entry and direct V4 URL rather than renaming or changing V3.
 
+New exploration branches must not unarchive or replace old review versions merely because their requested label matches archived history.
+
+**Why:** An archived DOOH V5 existed before the new map-only V5 request. Historical label allocation could rename the new canonical branch to V7, despite the requested public V5 identity.
+
+**How to apply:** Preserve the archived record's ID, status, and metadata. Let the new canonical branch coexist under its requested label when no active record holds it. Reconcile an already-auto-renamed, untouched new seed in place, never by deleting or overwriting archived history. Scope TV-specific same-label canonicalization to TV; DOOH IDs carry separate review histories.
+
 Version-dependent initial state must wait for resolved version metadata or reinitialize when the version gate changes.
 
 **Why:** Shared version metadata hydrates asynchronously. A direct V4 demo can initially mount as the legacy renderer, causing one-time state initializers to omit V4-only demo uploads even after the City tab becomes visible.

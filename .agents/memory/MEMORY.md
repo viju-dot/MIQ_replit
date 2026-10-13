@@ -14,3 +14,5 @@
 - [Review environment isolation](review-environments.md) — dev and published review data are separate; publishing code does not copy existing comments or annotations between databases.
 - [Optional numeric input modes](optional-numeric-inputs.md) — do not treat an intermediate empty edit as a mode toggle; reserve sentinel-mode changes for explicit controls.
 - [Shared prototype versions](shared-prototype-versions.md) — sync version records individually and preserve free requested labels so partial/out-of-order browser migrations keep history intact.
+- [DOOH V5 scope](dooh-v5-map-scope.md) — map-only visual exploration; leave V4 filters and V1–V4 intact and provide comparable rendered previews.
+- [Mockup React types](mockup-react-type-isolation.md) — extracted UI can resolve a different React type family; isolate declarations per artifact, not via source-app upgrades.

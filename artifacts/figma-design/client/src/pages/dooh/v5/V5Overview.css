@@ -1,0 +1,23 @@
+.dooh-v5-overview-tools {
+  position: absolute;
+  top: 16px;
+  left: 60px;
+  z-index: 1000;
+  display: flex;
+  padding: 3px;
+  background: var(--surface-background-lvl1, #fff);
+  border: 1px solid var(--border-dynamic-neutral-subtle-default, #e1e1e8);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(113, 113, 128, .08);
+  font: 12px "DM Sans", Helvetica;
+}
+.dooh-v5-overview-tools button { padding: 7px 12px; border: 0; border-radius: 4px; background: transparent; color: var(--surface-foreground-dynamic-neutral-default-regular, #717180); cursor: pointer; }
+.dooh-v5-overview-tools button[aria-pressed="true"] { background: var(--container-dynamic-brand-subtle-background-default, #f2e8fa); color: var(--container-dynamic-brand-subtle-foreground-default, #7c33b5); font-weight: 600; }
+.dooh-v5-overview-tools button:focus-visible { outline: 2px solid #7c33b5; outline-offset: 2px; }
+.fiber-v5-overview .dooh-bubble-legend,
+.fiber-v5-overview .dooh-hex-legend,
+.fiber-v5-overview .dooh-heat-legend { top: 64px; }
+@media (max-width: 600px) {
+  .dooh-v5-overview-tools { left: 58px; top: 10px; }
+  .dooh-v5-overview-tools button { padding: 7px 8px; }
+}

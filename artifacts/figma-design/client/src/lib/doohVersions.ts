@@ -5,6 +5,7 @@ export function doohVersionToken(version: PrototypeVersion): string {
   if (version.id === DOOH_VERSION_IDS.v2) return "v2";
   if (version.id === DOOH_VERSION_IDS.v3) return "v3";
   if (version.id === DOOH_VERSION_IDS.v4 || version.name.trim().toUpperCase() === "V4") return "v4";
+  if (version.id === DOOH_VERSION_IDS.v5 || version.name.trim().toUpperCase() === "V5") return "v5";
   return version.id;
 }
 
@@ -13,7 +14,8 @@ export function resolveDoohVersion(versions: PrototypeVersion[], token: string |
   const id = token.toLowerCase() === "v1" ? DOOH_VERSION_IDS.v1
     : token.toLowerCase() === "v2" ? DOOH_VERSION_IDS.v2
       : token.toLowerCase() === "v3" ? DOOH_VERSION_IDS.v3
-        : token.toLowerCase() === "v4" ? DOOH_VERSION_IDS.v4 : token;
+        : token.toLowerCase() === "v4" ? DOOH_VERSION_IDS.v4
+          : token.toLowerCase() === "v5" ? DOOH_VERSION_IDS.v5 : token;
   return versions.find(version => version.status === "active" && version.id === id)
     ?? versions.find(version => version.status === "active" && version.name.toLowerCase() === token.toLowerCase());
 }
@@ -24,7 +26,7 @@ export function doohRendererVersion(version: PrototypeVersion | undefined, versi
   let current = version;
   while (current && !seen.has(current.id)) {
     if (current.id === DOOH_VERSION_IDS.v1) return "v1";
-    if (current.id === DOOH_VERSION_IDS.v2 || current.id === DOOH_VERSION_IDS.v3 || current.id === DOOH_VERSION_IDS.v4) return "v2";
+    if (current.id === DOOH_VERSION_IDS.v2 || current.id === DOOH_VERSION_IDS.v3 || current.id === DOOH_VERSION_IDS.v4 || current.id === DOOH_VERSION_IDS.v5) return "v2";
     seen.add(current.id);
     const source = current.metadata?.createdFrom;
     current = source ? versions.find(item => item.id === source || item.name === source) : undefined;

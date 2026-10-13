@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import L, { LatLngExpression } from "leaflet";
 import {
   Circle,
@@ -21,6 +21,7 @@ import { V4ClusterTooltip, V4Currency, V4ScreenTooltip, buildV4SourceMembership,
 import { SmartSelectionMapEvents, SmartPreviewCircle, SmartSelectionControl } from "./v2planner-smart-selection";
 
 interface Props {
+  overviewLayer?: ReactNode;
   screens: ScreenData[];
   smartCandidates?: ScreenData[];
   hoveredScreenId: string | null;
@@ -614,6 +615,7 @@ function DrawingLayer({
 }
 
 export function MapPanelV2({
+  overviewLayer,
   screens,
   smartCandidates,
   hoveredScreenId,
@@ -744,7 +746,7 @@ export function MapPanelV2({
   };
 
   return (
-    <div className={`fiber-dooh-map ${v4Layout ? "fiber-v4-map" : ""} relative h-full w-full min-h-0 shrink-0`} style={{ height: expanded ? "100%" : "max(690px, calc(100dvh - 490px))", backgroundColor: "var(--surface-background-lvl2, #f7f7fa)" }}>
+    <div className={`fiber-dooh-map ${v4Layout ? "fiber-v4-map" : ""} ${overviewLayer ? "fiber-v5-overview" : ""} relative h-full w-full min-h-0 shrink-0`} style={{ height: expanded ? "100%" : "max(690px, calc(100dvh - 490px))", backgroundColor: "var(--surface-background-lvl2, #f7f7fa)" }}>
       <MapContainer center={[54.5, -3.2]} zoom={6} minZoom={3} maxZoom={19} className="h-full w-full" zoomControl={false} style={{ fontFamily: FONT }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -755,7 +757,7 @@ export function MapPanelV2({
         <FocusHovered screen={hoveredScreen} />
         <MapControls screens={displayScreens} />
         <ZoneLayers zones={zones} onZonesChange={onZonesChange} v4Layout={v4Layout} />
-        <ClusteredScreens 
+        {overviewLayer && !smartSelectionActive && !drawMode ? overviewLayer : <ClusteredScreens 
            screens={displayScreens} 
            hoveredScreenId={hoveredScreenId} 
            onScreenClick={onScreenClick} 
@@ -769,7 +771,7 @@ export function MapPanelV2({
            candidateIds={candidateIds}
            smartSelectionActive={smartSelectionActive}
            onSmartCapture={handleSmartCapture}
-        />
+        />}
         {drawMode && (
           <DrawingLayer
             key={drawMode}

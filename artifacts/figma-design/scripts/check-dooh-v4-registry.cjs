@@ -43,7 +43,8 @@ function browser(localPrototype, remoteVersions = []) {
         const { version } = JSON.parse(options.body);
         // Model the real API's allocation so accidental duplicate V4 writes
         // fail these tests instead of being silently accepted by the mock.
-        if (!remote.has(version.id) && [...remote.values()].some(item => item.name === version.name)) {
+        if (!remote.has(version.id) && [...remote.values()].some(item => item.name === version.name &&
+          !(version.id === "dooh_v5" && item.status === "archived"))) {
           version.name = "V5";
         }
         remote.set(version.id, version);
@@ -65,10 +66,15 @@ async function main() {
   assert.equal(fresh.doohVersionToken(v4), "v4");
   assert.equal(fresh.doohRendererVersion(v4, seed.versions), "v2");
   assert.equal(fresh.doohRendererVersion(seed.versions[0], seed.versions), "v1");
+  const v5 = seed.versions.find(version => version.name === "V5");
+  assert.equal(v5.id, "dooh_v5");
+  assert.equal(fresh.resolveDoohVersion(seed.versions, "v5").id, v5.id);
+  assert.equal(fresh.doohVersionToken(v5), "v5");
+  assert.equal(fresh.doohRendererVersion(v5, seed.versions), "v2");
 
   const old = clone(seed);
   old.name = "Existing DOOH review";
-  old.versions = old.versions.filter(version => version.name !== "V4");
+  old.versions = old.versions.filter(version => ["V1", "V2", "V3"].includes(version.name));
   const legacyBrowser = browser(old, old.versions);
   const migrated = clone(legacyBrowser.prototypeRepository.get("dooh"));
   assert.equal(migrated.name, old.name);
@@ -76,18 +82,18 @@ async function main() {
   assert.equal(migrated.versions[3].name, "V4");
   await legacyBrowser.hydratePrototypeVersions("dooh");
   assert(legacyBrowser.remote.has("dooh_v4"));
-  assert.deepEqual(legacyBrowser.writes, ["dooh_v4"]);
+  assert.deepEqual(legacyBrowser.writes, ["dooh_v4", "dooh_v5"]);
 
   const savedV4 = { ...v4, id: "existing_review_v4", metadata: { createdFrom: "dooh_v3" } };
   const existing = clone(old);
   existing.versions.push(savedV4);
   const returning = browser(existing, existing.versions);
   const kept = clone(returning.prototypeRepository.get("dooh"));
-  assert.deepEqual(kept.versions, existing.versions);
+  assert.deepEqual(kept.versions.filter(version => version.name !== "V5"), existing.versions);
   assert.equal(returning.resolveDoohVersion(kept.versions, "v4").id, savedV4.id);
   assert.equal(returning.doohVersionToken(savedV4), "v4");
   await returning.hydratePrototypeVersions("dooh");
-  assert.deepEqual(returning.writes, []);
+  assert.deepEqual(returning.writes, ["dooh_v5"]);
 
   const remoteOnly = browser(undefined, existing.versions);
   await remoteOnly.hydratePrototypeVersions("dooh");
@@ -95,7 +101,7 @@ async function main() {
   assert.equal(adopted.versions.filter(version => version.name === "V4").length, 1);
   assert.equal(adopted.versions.find(version => version.name === "V4").id, savedV4.id);
   assert(!remoteOnly.remote.has("dooh_v4"));
-  assert.deepEqual(remoteOnly.writes, []);
+  assert.deepEqual(remoteOnly.writes, ["dooh_v5"]);
 
   // A server can already contain an earlier accidentally renamed seed.
   // The existing review V4 must still win over that placeholder in the UI,
@@ -107,7 +113,7 @@ async function main() {
   assert.equal(collision.resolveDoohVersion(reconciled.versions, "v4").id, savedV4.id);
   assert.equal(reconciled.versions.filter(version => version.name === "V4").length, 1);
   assert(!reconciled.versions.some(version => version.id === "dooh_v4"));
-  assert.deepEqual(collision.writes, []);
+  assert.deepEqual(collision.writes, ["dooh_v5"]);
   assert(collision.remote.has("dooh_v4")); // No shared history was deleted.
 
   const archived = clone(existing);
@@ -116,10 +122,33 @@ async function main() {
   assert.equal(archivedBrowser.prototypeRepository.get("dooh").versions[3].status, "archived");
   assert.equal(archivedBrowser.resolveDoohVersion(archivedBrowser.prototypeRepository.get("dooh").versions, "v4"), undefined);
 
-  for (const scenario of [fresh, legacyBrowser, returning, remoteOnly, collision, archivedBrowser]) {
+  const oldArchivedV5 = { ...v5, id: "previous_archived_v5", status: "archived" };
+  const archivedV5Browser = browser(undefined, [...existing.versions, oldArchivedV5]);
+  await archivedV5Browser.hydratePrototypeVersions("dooh");
+  const v5History = clone(archivedV5Browser.prototypeRepository.get("dooh")).versions;
+  assert.equal(archivedV5Browser.resolveDoohVersion(v5History, "v5").id, "dooh_v5");
+  assert.deepEqual(v5History.find(version => version.id === oldArchivedV5.id), oldArchivedV5);
+  assert.equal(archivedV5Browser.remote.get("dooh_v5").name, "V5");
+  assert.equal(archivedV5Browser.remote.get(oldArchivedV5.id).status, "archived");
+
+  const renamedV5Browser = browser(undefined, [...existing.versions, oldArchivedV5, { ...v5, name: "V7" }]);
+  await renamedV5Browser.hydratePrototypeVersions("dooh");
+  await renamedV5Browser.hydratePrototypeVersions("dooh");
+  assert.equal(renamedV5Browser.remote.get("dooh_v5").name, "V5");
+  assert.equal(renamedV5Browser.resolveDoohVersion(renamedV5Browser.prototypeRepository.get("dooh").versions, "v5").id, "dooh_v5");
+  assert.deepEqual(renamedV5Browser.remote.get(oldArchivedV5.id), oldArchivedV5);
+  assert.deepEqual(renamedV5Browser.writes, ["dooh_v5"]);
+
+  const savedV5 = { ...v5, id: "existing_review_v5" };
+  const existingV5Browser = browser(undefined, [...existing.versions, savedV5]);
+  await existingV5Browser.hydratePrototypeVersions("dooh");
+  assert.equal(existingV5Browser.resolveDoohVersion(existingV5Browser.prototypeRepository.get("dooh").versions, "v5").id, savedV5.id);
+  assert(!existingV5Browser.remote.has("dooh_v5"));
+
+  for (const scenario of [fresh, legacyBrowser, returning, remoteOnly, collision, archivedBrowser, archivedV5Browser, renamedV5Browser, existingV5Browser]) {
     assert.deepEqual(scenario.warnings, []);
   }
-  console.log("PASS: fresh V4 availability, V1–V3 preservation, legacy migration, shared V4 adoption without duplication, deep links, archived history.");
+  console.log("PASS: V4/V5 availability and deep links, V1–V3 preservation, legacy migration, shared version adoption, archived V5 preservation and new map-only V5.");
 }
 
 main().catch(error => { console.error(error); process.exitCode = 1; });

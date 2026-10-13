@@ -1,0 +1,77 @@
+.dooh-bubble-icon {
+  background: transparent;
+  border: 0;
+}
+.dooh-bubble-disc {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-sizing: border-box;
+  background: rgba(124, 51, 181, .19);
+  border: 1.5px solid rgba(124, 51, 181, .78);
+  box-shadow: inset 0 0 0 2px rgba(250, 247, 253, .38);
+  transition: transform 140ms ease;
+}
+.dooh-bubble-icon:hover .dooh-bubble-disc,
+.dooh-bubble-icon:focus .dooh-bubble-disc {
+  transform: scale(1.07);
+  background: rgba(124, 51, 181, .27);
+}
+.dooh-bubble-icon:focus-visible {
+  outline: 2px solid #7c33b5;
+  outline-offset: 4px;
+  border-radius: 50%;
+}
+.dooh-bubble-legend {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  width: 222px;
+  padding: 13px 15px 12px;
+  border: 1px solid var(--border-dynamic-neutral-subtle-default, #e1e1e8);
+  border-radius: 4px;
+  background: var(--surface-background-lvl1, #fcfbfe);
+  color: var(--surface-foreground-dynamic-neutral-default-variation, #13131a);
+  box-shadow: 0 2px 8px rgba(113, 113, 128, .12);
+  font-family: "DM Sans", sans-serif;
+  font-size: 11px;
+  line-height: 1.5;
+  pointer-events: none;
+}
+.dooh-bubble-legend strong { font-size: 12px; font-weight: 600; }
+.dooh-bubble-legend p { margin: 3px 0 0; color: #717180; }
+.dooh-bubble-scale {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0 5px;
+}
+.dooh-bubble-scale span { flex-shrink: 0; }
+.dooh-bubble-direction { display: flex; justify-content: space-between; color: #717180; }
+.dooh-bubble-guidance { margin-top: 10px !important; padding-top: 9px; border-top: 1px solid #e1e1e8; }
+.dooh-bubble-empty {
+  position: absolute;
+  left: 50%;
+  top: 24px;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: #fcfbfe;
+  border: 1px solid #e1e1e8;
+  border-radius: 4px;
+  padding: 14px 18px;
+  color: #717180;
+  font: 12px/1.5 "DM Sans", sans-serif;
+  pointer-events: none;
+  text-align: center;
+}
+.dooh-bubble-empty strong { display: block; color: #13131a; font-weight: 600; }
+@media (max-width: 600px) {
+  .dooh-bubble-legend { width: 172px; top: 10px; right: 10px; padding: 10px 12px; }
+  .dooh-bubble-guidance { font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dooh-bubble-disc { transition: none; }
+}

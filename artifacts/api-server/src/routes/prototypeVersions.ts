@@ -96,19 +96,25 @@ router.put(
         }
       } else {
         const labelsResult = await client.query(
-          `SELECT data->>'name' AS name
+          `SELECT data->>'name' AS name, data->>'status' AS status
              FROM prototype_versions
             WHERE prototype_id = $1`,
           [prototypeId],
         );
         const labels = labelsResult.rows.map((row) => row.name);
+        // The requested map-only V5 is a new canonical branch, not an
+        // unarchive/overwrite of an earlier discarded V5. Its public label
+        // can be reused when only archived history occupies that name.
+        const newDoohMapV5 = prototypeId === "dooh" && versionId === "dooh_v5" &&
+          version.name === "V5" &&
+          !labelsResult.rows.some(row => row.name === "V5" && row.status !== "archived");
         version = {
           ...version,
           // Preserve the requested label when it is free. This supports
           // migrating a single newer version before the browser has uploaded
           // the seeded history. Concurrent copies with the same label still
           // receive distinct sequential names under the advisory lock.
-          name: labels.includes(version.name)
+          name: labels.includes(version.name) && !newDoohMapV5
             ? nextVersionName(labels)
             : version.name,
         };

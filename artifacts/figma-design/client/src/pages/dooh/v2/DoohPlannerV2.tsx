@@ -10,21 +10,25 @@ import { Download, Maximize2 } from "lucide-react";
 import { useScreenExport } from "./useScreenExport";
 import { countCreativeOptions } from "./creativeCounts";
 import "./DoohPlannerV2.css";
+import { V5Overview, type V5OverviewMode } from "../v5/V5Overview";
 
 export default function DoohPlannerV2({
   demoView = false,
   showRadius = true,
   v4Layout = false,
+  v5Layout = false,
 }: {
   demoView?: boolean;
   showRadius?: boolean;
   v4Layout?: boolean;
+  v5Layout?: boolean;
 }) {
   const [filters, setFilters] = useState<FilterStateV2>(() => demoView ? createDemoFilters(v4Layout) : DEFAULT_FILTERS_V2);
   const [selectedScreenIds, setSelectedScreenIds] = useState<Set<string>>(
     () => demoView ? new Set(DEMO_UPLOADS.screenList.records.map(record => record.id)) : new Set(),
   );
   const [hoveredScreenId, setHoveredScreenId] = useState<string | null>(null);
+  const [mapOverviewMode, setMapOverviewMode] = useState<V5OverviewMode>("bubbles");
   const [view, setView] = useState<"map" | "list">("map");
   const [showMapOverview, setShowMapOverview] = useState(false);
   const [showMapExpanded, setShowMapExpanded] = useState(false);
@@ -304,6 +308,9 @@ export default function DoohPlannerV2({
 
   const renderMapPanel = (expanded = false) => (
     <MapPanelV2
+      overviewLayer={v5Layout ? <V5Overview mode={mapOverviewMode} onModeChange={setMapOverviewMode}
+        screens={matchedScreens} hoveredScreenId={hoveredScreenId} onScreenClick={setHoveredScreenId}
+        currency={filters.budget.currency} showCpm={showScreenCpm} sourceScreenIds={sourceScreenIds} /> : undefined}
       screens={matchedScreens}
       smartCandidates={smartCandidates}
       hoveredScreenId={hoveredScreenId}
