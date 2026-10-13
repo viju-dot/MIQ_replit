@@ -1,3 +1,11 @@
+.fiber-heatmap-preview {
+  display: contents;
+  --dooh-heat-density-0: var(--container-dynamic-brand-subtle-background-default, #f6ebff);
+  --dooh-heat-density-1: var(--container-dynamic-brand-subtle-background-hover, #e7c7ff);
+  --dooh-heat-density-2: var(--container-dynamic-brand-bold-background-default, #7c33b5);
+  --dooh-heat-density-3: var(--container-dynamic-brand-bold-background-hover, #702ea3);
+}
+.fiber-heatmap-preview .leaflet-tile-pane { filter: grayscale(1); }
 .dooh-heat-legend {
   position: absolute;
   z-index: 1000;
@@ -17,12 +25,12 @@
   height: 7px;
   margin-top: 12px;
   border-radius: 3px;
-  background: linear-gradient(90deg, #e6efec, #b4d5ca, #65a79c, #337d7b, #24505e);
+  background: linear-gradient(90deg, var(--dooh-heat-density-0), var(--dooh-heat-density-1), var(--dooh-heat-density-2), var(--dooh-heat-density-3));
 }
 .dooh-heat-labels { display: flex; justify-content: space-between; margin-top: 5px; color: #717180; font-size: 10px; }
 .dooh-heat-legend p { margin: 10px 0 0; color: #717180; line-height: 1.5; font-size: 11px; }
 .dooh-heat-keyboard { width: 30px; height: 30px; border-radius: 50%; background: transparent; border: none; pointer-events: none !important; }
-.dooh-heat-keyboard:focus-visible { outline: 2px solid #24505e; outline-offset: 4px; background: rgba(101, 167, 156, .15); }
+.dooh-heat-keyboard:focus-visible { outline: 2px solid var(--dooh-heat-density-2); outline-offset: 4px; background: var(--dooh-heat-density-0); }
 .dooh-heat-empty {
   position: absolute;
   top: 45%;
