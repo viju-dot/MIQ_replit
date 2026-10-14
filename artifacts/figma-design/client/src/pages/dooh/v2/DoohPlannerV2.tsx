@@ -28,7 +28,7 @@ export default function DoohPlannerV2({
     () => demoView ? new Set(DEMO_UPLOADS.screenList.records.map(record => record.id)) : new Set(),
   );
   const [hoveredScreenId, setHoveredScreenId] = useState<string | null>(null);
-  const [mapOverviewMode, setMapOverviewMode] = useState<V5OverviewMode>("bubbles");
+  const [mapOverviewMode, setMapOverviewMode] = useState<V5OverviewMode>("v4");
   const [view, setView] = useState<"map" | "list">("map");
   const [showMapOverview, setShowMapOverview] = useState(false);
   const [showMapExpanded, setShowMapExpanded] = useState(false);
@@ -308,6 +308,7 @@ export default function DoohPlannerV2({
 
   const renderMapPanel = (expanded = false) => (
     <MapPanelV2
+      refinedV4Map={v5Layout && mapOverviewMode === "v4"}
       overviewLayer={v5Layout ? v4Layer => <V5Overview mode={mapOverviewMode} onModeChange={setMapOverviewMode} v4Layer={v4Layer}
         screens={matchedScreens} hoveredScreenId={hoveredScreenId} onScreenClick={setHoveredScreenId}
         currency={filters.budget.currency} showCpm={showScreenCpm} sourceScreenIds={sourceScreenIds} /> : undefined}

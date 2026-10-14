@@ -48,12 +48,12 @@ export const v4PinIcon = (active: boolean, key: string, sel: boolean, cand: bool
     html: `<span style="display:block;width:100%;height:100%;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${v4CssColor(key)};border:2px solid ${border(sel, cand)};box-shadow:0 2px 6px var(--shadow-lvl8, rgba(113,113,128,0.25))${halo(sel, cand)};transition:all 0.2s ease;"></span>`,
   });
 
-export const v4ClusterIcon = (count: number, key: string, sel: boolean, cand: boolean) =>
+export const v4ClusterIcon = (count: number, key: string, sel: boolean, cand: boolean, diameter = 38) =>
   L.divIcon({
     className: "",
-    iconSize: [38, 38],
-    iconAnchor: [19, 19],
-    html: `<span class="fiber-v4-cluster" style="display:flex;width:38px;height:38px;align-items:center;justify-content:center;border-radius:999px;background:${v4CssColor(key)};color:${labelColor(key)};border:2px solid ${border(sel, cand)};box-shadow:0 2px 8px var(--shadow-lvl8, rgba(113,113,128,0.25))${halo(sel, cand)};font-family:${FONT.replace(/"/g, "'")};font-weight:700;font-size:12px;">${count}</span>`,
+    iconSize: [diameter, diameter],
+    iconAnchor: [diameter / 2, diameter / 2],
+    html: `<span class="fiber-v4-cluster" style="display:flex;box-sizing:border-box;width:${diameter}px;height:${diameter}px;align-items:center;justify-content:center;border-radius:999px;background:${v4CssColor(key)};color:${labelColor(key)};border:2px solid ${border(sel, cand)};box-shadow:0 2px 8px var(--shadow-lvl8, rgba(113,113,128,0.25))${halo(sel, cand)};font-family:${FONT.replace(/"/g, "'")};font-weight:700;font-size:12px;">${count}</span>`,
   });
 
 export const formatCpm = (gbp: number, currency: V4Currency) => {

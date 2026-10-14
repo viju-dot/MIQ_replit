@@ -19,9 +19,11 @@ import { PlanningZone } from "./v2planner-sidebar";
 import { CARD_BG, CARD_SHADOW, GRID, MUTED, TITLE, FONT, FiberButton, FiberSlider } from "./primitives";
 import { V4ClusterTooltip, V4Currency, V4ScreenTooltip, buildV4SourceMembership, v4ClusterIcon, v4CssColor, v4FocusTooltipHandler, v4PinIcon, v4ResolvedColor } from "./v4-map-helpers";
 import { SmartSelectionMapEvents, SmartPreviewCircle, SmartSelectionControl } from "./v2planner-smart-selection";
+import { clusterV4Overview, v4OverviewDiameter, V4_DETAIL_ZOOM } from "../v5/v4MapClustering";
 
 interface Props {
   overviewLayer?: (v4Layer: ReactNode) => ReactNode;
+  refinedV4Map?: boolean;
   screens: ScreenData[];
   smartCandidates?: ScreenData[];
   hoveredScreenId: string | null;
@@ -239,6 +241,7 @@ function ClusteredScreens({
   currency = "GBP",
   showCpm = true,
   hasSourceTargeting = false,
+  refinedV4Map = false,
 }: Pick<Props, "screens" | "hoveredScreenId" | "onScreenClick" | "selectedScreenIds"> & {
   sourceMap: Map<string, string>;
   sourceMembership?: Map<string, string[]>;
@@ -246,6 +249,7 @@ function ClusteredScreens({
   currency?: V4Currency;
   showCpm?: boolean;
   hasSourceTargeting?: boolean;
+  refinedV4Map?: boolean;
   candidateIds?: Set<string>;
   smartSelectionActive?: boolean;
   onSmartCapture?: (latlng: L.LatLng) => void;
@@ -264,7 +268,13 @@ function ClusteredScreens({
 
   const clusters = useMemo(() => {
     const cells = new Map<string, ScreenData[]>();
-    screens.forEach((screen) => {
+    if (refinedV4Map) {
+      const visible = map.getZoom() >= V4_DETAIL_ZOOM
+        ? screens.filter(screen => map.getBounds().pad(.15).contains([screen.lat, screen.lng]))
+        : screens;
+      clusterV4Overview(visible, screen => map.project([screen.lat, screen.lng], map.getZoom()), map.getZoom(), hoveredScreenId)
+        .forEach(group => cells.set(group.key, group.screens));
+    } else screens.forEach((screen) => {
       const point = map.latLngToLayerPoint([screen.lat, screen.lng]);
       const key =
         screen.id === hoveredScreenId
@@ -288,7 +298,7 @@ function ClusteredScreens({
         lng: members.reduce((sum, item) => sum + item.lng, 0) / members.length,
       };
     });
-  }, [screens, hoveredScreenId, map, revision, sourceMap]);
+  }, [screens, hoveredScreenId, map, revision, sourceMap, refinedV4Map]);
 
   const screenMarker = (screen: ScreenData, position?: LatLngExpression) => {
     const isSelected = selectedScreenIds.has(screen.id);
@@ -368,7 +378,7 @@ function ClusteredScreens({
             key={cluster.key}
             title={v4Layout ? `${cluster.screens.length} matched screens. Click to expand.` : undefined}
             position={[cluster.lat, cluster.lng]}
-            icon={v4Layout ? v4ClusterIcon(cluster.screens.length, cluster.dominantSource, isSelected, isCandidate) : clusterIcon(cluster.screens.length, clusterColor, isSelected, isCandidate)}
+            icon={v4Layout ? v4ClusterIcon(cluster.screens.length, cluster.dominantSource, isSelected, isCandidate, refinedV4Map ? v4OverviewDiameter(cluster.screens.length) : undefined) : clusterIcon(cluster.screens.length, clusterColor, isSelected, isCandidate)}
             zIndexOffset={isCandidate ? 600 : (isSelected ? 500 : 0)}
             eventHandlers={{
               ...(v4Layout ? { add: v4FocusTooltipHandler } : {}),
@@ -616,6 +626,7 @@ function DrawingLayer({
 
 export function MapPanelV2({
   overviewLayer,
+  refinedV4Map = false,
   screens,
   smartCandidates,
   hoveredScreenId,
@@ -748,6 +759,7 @@ export function MapPanelV2({
   // Reuse the original layer, including source tooltips and screen selection,
   // both for V4's map and for the V4 Map option inside V5.
   const v4Layer = <ClusteredScreens
+    refinedV4Map={refinedV4Map}
     screens={displayScreens}
     hoveredScreenId={hoveredScreenId}
     onScreenClick={onScreenClick}
