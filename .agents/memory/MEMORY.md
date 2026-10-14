@@ -16,3 +16,4 @@
 - [Shared prototype versions](shared-prototype-versions.md) — sync version records individually and preserve free requested labels so partial/out-of-order browser migrations keep history intact.
 - [DOOH V5 scope](dooh-v5-map-scope.md) — map-only visual exploration; leave V4 filters and V1–V4 intact and provide comparable rendered previews.
 - [Mockup React types](mockup-react-type-isolation.md) — extracted UI can resolve a different React type family; isolate declarations per artifact, not via source-app upgrades.
+- [Leaflet marker accessibility](leaflet-marker-accessibility.md) — changing cluster icon counts can leave old accessible names; synchronize labels or recreate the marker.

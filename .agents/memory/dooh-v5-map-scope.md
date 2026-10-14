@@ -14,3 +14,9 @@ Use Fiber brand color tokens for the V5 heatmap density ramp, not green or teal.
 **Why:** The user explicitly rejected the green heatmap and requested Fiber token colors.
 
 **How to apply:** Keep the density surface, legend, hover outline, and focus treatment aligned with Fiber's subtle-to-bold purple brand ramp. Do not introduce a separate green density palette.
+
+V4 Map cluster totals mean visible, filtered screen locations—not the full city inventory or screens outside the viewport.
+
+**Why:** The user explicitly requires counts to update on zoom, pan, and geographic coverage changes, with every represented screen counted once. They allow equal labels only when the underlying data genuinely produces them and require demo inventory to be identified.
+
+**How to apply:** Preserve that visible-coverage meaning when changing clustering, caching, or rendering buffers. Split and merge clusters from the underlying locations rather than manufacturing varied numbers or changing the inventory to improve the appearance.

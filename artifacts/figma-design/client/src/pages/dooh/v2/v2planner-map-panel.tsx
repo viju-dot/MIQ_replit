@@ -19,7 +19,7 @@ import { PlanningZone } from "./v2planner-sidebar";
 import { CARD_BG, CARD_SHADOW, GRID, MUTED, TITLE, FONT, FiberButton, FiberSlider } from "./primitives";
 import { V4ClusterTooltip, V4Currency, V4ScreenTooltip, buildV4SourceMembership, v4ClusterIcon, v4CssColor, v4FocusTooltipHandler, v4PinIcon, v4ResolvedColor } from "./v4-map-helpers";
 import { SmartSelectionMapEvents, SmartPreviewCircle, SmartSelectionControl } from "./v2planner-smart-selection";
-import { clusterV4Overview, v4OverviewDiameter, V4_DETAIL_ZOOM } from "../v5/v4MapClustering";
+import { clusterV4Overview, v4OverviewDiameter } from "../v5/v4MapClustering";
 
 interface Props {
   overviewLayer?: (v4Layer: ReactNode) => ReactNode;
@@ -263,16 +263,21 @@ function ClusteredScreens({
       setSpiderCluster(null);
       setRevision((value) => value + 1);
     },
-    moveend: () => setRevision((value) => value + 1),
+    moveend: () => {
+      if (refinedV4Map) setSpiderCluster(null);
+      setRevision((value) => value + 1);
+    },
+    resize: () => {
+      if (refinedV4Map) setRevision((value) => value + 1);
+    },
   });
 
   const clusters = useMemo(() => {
     const cells = new Map<string, ScreenData[]>();
     if (refinedV4Map) {
-      const visible = map.getZoom() >= V4_DETAIL_ZOOM
-        ? screens.filter(screen => map.getBounds().pad(.15).contains([screen.lat, screen.lng]))
-        : screens;
-      clusterV4Overview(visible, screen => map.project([screen.lat, screen.lng], map.getZoom()), map.getZoom(), hoveredScreenId)
+      const bounds = map.getBounds();
+      const visible = screens.filter(screen => bounds.contains([screen.lat, screen.lng]));
+      clusterV4Overview(visible, screen => map.project([screen.lat, screen.lng], map.getZoom()), map.getZoom())
         .forEach(group => cells.set(group.key, group.screens));
     } else screens.forEach((screen) => {
       const point = map.latLngToLayerPoint([screen.lat, screen.lng]);
@@ -344,6 +349,12 @@ function ClusteredScreens({
 
   return (
     <>
+      {refinedV4Map && (
+        <aside className="dooh-v4-aggregation-status" role="status" aria-live="polite" aria-atomic="true">
+          <strong>Demo data · {clusters.reduce((total, cluster) => total + cluster.screens.length, 0).toLocaleString()} visible screens</strong>
+          <span>{clusters.reduce((total, cluster) => total + (spiderCluster === cluster.key ? cluster.screens.length : 1), 0).toLocaleString()} map markers · counts follow zoom and visible coverage</span>
+        </aside>
+      )}
       {clusters.map((cluster) => {
         if (cluster.screens.length === 1) return screenMarker(cluster.screens[0]);
 
@@ -375,7 +386,7 @@ function ClusteredScreens({
         const clusterColor = getSourceColor(cluster.dominantSource);
         return (
           <Marker
-            key={cluster.key}
+            key={refinedV4Map ? `${cluster.key}:${cluster.screens.length}` : cluster.key}
             title={v4Layout ? `${cluster.screens.length} matched screens. Click to expand.` : undefined}
             position={[cluster.lat, cluster.lng]}
             icon={v4Layout ? v4ClusterIcon(cluster.screens.length, cluster.dominantSource, isSelected, isCandidate, refinedV4Map ? v4OverviewDiameter(cluster.screens.length) : undefined) : clusterIcon(cluster.screens.length, clusterColor, isSelected, isCandidate)}
