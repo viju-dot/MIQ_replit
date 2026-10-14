@@ -21,7 +21,7 @@ import { V4ClusterTooltip, V4Currency, V4ScreenTooltip, buildV4SourceMembership,
 import { SmartSelectionMapEvents, SmartPreviewCircle, SmartSelectionControl } from "./v2planner-smart-selection";
 
 interface Props {
-  overviewLayer?: ReactNode;
+  overviewLayer?: (v4Layer: ReactNode) => ReactNode;
   screens: ScreenData[];
   smartCandidates?: ScreenData[];
   hoveredScreenId: string | null;
@@ -745,6 +745,24 @@ export function MapPanelV2({
     setPreviewCenter(null);
   };
 
+  // Reuse the original layer, including source tooltips and screen selection,
+  // both for V4's map and for the V4 Map option inside V5.
+  const v4Layer = <ClusteredScreens
+    screens={displayScreens}
+    hoveredScreenId={hoveredScreenId}
+    onScreenClick={onScreenClick}
+    sourceMap={sourceMap}
+    sourceMembership={v4Membership?.all}
+    hasSourceTargeting={Object.values(activeSources ?? {}).some(Boolean)}
+    v4Layout={v4Layout}
+    currency={currency}
+    showCpm={showCpm}
+    selectedScreenIds={selectedScreenIds}
+    candidateIds={candidateIds}
+    smartSelectionActive={smartSelectionActive}
+    onSmartCapture={handleSmartCapture}
+  />;
+
   return (
     <div className={`fiber-dooh-map ${v4Layout ? "fiber-v4-map" : ""} ${overviewLayer ? "fiber-v5-overview" : ""} relative h-full w-full min-h-0 shrink-0`} style={{ height: expanded ? "100%" : "max(690px, calc(100dvh - 490px))", backgroundColor: "var(--surface-background-lvl2, #f7f7fa)" }}>
       <MapContainer center={[54.5, -3.2]} zoom={6} minZoom={3} maxZoom={19} className="h-full w-full" zoomControl={false} style={{ fontFamily: FONT }}>
@@ -757,21 +775,7 @@ export function MapPanelV2({
         <FocusHovered screen={hoveredScreen} />
         <MapControls screens={displayScreens} />
         <ZoneLayers zones={zones} onZonesChange={onZonesChange} v4Layout={v4Layout} />
-        {overviewLayer && !smartSelectionActive && !drawMode ? overviewLayer : <ClusteredScreens 
-           screens={displayScreens} 
-           hoveredScreenId={hoveredScreenId} 
-           onScreenClick={onScreenClick} 
-           sourceMap={sourceMap}
-           sourceMembership={v4Membership?.all}
-           hasSourceTargeting={Object.values(activeSources ?? {}).some(Boolean)}
-           v4Layout={v4Layout}
-           currency={currency}
-           showCpm={showCpm}
-           selectedScreenIds={selectedScreenIds}
-           candidateIds={candidateIds}
-           smartSelectionActive={smartSelectionActive}
-           onSmartCapture={handleSmartCapture}
-        />}
+        {overviewLayer && !smartSelectionActive && !drawMode ? overviewLayer(v4Layer) : v4Layer}
         {drawMode && (
           <DrawingLayer
             key={drawMode}

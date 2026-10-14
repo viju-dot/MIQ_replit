@@ -308,7 +308,7 @@ export default function DoohPlannerV2({
 
   const renderMapPanel = (expanded = false) => (
     <MapPanelV2
-      overviewLayer={v5Layout ? <V5Overview mode={mapOverviewMode} onModeChange={setMapOverviewMode}
+      overviewLayer={v5Layout ? v4Layer => <V5Overview mode={mapOverviewMode} onModeChange={setMapOverviewMode} v4Layer={v4Layer}
         screens={matchedScreens} hoveredScreenId={hoveredScreenId} onScreenClick={setHoveredScreenId}
         currency={filters.budget.currency} showCpm={showScreenCpm} sourceScreenIds={sourceScreenIds} /> : undefined}
       screens={matchedScreens}
