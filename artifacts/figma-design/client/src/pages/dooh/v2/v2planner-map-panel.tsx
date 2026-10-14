@@ -349,12 +349,6 @@ function ClusteredScreens({
 
   return (
     <>
-      {refinedV4Map && (
-        <aside className="dooh-v4-aggregation-status" role="status" aria-live="polite" aria-atomic="true">
-          <strong>Demo data · {clusters.reduce((total, cluster) => total + cluster.screens.length, 0).toLocaleString()} visible screens</strong>
-          <span>{clusters.reduce((total, cluster) => total + (spiderCluster === cluster.key ? cluster.screens.length : 1), 0).toLocaleString()} map markers · counts follow zoom and visible coverage</span>
-        </aside>
-      )}
       {clusters.map((cluster) => {
         if (cluster.screens.length === 1) return screenMarker(cluster.screens[0]);
 
