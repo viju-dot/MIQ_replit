@@ -245,6 +245,7 @@ interface Props {
   demoView?: boolean;
   showRadius?: boolean;
   pointRadiusOnly?: boolean;
+  allowClearAll?: boolean;
   v4Layout?: boolean;
   creativeCounts?: CreativeScreenCounts;
 }
@@ -286,6 +287,7 @@ export function SidebarV2({
   demoView = false,
   showRadius = true,
   pointRadiusOnly = false,
+  allowClearAll = false,
   v4Layout = false,
   creativeCounts,
 }: Props) {
@@ -573,7 +575,7 @@ export function SidebarV2({
           </div>}
           
           {filters.location.method === "poi" && <div className="space-y-2">
-            <PoiSearch values={filters.location.poiIds} onChange={poiIds => updateSection("location", { poiIds })} />
+            <PoiSearch values={filters.location.poiIds} onChange={poiIds => updateSection("location", { poiIds })} allowClearAll={allowClearAll} />
           </div>}
           
           {filters.location.method === "latlng" && <div className="space-y-2">
@@ -827,11 +829,11 @@ export function SidebarV2({
         </FilterCard>
 
         {/* 3. Venue Type */}
-        <ScalarFacet dropdown={v4Layout} style={sectionStyle(4)} title="Venue Type" icon={<LayoutDashboard className="w-4 h-4" />} enabled={filters.venueType.enabled} values={VENUES} selected={filters.venueType.venues}
+        <ScalarFacet allowClearAll={allowClearAll} dropdown={v4Layout} style={sectionStyle(4)} title="Venue Type" icon={<LayoutDashboard className="w-4 h-4" />} enabled={filters.venueType.enabled} values={VENUES} selected={filters.venueType.venues}
           onToggle={enabled => updateSection("venueType", { enabled })} onSelected={venues => updateSection("venueType", { venues })} />
         
         {/* 4. Publisher */}
-        <ScalarFacet dropdown={v4Layout} screenCounts={v4Layout ? PUBLISHER_SCREEN_COUNTS : undefined} style={sectionStyle(6)} title="Publisher" icon={<Target className="w-4 h-4" />} enabled={filters.publishers.enabled} values={PUBLISHERS} selected={filters.publishers.publishers}
+        <ScalarFacet allowClearAll={allowClearAll} dropdown={v4Layout} screenCounts={v4Layout ? PUBLISHER_SCREEN_COUNTS : undefined} style={sectionStyle(6)} title="Publisher" icon={<Target className="w-4 h-4" />} enabled={filters.publishers.enabled} values={PUBLISHERS} selected={filters.publishers.publishers}
           onToggle={enabled => updateSection("publishers", { enabled })} onSelected={publishers => updateSection("publishers", { publishers })} />
 
         {/* 5. Day Part */}
@@ -914,7 +916,10 @@ export function SidebarV2({
               </Select>
             </div>
             <div>
-              <label className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Resolution</label>
+              <div className="flex items-center justify-between gap-2">
+                <label className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Resolution</label>
+                {allowClearAll && <FiberButton variant="outline" size="compact" className="shrink-0" ariaLabel="Clear all resolutions" disabled={!filters.creativeType.resolution} onClick={() => updateSection("creativeType", { resolution: "" })}>Clear all</FiberButton>}
+              </div>
               <Select value={filters.creativeType.resolution || "any"} onValueChange={resolution => updateSection("creativeType", { resolution: resolution === "any" ? "" : resolution })}>
                 <SelectTrigger className="h-8 mt-1"><SelectValue /></SelectTrigger><SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectItem value="any" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>Any{resolutionCount("")}</SelectItem>{RESOLUTIONS.map(r => <SelectItem value={r} key={r}>{r}{resolutionCount(r)}</SelectItem>)}</SelectContent>
               </Select>
@@ -968,13 +973,14 @@ export function SidebarV2({
   );
 }
 
-function ScalarFacet({ title, icon, enabled, values, selected, onToggle, onSelected, style, dropdown = false, screenCounts }: {
+function ScalarFacet({ title, icon, enabled, values, selected, onToggle, onSelected, style, dropdown = false, screenCounts, allowClearAll = false }: {
   title: string; icon: ReactNode; enabled: boolean; values: string[]; selected: string[];
   onToggle: (value: boolean) => void; onSelected: (value: string[]) => void; style?: CSSProperties; dropdown?: boolean;
   screenCounts?: Record<string, number>;
+  allowClearAll?: boolean;
 }) {
   return <FilterCard style={style} title={title} icon={icon} enabled={enabled} onToggle={onToggle}>
-    <FacetDropdown title={title} values={values} selected={selected} onSelected={onSelected} dropdown={dropdown} screenCounts={screenCounts} />
+    <FacetDropdown title={title} values={values} selected={selected} onSelected={onSelected} dropdown={dropdown} screenCounts={screenCounts} allowClearAll={allowClearAll} />
   </FilterCard>;
 }
 

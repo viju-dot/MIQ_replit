@@ -5,7 +5,7 @@ import { SearchStandard } from "@/pages/ds/SearchPage";
 import { FiberButton } from "./primitives";
 import { Checkbox } from "@/pages/ds/CheckPage";
 
-export function PoiSearch({ values, onChange }: { values: string[]; onChange: (v: string[]) => void }) {
+export function PoiSearch({ values, onChange, allowClearAll = false }: { values: string[]; onChange: (v: string[]) => void; allowClearAll?: boolean }) {
   const [query, setQuery] = useState("");
   const selected = MOCK_POIS.filter(poi => values.includes(poi.id));
   const filtered = MOCK_POIS.filter(poi =>
@@ -31,7 +31,10 @@ export function PoiSearch({ values, onChange }: { values: string[]; onChange: (v
       borderColor: "var(--border-static-subtle-neutral, #e1e1e8)",
       background: "var(--surface-background-lvl2, #f7f7fa)",
     }}>
-      <p className="text-sm font-medium">POI overview</p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm font-medium">POI overview</p>
+        {allowClearAll && <FiberButton variant="outline" size="compact" className="shrink-0" ariaLabel="Clear all POIs" disabled={selected.length === 0} onClick={() => { setQuery(""); onChange([]); }}>Clear all</FiberButton>}
+      </div>
       <p role="status" aria-live="polite" className="text-xs">{selected.length} {selected.length === 1 ? "POI" : "POIs"} selected</p>
       {selected.length > 0 ? <>
         <div className="max-h-52 overflow-y-auto space-y-2">
@@ -47,7 +50,7 @@ export function PoiSearch({ values, onChange }: { values: string[]; onChange: (v
           </div>)}
         </div>
         <p className="text-xs">Screens within the chosen radius of any selected POI are included.</p>
-        <FiberButton variant="outline" size="compact" onClick={() => onChange([])}>Clear all POIs</FiberButton>
+        {!allowClearAll && <FiberButton variant="outline" size="compact" onClick={() => onChange([])}>Clear all POIs</FiberButton>}
       </> : null}
     </section>
   </div>;

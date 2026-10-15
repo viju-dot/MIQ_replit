@@ -7,13 +7,14 @@ import { FiberActionPill, FiberRemovablePill } from "@/pages/ds/PillPage";
 import { FiberButton } from "./primitives";
 
 /** An empty selection means All, matching the planner's unfiltered facets. */
-export function FacetDropdown({ title, values, selected, onSelected, dropdown = false, screenCounts }: {
+export function FacetDropdown({ title, values, selected, onSelected, dropdown = false, screenCounts, allowClearAll = false }: {
   title: string;
   values: string[];
   selected: string[];
   onSelected: (values: string[]) => void;
   dropdown?: boolean;
   screenCounts?: Record<string, number>;
+  allowClearAll?: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -83,6 +84,7 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
             {showScreenCounts && <span className="ml-auto text-right" title="Total inventory screens belonging to the selected publishers">
               total scr {selectedScreens.toLocaleString()}
             </span>}
+            {allowClearAll && <FiberButton variant="outline" size="compact" className="shrink-0" ariaLabel={`Clear all ${noun}`} disabled={all} onClick={() => { setShowAllSelected(false); setQuery(""); onSelected([]); }}>Clear all</FiberButton>}
           </div>
           <div className="flex w-full flex-wrap gap-1">
             {visibleSelected.map(value => <FiberRemovablePill

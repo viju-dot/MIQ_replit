@@ -405,6 +405,7 @@ export default function DoohPlannerV2({
           demoView={demoView}
           showRadius={showRadius || v5Layout}
           pointRadiusOnly={v5Layout}
+          allowClearAll={v5Layout}
           v4Layout={v4Layout}
           creativeCounts={creativeCounts}
         />

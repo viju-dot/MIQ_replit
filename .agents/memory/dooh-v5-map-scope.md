@@ -15,6 +15,12 @@ The user expanded V5 scope to restore "Radius around points" for Location → PO
 
 **How to apply:** Preserve the existing slider, exact input, and meters/kilometers behavior. Radius edits in POI/LatLong must not change the previously fixed coverage of Saved Audience, Postcode, or City.
 
+V5 also permits local "Clear all" actions only for POI, Venue Type, Publisher, and Creative resolutions—not Creative format or every filter globally.
+
+**Why:** The user explicitly limited the clearing action to these selections and required Fiber styling with proper alignment, leaving historical versions and other filter settings unchanged.
+
+**How to apply:** Clear only the local selection, preserve enabled toggles and independent values (especially Creative format and Location radius), and gate new controls to V5.
+
 Use Fiber brand color tokens for the V5 heatmap density ramp, not green or teal.
 
 **Why:** The user explicitly rejected the green heatmap and requested Fiber token colors.
