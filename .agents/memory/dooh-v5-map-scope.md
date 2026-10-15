@@ -15,9 +15,9 @@ The user expanded V5 scope to restore "Radius around points" for Location → PO
 
 **How to apply:** Preserve the existing slider, exact input, and meters/kilometers behavior. Radius edits in POI/LatLong must not change the previously fixed coverage of Saved Audience, Postcode, or City.
 
-V5 also permits local "Clear all" actions only for POI, Venue Type, Publisher, and Creative resolutions—not Creative format or every filter globally.
+V5 also permits local "Clear all" actions only for POI, Venue Type, Publisher, and Creative resolutions—not Creative format or every filter globally. Creative resolutions use multiple checkbox selections, with "Clear all" below the resolution options; Format stays single-select.
 
-**Why:** The user explicitly limited the clearing action to these selections and required Fiber styling with proper alignment, leaving historical versions and other filter settings unchanged.
+**Why:** The user explicitly limited the clearing action to these selections, then requested multiple resolution checkboxes and the clear action below them. They require Fiber styling and proper alignment, leaving historical versions and other filter settings unchanged.
 
 **How to apply:** Clear only the local selection, preserve enabled toggles and independent values (especially Creative format and Location radius), and gate new controls to V5.
 

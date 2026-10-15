@@ -8,16 +8,16 @@ export interface CreativeScreenCounts {
 
 /** Count each alternative with the other creative dimension kept in place. */
 export function countCreativeOptions(
-  selection: { format: string; resolution: string },
-  countMatches: (format: string, resolution: string) => number,
+  selection: { format: string; resolution: string; resolutions?: string[] },
+  countMatches: (format: string, resolution: string, resolutions?: string[]) => number,
 ): CreativeScreenCounts {
   return {
     formats: Object.fromEntries(["", ...CREATIVE_FORMATS].map(format =>
-      [format, countMatches(format, selection.resolution)],
+      [format, countMatches(format, selection.resolution, selection.resolutions)],
     )),
     resolutions: Object.fromEntries(["", ...RESOLUTIONS].map(resolution =>
       [resolution, countMatches(selection.format, resolution)],
     )),
-    overall: countMatches(selection.format, selection.resolution),
+    overall: countMatches(selection.format, selection.resolution, selection.resolutions),
   };
 }

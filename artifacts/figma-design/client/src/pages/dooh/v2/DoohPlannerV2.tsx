@@ -141,8 +141,11 @@ export default function DoohPlannerV2({
       if (creativeType.format) {
         baseResults = baseResults.filter(s => s.creativeFormat === creativeType.format);
       }
-      if (creativeType.resolution) {
-        baseResults = baseResults.filter(s => s.creativeRes === creativeType.resolution);
+      const resolutions = v5Layout && creativeType.resolutions !== undefined
+        ? creativeType.resolutions
+        : creativeType.resolution ? [creativeType.resolution] : [];
+      if (resolutions.length > 0) {
+        baseResults = baseResults.filter(s => resolutions.includes(s.creativeRes));
       }
     }
 
@@ -192,10 +195,10 @@ export default function DoohPlannerV2({
       ...computeResults(),
       creativeCounts: v4Layout ? countCreativeOptions(
         filters.creativeType,
-        (format, resolution) => computeResults({ enabled: true, format, resolution }).matchedScreens.length,
+        (format, resolution, resolutions) => computeResults({ enabled: true, format, resolution, resolutions: v5Layout ? resolutions : undefined }).matchedScreens.length,
       ) : undefined,
     };
-  }, [filters, audiences, v4Layout, radiusByMethod]);
+  }, [filters, audiences, v4Layout, v5Layout, radiusByMethod]);
 
   useEffect(() => {
     const ids = new Set(matchedScreens.map(screen => screen.id));
@@ -406,6 +409,7 @@ export default function DoohPlannerV2({
           showRadius={showRadius || v5Layout}
           pointRadiusOnly={v5Layout}
           allowClearAll={v5Layout}
+          multipleResolutions={v5Layout}
           v4Layout={v4Layout}
           creativeCounts={creativeCounts}
         />

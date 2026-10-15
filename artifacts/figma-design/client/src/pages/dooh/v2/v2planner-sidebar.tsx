@@ -75,7 +75,7 @@ export interface FilterStateV2 {
     customEnd: string;
   };
   budget: { enabled: boolean; currency: "GBP" | "EUR" | "USD"; total: number | ""; cpm: number | "" | null };
-  creativeType: { enabled: boolean; format: string; resolution: string };
+  creativeType: { enabled: boolean; format: string; resolution: string; resolutions?: string[] };
   screenList: { enabled: boolean; ids: string[]; configured: boolean };
 }
 
@@ -246,6 +246,7 @@ interface Props {
   showRadius?: boolean;
   pointRadiusOnly?: boolean;
   allowClearAll?: boolean;
+  multipleResolutions?: boolean;
   v4Layout?: boolean;
   creativeCounts?: CreativeScreenCounts;
 }
@@ -288,6 +289,7 @@ export function SidebarV2({
   showRadius = true,
   pointRadiusOnly = false,
   allowClearAll = false,
+  multipleResolutions = false,
   v4Layout = false,
   creativeCounts,
 }: Props) {
@@ -512,6 +514,7 @@ export function SidebarV2({
   const budgetSymbol = v4Layout ? CURRENCY_SYMBOLS[filters.budget.currency] : "£";
   const formatCount = (format: string) => v4Layout && creativeCounts ? ` [${creativeCounts.formats[format].toLocaleString()}]` : "";
   const resolutionCount = (resolution: string) => v4Layout && creativeCounts ? ` [${creativeCounts.resolutions[resolution].toLocaleString()}]` : "";
+  const selectedResolutions = filters.creativeType.resolutions ?? (filters.creativeType.resolution ? [filters.creativeType.resolution] : []);
 
   return (
     <div data-annotate="DOOH filter panel" className="w-[300px] xl:w-[340px] shrink-0 bg-[var(--surface-background-lvl2,#f7f7fa)] flex flex-col z-20 overflow-y-auto">
@@ -916,13 +919,27 @@ export function SidebarV2({
               </Select>
             </div>
             <div>
-              <div className="flex items-center justify-between gap-2">
-                <label className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Resolution</label>
-                {allowClearAll && <FiberButton variant="outline" size="compact" className="shrink-0" ariaLabel="Clear all resolutions" disabled={!filters.creativeType.resolution} onClick={() => updateSection("creativeType", { resolution: "" })}>Clear all</FiberButton>}
-              </div>
-              <Select value={filters.creativeType.resolution || "any"} onValueChange={resolution => updateSection("creativeType", { resolution: resolution === "any" ? "" : resolution })}>
+              <label className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Resolution</label>
+              {multipleResolutions ? <>
+                <div role="group" aria-label="Resolution options" className="mt-2 space-y-2">
+                  {RESOLUTIONS.map(resolution => <Checkbox
+                    key={resolution}
+                    labelValue={`${resolution}${resolutionCount(resolution)}`}
+                    variant={selectedResolutions.includes(resolution) ? "Checked" : "Unchecked"}
+                    onToggle={() => setFilters(previous => {
+                      const current = previous.creativeType.resolutions ?? (previous.creativeType.resolution ? [previous.creativeType.resolution] : []);
+                      const resolutions = current.includes(resolution) ? current.filter(value => value !== resolution) : [...current, resolution];
+                      return { ...previous, creativeType: { ...previous.creativeType, resolution: "", resolutions } };
+                    })}
+                  />)}
+                </div>
+                <div className="mt-3 flex items-center justify-between gap-2">
+                  <span role="status" className="text-xs">{selectedResolutions.length ? `${selectedResolutions.length} selected` : "All resolutions included"}</span>
+                  {allowClearAll && <FiberButton variant="outline" size="compact" className="shrink-0" ariaLabel="Clear all resolutions" disabled={selectedResolutions.length === 0} onClick={() => updateSection("creativeType", { resolution: "", resolutions: [] })}>Clear all</FiberButton>}
+                </div>
+              </> : <Select value={filters.creativeType.resolution || "any"} onValueChange={resolution => updateSection("creativeType", { resolution: resolution === "any" ? "" : resolution })}>
                 <SelectTrigger className="h-8 mt-1"><SelectValue /></SelectTrigger><SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectItem value="any" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>Any{resolutionCount("")}</SelectItem>{RESOLUTIONS.map(r => <SelectItem value={r} key={r}>{r}{resolutionCount(r)}</SelectItem>)}</SelectContent>
-              </Select>
+              </Select>}
             </div>
             {v4Layout && creativeCounts && (
               <p className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]" role="status" aria-live="polite">
