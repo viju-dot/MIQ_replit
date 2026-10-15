@@ -577,12 +577,14 @@ function CommentsPanelBody({
   comments,
   versions,
   authors,
+  deduplicateVersionLabels = false,
   onReply,
   onStatus,
 }: {
   comments: PrototypeComment[];
   versions: PrototypeVersion[];
   authors: string[];
+  deduplicateVersionLabels?: boolean;
   onReply: (
     parentId: string,
     author: string,
@@ -596,7 +598,8 @@ function CommentsPanelBody({
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("All");
   const [sort, setSort] = useState<SortOrder>("Newest");
 
-  const chips = ["All", ...versions.map((v) => v.name).reverse()];
+  const versionLabels = versions.map((v) => v.name).reverse();
+  const chips = ["All", ...(deduplicateVersionLabels ? Array.from(new Set(versionLabels)) : versionLabels)];
 
   // Build threads: top-level comments (no parentId) with their replies.
   const topLevel = comments.filter((c) => !c.parentId);
@@ -1978,6 +1981,8 @@ export function PrototypeCollabOverlay({
   const viewedVersion =
     activeVersions.find((v) => v.id === viewedVersionId) ?? newestActive;
   if (!viewedVersion) return <>{children}</>;
+  const isDoohV6 = proto.id === "dooh" &&
+    (viewedVersion.id === "dooh_v6" || viewedVersion.name.trim().toUpperCase() === "V6");
   const isNewest = viewedVersion.id === newestActive.id;
 
   const reconcile = () => setTick((t) => t + 1);
@@ -2159,7 +2164,7 @@ export function PrototypeCollabOverlay({
         {/* Floating control cluster — bottom-right, ~24px from edges. */}
         <div
           data-design-annotation-floating-panel
-          className="fixed bottom-[24px] right-[24px] z-40 flex flex-col items-end gap-2"
+          className={`fixed bottom-[24px] right-[24px] z-40 flex flex-col items-end gap-2 ${isDoohV6 ? "dooh-v6-collab" : ""}`}
           style={{ fontFamily: '"DM Sans", Helvetica' }}
         >
           {/* Current version chip — always visible. */}
@@ -2433,6 +2438,7 @@ export function PrototypeCollabOverlay({
           <CommentsPanelBody
             comments={comments}
             versions={proto.versions}
+            deduplicateVersionLabels={isDoohV6}
             authors={authors}
             onReply={addReply}
             onStatus={(id, action) => {

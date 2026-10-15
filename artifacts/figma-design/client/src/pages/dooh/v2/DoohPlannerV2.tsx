@@ -316,6 +316,7 @@ export default function DoohPlannerV2({
   const { csvDownload, handleExport } = useScreenExport(
     selectedScreens.length ? selectedScreens : matchedScreens,
     filters.budget.currency,
+    v6Layout ? JSON.stringify([filters, Array.from(selectedScreenIds), matchedScreens.map(screen => screen.id)]) : undefined,
   );
 
   const renderMapPanel = (expanded = false) => (
@@ -402,8 +403,8 @@ export default function DoohPlannerV2({
   );
 
   return (
-    <div className="dooh-v2-planner flex flex-col flex-1 min-h-0 font-fiber">
-      <div className="flex flex-1 min-h-0 items-start gap-6">
+    <div className={`dooh-v2-planner ${v6Layout ? "dooh-v6-planner" : ""} flex flex-col flex-1 min-h-0 font-fiber`}>
+      <div className="dooh-planner-layout flex flex-1 min-h-0 items-start gap-6">
         <SidebarV2
           filters={filters}
           setFilters={setFilters}
@@ -417,7 +418,7 @@ export default function DoohPlannerV2({
           creativeCounts={creativeCounts}
         />
         
-        <div className="flex-1 min-w-0 min-h-0 flex flex-col sticky top-4 self-start bg-transparent">
+        <div className="dooh-planner-explorer flex-1 min-w-0 min-h-0 flex flex-col sticky top-4 self-start bg-transparent">
           <SmartCard
             title="Explorer"
             rightOnDivider

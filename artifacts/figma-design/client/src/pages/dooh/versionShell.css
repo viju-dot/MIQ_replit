@@ -19,3 +19,52 @@
 .dooh-fixed-planner .dooh-page-intro {
   flex-shrink: 0;
 }
+
+/* V6 review layout only; historical prototype layouts are unchanged. */
+@media (max-width: 767px) {
+  .dooh-v6-shell .dooh-page-content {
+    padding: 24px 16px 112px;
+  }
+  .dooh-v6-shell .dooh-page-intro h1 { font-size: 22px; }
+  .dooh-v6-planner { min-width: 0; }
+  .dooh-v6-planner .dooh-planner-layout {
+    flex-direction: column;
+    min-width: 0;
+  }
+  .dooh-v6-planner [data-annotate="DOOH filter panel"] {
+    width: 100%;
+    min-width: 0;
+    overflow: visible;
+  }
+  .dooh-v6-planner [aria-label="Location filter method"] > div {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .dooh-v6-planner .dooh-planner-explorer {
+    position: static;
+    width: 100%;
+  }
+  .dooh-v6-shell .dooh-actions-bar {
+    min-height: 48px;
+    padding: 8px 16px 80px;
+  }
+  .dooh-v6-collab {
+    right: 12px;
+    bottom: 12px;
+    max-width: calc(100vw - 24px);
+  }
+  .dooh-v6-collab [aria-label="Prototype collaboration"] {
+    width: 100%;
+    max-width: 100%;
+  }
+  .dooh-v6-collab [aria-label="Prototype collaboration"] > button {
+    min-width: 0;
+    flex-shrink: 1;
+    justify-content: center;
+    padding-inline: 8px;
+  }
+  .dooh-v6-collab [aria-label="Prototype collaboration"] > button > span:last-child {
+    font-size: 12px;
+    white-space: normal;
+  }
+}

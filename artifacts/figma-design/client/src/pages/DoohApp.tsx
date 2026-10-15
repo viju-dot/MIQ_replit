@@ -126,7 +126,7 @@ function DoohVersionedContent() {
     ) : <DoohPlanner />;
 
   return (
-    <div className={`min-h-screen flex flex-col dooh-theme bg-[var(--surface-background-lvl2,#f7f7fa)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)] ${!isGeo && !isSaved && version === "v2" ? "dooh-fixed-planner" : ""}`}>
+    <div className={`min-h-screen flex flex-col dooh-theme bg-[var(--surface-background-lvl2,#f7f7fa)] text-[var(--surface-foreground-dynamic-neutral-default-regular,#4b4b59)] ${isV6 ? "dooh-v6-shell" : ""} ${!isGeo && !isSaved && version === "v2" ? "dooh-fixed-planner" : ""}`}>
       <header className="relative z-50 shrink-0" aria-label="Fiber navigation">
         <PrimaryNavigation />
         <SecondaryNavigation activeSection="Advanced" />

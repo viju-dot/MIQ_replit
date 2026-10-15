@@ -2,8 +2,13 @@ import { useEffect, useState } from "react";
 import type { ScreenData } from "../data";
 import { EXCHANGE_RATES } from "./v2planner-sidebar";
 
-export function useScreenExport(screens: ScreenData[], currency: "GBP" | "EUR" | "USD") {
+export function useScreenExport(screens: ScreenData[], currency: "GBP" | "EUR" | "USD", resetKey?: string) {
   const [csvDownload, setCsvDownload] = useState<{ url: string; count: number } | null>(null);
+  // V6 invalidates the last export when the plan or shortlist changes.
+  // Other versions omit resetKey and retain their existing behavior.
+  useEffect(() => {
+    if (resetKey !== undefined) setCsvDownload(null);
+  }, [resetKey]);
   useEffect(() => () => {
     if (csvDownload) URL.revokeObjectURL(csvDownload.url);
   }, [csvDownload]);
