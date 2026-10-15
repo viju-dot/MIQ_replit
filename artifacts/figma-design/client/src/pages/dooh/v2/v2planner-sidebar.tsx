@@ -930,6 +930,7 @@ export function SidebarV2({
                   screenCounts={creativeCounts?.resolutions}
                   allowClearAll={allowClearAll}
                   preserveFullSelection
+                  minimal
                 />
               </div> : <Select value={filters.creativeType.resolution || "any"} onValueChange={resolution => updateSection("creativeType", { resolution: resolution === "any" ? "" : resolution })}>
                 <SelectTrigger className="h-8 mt-1"><SelectValue /></SelectTrigger><SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectItem value="any" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>Any{resolutionCount("")}</SelectItem>{RESOLUTIONS.map(r => <SelectItem value={r} key={r}>{r}{resolutionCount(r)}</SelectItem>)}</SelectContent>

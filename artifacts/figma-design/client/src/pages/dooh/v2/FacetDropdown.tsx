@@ -7,7 +7,7 @@ import { FiberActionPill, FiberRemovablePill } from "@/pages/ds/PillPage";
 import { FiberButton } from "./primitives";
 
 /** An empty selection means All, matching the planner's unfiltered facets. */
-export function FacetDropdown({ title, values, selected, onSelected, dropdown = false, screenCounts, allowClearAll = false, preserveFullSelection = false }: {
+export function FacetDropdown({ title, values, selected, onSelected, dropdown = false, screenCounts, allowClearAll = false, preserveFullSelection = false, minimal = false }: {
   title: string;
   values: string[];
   selected: string[];
@@ -16,6 +16,7 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
   screenCounts?: Record<string, number>;
   allowClearAll?: boolean;
   preserveFullSelection?: boolean;
+  minimal?: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -70,7 +71,7 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
             borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)",
             color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)",
           }} aria-label={`Choose ${noun}`}>
-            <SearchStandard background label={`Search ${noun}`} value={query} onValueChange={setQuery} />
+            {!minimal && <SearchStandard background label={`Search ${noun}`} value={query} onValueChange={setQuery} />}
             {optionList}
           </PopoverContent>
         </Popover>
@@ -80,14 +81,14 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
       </div>
       <div className="space-y-2" aria-label={`Selected ${noun}`}>
         {dropdown ? <>
-          <div role="status" className="flex items-center justify-between gap-2 text-xs font-medium">
-            <span>{selected.length} selected</span>
-            {showScreenCounts && <span className="ml-auto text-right" title={`Total inventory screens belonging to the selected ${noun}`}>
+          <div role={minimal ? undefined : "status"} className={`flex items-center ${minimal ? "justify-end" : "justify-between"} gap-2 text-xs font-medium`}>
+            {!minimal && <span>{selected.length} selected</span>}
+            {!minimal && showScreenCounts && <span className="ml-auto text-right" title={`Total inventory screens belonging to the selected ${noun}`}>
               total scr {selectedScreens.toLocaleString()}
             </span>}
             {allowClearAll && <FiberButton variant="outline" size="compact" className="shrink-0" ariaLabel={`Clear all ${noun}`} disabled={all} onClick={() => { setShowAllSelected(false); setQuery(""); onSelected([]); }}>Clear all</FiberButton>}
           </div>
-          <div className="flex w-full flex-wrap gap-1">
+          {!minimal && <div className="flex w-full flex-wrap gap-1">
             {visibleSelected.map(value => <FiberRemovablePill
               key={value}
               style="Brand (Subtle)"
@@ -102,7 +103,7 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
               expanded={showAllSelected}
               onClick={() => setShowAllSelected(previous => !previous)}
             />}
-          </div>
+          </div>}
         </> : <>
         <p role="status" className="text-xs">{all ? "All included" : `${selected.length} selected`}</p>
         {!all && <div className="flex flex-wrap gap-1">
