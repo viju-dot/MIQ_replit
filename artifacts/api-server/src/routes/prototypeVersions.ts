@@ -96,7 +96,7 @@ router.put(
         }
       } else {
         const labelsResult = await client.query(
-          `SELECT data->>'name' AS name, data->>'status' AS status
+          `SELECT id, data->>'name' AS name, data->>'status' AS status
              FROM prototype_versions
             WHERE prototype_id = $1`,
           [prototypeId],
@@ -108,13 +108,18 @@ router.put(
         const newDoohMapV5 = prototypeId === "dooh" && versionId === "dooh_v5" &&
           version.name === "V5" &&
           !labelsResult.rows.some(row => row.name === "V5" && row.status !== "archived");
+        // Keep the old auto-renamed V4 placeholder intact, but do not let it
+        // reserve the label of the new V5 duplicate.
+        const newDoohV6 = prototypeId === "dooh" && versionId === "dooh_v6" &&
+          version.name === "V6" &&
+          !labelsResult.rows.some(row => row.name === "V6" && row.status !== "archived" && row.id !== "dooh_v4");
         version = {
           ...version,
           // Preserve the requested label when it is free. This supports
           // migrating a single newer version before the browser has uploaded
           // the seeded history. Concurrent copies with the same label still
           // receive distinct sequential names under the advisory lock.
-          name: labels.includes(version.name) && !newDoohMapV5
+          name: labels.includes(version.name) && !newDoohMapV5 && !newDoohV6
             ? nextVersionName(labels)
             : version.name,
         };

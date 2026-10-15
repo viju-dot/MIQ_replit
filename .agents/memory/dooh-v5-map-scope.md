@@ -1,9 +1,15 @@
 ---
-name: DOOH V5 scope
-description: User-defined boundaries for V5 map exploration and the POI/LatLong radius exception.
+name: DOOH V5 and V6 scope
+description: V5 feature boundaries and V6's requested identical starting point.
 ---
 
 DOOH V5 is a map exploration based on V4. Preserve V1–V4 and keep existing filters unchanged except for explicitly requested V5-only additions.
+
+V6 starts as an exact duplicate of V5's current design and functionality, not a new design direction.
+
+**Why:** The user said the design was almost there and requested duplicating DOOH V5 to V6.
+
+**How to apply:** Inherit the completed V5 features in V6, preserve V5 and earlier review histories, and scope any subsequently requested V6 changes to that version.
 
 **Why:** The user explicitly requested a new V5 to compare bubble and hexagon alternatives to numbered overview clusters, with no filter-side changes. Text descriptions alone were insufficient to review the options.
 

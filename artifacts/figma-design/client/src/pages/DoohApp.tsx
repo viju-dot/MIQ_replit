@@ -37,7 +37,8 @@ function DoohVersionedContent() {
   const version = doohRendererVersion(versionContext?.viewedVersion ?? resolved, versions);
   const versionToken = versionContext ? doohVersionToken(versionContext.viewedVersion) : requestedVersion ?? "v2";
   const versionName = versionContext?.viewedVersion.name ?? version.toUpperCase();
-  const isV5 = versionContext?.viewedVersion.id === DOOH_VERSION_IDS.v5 || versionName.trim().toLowerCase() === "v5";
+  const isV6 = versionContext?.viewedVersion.id === DOOH_VERSION_IDS.v6 || versionName.trim().toLowerCase() === "v6";
+  const isV5 = isV6 || versionContext?.viewedVersion.id === DOOH_VERSION_IDS.v5 || versionName.trim().toLowerCase() === "v5";
   const isV4 = isV5 || versionContext?.viewedVersion.id === DOOH_VERSION_IDS.v4 || versionName.trim().toLowerCase() === "v4";
   const supportsDemoView = versionToken === "v3" || isV4;
   const demoView = supportsDemoView && new URLSearchParams(search).get("demo") === "1";
@@ -115,7 +116,7 @@ function DoohVersionedContent() {
     : isGeo ? version === "v2" ? <GeoPlannerV2 /> : <GeoPlanner />
     : version === "v2" ? (
       <DoohPlannerV2
-        key={isV5 ? "v5" : isV4 ? "v4" : "v2"}
+        key={isV6 ? "v6" : isV5 ? "v5" : isV4 ? "v4" : "v2"}
         demoView={demoView}
         showRadius={!isV4}
         v4Layout={isV4}

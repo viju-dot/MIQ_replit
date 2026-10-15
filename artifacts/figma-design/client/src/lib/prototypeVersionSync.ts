@@ -63,7 +63,8 @@ export async function hydratePrototypeVersions(prototypeId: string): Promise<boo
       prototypeId === "dooh" &&
       remote.some(version =>
         (version.id !== DOOH_VERSION_IDS.v4 && version.name.trim().toUpperCase() === "V4") ||
-        (version.id !== DOOH_VERSION_IDS.v5 && version.name.trim().toUpperCase() === "V5" && version.status === "active"),
+        (version.id !== DOOH_VERSION_IDS.v5 && version.name.trim().toUpperCase() === "V5" && version.status === "active") ||
+        (version.id !== DOOH_VERSION_IDS.v6 && version.id !== DOOH_VERSION_IDS.v4 && version.name.trim().toUpperCase() === "V6" && version.status === "active"),
       )
     ) {
       local = prototypeRepository.mergeVersions(prototypeId, remote) ?? local;

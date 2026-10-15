@@ -90,6 +90,7 @@ export const DOOH_VERSION_IDS = {
   v3: "dooh_v3",
   v4: "dooh_v4",
   v5: "dooh_v5",
+  v6: "dooh_v6",
 } as const;
 
 /* ---------------------------------------------------------------------- */
@@ -221,6 +222,21 @@ const SEED: Prototype[] = [
           description: "Compare alternative DOOH map overview encodings using the same matched screen inventory.",
           status: "Live",
           notes: "V4 filters are unchanged. Overview options remove large cluster count labels; exact counts remain available on hover and individual screens on zoom.",
+        },
+      },
+      {
+        id: DOOH_VERSION_IDS.v6,
+        name: "V6",
+        createdAt: "2026-10-15T00:00:00.000Z",
+        updatedAt: "2026-10-15T00:00:00.000Z",
+        description: "Duplicate of DOOH V5.",
+        rendererKey: "dooh",
+        status: "active",
+        metadata: { createdFrom: DOOH_VERSION_IDS.v5 },
+        snapshot: {
+          description: "DOOH V5 duplicated as V6 with the same design and behavior.",
+          status: "Live",
+          notes: "Includes V5 map modes and clustering, location radius controls, searchable POI selection with detail pills, local Clear all actions, and multi-select resolution dropdown.",
         },
       },
     ],
@@ -492,7 +508,8 @@ function readLocal(): Prototype[] {
         !prototype.versions.some(version =>
           version.id === seedVersion.id ||
           (seedVersion.id === DOOH_VERSION_IDS.v4 && version.name.trim().toUpperCase() === "V4") ||
-          (seedVersion.id === DOOH_VERSION_IDS.v5 && version.name.trim().toUpperCase() === "V5" && version.status === "active"),
+          (seedVersion.id === DOOH_VERSION_IDS.v5 && version.name.trim().toUpperCase() === "V5" && version.status === "active") ||
+          (seedVersion.id === DOOH_VERSION_IDS.v6 && version.id !== DOOH_VERSION_IDS.v4 && version.name.trim().toUpperCase() === "V6" && version.status === "active"),
         ),
       )
         ? reconcileSeededVersions(prototype, doohSeed)
@@ -559,9 +576,10 @@ function reconcileSeededVersions(
   const matchedLocalIds = new Set<string>();
   const reconciledSeed = seed.versions.map((seedVersion) => {
     const existing =
-      (seed.id === "dooh" && (seedVersion.id === DOOH_VERSION_IDS.v4 || seedVersion.id === DOOH_VERSION_IDS.v5)
+      (seed.id === "dooh" && (seedVersion.id === DOOH_VERSION_IDS.v4 || seedVersion.id === DOOH_VERSION_IDS.v5 || seedVersion.id === DOOH_VERSION_IDS.v6)
         ? local.versions.find(version => version.id !== seedVersion.id && version.name.trim().toUpperCase() === seedVersion.name &&
-          (seedVersion.id !== DOOH_VERSION_IDS.v5 || version.status === "active"))
+          (seedVersion.id === DOOH_VERSION_IDS.v4 || version.status === "active") &&
+          (seedVersion.id !== DOOH_VERSION_IDS.v6 || version.id !== DOOH_VERSION_IDS.v4))
         : undefined) ??
       local.versions.find((version) => version.id === seedVersion.id) ??
       (seed.id === "dooh" && seedVersion.id === DOOH_VERSION_IDS.v4
@@ -577,16 +595,16 @@ function reconcileSeededVersions(
     // branch in place; retain its id and every archived/custom review record.
     if (
       seed.id === "dooh" &&
-      seedVersion.id === DOOH_VERSION_IDS.v5 &&
-      existing.id === DOOH_VERSION_IDS.v5 &&
-      existing.name !== "V5" &&
+      (seedVersion.id === DOOH_VERSION_IDS.v5 || seedVersion.id === DOOH_VERSION_IDS.v6) &&
+      existing.id === seedVersion.id &&
+      existing.name !== seedVersion.name &&
       existing.createdAt === seedVersion.createdAt &&
       existing.description === seedVersion.description &&
       existing.metadata?.createdFrom === seedVersion.metadata?.createdFrom
     ) {
       return {
         ...existing,
-        name: "V5",
+        name: seedVersion.name,
         updatedAt: new Date(Date.parse(existing.updatedAt) + 1).toISOString(),
       };
     }
