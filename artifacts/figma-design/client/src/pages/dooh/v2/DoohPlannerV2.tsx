@@ -24,6 +24,14 @@ export default function DoohPlannerV2({
   v5Layout?: boolean;
 }) {
   const [filters, setFilters] = useState<FilterStateV2>(() => demoView ? createDemoFilters(v4Layout) : DEFAULT_FILTERS_V2);
+  const [initialRadiusMeters] = useState(() => Number(filters.location.radius) * (filters.location.radiusUnit === "km" ? 1000 : 1));
+  // V5 exposes radius only for POI/coordinates; other methods retain their
+  // original radius, including the demo preset, after switching tabs.
+  const radiusByMethod = useMemo(() => {
+    const radius = Number(filters.location.radius) * (filters.location.radiusUnit === "km" ? 1000 : 1);
+    const fixedRadius = v5Layout ? initialRadiusMeters : radius;
+    return { poi: radius, latlng: radius, audience: fixedRadius, postcode: fixedRadius, city: fixedRadius };
+  }, [filters.location.radius, filters.location.radiusUnit, initialRadiusMeters, v5Layout]);
   const [selectedScreenIds, setSelectedScreenIds] = useState<Set<string>>(
     () => demoView ? new Set(DEMO_UPLOADS.screenList.records.map(record => record.id)) : new Set(),
   );
@@ -52,7 +60,7 @@ export default function DoohPlannerV2({
   const { matchedScreens, smartCandidates, creativeCounts } = useMemo(() => {
     const computeResults = (creativeType = filters.creativeType) => {
     const method = filters.location.method;
-    const radius = Number(filters.location.radius) * (filters.location.radiusUnit === "km" ? 1000 : 1);
+    const radius = radiusByMethod[method];
     const selectedAudience = method === "audience"
       ? audiences?.find(a => a.id === filters.location.audienceId)
       : undefined;
@@ -187,7 +195,7 @@ export default function DoohPlannerV2({
         (format, resolution) => computeResults({ enabled: true, format, resolution }).matchedScreens.length,
       ) : undefined,
     };
-  }, [filters, audiences, v4Layout]);
+  }, [filters, audiences, v4Layout, radiusByMethod]);
 
   useEffect(() => {
     const ids = new Set(matchedScreens.map(screen => screen.id));
@@ -224,9 +232,8 @@ export default function DoohPlannerV2({
   // postcode count visible even when postcode + planning-zone intersection has
   // no results, instead of incorrectly turning every other source into 0.
   const { sourceCounts, sourceScreenIds } = useMemo(() => {
-    const radiusMeters = Number(filters.location.radius) *
-      (filters.location.radiusUnit === "km" ? 1000 : 1);
-    const idsAround = (points: Array<{ lat: number; lng: number }>) => {
+    const idsAround = (points: Array<{ lat: number; lng: number }>, method: FilterStateV2["location"]["method"]) => {
+      const radiusMeters = radiusByMethod[method];
       if (!points.length || !Number.isFinite(radiusMeters) || radiusMeters < 0) return [];
       return SCREENS.filter(screen =>
         points.some(point => getDistance(screen.lat, screen.lng, point.lat, point.lng) <= radiusMeters)
@@ -262,25 +269,25 @@ export default function DoohPlannerV2({
               { lat: screen.lat, lng: screen.lng },
               audiencePolygon,
             )).map(screen => screen.id)
-          : idsAround(audiencePoints)
+          : idsAround(audiencePoints, "audience")
         : [],
       planningZone: planningZoneIds,
       ...(v4Layout ? {
-        city: activeSources.city ? idsAround(filters.location.uploadedPointsByMethod.city) : [],
+        city: activeSources.city ? idsAround(filters.location.uploadedPointsByMethod.city, "city") : [],
         screenList: activeSources.screenList
           ? SCREENS.filter(screen => filters.screenList.ids.includes(screen.id)).map(screen => screen.id)
           : [],
       } : {}),
       postcode: activeSources.postcode
-        ? idsAround(filters.location.uploadedPointsByMethod.postcode)
+        ? idsAround(filters.location.uploadedPointsByMethod.postcode, "postcode")
         : [],
       latlng: activeSources.latlng
-        ? idsAround(filters.location.uploadedPointsByMethod.latlng)
+        ? idsAround(filters.location.uploadedPointsByMethod.latlng, "latlng")
         : [],
       poi: activeSources.poi
         ? idsAround(MOCK_POIS
             .filter(poi => filters.location.poiIds.includes(poi.id))
-            .map(poi => ({ lat: poi.lat, lng: poi.lng })))
+            .map(poi => ({ lat: poi.lat, lng: poi.lng })), "poi")
         : [],
     };
     return {
@@ -298,7 +305,7 @@ export default function DoohPlannerV2({
       },
     };
   }, [activeSources.geoPlanner, activeSources.planningZone, activeSources.postcode,
-    activeSources.latlng, activeSources.poi, activeSources.city, activeSources.screenList, audiences, filters, v4Layout]);
+    activeSources.latlng, activeSources.poi, activeSources.city, activeSources.screenList, audiences, filters, v4Layout, radiusByMethod]);
       
   const selectedScreens = matchedScreens.filter(screen => selectedScreenIds.has(screen.id));
   const { csvDownload, handleExport } = useScreenExport(
@@ -396,7 +403,8 @@ export default function DoohPlannerV2({
           filters={filters}
           setFilters={setFilters}
           demoView={demoView}
-          showRadius={showRadius}
+          showRadius={showRadius || v5Layout}
+          pointRadiusOnly={v5Layout}
           v4Layout={v4Layout}
           creativeCounts={creativeCounts}
         />

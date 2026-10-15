@@ -244,6 +244,7 @@ interface Props {
   setFilters: React.Dispatch<React.SetStateAction<FilterStateV2>>;
   demoView?: boolean;
   showRadius?: boolean;
+  pointRadiusOnly?: boolean;
   v4Layout?: boolean;
   creativeCounts?: CreativeScreenCounts;
 }
@@ -284,6 +285,7 @@ export function SidebarV2({
   setFilters,
   demoView = false,
   showRadius = true,
+  pointRadiusOnly = false,
   v4Layout = false,
   creativeCounts,
 }: Props) {
@@ -591,7 +593,7 @@ export function SidebarV2({
 
           {uploadError && <p className="text-[11px] text-[var(--surface-foreground-dynamic-error-default,#da294b)] mt-2" role="alert">{uploadError}</p>}
           
-          {showRadius && (
+          {showRadius && (!pointRadiusOnly || filters.location.method === "poi" || filters.location.method === "latlng") && (
           <div className="mt-4 pt-4 border-t border-[var(--border-dynamic-neutral-subtle-default,#e1e1e8)]">
              <div className="flex items-center justify-between mb-3">
                <label className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Radius around points</label>
@@ -604,7 +606,7 @@ export function SidebarV2({
                  }
                  updateSection("location", { radiusUnit: val, radius: current });
                }}>
-                 <SelectTrigger className="h-6 w-[85px] text-[11px]" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectValue /></SelectTrigger>
+                 <SelectTrigger aria-label="Radius units" className="h-6 w-[85px] text-[11px]" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectValue /></SelectTrigger>
                  <SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>
                    <SelectItem value="m" className="text-[11px]">meters</SelectItem>
                    <SelectItem value="km" className="text-[11px]">kilometers</SelectItem>
@@ -638,9 +640,15 @@ export function SidebarV2({
                      } else {
                        const max = filters.location.radiusUnit === "km" ? 10 : 10000;
                        const min = filters.location.radiusUnit === "km" ? 0.05 : 50;
-                       updateSection("location", { radius: Math.max(min, Math.min(max, Number(v))) });
+                       updateSection("location", { radius: pointRadiusOnly ? Number(v) : Math.max(min, Math.min(max, Number(v))) });
                      }
-                   }} 
+                   }}
+                   onBlur={() => {
+                     if (!pointRadiusOnly) return;
+                     const min = filters.location.radiusUnit === "km" ? 0.05 : 50;
+                     const max = filters.location.radiusUnit === "km" ? 10 : 10000;
+                     updateSection("location", { radius: Math.max(min, Math.min(max, Number(filters.location.radius) || min)) });
+                   }}
                    className="h-7 text-xs px-2" 
                  />
               </div>
