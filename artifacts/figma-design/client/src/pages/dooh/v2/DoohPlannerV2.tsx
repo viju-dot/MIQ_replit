@@ -17,11 +17,13 @@ export default function DoohPlannerV2({
   showRadius = true,
   v4Layout = false,
   v5Layout = false,
+  v6Layout = false,
 }: {
   demoView?: boolean;
   showRadius?: boolean;
   v4Layout?: boolean;
   v5Layout?: boolean;
+  v6Layout?: boolean;
 }) {
   const [filters, setFilters] = useState<FilterStateV2>(() => demoView ? createDemoFilters(v4Layout) : DEFAULT_FILTERS_V2);
   const [initialRadiusMeters] = useState(() => Number(filters.location.radius) * (filters.location.radiusUnit === "km" ? 1000 : 1));
@@ -318,8 +320,8 @@ export default function DoohPlannerV2({
 
   const renderMapPanel = (expanded = false) => (
     <MapPanelV2
-      refinedV4Map={v5Layout && mapOverviewMode === "v4"}
-      overviewLayer={v5Layout ? v4Layer => <V5Overview mode={mapOverviewMode} onModeChange={setMapOverviewMode} v4Layer={v4Layer}
+      refinedV4Map={v5Layout && (v6Layout || mapOverviewMode === "v4")}
+      overviewLayer={v5Layout && !v6Layout ? v4Layer => <V5Overview mode={mapOverviewMode} onModeChange={setMapOverviewMode} v4Layer={v4Layer}
         screens={matchedScreens} hoveredScreenId={hoveredScreenId} onScreenClick={setHoveredScreenId}
         currency={filters.budget.currency} showCpm={showScreenCpm} sourceScreenIds={sourceScreenIds} /> : undefined}
       screens={matchedScreens}

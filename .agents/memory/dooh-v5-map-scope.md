@@ -11,6 +11,12 @@ V6 starts as an exact duplicate of V5's current design and functionality, not a 
 
 **How to apply:** Inherit the completed V5 features in V6, preserve V5 and earlier review histories, and scope any subsequently requested V6 changes to that version.
 
+For stakeholder review, V6 uses only the existing "V4 Map" rendering. Do not expose the Bubbles, Hexagons, or Heatmap alternatives or their selector in V6.
+
+**Why:** The user selected V4 Map as final and explicitly requested this correction in V6 alone.
+
+**How to apply:** Keep the numbered, dynamic cluster map and all other V6 features. Preserve alternative map modes in V5 and leave earlier versions unchanged.
+
 **Why:** The user explicitly requested a new V5 to compare bubble and hexagon alternatives to numbered overview clusters, with no filter-side changes. Text descriptions alone were insufficient to review the options.
 
 **How to apply:** Keep changes within the map and its view controls. Provide actual comparable visual previews using the same inventory and geography. Alternative encodings disclose exact counts on hover; the original V4 comparison view retains its numbered clusters as explicitly requested. Reuse the existing V4 filter behavior unless the user explicitly expands the scope.

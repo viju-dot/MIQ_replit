@@ -121,6 +121,7 @@ function DoohVersionedContent() {
         showRadius={!isV4}
         v4Layout={isV4}
         v5Layout={isV5}
+        v6Layout={isV6}
       />
     ) : <DoohPlanner />;
 
