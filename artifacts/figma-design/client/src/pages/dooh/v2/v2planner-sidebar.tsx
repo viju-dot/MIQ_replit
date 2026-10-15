@@ -920,24 +920,18 @@ export function SidebarV2({
             </div>
             <div>
               <label className="text-xs font-medium text-[var(--surface-foreground-dynamic-neutral-default-regular,#282833)]">Resolution</label>
-              {multipleResolutions ? <>
-                <div role="group" aria-label="Resolution options" className="mt-2 space-y-2">
-                  {RESOLUTIONS.map(resolution => <Checkbox
-                    key={resolution}
-                    labelValue={`${resolution}${resolutionCount(resolution)}`}
-                    variant={selectedResolutions.includes(resolution) ? "Checked" : "Unchecked"}
-                    onToggle={() => setFilters(previous => {
-                      const current = previous.creativeType.resolutions ?? (previous.creativeType.resolution ? [previous.creativeType.resolution] : []);
-                      const resolutions = current.includes(resolution) ? current.filter(value => value !== resolution) : [...current, resolution];
-                      return { ...previous, creativeType: { ...previous.creativeType, resolution: "", resolutions } };
-                    })}
-                  />)}
-                </div>
-                <div className="mt-3 flex items-center justify-between gap-2">
-                  <span role="status" className="text-xs">{selectedResolutions.length ? `${selectedResolutions.length} selected` : "All resolutions included"}</span>
-                  {allowClearAll && <FiberButton variant="outline" size="compact" className="shrink-0" ariaLabel="Clear all resolutions" disabled={selectedResolutions.length === 0} onClick={() => updateSection("creativeType", { resolution: "", resolutions: [] })}>Clear all</FiberButton>}
-                </div>
-              </> : <Select value={filters.creativeType.resolution || "any"} onValueChange={resolution => updateSection("creativeType", { resolution: resolution === "any" ? "" : resolution })}>
+              {multipleResolutions ? <div className="mt-2">
+                <FacetDropdown
+                  title="Resolution"
+                  values={RESOLUTIONS}
+                  selected={selectedResolutions}
+                  onSelected={resolutions => updateSection("creativeType", { resolution: "", resolutions })}
+                  dropdown
+                  screenCounts={creativeCounts?.resolutions}
+                  allowClearAll={allowClearAll}
+                  preserveFullSelection
+                />
+              </div> : <Select value={filters.creativeType.resolution || "any"} onValueChange={resolution => updateSection("creativeType", { resolution: resolution === "any" ? "" : resolution })}>
                 <SelectTrigger className="h-8 mt-1"><SelectValue /></SelectTrigger><SelectContent style={{ backgroundColor: "var(--surface-background-lvl1, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #e1e1e8)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}><SelectItem value="any" style={{ backgroundColor: "var(--surface-background-lvl2, #ffffff)", borderColor: "var(--border-dynamic-neutral-subtle-default, #c6c6cc)", color: "var(--surface-foreground-dynamic-neutral-default-variation, #13131a)" }}>Any{resolutionCount("")}</SelectItem>{RESOLUTIONS.map(r => <SelectItem value={r} key={r}>{r}{resolutionCount(r)}</SelectItem>)}</SelectContent>
               </Select>}
             </div>

@@ -7,7 +7,7 @@ import { FiberActionPill, FiberRemovablePill } from "@/pages/ds/PillPage";
 import { FiberButton } from "./primitives";
 
 /** An empty selection means All, matching the planner's unfiltered facets. */
-export function FacetDropdown({ title, values, selected, onSelected, dropdown = false, screenCounts, allowClearAll = false }: {
+export function FacetDropdown({ title, values, selected, onSelected, dropdown = false, screenCounts, allowClearAll = false, preserveFullSelection = false }: {
   title: string;
   values: string[];
   selected: string[];
@@ -15,6 +15,7 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
   dropdown?: boolean;
   screenCounts?: Record<string, number>;
   allowClearAll?: boolean;
+  preserveFullSelection?: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -27,7 +28,7 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
   const selectedScreens = showScreenCounts
     ? (all ? values : selected).reduce((total, value) => total + (screenCounts[value] ?? 0), 0)
     : 0;
-  const noun = title === "Venue Type" ? "venue types" : "publishers";
+  const noun = title === "Venue Type" ? "venue types" : title === "Resolution" ? "resolutions" : "publishers";
   const filtered = values.filter(value => value.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
   const ordered = dropdown
     ? [...filtered.filter(value => selected.includes(value)), ...filtered.filter(value => !selected.includes(value))]
@@ -35,9 +36,9 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
   const toggleValue = (value: string) => {
     const next = selected.includes(value) ? selected.filter(item => item !== value) : [...selected, value];
     if (next.length <= 5 || next.length === values.length) setShowAllSelected(false);
-    onSelected(next.length === values.length ? [] : next);
+    onSelected(!preserveFullSelection && next.length === values.length ? [] : next);
   };
-  const optionList = <div role="group" aria-label={title === "Venue Type" ? "Venue types" : "Publishers"} className="max-h-52 overflow-y-auto space-y-1">
+  const optionList = <div role="group" aria-label={title === "Venue Type" ? "Venue types" : title === "Resolution" ? "Resolutions" : "Publishers"} className="max-h-52 overflow-y-auto space-y-1">
     {ordered.map((value, index) => <div key={value}>
       {dropdown && index === 0 && selected.includes(value) && <p className="text-xs font-medium pb-2">Selected options</p>}
       {dropdown && !selected.includes(value) && (index === 0 || selected.includes(ordered[index - 1])) && <p className="text-xs font-medium py-2">Other options</p>}
@@ -75,13 +76,13 @@ export function FacetDropdown({ title, values, selected, onSelected, dropdown = 
         </Popover>
       ) : <SearchStandard background label={`Search ${noun}`} value={query} onValueChange={setQuery} />}
       <div className="pb-2 border-b" style={{ borderColor: "var(--border-static-subtle-neutral, #e1e1e8)" }}>
-        <Checkbox labelValue="All" variant={all ? "Checked" : "Unchecked"} onToggle={() => { setShowAllSelected(false); onSelected([]); }} />
+        <Checkbox labelValue="All" variant={all || (preserveFullSelection && selected.length === values.length) ? "Checked" : "Unchecked"} onToggle={() => { setShowAllSelected(false); onSelected([]); }} />
       </div>
-      <div className="space-y-2" aria-label={`Selected ${title === "Venue Type" ? "venue types" : "publishers"}`}>
+      <div className="space-y-2" aria-label={`Selected ${noun}`}>
         {dropdown ? <>
           <div role="status" className="flex items-center justify-between gap-2 text-xs font-medium">
             <span>{selected.length} selected</span>
-            {showScreenCounts && <span className="ml-auto text-right" title="Total inventory screens belonging to the selected publishers">
+            {showScreenCounts && <span className="ml-auto text-right" title={`Total inventory screens belonging to the selected ${noun}`}>
               total scr {selectedScreens.toLocaleString()}
             </span>}
             {allowClearAll && <FiberButton variant="outline" size="compact" className="shrink-0" ariaLabel={`Clear all ${noun}`} disabled={all} onClick={() => { setShowAllSelected(false); setQuery(""); onSelected([]); }}>Clear all</FiberButton>}
