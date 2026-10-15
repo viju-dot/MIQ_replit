@@ -247,6 +247,7 @@ interface Props {
   pointRadiusOnly?: boolean;
   allowClearAll?: boolean;
   multipleResolutions?: boolean;
+  poiDropdown?: boolean;
   v4Layout?: boolean;
   creativeCounts?: CreativeScreenCounts;
 }
@@ -290,6 +291,7 @@ export function SidebarV2({
   pointRadiusOnly = false,
   allowClearAll = false,
   multipleResolutions = false,
+  poiDropdown = false,
   v4Layout = false,
   creativeCounts,
 }: Props) {
@@ -578,7 +580,7 @@ export function SidebarV2({
           </div>}
           
           {filters.location.method === "poi" && <div className="space-y-2">
-            <PoiSearch values={filters.location.poiIds} onChange={poiIds => updateSection("location", { poiIds })} allowClearAll={allowClearAll} />
+            <PoiSearch values={filters.location.poiIds} onChange={poiIds => updateSection("location", { poiIds })} allowClearAll={allowClearAll} dropdown={poiDropdown} />
           </div>}
           
           {filters.location.method === "latlng" && <div className="space-y-2">

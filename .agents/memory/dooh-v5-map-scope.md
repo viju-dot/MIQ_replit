@@ -21,6 +21,12 @@ V5 also permits local "Clear all" actions only for POI, Venue Type, Publisher, a
 
 **How to apply:** Clear only the local selection, preserve enabled toggles and independent values (especially Creative format and Location radius), and gate new controls to V5.
 
+V5 POI selection belongs in a searchable multi-select dropdown. Its overview is a simple set of title-only Fiber pills; hover/focus reveals the POI's full available details.
+
+**Why:** The user found the always-visible preset list too space-consuming and requested a simpler overview rather than full selected-POI cards.
+
+**How to apply:** Keep name/city search inside the dropdown and individual removal/Clear all available. Put city and coordinates in accessible tooltips rather than expanding the pill labels. Preserve the old picker in earlier versions.
+
 Use Fiber brand color tokens for the V5 heatmap density ramp, not green or teal.
 
 **Why:** The user explicitly rejected the green heatmap and requested Fiber token colors.

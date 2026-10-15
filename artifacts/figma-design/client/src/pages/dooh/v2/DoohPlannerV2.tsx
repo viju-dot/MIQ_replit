@@ -410,6 +410,7 @@ export default function DoohPlannerV2({
           pointRadiusOnly={v5Layout}
           allowClearAll={v5Layout}
           multipleResolutions={v5Layout}
+          poiDropdown={v5Layout}
           v4Layout={v4Layout}
           creativeCounts={creativeCounts}
         />

@@ -4,8 +4,9 @@ import { MOCK_POIS } from "../data";
 import { SearchStandard } from "@/pages/ds/SearchPage";
 import { FiberButton } from "./primitives";
 import { Checkbox } from "@/pages/ds/CheckPage";
+import { PoiDropdown } from "./PoiDropdown";
 
-export function PoiSearch({ values, onChange, allowClearAll = false }: { values: string[]; onChange: (v: string[]) => void; allowClearAll?: boolean }) {
+export function PoiSearch({ values, onChange, allowClearAll = false, dropdown = false }: { values: string[]; onChange: (v: string[]) => void; allowClearAll?: boolean; dropdown?: boolean }) {
   const [query, setQuery] = useState("");
   const selected = MOCK_POIS.filter(poi => values.includes(poi.id));
   const filtered = MOCK_POIS.filter(poi =>
@@ -14,6 +15,8 @@ export function PoiSearch({ values, onChange, allowClearAll = false }: { values:
   const toggle = (id: string) => {
     onChange(values.includes(id) ? values.filter(value => value !== id) : [...values, id]);
   };
+
+  if (dropdown) return <PoiDropdown values={values} onChange={onChange} />;
 
   return <div className="space-y-3" style={{ fontFamily: '"DM Sans", Helvetica', color: "var(--surface-foreground-static-neutral-lvl1, #13131a)" }}>
     <SearchStandard background label="Search points of interest" value={query} onValueChange={setQuery} />
